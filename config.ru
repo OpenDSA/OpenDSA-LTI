@@ -1,3 +1,4 @@
+require 'sinatra/reloader'
 require './tool_provider'
 
 use Rack::Static,
