@@ -13,7 +13,7 @@ get '/' do
 end
 
 # the consumer keys/secrets
-$oauth_creds = {"test" => "secret", "testing" => "supersecret"}
+$oauth_creds = {"test" => "secret", "testing" => "supersecret", "116997e807a57c92393f968782acf65b" => "3ac556a8fa7b988c3dec2215640af717"}
 
 def show_error(message)
   @message = message
