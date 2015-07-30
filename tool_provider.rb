@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'ims/lti'
+require 'ims/lti/extensions'
 require 'json'
 
 # must include the oauth proxy object
@@ -13,7 +14,7 @@ get '/' do
 end
 
 # the consumer keys/secrets
-$oauth_creds = {"test" => "secret", "testing" => "supersecret", "116997e807a57c92393f968782acf65b" => "3ac556a8fa7b988c3dec2215640af717"}
+$oauth_creds = {"test" => "secret", "testing" => "supersecret"}
 
 def show_error(message)
   @message = message
@@ -62,14 +63,18 @@ end
 post '/lti_tool' do
   return erb :error unless authorize!
 
-  if ['pe', 'av'].include? params["problem_type"]
+  if ['pe', 'av', 'ka', 'module'].include? params["problem_type"]
     @JSAV_html = html params["short_name"]
   end
   erb :static_content
 end
 
 def html(view)
-  File.read(File.join('public', params["problem_url"], "#{view.to_s}.html"))
+  if params["problem_type"] == 'module'
+    File.read(File.join('public/OpenDSA/Books/', params["problem_url"], "#{view.to_s}.html"))
+  else
+    File.read(File.join('public/OpenDSA/', params["problem_url"], "#{view.to_s}.html"))
+  end
 end
 
 post '/signature_test' do
@@ -153,10 +158,13 @@ post '/assessment', :provides => :json do
 end
 
 get '/tool_config.xml' do
+
   host = request.scheme + "://" + request.host_with_port
   url = (params['signature_proxy_test'] ? host + "/signature_test" : host + "/lti_tool")
   tc = IMS::LTI::ToolConfig.new(:title => "Example Sinatra Tool Provider", :launch_url => url)
+  tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
   tc.description = "This example LTI Tool Provider supports LIS Outcome pass-back."
+  tc.canvas_privacy_public!
 
   headers 'Content-Type' => 'text/xml'
   tc.to_xml(:indent => 2)

@@ -93,26 +93,32 @@
 <% end %>
 
 <script>
-  var TP = TP || {};
-  <% if @tp.outcome_service? %>
-	  TP.outcomeService = true;
-  <% else %>
-  	TP.outcomeService = false;
-  <% end %>
-  TP.ODSAParams = {};
-  TP.toParams = {};
-  TP.toParams.launch_params = {};
-  <% @tp.to_params.each do |key, value| %>
-    TP.toParams.launch_params.<%= key %> = "<%= value %>";
-  <% end%>
+	(function() {
+	  var TP = {};
+	  <% if @tp.outcome_service? %>
+		  TP.outcomeService = true;
+	  <% else %>
+	  	TP.outcomeService = false;
+	  <% end %>
+	  TP.ODSAParams = {};
+	  TP.toParams = {};
+	  TP.toParams.launch_params = {};
+	  <% @tp.to_params.each do |key, value| %>
+	    TP.toParams.launch_params.<%= key %> = "<%= value %>";
+	  <% end%>
 
-  TP.ODSAParams.problem_url = "<%= params["problem_url"] %>";
-  TP.ODSAParams.problem_type = "<%= params["problem_type"] %>";
-  TP.ODSAParams.short_name = "<%= params["short_name"] %>";
-  TP.ODSAParams["JOP-lang"] = "<%= params["JOP-lang"] %>";
-  TP.ODSAParams["JXOP-feedback"] = "<%= params["JXOP-feedback"] %>";
-  TP.ODSAParams["JXOP-fixmode"] = "<%= params["JXOP-fixmode"] %>";
-  TP.ODSAParams["JXOP-code"] = "<%= params["JXOP-code"] %>";
-  TP.ODSAParams["JXOP-debug"] = "<%= params["JXOP-debug"] %>";
+	  TP.ODSAParams.problem_url = "<%= params["problem_url"] %>";
+	  TP.ODSAParams.problem_type = "<%= params["problem_type"] %>";
+	  TP.ODSAParams.short_name = "<%= params["short_name"] %>";
+	  TP.ODSAParams["JOP-lang"] = "<%= params["JOP-lang"] %>";
+	  TP.ODSAParams["JXOP-feedback"] = "<%= params["JXOP-feedback"] %>";
+	  TP.ODSAParams["JXOP-fixmode"] = "<%= params["JXOP-fixmode"] %>";
+	  TP.ODSAParams["JXOP-code"] = "<%= params["JXOP-code"] %>";
+	  TP.ODSAParams["JXOP-debug"] = "<%= params["JXOP-debug"] %>";
+	  TP.ODSAParams["threshold"] = "<%= params["threshold"] %>";
 
+	  ODSA.TP = TP;
+	  window.ODSA = window.ODSA || {};
+	  window.ODSA.TP = TP;
+	}());
 </script>
