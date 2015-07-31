@@ -71,9 +71,9 @@ end
 
 def html(view)
   if params["problem_type"] == 'module'
-    File.read(File.join('public/OpenDSA/Books/', params["problem_url"], "#{view.to_s}.html"))
+    File.read(File.join('public/OpenDSA/Books/', params["problem_url"], '/html/', "#{view.to_s}.html"))
   else
-    File.read(File.join('public/OpenDSA/', params["problem_url"], "#{view.to_s}.html"))
+    File.read(File.join('public/OpenDSA/', params["problem_url"], '/html/', "#{view.to_s}.html"))
   end
 end
 
