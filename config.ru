@@ -3,7 +3,7 @@ require './tool_provider'
 require "webrick/https"
 
 Rack::Server.start(
-  :Host             => 'ltitest.cs.vt.edu',
+  :Host             => 'lti.cs.vt.edu',
   :Port             => 9292,
   :Logger           => WEBrick::Log::new($stderr, WEBrick::Log::DEBUG),
   :app              => Sinatra::Application,
