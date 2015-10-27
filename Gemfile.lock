@@ -6,9 +6,13 @@ GEM
       builder
       oauth (~> 0.4.5)
     oauth (0.4.7)
+    passenger (5.0.21)
+      rack
+      rake (>= 0.8.1)
     rack (1.5.2)
     rack-protection (1.5.0)
       rack
+    rake (10.4.2)
     shotgun (0.9)
       rack (>= 1.0)
     sinatra (1.3.5)
@@ -22,5 +26,6 @@ PLATFORMS
 
 DEPENDENCIES
   ims-lti (~> 1.1.8)
+  passenger
   shotgun
   sinatra
