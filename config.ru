@@ -1,21 +1,5 @@
-# config.ru
-require './tool_provider'
-require "webrick/https"
-
-Rack::Server.start(
-  :Host             => '0.0.0.0',
-  :Port             => 9292,
-  :Logger           => WEBrick::Log::new($stderr, WEBrick::Log::DEBUG),
-  :app              => Sinatra::Application,
-  :SSLEnable        => true,
-  :SSLVerifyClient  => OpenSSL::SSL::VERIFY_NONE,
-  :SSLPrivateKey    => OpenSSL::PKey::RSA.new( File.read "./cert/server.key" ),
-  :SSLCertificate   => OpenSSL::X509::Certificate.new( File.read "./cert/server.crt" ),
-  :SSLCertName      => [["CN", WEBrick::Utils::getservername]]
-)
-
-use Rack::Static,
-  :urls => ["/AV", "/config", "/JSAV", "/lib"],
-  :root => "public"
+require 'rubygems'
+require 'sinatra'
+require File.expand_path '../app.rb', __FILE__
 
 run Sinatra::Application
