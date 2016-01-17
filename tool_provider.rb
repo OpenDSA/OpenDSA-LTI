@@ -1,4 +1,5 @@
 require 'sinatra'
+require "sinatra/cookies"
 require 'ims/lti'
 require 'ims/lti/extensions'
 require 'json'
@@ -11,6 +12,31 @@ set :protection, :except => :frame_options
 
 get '/' do
   erb :index
+end
+
+get '/1' do
+  cookies[:third_party_c_t] = 'dummyValue'
+  redirect to('/first')
+end
+
+get '/first' do
+  content_type 'text/javascript'
+  erb :first
+end
+
+get '/2' do
+  cookie_received = cookies[:third_party_c_t]
+  @cookie_str = cookie_received
+  if cookie_received.to_s.strip.length == 0
+    # It's nil, empty, or just whitespace
+    @cookie_value = 'false'
+  else
+    @cookie_value = 'true'
+  end
+  cookies[:third_party_c_t] = ''
+
+  content_type 'text/javascript'
+  erb :second
 end
 
 # the consumer keys/secrets
