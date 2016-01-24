@@ -2,12 +2,12 @@ Here we describe how to install [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA
 
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
-- [Hardware requirements](#)
-- [Installation instructions](#)
-  - [Prepare the system](#)
-  - [Installing Passenger + Apache](#)
-  - [Deploying OpenDSA-LTI app on Ubuntu server](#)
-  - [Installing OpenDSA dependencies and compile books](#)
+- [Hardware requirements](#hardware-requirements)
+- [Installation instructions](#installation-instructions)
+  - [Prepare the system](#prepare-the-system)
+  - [Installing Passenger + Apache](#installing-passenger-+-apache)
+  - [Deploying OpenDSA-LTI app on Ubuntu server](#Deploying-OpenDSA-LTI-app-on-Ubuntu-server)
+  - [Installing OpenDSA dependencies and compile books](#Installing-OpenDSA-dependencies-and-compile-books)
 
 ## Hardware requirements
 
