@@ -5,8 +5,8 @@ Here we describe how to install [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA
 - [Hardware requirements](#hardware-requirements)
 - [Installation instructions](#installation-instructions)
   - [Prepare the system](#prepare-the-system)
-  - [Installing Passenger + Apache](#installing-passenger-+-apache)
-  - [Deploying OpenDSA-LTI app on Ubuntu server](#Deploying-OpenDSA-LTI-app-on-Ubuntu-server)
+  - [Installing Passenger and Apache](#installing-passenger-and-apache)
+  - [Deploying OpenDSA-LTI app on Ubuntu server](#deploying-OpenDSA-LTI-app-on-Ubuntu-server)
   - [Installing OpenDSA dependencies and compile books](#Installing-OpenDSA-dependencies-and-compile-books)
 
 ## Hardware requirements
@@ -62,7 +62,7 @@ The following server requirements will be fine for supporting hundreds of users.
     gem install bundler --no-rdoc --no-ri
     ```
 
-### Installing Passenger + Apache
+### Installing Passenger and Apache
 
   - Install Passenger packages
     ```
