@@ -1,5 +1,14 @@
 Here we describe how to install [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA-LTI) on a single Ubuntu Server 14.04.3 LTS 64-bit from scratch.
 
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [Hardware requirements](#)
+- [Installation instructions](#)
+  - [Prepare the system](#)
+  - [Installing Passenger + Apache](#)
+  - [Deploying OpenDSA-LTI app on Ubuntu server](#)
+  - [Installing OpenDSA dependencies and compile books](#)
+
 ## Hardware requirements
 
 The following server requirements will be fine for supporting hundreds of users.
