@@ -1,0 +1,27 @@
+<script>
+  (function() {
+    var TP = {};
+    <% if @tp.outcome_service? %>
+      TP.outcomeService = true;
+    <% else %>
+      TP.outcomeService = false;
+    <% end %>
+    TP.ODSAParams = {};
+    TP.toParams = {};
+    TP.toParams.launch_params = {};
+    <% @tp.to_params.each do |key, value| %>
+      TP.toParams.launch_params.<%= key %> = "<%= value %>";
+    <% end%>
+
+    TP.ODSAParams.problem_url = "<%= params["problem_url"] %>";
+    TP.ODSAParams.short_name = "<%= params["short_name"] %>";
+    TP.ODSAParams.gradeable_exercise = "<%= params["gradeable_exercise"] %>";
+    TP.ODSAParams.section_name = "<%= params["section_name"] %>";
+    TP.ODSAParams.problem_type = "<%= params["problem_type"] %>";
+
+    window.ODSA = window.ODSA || {};
+    window.ODSA.TP = TP;
+  }());
+</script>
+
+<%= @section_html.html_safe %>

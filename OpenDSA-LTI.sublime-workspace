@@ -1,0 +1,559 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"cou",
+				"course_id	statement"
+			],
+			[
+				"exer",
+				"exercises	statement"
+			],
+			[
+				"P",
+				"POST"
+			],
+			[
+				"re",
+				"request"
+			],
+			[
+				"conf",
+				"config_url"
+			],
+			[
+				"tool",
+				"tool_name"
+			],
+			[
+				"rest",
+				"results	statement"
+			],
+			[
+				"res",
+				"results	statement"
+			],
+			[
+				"cour",
+				"course_id	statement"
+			],
+			[
+				"boo",
+				"book_json"
+			],
+			[
+				"can",
+				"canvas_url	statement"
+			],
+			[
+				"book",
+				"book_json	statement"
+			],
+			[
+				"access",
+				"access_token	statement"
+			],
+			[
+				"create",
+				"createcourse"
+			],
+			[
+				"to",
+				"toParams"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 76.0,
+		"last_filter": "json",
+		"selected_items":
+		[
+			[
+				"json",
+				"Indent JSON"
+			],
+			[
+				"read",
+				"ReadmePlease"
+			],
+			[
+				"pyth	",
+				"Set Syntax: Python"
+			],
+			[
+				"xml",
+				"Indent XML"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/hshahin/workspaces/sites/OpenDSA-LTI"
+	],
+	"file_history":
+	[
+		"/home/hshahin/workspaces/OpenDSA-LTI/tool_provider.rb",
+		"/home/hshahin/workspaces/OpenDSA-LTI/views/static_content.erb",
+		"/home/hshahin/workspaces/OpenDSA-LTI/public/public.txt",
+		"/home/hshahin/workspaces/OpenDSA-LTI/public/OpenDSA/lib/odsaAV.js",
+		"/home/hshahin/workspaces/OpenDSA-LTI/.gitignore",
+		"/home/hshahin/workspaces/OpenDSA-LTI/config.ru",
+		"/home/hshahin/workspaces/OpenDSA-LTI/public/OpenDSA/Makefile",
+		"/home/hshahin/workspaces/OpenDSA-LTI/public/OpenDSA/config/CS3114LTI.json",
+		"/home/hshahin/workspaces/OpenDSA-LTI/public/OpenDSA/Exercises/Sorting/QuicksortPivotPRO.html",
+		"/home/hshahin/workspaces/OpenDSA-LTI/README.md",
+		"/home/hshahin/workspaces/OpenDSA-server_old/.gitignore",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/JsFormat.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/JsFormat/JsFormat.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/hshahin/workspaces/lti_tool_provider_example-1/.gitignore"
+	],
+	"find":
+	{
+		"height": 27.0
+	},
+	"find_in_files":
+	{
+		"height": 105.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"html",
+			"get",
+			"gradeable_exercise",
+			"short_name",
+			"CS3114",
+			"browser",
+			"ODSAKhan-exercises",
+			"problem_url",
+			"url",
+			"create_book_file",
+			"This",
+			"\"\"\"",
+			"request.POST['book']",
+			"createcourse",
+			"ubook",
+			"loadmodule",
+			"get_book",
+			"loadmodule",
+			"o",
+			"kbook, added = Books.objects.get_or_create(",
+			"if kbook is None:",
+			"get_book",
+			"creation_date",
+			"request.POST['book']",
+			"response['saved'] = True",
+			"book_json",
+			"course_id",
+			"get_book",
+			"test",
+			"tool_name",
+			"book_json.get",
+			"chapters",
+			"external_tool_name",
+			"public",
+			"privacy_level",
+			"accounts",
+			"accoutns",
+			"\\n",
+			",",
+			"request.POST",
+			"str(",
+			"str",
+			"course_code",
+			"\\n",
+			"↵",
+			"course_code",
+			"↵",
+			"canvas_url",
+			"access_token",
+			"createcourse",
+			"loadbook",
+			"api_createcourse",
+			"api_modbook",
+			"api_modproficient",
+			"loadbook",
+			"config_data",
+			"simplejson",
+			"                    '",
+			"oauth_token",
+			"createcourse",
+			"json.",
+			"json",
+			"course_code",
+			"canvas_url",
+			"book",
+			"loadbook",
+			"api_modbook",
+			"loadbook",
+			"python manage.py runserver",
+			"That username already exists",
+			"https://ltitest.herokuapp.com",
+			"fs-install-utils",
+			"fs-install-xblocks",
+			"config.vm.",
+			"config.vm.boot_mode",
+			"make_edx",
+			"quicksortAV",
+			"restart-edxapp",
+			"fs-install-utils",
+			"It appears you've customized things",
+			"embededJSAVMsgHandler",
+			"JSAVEventHandler",
+			"reportProgress",
+			"signature_test",
+			"request_params",
+			"assess",
+			"params",
+			"launch_params",
+			"TC",
+			"eventLis",
+			"eventList",
+			"ajax",
+			"outcomeService",
+			"was_nonce_used_in_last_x_minutes",
+			"sinatra",
+			"settings",
+			"RACK_ENV",
+			"protection",
+			"boring_tool",
+			"lti_msg",
+			"@tp",
+			"lis_person_name_family",
+			"lis_outcome_service_url",
+			"launch_presentation_return_url",
+			"launch_presentation_locale",
+			"launch_presentation_document_target",
+			"ext_roles",
+			"ext_outcome_result_total_score_accepted",
+			"ext_outcome_data_values_accepted",
+			"ext_ims_lis_basic_outcome_url",
+			"custom_canvas_enrollment_state",
+			"custom_canvas_assignment_title",
+			"custom_canvas_assignment_points_possible",
+			"context_title",
+			"context_label",
+			"context_id",
+			"oauth_version",
+			"oauth_nonce",
+			"oauth_timestamp",
+			"oauth_signature_method",
+			"oauth_consumer_key",
+			"launch_presentation_return_url",
+			"lis_outcome_service_url",
+			"custom_canvas_enrollment_state",
+			"launch_presentation_locale",
+			"launch_presentation_return_url",
+			"lis_person_name_family",
+			"ext_outcome_result_total_score_accepted"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/hshahin/workspaces/OpenDSA-LTI",
+							"origPos":
+							[
+								0.0,
+								0.0
+							],
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 39.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "OpenDSA-LTI.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"make",
+				"public/OpenDSA/Makefile"
+			],
+			[
+				"cs3114",
+				"public/OpenDSA/config/CS3114.json"
+			],
+			[
+				"runserver",
+				"ODSA-django/runserver"
+			],
+			[
+				"dev_https",
+				"ODSA-django/stunnel/dev_https"
+			],
+			[
+				"dev",
+				"ODSA-django/templates/developer_view/default_csv_view.html"
+			],
+			[
+				"run",
+				"ODSA-django/runserver"
+			],
+			[
+				"runserv",
+				"ODSA-django/runserver"
+			],
+			[
+				"setting",
+				"ODSA-django/settings.py"
+			],
+			[
+				"settings",
+				"ODSA-django/settings.py"
+			],
+			[
+				"requi",
+				"xblocks/xblock-utils/requirements.txt"
+			],
+			[
+				"requiremt",
+				"requirements.txt"
+			],
+			[
+				"quick",
+				"RST/en/Sorting/Quicksort.rst"
+			],
+			[
+				"postpro",
+				"tools/postprocessor.py"
+			],
+			[
+				"quicksort.rst",
+				"RST/en/Sorting/Quicksort.rst"
+			],
+			[
+				"post",
+				"tools/postprocessor.py"
+			],
+			[
+				"makefile",
+				"Makefile"
+			],
+			[
+				"graded",
+				"views/graded_content.erb"
+			],
+			[
+				"tool",
+				"tool_provider.rb"
+			],
+			[
+				"too",
+				"tool_provider.rb"
+			],
+			[
+				"odsa",
+				"public/lib/odsaAV-min.js"
+			],
+			[
+				"gemfile",
+				"Gemfile"
+			],
+			[
+				"assess",
+				"views/assessment_finished.erb"
+			],
+			[
+				"odsaav",
+				"public/lib/odsaAV-min.js"
+			],
+			[
+				"odau",
+				"public/lib/odsaUtils.js"
+			],
+			[
+				"odsautil",
+				"public/lib/odsaUtils.js"
+			],
+			[
+				"static",
+				"views/static_content.erb"
+			],
+			[
+				"odsaav-",
+				"public/lib/odsaAV-min.js"
+			],
+			[
+				"staic",
+				"views/static_content.erb"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 311.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
