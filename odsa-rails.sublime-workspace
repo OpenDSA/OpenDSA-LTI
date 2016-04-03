@@ -1,0 +1,758 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+		]
+	},
+	"buffers":
+	[
+		{
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "config/secrets.yml",
+			"settings":
+			{
+				"buffer_size": 1496,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "require File.expand_path('../boot', __FILE__)\n\nrequire 'rails/all'\n\n# Require the gems listed in Gemfile, including any gems\n# you've limited to :test, :development, or :production.\nBundler.require(*Rails.groups)\n\nmodule OdsaRails\n  class Application < Rails::Application\n    # Settings in config/environments/* take precedence over those specified here.\n    # Application configuration should go into files in config/initializers\n    # -- all .rb files in that directory are automatically loaded.\n\n    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.\n    # Run \"rake -D time\" for a list of tasks for finding time zone names. Default is UTC.\n    # config.time_zone = 'Central Time (US & Canada)'\n\n    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.\n    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]\n    # config.i18n.default_locale = :de\n\n    # Do not swallow errors in after_commit/after_rollback callbacks.\n    config.active_record.raise_in_transactional_callbacks = true\n  end\nend\n",
+			"file": "config/application.rb",
+			"file_size": 1116,
+			"file_write_time": 131041612504143412,
+			"settings":
+			{
+				"buffer_size": 1116,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "class User < ActiveRecord::Base\n  enum role: [:user, :vip, :admin]\n  after_initialize :set_default_role, :if => :new_record?\n\n  def set_default_role\n    self.role ||= :user\n  end\n\n  # Include default devise modules. Others available are:\n  # :confirmable, :lockable, :timeoutable and :omniauthable\n  devise :database_authenticatable, :registerable,\n         :recoverable, :rememberable, :trackable, :validatable\nend\n",
+			"file": "app/models/user.rb",
+			"file_size": 416,
+			"file_write_time": 131041613382583463,
+			"settings":
+			{
+				"buffer_size": 416,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 243.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"text",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"ruby",
+				"Set Syntax: Ruby Haml"
+			],
+			[
+				"yml",
+				"Set Syntax: YAML"
+			],
+			[
+				"pyth",
+				"Set Syntax: Python"
+			],
+			[
+				"pytho	",
+				"Set Syntax: Python"
+			],
+			[
+				"rails",
+				"Set Syntax: JavaScript (Rails)"
+			],
+			[
+				"erb",
+				"Snippet: end (ERB)"
+			],
+			[
+				"sass",
+				"Set Syntax: Sass"
+			],
+			[
+				"python",
+				"Set Syntax: Python"
+			],
+			[
+				"shell",
+				"Set Syntax: Shell Script (Bash)"
+			],
+			[
+				"py",
+				"Set Syntax: Python"
+			],
+			[
+				"scala	",
+				"Set Syntax: Scala"
+			],
+			[
+				"scala",
+				"Set Syntax: Scala"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"readm",
+				"ReadmePlease"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"readme",
+				"ReadmePlease"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/hshahin/workspaces/sites/odsa-rails"
+	],
+	"file_history":
+	[
+		"/home/hshahin/workspaces/code-workout/app/controllers/course_offerings_controller.rb",
+		"/home/hshahin/workspaces/code-workout/Vagrantfile",
+		"/home/hshahin/workspaces/code-workout/app/assets/javascripts/timeout.js.coffee.erb",
+		"/home/hshahin/workspaces/code-workout/Gemfile",
+		"/home/hshahin/workspaces/code-workout/code-workout.sh",
+		"/home/hshahin/spark/IR_Project_2.py",
+		"/home/hshahin/spark/IR_Project_2.ipynb",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/src/fpGrowthPrj/spark-submit",
+		"/home/hshahin/training/spark/ampcamp5/data/pagecounts/part-00001",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/src/SVMPrj/simple_text_classification_pipeline.py",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/src/SVMPrj/svm.py",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/src/DFSReadWriteTest/DFSReadWriteTest.scala",
+		"/home/hshahin/.bashrc",
+		"/home/hshahin/training/spark/ampcamp5/spark/conf/log4j.properties",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/data/small_data/z_602/part-m-00000",
+		"/home/hshahin/Downloads/Chs8-9comments.txt",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/.gitignore",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/data/small_data (2)/z_602/part-m-00000",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/data/small_data (2)/z_668/part-m-00000",
+		"/home/hshahin/workspaces/spring2016_ir_project/data/small_data/z_602/part-m-00000",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/src/testPrj/wordCounter.scala",
+		"/home/hshahin/workspaces/Spring2016_IR_Project/src/fpGrowthPrj/FPGrowth.scala",
+		"/home/hshahin/workspaces/spring2016_ir_project/src/DFSReadWriteTest/DFSReadWriteTest.scala",
+		"/home/hshahin/workspaces/spring2016_ir_project/src/DFSReadWriteTest/HdfsTest.scala",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/sections/conclusion.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/main.sty",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/setup/preamble.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/plan_overleaf.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/bib/mybib.bib",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/setup/hyphenations.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/sections/plan.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/master-blx.bib",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/main.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/sections/conclution.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/setup/macros.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/sections/frontpage.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/sections/introduction.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/sections/acknowledgements.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/sections/abstract.tex",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/master.sty",
+		"/home/hshahin/workspaces/spring2016_ir_project/.gitignore",
+		"/home/hshahin/workspaces/spring2016_ir_project/report/ir-project-spring/master.tex",
+		"/home/hshahin/workspaces/OpenDSA/config/CS3.json",
+		"/home/hshahin/.config/sublime-text-3/Packages/JsFormat/README.md",
+		"/home/hshahin/.config/sublime-text-3/Packages/JsFormat/JsFormat.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/Theme - Monokai/README.md",
+		"/home/hshahin/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/hshahin/.config/sublime-text-3/Packages/User/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 27.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"",
+			"/home/hshahin/workspaces/OpenDSA/khan-exercises",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"lti_authentication",
+			"content_item_selection",
+			"shared_secret",
+			"process_message",
+			"@secret",
+			"secret",
+			"Consumer key:",
+			"process_message",
+			"redirect_to_consumer",
+			"MESSAGE_TYPE",
+			"content_item_selection",
+			"blti",
+			"lti",
+			"blti",
+			"lti_authentication",
+			"post_replace_result!",
+			"outcome_service?",
+			"IMS::LTI::ToolProvider",
+			"short_name",
+			"=",
+			"read_html",
+			"shared_secret",
+			"read_html",
+			".params",
+			"outcome_service",
+			"= params[",
+			"params[",
+			"Params[",
+			"params[",
+			"Params[",
+			"params[",
+			"Params[",
+			"params[",
+			"Params[",
+			"params[",
+			"Params[",
+			"params[",
+			"Params[",
+			"params[",
+			"params",
+			"Params",
+			"params",
+			"Params",
+			"params",
+			"@tp",
+			"messages",
+			"tomorrow",
+			"content_item_launch",
+			"basic_lti_launch_request",
+			"basic_lti_request",
+			"content_item_selection",
+			"rake",
+			"redirect_to_consumer",
+			"size",
+			"RailsLti2Provider",
+			"to:",
+			"n_top_words",
+			"n_topics",
+			"n_features",
+			"n_samples",
+			"data_samples",
+			"tf_vectorizer",
+			"tfidf_vectorizer",
+			"n_samples",
+			"tf",
+			"tf_vectorizer",
+			"CountVectorizer",
+			"tf_vectorizer",
+			"data_samples",
+			"tf_vectorizer",
+			"tfidf",
+			"data_samples",
+			"tfidf_vectorizer",
+			"data_samples",
+			"dataset",
+			"n_top_words",
+			"n_topics",
+			"n_features",
+			"n_samples",
+			"In [",
+			"/home/hshahin",
+			"--output",
+			"--input",
+			" ",
+			"In [",
+			"....:",
+			"In [",
+			"Out[",
+			"In [",
+			"....:",
+			"In [",
+			"....:",
+			"Out[",
+			"In [",
+			"Out[",
+			"In [",
+			"Out[",
+			"In [",
+			"Out[",
+			"In [",
+			"....:",
+			"In [",
+			"In",
+			"....:",
+			"In [",
+			"in",
+			"In",
+			"data/",
+			"ë",
+			"In",
+			"Out",
+			"In",
+			"$",
+			"https://",
+			"https",
+			"cd",
+			".select",
+			"select",
+			"Config",
+			"four",
+			"libpq-dev",
+			"debug",
+			"set_workout",
+			"before_action",
+			"jquery",
+			"sass",
+			".permit",
+			"scope"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/hshahin/workspaces/sites/lti_tool_provider_example",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "config/secrets.yml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1496,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								880,
+								880
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 114.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "config/application.rb",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 1116,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "app/models/user.rb",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 416,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								416,
+								416
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 35.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "odsa-rails.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"sec",
+				"config/secrets.yml"
+			],
+			[
+				"user",
+				"app/models/user.rb"
+			],
+			[
+				"secre",
+				"config/secrets.yml"
+			],
+			[
+				"mess",
+				"app/controllers/message_controller.rb"
+			],
+			[
+				"message",
+				"app/controllers/message_controller.rb"
+			],
+			[
+				"route",
+				"config/routes.rb"
+			],
+			[
+				"routes",
+				"config/routes.rb"
+			],
+			[
+				"ignore",
+				".gitignore"
+			],
+			[
+				"resource_handlers",
+				"config/resource_handlers/lti2_example.yml"
+			],
+			[
+				"gem",
+				"Gemfile"
+			],
+			[
+				"sugar",
+				"Chapter05/05_06_ruby_sandbox/syntactic_sugar.rb"
+			],
+			[
+				"arge",
+				"Chapter08/08_03_ruby_sandbox/argument_defaults.rb"
+			],
+			[
+				".sh",
+				"cw_provisioning.sh"
+			],
+			[
+				"vag",
+				"Vagrantfile"
+			],
+			[
+				"vagran",
+				"Vagrantfile"
+			],
+			[
+				"session",
+				"config/initializers/session_store.rb"
+			],
+			[
+				"code",
+				"code-workout.sh"
+			],
+			[
+				"plan",
+				"report/sections/plan.tex"
+			],
+			[
+				"part",
+				"data/small_data (2)/z_602/part-m-00000"
+			],
+			[
+				"fp",
+				"examples/src/main/scala/org/apache/spark/examples/mllib/FPGrowthExample.scala"
+			],
+			[
+				"fpg",
+				"examples/src/main/scala/org/apache/spark/examples/mllib/FPGrowthExample.scala"
+			],
+			[
+				"dfs",
+				"examples/src/main/scala/org/apache/spark/examples/HdfsTest.scala"
+			],
+			[
+				"readme",
+				"README.md"
+			],
+			[
+				"read",
+				"examples/src/main/scala/org/apache/spark/examples/DFSReadWriteTest.scala"
+			],
+			[
+				"pre",
+				"report/ir-project-spring/setup/preamble.tex"
+			],
+			[
+				"main",
+				"report/ir-project-spring/main.tex"
+			],
+			[
+				"hy",
+				"report/ir-project-spring/setup/hyphenations.tex"
+			],
+			[
+				"bib",
+				"report/ir-project-spring/bib/mybib.bib"
+			],
+			[
+				"p",
+				"report/ir-project-spring/sections/plan.tex"
+			],
+			[
+				"master",
+				"report/ir-project-spring/master.sty"
+			],
+			[
+				"conclusion",
+				"report/ir-project-spring/sections/conclusion.tex"
+			],
+			[
+				"conclu",
+				"~/workspaces/spring2016_ir_project/report/ir-project-spring/sections/conclution.tex"
+			],
+			[
+				"git",
+				".gitignore"
+			],
+			[
+				"concu",
+				"report/ir-project-spring/sections/conclusion.tex"
+			],
+			[
+				"ack",
+				"report/ir-project-spring/sections/acknowledgements.tex"
+			],
+			[
+				"abstr",
+				"report/ir-project-spring/sections/abstract.tex"
+			],
+			[
+				"introduction",
+				"report/ir-project-spring/sections/introduction.tex"
+			],
+			[
+				"macro",
+				"report/ir-project-spring/setup/macros.tex"
+			],
+			[
+				"front",
+				"report/ir-project-spring/sections/frontpage.tex"
+			],
+			[
+				"khan",
+				"khan-exercises/khan-exercise.js"
+			],
+			[
+				"odsaka",
+				"lib/odsaKA.js"
+			],
+			[
+				"cs3",
+				"config/CS3.json"
+			],
+			[
+				"cs",
+				"RST/en/C2GEN/Class3_Starting.rst"
+			],
+			[
+				"astack",
+				"Exercises/List/AstackPopPRO.html"
+			],
+			[
+				"astackpoppro",
+				"Exercises/List/AstackPopPRO.js"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "Sprin",
+		"selected_items":
+		[
+			[
+				"Sprin",
+				"~/workspaces/Spring2016_IR_Project/Spring2016_IR_Project.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 295.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
