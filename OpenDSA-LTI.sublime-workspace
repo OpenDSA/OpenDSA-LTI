@@ -13,36 +13,6 @@
 				"buffer_size": 0,
 				"line_ending": "Unix"
 			}
-		},
-		{
-			"file": "config/secrets.yml",
-			"settings":
-			{
-				"buffer_size": 1496,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "require File.expand_path('../boot', __FILE__)\n\nrequire 'rails/all'\n\n# Require the gems listed in Gemfile, including any gems\n# you've limited to :test, :development, or :production.\nBundler.require(*Rails.groups)\n\nmodule OdsaRails\n  class Application < Rails::Application\n    # Settings in config/environments/* take precedence over those specified here.\n    # Application configuration should go into files in config/initializers\n    # -- all .rb files in that directory are automatically loaded.\n\n    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.\n    # Run \"rake -D time\" for a list of tasks for finding time zone names. Default is UTC.\n    # config.time_zone = 'Central Time (US & Canada)'\n\n    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.\n    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]\n    # config.i18n.default_locale = :de\n\n    # Do not swallow errors in after_commit/after_rollback callbacks.\n    config.active_record.raise_in_transactional_callbacks = true\n  end\nend\n",
-			"file": "config/application.rb",
-			"file_size": 1116,
-			"file_write_time": 131041612504143412,
-			"settings":
-			{
-				"buffer_size": 1116,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "class User < ActiveRecord::Base\n  enum role: [:user, :vip, :admin]\n  after_initialize :set_default_role, :if => :new_record?\n\n  def set_default_role\n    self.role ||= :user\n  end\n\n  # Include default devise modules. Others available are:\n  # :confirmable, :lockable, :timeoutable and :omniauthable\n  devise :database_authenticatable, :registerable,\n         :recoverable, :rememberable, :trackable, :validatable\nend\n",
-			"file": "app/models/user.rb",
-			"file_size": 416,
-			"file_write_time": 131041613382583463,
-			"settings":
-			{
-				"buffer_size": 416,
-				"line_ending": "Unix"
-			}
 		}
 	],
 	"build_system": "",
@@ -52,37 +22,17 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 243.0,
+		"height": 33.0,
 		"last_filter": "",
 		"selected_items":
 		[
 			[
-				"text",
-				"Set Syntax: Plain Text"
-			],
-			[
-				"json",
-				"Set Syntax: JSON"
+				"rails",
+				"Set Syntax: JavaScript (Rails)"
 			],
 			[
 				"ruby",
-				"Set Syntax: Ruby Haml"
-			],
-			[
-				"yml",
-				"Set Syntax: YAML"
-			],
-			[
-				"pyth",
-				"Set Syntax: Python"
-			],
-			[
-				"pytho	",
-				"Set Syntax: Python"
-			],
-			[
-				"rails",
-				"Set Syntax: JavaScript (Rails)"
+				"Set Syntax: Ruby"
 			],
 			[
 				"erb",
@@ -94,6 +44,10 @@
 			],
 			[
 				"python",
+				"Set Syntax: Python"
+			],
+			[
+				"pyth",
 				"Set Syntax: Python"
 			],
 			[
@@ -125,11 +79,15 @@
 				"Package Control: Install Package"
 			],
 			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
 				"readme",
 				"ReadmePlease"
 			]
 		],
-		"width": 449.0
+		"width": 530.0
 	},
 	"console":
 	{
@@ -150,7 +108,7 @@
 	},
 	"expanded_folders":
 	[
-		"/home/hshahin/workspaces/sites/odsa-rails"
+		"/home/hshahin/workspaces/sites/OpenDSA-LTI"
 	],
 	"file_history":
 	[
@@ -219,129 +177,9 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
-			"lti_authentication",
-			"content_item_selection",
-			"shared_secret",
-			"process_message",
-			"@secret",
-			"secret",
-			"Consumer key:",
-			"process_message",
-			"redirect_to_consumer",
-			"MESSAGE_TYPE",
-			"content_item_selection",
-			"blti",
-			"lti",
-			"blti",
-			"lti_authentication",
-			"post_replace_result!",
-			"outcome_service?",
-			"IMS::LTI::ToolProvider",
-			"short_name",
-			"=",
-			"read_html",
-			"shared_secret",
-			"read_html",
-			".params",
-			"outcome_service",
-			"= params[",
-			"params[",
-			"Params[",
-			"params[",
-			"Params[",
-			"params[",
-			"Params[",
-			"params[",
-			"Params[",
-			"params[",
-			"Params[",
-			"params[",
-			"Params[",
-			"params[",
-			"params",
-			"Params",
-			"params",
-			"Params",
-			"params",
-			"@tp",
-			"messages",
-			"tomorrow",
-			"content_item_launch",
-			"basic_lti_launch_request",
-			"basic_lti_request",
-			"content_item_selection",
-			"rake",
-			"redirect_to_consumer",
-			"size",
-			"RailsLti2Provider",
-			"to:",
-			"n_top_words",
-			"n_topics",
-			"n_features",
-			"n_samples",
-			"data_samples",
-			"tf_vectorizer",
-			"tfidf_vectorizer",
-			"n_samples",
-			"tf",
-			"tf_vectorizer",
-			"CountVectorizer",
-			"tf_vectorizer",
-			"data_samples",
-			"tf_vectorizer",
-			"tfidf",
-			"data_samples",
-			"tfidf_vectorizer",
-			"data_samples",
-			"dataset",
-			"n_top_words",
-			"n_topics",
-			"n_features",
-			"n_samples",
-			"In [",
-			"/home/hshahin",
-			"--output",
-			"--input",
-			" ",
-			"In [",
-			"....:",
-			"In [",
-			"Out[",
-			"In [",
-			"....:",
-			"In [",
-			"....:",
-			"Out[",
-			"In [",
-			"Out[",
-			"In [",
-			"Out[",
-			"In [",
-			"Out[",
-			"In [",
-			"....:",
-			"In [",
-			"In",
-			"....:",
-			"In [",
-			"in",
-			"In",
-			"data/",
-			"ë",
-			"In",
-			"Out",
-			"In",
-			"$",
-			"https://",
-			"https",
-			"cd",
-			".select",
-			"select",
-			"Config",
-			"four",
 			"libpq-dev",
 			"debug",
 			"set_workout",
@@ -349,7 +187,87 @@
 			"jquery",
 			"sass",
 			".permit",
-			"scope"
+			"scope",
+			"libmysqlclient",
+			"labelsAndPreds",
+			"LogisticRegression",
+			"sqlContext",
+			"SQLContext",
+			"\\n",
+			"HashingTF",
+			"\"\\t\"",
+			"\\t",
+			"lines",
+			"INFO",
+			"\")",
+			"pyspark",
+			"LabeledPoint",
+			"would",
+			"629606838972121088",
+			"602-629606838972121088",
+			"joinedRDD",
+			"668-",
+			"xcolor",
+			"table",
+			"xcolor",
+			"listings",
+			"documentclass",
+			"xcolor",
+			"T1",
+			"inputenc",
+			"greatest",
+			"textwidth",
+			"geometry",
+			"textwidth",
+			"geometry",
+			"January",
+			"February",
+			"January",
+			"textwidth",
+			"&",
+			"l",
+			"master",
+			"cleardoublepage",
+			"pagenumbering",
+			"normalfont",
+			"introduction",
+			"pagenumbering",
+			"cleardoublepage",
+			"tableofcontents",
+			"pdfbookmark",
+			"titlepageleftcolumnwidth",
+			"2048",
+			"config.vm.define",
+			"KhanUtil",
+			"KhanUtil.random()",
+			"KhanUtil.random()\nrandom",
+			"random()\nandom",
+			"KhanUtil.random()\nrandom",
+			"random",
+			"KhanUtil.random()\nrandom",
+			"KhanUtil.random()\nKhanUtil.random",
+			"KhanUtil.random()\nKhanUtil.random()",
+			"KhanUtil.random()",
+			"random",
+			"random(",
+			"random",
+			"randRange",
+			"currentProblemType",
+			"getseed",
+			"\"theme\": \"Soda SolarizedDark.sublime-theme\"",
+			"getSeedInfo",
+			"buildAttemptData",
+			"theme",
+			"font",
+			"currentProblemType",
+			"problem_type",
+			"\\n",
+			"pop",
+			"false",
+			"theme",
+			"tab",
+			"false",
+			"theme"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -367,7 +285,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -388,102 +306,14 @@
 						],
 						"settings":
 						{
-							"default_dir": "/home/hshahin/workspaces/sites/lti_tool_provider_example",
+							"default_dir": "/home/hshahin/workspaces/code-workout",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "config/secrets.yml",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1496,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								880,
-								880
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/YAML/YAML.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 114.0,
-						"zoom_level": 1.0
-					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "config/application.rb",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 1116,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Ruby/Ruby.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "app/models/user.rb",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 416,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								416,
-								416
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Ruby/Ruby.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -525,7 +355,7 @@
 		"height": 0.0
 	},
 	"pinned_build_system": "",
-	"project": "odsa-rails.sublime-project",
+	"project": "OpenDSA-LTI.sublime-project",
 	"replace":
 	{
 		"height": 50.0
@@ -538,52 +368,8 @@
 		"selected_items":
 		[
 			[
-				"sec",
-				"config/secrets.yml"
-			],
-			[
-				"user",
-				"app/models/user.rb"
-			],
-			[
-				"secre",
-				"config/secrets.yml"
-			],
-			[
-				"mess",
-				"app/controllers/message_controller.rb"
-			],
-			[
-				"message",
-				"app/controllers/message_controller.rb"
-			],
-			[
-				"route",
-				"config/routes.rb"
-			],
-			[
-				"routes",
-				"config/routes.rb"
-			],
-			[
-				"ignore",
-				".gitignore"
-			],
-			[
-				"resource_handlers",
-				"config/resource_handlers/lti2_example.yml"
-			],
-			[
 				"gem",
 				"Gemfile"
-			],
-			[
-				"sugar",
-				"Chapter05/05_06_ruby_sandbox/syntactic_sugar.rb"
-			],
-			[
-				"arge",
-				"Chapter08/08_03_ruby_sandbox/argument_defaults.rb"
 			],
 			[
 				".sh",
@@ -612,6 +398,10 @@
 			[
 				"part",
 				"data/small_data (2)/z_602/part-m-00000"
+			],
+			[
+				"ignore",
+				".gitignore"
 			],
 			[
 				"fp",
@@ -722,16 +512,12 @@
 	},
 	"select_project":
 	{
-		"height": 500.0,
-		"last_filter": "Sprin",
+		"height": 0.0,
+		"last_filter": "",
 		"selected_items":
 		[
-			[
-				"Sprin",
-				"~/workspaces/Spring2016_IR_Project/Spring2016_IR_Project.sublime-project"
-			]
 		],
-		"width": 380.0
+		"width": 0.0
 	},
 	"select_symbol":
 	{
@@ -750,7 +536,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 295.0,
+	"side_bar_width": 220.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
