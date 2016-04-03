@@ -1,4 +1,5 @@
 GEM
+  remote: https://rubygems.org/
   specs:
     actionmailer (4.2.6)
       actionpack (= 4.2.6)
@@ -157,6 +158,7 @@ DEPENDENCIES
   ims-lti (~> 1.1.8)
   jbuilder (~> 2.0)
   jquery-rails
+  json
   rails (= 4.2.6)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)

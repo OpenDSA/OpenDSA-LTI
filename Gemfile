@@ -1,4 +1,4 @@
- 'https://rubygems.org'
+source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
@@ -48,3 +48,5 @@ end
 gem 'ims-lti', '~> 1.1.8'
 
 gem 'thin'
+
+gem 'json'

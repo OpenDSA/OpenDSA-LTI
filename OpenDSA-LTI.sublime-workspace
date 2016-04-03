@@ -73,6 +73,30 @@
 				"buffer_size": 0,
 				"line_ending": "Unix"
 			}
+		},
+		{
+			"file": "app/controllers/lti_controller.rb",
+			"settings":
+			{
+				"buffer_size": 3078,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Gemfile",
+			"settings":
+			{
+				"buffer_size": 1539,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Gemfile.lock",
+			"settings":
+			{
+				"buffer_size": 4204,
+				"line_ending": "Unix"
+			}
 		}
 	],
 	"build_system": "",
@@ -140,7 +164,10 @@
 	},
 	"expanded_folders":
 	[
-		"/home/hshahin/workspaces/sites/OpenDSA-LTI"
+		"/home/hshahin/workspaces/sites/OpenDSA-LTI",
+		"/home/hshahin/workspaces/sites/OpenDSA-LTI/app",
+		"/home/hshahin/workspaces/sites/OpenDSA-LTI/app/controllers",
+		"/home/hshahin/workspaces/sites/OpenDSA-LTI/public"
 	],
 	"file_history":
 	[
@@ -177,6 +204,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"auth",
+			"allow_iframe",
 			"html",
 			"get",
 			"gradeable_exercise",
@@ -302,9 +331,7 @@
 			"lis_outcome_service_url",
 			"custom_canvas_enrollment_state",
 			"launch_presentation_locale",
-			"launch_presentation_return_url",
-			"lis_person_name_family",
-			"ext_outcome_result_total_score_accepted"
+			"launch_presentation_return_url"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -322,7 +349,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -343,7 +370,7 @@
 						],
 						"settings":
 						{
-							"default_dir": "/home/hshahin/workspaces/OpenDSA-LTI",
+							"default_dir": "/home/hshahin/workspaces/sites/OpenDSA-LTI",
 							"origPos":
 							[
 								0.0,
@@ -356,7 +383,113 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "app/controllers/lti_controller.rb",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3078,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1639,
+								1639
+							]
+						],
+						"settings":
+						{
+							"origPos":
+							[
+								0.0,
+								684.0
+							],
+							"syncScroll": false,
+							"syntax": "Packages/Ruby/Ruby.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 684.0,
+						"zoom_level": 1.0
+					},
 					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Gemfile",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1539,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6,
+								6
+							]
+						],
+						"settings":
+						{
+							"origPos":
+							[
+								-0.0,
+								0.0
+							],
+							"syncScroll": false,
+							"syntax": "Packages/Ruby/Ruby.sublime-syntax"
+						},
+						"translation.x": -0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Gemfile.lock",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4204,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								782,
+								782
+							]
+						],
+						"settings":
+						{
+							"origPos":
+							[
+								0.0,
+								0.0
+							],
+							"syncScroll": false,
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -410,6 +543,14 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"route",
+				"config/routes.rb"
+			],
+			[
+				"gem",
+				"Gemfile"
+			],
 			[
 				"make",
 				"public/OpenDSA/Makefile"
@@ -551,7 +692,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 311.0,
+	"side_bar_width": 256.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

@@ -1,50 +1,51 @@
 class LtiController < ApplicationController
 
+
   after_action :allow_iframe, only: :launch
   # the consumer keys/secrets
-  $oauth_creds = {"key" => "secret"}
+  $oauth_creds = {"test" => "secret"}
 
   def launch
+    # must include the oauth proxy object
+    require 'oauth/request_proxy/rack_request'
+
     render('error') and return unless authorize!
 
-    @section_html = File.read(File.join('public/OpenDSA/Books', params["book_id"], '/lti_html/', "#{params['section_id'].to_s}.html")) and return
+    @section_html = File.read(File.join('public/OpenDSA/Books', params["book_folder_name"], '/lti_html/', "#{params['section_file_name'].to_s}.html")) and return
   end
 
-
   def assessment
-    # content_type :json
+    request_params = JSON.parse(request.body.read.to_s)
+    launch_params = request_params['launch_params']
+    if launch_params
+      key = launch_params['oauth_consumer_key']
+    else
+      @message = "The tool never launched"
+      render(:error)
+    end
 
-    # request_params = JSON.parse(request.body.read.to_s)
-    # launch_params = request_params['launch_params']
-    # if launch_params
-    #   key = launch_params['oauth_consumer_key']
-    # else
-    #   show_error "The tool never launched"
-    #   return erb :error
-    # end
+    @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
 
-    # @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
+    if !@tp.outcome_service?
+      @message = "This tool wasn't lunched as an outcome service"
+      render(:error)
+    end
 
-    # if !@tp.outcome_service?
-    #   show_error "This tool wasn't lunched as an outcome service"
-    #   return erb :error
-    # end
+    # post the given score to the TC
+    score = (request_params['score'] != '' ? request_params['score'] : nil)
+    res = @tp.post_replace_result!(score)
 
-    # # post the given score to the TC
-    # score = (request_params['score'] != '' ? request_params['score'] : nil)
-    # res = @tp.post_replace_result!(score)
-
-    # if res.success?
-    #   # @score = request_params['score']
-    #   # @tp.lti_msg = "Message shown when arriving back at Tool Consumer."
-    #   { :message => 'success' }.to_json
-    #   # erb :assessment_finished
-    # else
-    #   { :message => 'failure' }.to_json
-    #   # @tp.lti_errormsg = "The Tool Consumer failed to add the score."
-    #   # show_error "Your score was not recorded: #{res.description}"
-    #   # return erb :error
-    # end
+    if res.success?
+      # @score = request_params['score']
+      # @tp.lti_msg = "Message shown when arriving back at Tool Consumer."
+      render :json => { :message => 'success' }.to_json
+      # erb :assessment_finished
+    else
+      render :json => { :message => 'failure' }.to_json
+      # @tp.lti_errormsg = "The Tool Consumer failed to add the score."
+      # show_error "Your score was not recorded: #{res.description}"
+      # return erb :error
+    end
   end
 
   private
