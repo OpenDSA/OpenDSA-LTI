@@ -8,4 +8,6 @@ Rails.application.routes.draw do
 
   post 'lti/assessment'
 
+  get 'configurations/book/create'
+
 end
