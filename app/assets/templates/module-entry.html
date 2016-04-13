@@ -1,0 +1,26 @@
+<style>
+    .module-entry{
+        list-style-type: none;
+        padding: 8px 8px;
+        border-radius: 3px;
+        border-width: thin;
+        border-style: solid;
+        border-color: #ddd;
+        margin-bottom: 5px;
+    }
+    .module-entry:hover{
+        background-color: #f5f5f5;
+    }
+    .module-entry-delete{
+        float: right;
+    }
+    .module-entry-delete:hover{
+        color: red;
+    }
+    
+</style>
+
+<li class="module-entry" draggable="true">
+    <span class="module-entry-body">{{module.path | moduleName}}</span>
+    <span class="module-entry-delete glyphicon glyphicon-trash"></span>
+</li>

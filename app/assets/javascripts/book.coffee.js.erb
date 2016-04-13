@@ -1,0 +1,465 @@
+//= require angular/angular
+//= require bootstrap/dist/js/bootstrap
+
+(function() {
+    /* Book Configuration module */
+    var app = angular.module("bookConfig", []);
+
+    /* This is a variable used to house the dragging type. This will either be
+    'chapter' or 'module' which denotes the type of the element being dragged.
+    This is necessary because there is no way to access the data from the dataTransfer object
+    during drag events other than 'dragstart' and 'drop'. Refer to https://developers.whatwg.org/dnd.html#drag-data-store-mode
+    for more information.
+     */
+    var draggingType;
+
+    // Gets the module name from the path.
+    app.filter("moduleName", function() {
+        return function(path) {
+            var name = path.split("/");
+            name = name[name.length - 1];
+            return name;
+        };
+    });
+
+    app.directive("configBanner", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "<%= asset_path("config-banner.html") %>"
+        };
+    });
+
+    app.directive("newBook", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "<%= asset_path("new-book.html") %>"
+        };
+    });
+
+    app.directive("textInput", function() {
+        return {
+            restrict: 'E',
+            scope: {
+                label: "@",
+                input: "@",
+                placeholder: "@",
+                ngModel: "="
+            },
+            templateUrl: "<%= asset_path("text-input.html") %>"
+        };
+    });
+
+    app.directive("chapterMenu", function() {
+        return {
+            restrict: 'E',
+            scope: {
+                label: "@",
+                input: "@",
+                ngModel: "=",
+                dataToggle: "=",
+                dataTarget: "="
+            },
+            templateUrl: "<%= asset_path("chapter-menu.html") %>",
+            link: function($scope, $elem, $attrs) {
+                /* Get the attributes */
+                var dataToggle = $elem.attr('data-toggle');
+                var dataTarget = $elem.attr('data-target');
+
+                /* Remove them from the chapter-entry element */
+                $elem.removeAttr('data-target');
+                $elem.removeAttr('data-toggle');
+
+                /* find the element that needs attributes */
+                var add = $elem.find('.chapter-menu-add-elem');
+                add.attr('data-toggle', dataToggle);
+                add.attr('data-target', dataTarget);
+            }
+        };
+    });
+
+    app.directive("checkInput", function() {
+        return {
+            restrict: 'E',
+            scope: {
+                label: "@",
+                input: "@",
+                ngModel: "="
+            },
+            templateUrl: "<%= asset_path("check-input.html") %>"
+        };
+    });
+
+    app.directive("modulesModal", function() {
+        return {
+            restrict: 'E',
+            require: "ngModel",
+            scope: {
+                label: "@",
+                input: "@",
+                id: "@",
+                addModule: "&"
+            },
+            templateUrl: "<%= asset_path("modules-modal.html") %>",
+            link: function($scope, $elem, $attrs, $ngModel) {
+                var id = $attrs.id.value;
+                /* Remove the id attribute from the element */
+                $elem.removeAttr('id');
+                /* Apply the removed id to the first child div */
+                $elem.find("div").attr('id', id);
+                $(document).ready(function() {
+                    $.getJSON("/book/modules", function(d) {
+                        var setIcons = function(elem) {
+                            if (elem.type === "category") {
+                                $.each(elem.children, function(i, child) {
+                                    setIcons(child);
+                                });
+                            } else if (elem.type === "module") {
+                                elem.icon = 'jstree-file';
+                            }
+                        };
+                        setIcons(d);
+                        var moduleDiv = $("#module-div");
+                        moduleDiv.jstree({
+                            core: {
+                                data: d
+                            }
+                        });
+                        moduleDiv.on("select_node.jstree", function(e, data) {
+                            $ngModel.$setViewValue(data.node.original);
+                        });
+                    });
+                });
+            }
+        };
+    });
+
+    app.directive("newChapterModal", function() {
+        return {
+            restrict: 'E',
+            scope: {
+                label: "@",
+                input: "@",
+                id: "@"
+            },
+            templateUrl: "<%= asset_path("new-chapter-modal.html") %>",
+            link: function($scope, $elem, $attrs, $ngModel) {
+                var id = $attrs.id.value;
+                $elem.removeAttr('id');
+                $elem.find("div").attr('id', id);
+            },
+        };
+    });
+
+    app.directive("chapterEntry", function() {
+        return {
+            restrict: 'E',
+            scope: {
+                name: "@",
+                onDelete: "&",
+                onEdit: "&",
+                onToggle: "&",
+                show: "=",
+                modules: "=",
+                dataToggle: "@",
+                dataTarget: "@",
+                chapterIndex: "@"
+            },
+            templateUrl: "<%= asset_path("chapter-entry.html") %>",
+            link: function($scope, $elem, $attrs) {
+
+                /* Get the attributes */
+                var dataToggle = $elem.attr('data-toggle');
+                var dataTarget = $elem.attr('data-target');
+
+                /* Remove them from the chapter-entry element */
+                $elem.removeAttr('data-target');
+                $elem.removeAttr('data-toggle');
+
+                /* Assign on click to the trash can span element */
+                var del = $elem.find("span.chapter-entry-body-delete");
+                var edit = $elem.find("span.chapter-entry-body-edit");
+                var entryName = $elem.find(".chapter-entry-name");
+                var entry = $elem.find(".chapter-entry");
+
+                /* Set up on click listeners */
+                del.click($scope.onDelete);
+                edit.click($scope.onEdit);
+                entryName.click($scope.onToggle);
+
+                /* Drag event listeners */
+                var onDragEnter = function(e) {
+                    // Adds over
+                    if (e.preventDefault) {
+                        e.preventDefault();
+                    }
+                    if (draggingType === "chapter") {
+                        entry.addClass('over');
+                    }
+                };
+                var onDragLeave = function(e) {
+                    if (draggingType === "chapter") {
+                        entry.removeClass('over');
+                    }
+                };
+                var onDragStart = function(e) {
+                    e.stopPropagation();
+                    if (draggingType === undefined) {
+                        var index = $(this).index();
+                        e.originalEvent.dataTransfer.setData("index", index);
+                        e.originalEvent.dataTransfer.setData("type", "chapter");
+                        draggingType = "chapter";
+                    }
+                };
+                var onDragOver = function(e) {
+                    if (e.preventDefault) {
+                        e.preventDefault();
+                    }
+                    if (draggingType === "chapter") {
+                        entry.addClass('over');
+                    }
+                };
+                var onDrop = function(e) {
+                    if (draggingType === "chapter") {
+                        entry.removeClass('over');
+                        var otherIndex = parseInt(e.originalEvent.dataTransfer.getData("index")); // Index to switch with
+                        var thisIndex = $(this).index();
+                        $scope.$emit('switchChapters', thisIndex, otherIndex);
+                        draggingType = undefined;
+                    } else {
+
+                    }
+                };
+                var onDragEnd = function(e) {
+                    e.stopPropagation();
+                    if (draggingType) {
+                        draggingType = undefined;
+                    }
+                };
+
+                entry.on('dragenter', onDragEnter);
+                entry.on('dragleave', onDragLeave);
+                entry.on('dragstart', onDragStart);
+                $elem.on('dragover', onDragOver);
+                $elem.on('drop', onDrop);
+                $elem.on('dragend', onDragEnd);
+
+                // Add "hover" effect
+                var wrapper = $elem.find("ul.chapter-entry-wrapper");
+                wrapper.hover(function() {
+                    wrapper.addClass("chapter-entry-hover");
+                }, function() {
+                    wrapper.removeClass("chapter-entry-hover");
+                });
+
+                /* Correctly assign the attributes to the intended elements */
+                edit.attr('data-toggle', dataToggle);
+                edit.attr('data-target', dataTarget);
+
+            }
+        };
+    });
+
+    /* Module Entry directive */
+    app.directive("moduleEntry", function() {
+        return {
+            restrict: 'E',
+            scope: {
+                module: "=", // The module itself
+                moduleIndex: "@", // the index of the module in the array of modules of this chapter
+                chapterIndex: "@" // Chapter index in the array of indexes
+            },
+            templateUrl: "<%= asset_path("module-entry.html") %>",
+            link: function($scope, $elem, $attr) {
+                var del = $elem.find(".module-entry-delete");
+                del.click(function() {
+                    $scope.$emit('deleteModule', parseInt($scope.chapterIndex), parseInt($scope.moduleIndex));
+                });
+
+                var entry = $elem.find(".module-entry");
+                var onDragEnter = function(e) {
+                    e.stopPropagation();
+                    // Adds over
+                    if (draggingType === "module") {
+                        entry.addClass('over');
+                    }
+                };
+                var onDragLeave = function(e) {
+                    e.stopPropagation();
+                    if (draggingType === "module") {
+                        entry.removeClass('over');
+                    }
+                };
+                var onDragStart = function(e) {
+                    e.stopPropagation();
+                    if (draggingType === undefined) {
+                        draggingType = "module";
+                        var index = $(this).index();
+                        e.originalEvent.dataTransfer.setData("moduleIndex", index);
+                        e.originalEvent.dataTransfer.setData("chapterIndex", $scope.chapterIndex);
+                        e.originalEvent.dataTransfer.setData("type", "module");
+                    }
+                };
+                var onDragOver = function(e) {
+                    e.stopPropagation();
+                    if (e.preventDefault) {
+                        e.preventDefault();
+                    }
+                };
+                var onDrop = function(e) {
+                    e.stopPropagation();
+                    if (draggingType === "module") {
+                        entry.removeClass('over');
+                        var mod = $(this).index();
+                        var chapter = $scope.chapterIndex;
+                        var otherMod = e.originalEvent.dataTransfer.getData("moduleIndex");
+                        var otherChapter = e.originalEvent.dataTransfer.getData("chapterIndex");
+                        if (chapter === otherChapter) {
+                            $scope.$emit("copyModule", parseInt(otherChapter), parseInt(otherMod), chapter, mod);
+                            $scope.$emit("deleteModule", parseInt(otherChapter), parseInt(otherMod) + 1);
+                        } else {
+                            $scope.$emit("copyModule", parseInt(otherChapter), parseInt(otherMod), chapter, mod);
+                            $scope.$emit("deleteModule", parseInt(otherChapter), parseInt(otherMod));
+                        }
+                    }
+                };
+                var onDragEnd = function(e) {
+                    e.stopPropagation();
+                    if (draggingType === "module") {
+                        draggingType = undefined;
+                    }
+                };
+                entry.on('dragenter', onDragEnter);
+                entry.on('dragleave', onDragLeave);
+                $elem.on('dragstart', onDragStart);
+                $elem.on('dragover', onDragOver);
+                $elem.on('drop', onDrop);
+                $elem.on('dragend', onDragEnd);
+            }
+        };
+    });
+
+    /* The new book controller */
+    app.controller("NewBookController", function($scope) {
+        this.bookConfig = {};
+        this.toggleOptional = false;
+        this.bookConfig.chapters = [];
+        var vm = this; // Store this so functions can refer to it later
+
+        /* used to add modules to the selected chapter */
+        var addModule = function() {
+            if (vm.selectedChapter >= 0 && vm.selectedChapter < vm.bookConfig.chapters.length) {
+                var selectedChapter = vm.bookConfig.chapters[vm.selectedChapter];
+                if (vm.selectedModule) {
+                    selectedChapter.modules.push(vm.selectedModule);
+                }
+            }
+        };
+        $scope.addModule = addModule;
+
+        var openChapter = function(index) {
+            if (index >= 0 && index < vm.bookConfig.chapters.length) {
+                var chapter = vm.bookConfig.chapters[index];
+                /* Switches whether or not the chapter is open*/
+                //chapter.open = (chapter.open !== true);
+                if (chapter.open) {
+                    chapter.open = false;
+                } else {
+                    chapter.open = true;
+                }
+                $scope.$apply(); // Updates the model and view
+            }
+        };
+        $scope.openChapter = openChapter;
+
+        /* Sets the selected chapter */
+        var selectChapter = function(index) {
+            if (index >= 0 && index < vm.bookConfig.chapters.length) {
+                vm.selectedChapter = index;
+            }
+        };
+        $scope.selectChapter = selectChapter;
+
+        /* Deletes a chapter */
+        var deleteChapter = function(index) {
+            if (index >= 0 && index < vm.bookConfig.chapters.length) {
+                vm.bookConfig.chapters.splice(index, 1);
+            }
+        };
+        $scope.deleteChapter = function(index) {
+            deleteChapter(index);
+            $scope.$apply();
+        };
+
+        /* Adds a chapter */
+        var addChapter = function(chapter) {
+            vm.bookConfig.chapters.push(chapter);
+        };
+
+        /* Switches chapters by using their indexes */
+        var switchChapters = function(first, second) {
+            // Bounds check
+            if (first >= 0 && second >= 0 && first < vm.bookConfig.chapters.length && second < vm.bookConfig.chapters.length) {
+                var temp = vm.bookConfig.chapters[first];
+                vm.bookConfig.chapters[first] = vm.bookConfig.chapters[second];
+                vm.bookConfig.chapters[second] = temp;
+            }
+        };
+
+        /* Copys the module from one chapter to another chapter using indexes. */
+        /* The idea is to be able to copy a module then delete the original module using delete module */
+        var copyModule = function(fromChapterIndex, fromModuleIndex, toChapterIndex, toModuleIndex) {
+            var chapters = vm.bookConfig.chapters;
+            // Basic bounds checking
+            if (fromChapterIndex >= 0 && toChapterIndex >= 0 && fromChapterIndex < chapters.length && toChapterIndex < chapters.length) {
+                //Assign chapter variables for readability
+                var fromChapter = chapters[fromChapterIndex];
+                var toChapter = chapters[toChapterIndex];
+                // toChapterIndex can be equal to the length of the modules in the toChapter.
+                // This will allow us to be able to append to the end of the array
+                if (fromModuleIndex >= 0 && toModuleIndex >= 0 && fromModuleIndex < fromChapter.modules.length && toModuleIndex <= toChapter.modules.length) {
+                    var mod = fromChapter.modules[fromModuleIndex];
+                    // Insert at toModuleIndex; No deletion
+                    toChapter.modules.splice(toModuleIndex, 0, mod);
+                }
+            }
+        };
+
+        /* Deletes the module at moduleIndex from the chapter at chapterIndex */
+        var deleteModule = function(chapterIndex, moduleIndex) {
+            if (chapterIndex >= 0 && chapterIndex < vm.bookConfig.chapters.length) {
+                var chapter = vm.bookConfig.chapters[chapterIndex];
+                if (moduleIndex >= 0 && moduleIndex < chapter.modules.length) {
+                    chapter.modules.splice(moduleIndex, 1); // Remove the module
+                }
+            }
+        };
+
+        /* Setup events that can be broadcasted to angular */
+        $scope.$on('addChapter', function(event, args) {
+            addChapter(args);
+        });
+        $scope.$on('switchChapters', function(event, arg1, arg2) {
+            switchChapters(arg1, arg2);
+            $scope.$apply();
+        });
+        $scope.$on('deleteModule', function(event, chapterIndex, moduleIndex) {
+            deleteModule(chapterIndex, moduleIndex);
+            $scope.$apply();
+        });
+        $scope.$on('copyModule', function(event, fromChapterIndex, fromModuleIndex, toChapterIndex, toModuleIndex) {
+            copyModule(fromChapterIndex, fromModuleIndex, toChapterIndex, toModuleIndex);
+            $scope.$apply();
+        });
+    });
+
+    app.controller("NewChapterController", function($scope) {
+        this.chapter = {};
+        var vm = this;
+        $scope.addChapter = function() {
+            /* Sends addChapter event with the chapter object */
+            vm.chapter.modules = [];
+            $scope.$emit('addChapter', vm.chapter);
+            vm.chapter = {};
+        };
+    });
+})();
