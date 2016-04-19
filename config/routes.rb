@@ -10,4 +10,6 @@ Rails.application.routes.draw do
 
   get 'configurations/book/create'
 
+  get 'configurations/book/modules'
+
 end
