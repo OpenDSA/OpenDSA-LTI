@@ -106,7 +106,7 @@
                 /* Apply the removed id to the first child div */
                 $elem.find("div").attr('id', id);
                 $(document).ready(function() {
-                    $.getJSON("/book/modules", function(d) {
+                    $.getJSON("/configurations/book/modules", function(d) {
                         var setIcons = function(elem) {
                             if (elem.type === "category") {
                                 $.each(elem.children, function(i, child) {

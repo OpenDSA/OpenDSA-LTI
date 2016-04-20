@@ -19,12 +19,12 @@ class FileSystemToJSON
                 child["type"] = "module"
                 child["path"] = subpath
                 child["text"] = entry
-            else
+                json["children"].push(child)
+            elsif Dir.exists?(subpath)
                 # must be a directory so convert the subpath
                 child = self.convert(subpath)
+                json["children"].push(child)
             end
-            # Add each child
-            json["children"].push(child)
         end
         return json
     end
@@ -36,7 +36,6 @@ class Configurations::BookController < ApplicationController
     end
 
     def modules
-        render json: FileSystemToJSON.convert("/home/hudson/Documents/Coding/UndergradResearch/OpenDSA-LTI-Rails
-/RST")
+        render json: FileSystemToJSON.convert("./RST")
     end
 end
