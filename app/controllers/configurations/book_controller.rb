@@ -32,7 +32,9 @@ end
 
 class Configurations::BookController < ApplicationController
     def create
-
+        if request.post?
+            render json: {success: true}
+        end
     end
 
     def modules
