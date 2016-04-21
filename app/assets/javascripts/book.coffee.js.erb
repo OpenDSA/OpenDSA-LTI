@@ -1,4 +1,5 @@
 //= require 'angular/angular'
+//= require 'jstree/dist/jstree.min'
 (function() {
     /* Book Configuration module */
     var app = angular.module("bookConfig", []);
@@ -20,18 +21,10 @@
         };
     });
 
-    // The banner or 'nav bar' displayed at the top of the page
-    app.directive("configBanner", function() {
-        return {
-            restrict: 'E',
-            templateUrl: "<%= asset_path("config-banner.html") %>"
-        };
-    });
-
     app.directive("newBook", function() {
         return {
             restrict: 'E',
-            templateUrl: "<%= asset_path("new-book.html") %>"
+            templateUrl: "<%= asset_path('new-book.html') %>"
         };
     });
 
@@ -44,7 +37,7 @@
                 placeholder: "@",
                 ngModel: "="
             },
-            templateUrl: "<%= asset_path("text-input.html") %>"
+            templateUrl: "<%= asset_path('text-input.html') %>"
         };
     });
 
@@ -58,10 +51,10 @@
                 ngModel: "=",
                 options: "="
             },
-            templateUrl: "<%= asset_path("select-input.html") %>",
-            link: function($scope, $elem, $attrs){
+            templateUrl:"<%= asset_path('select-input.html') %>",
+            link: function($scope, $elem, $attrs) {
                 var select = $elem.find('select');
-                $.each($scope.options, function(key, value){
+                $.each($scope.options, function(key, value) {
                     select.append($("<option></option>").attr("value", value).text(value));
                 });
             }
@@ -78,7 +71,7 @@
                 dataToggle: "=",
                 dataTarget: "="
             },
-            templateUrl: "<%= asset_path("chapter-menu.html") %>",
+            templateUrl: "<%= asset_path('chapter-menu.html') %>",
             link: function($scope, $elem, $attrs) {
                 /* Get the attributes */
                 var dataToggle = $elem.attr('data-toggle');
@@ -104,7 +97,7 @@
                 input: "@",
                 ngModel: "="
             },
-            templateUrl: "<%= asset_path("check-input.html") %>"
+            templateUrl: "<%= asset_path('check-input.html')%>"
         };
     });
 
@@ -116,37 +109,69 @@
                 label: "@",
                 input: "@",
                 id: "@",
-                addModule: "&"
+                addModule: "&",
+                watchValue: "="
             },
-            templateUrl: "<%= asset_path("modules-modal.html") %>",
+            templateUrl: "<%= asset_path('modules-modal.html') %>",
             link: function($scope, $elem, $attrs, $ngModel) {
                 var id = $attrs.id.value;
                 /* Remove the id attribute from the element */
                 $elem.removeAttr('id');
                 /* Apply the removed id to the first child div */
                 $elem.find("div").attr('id', id);
-                $(document).ready(function() {
+                var scope = $scope;
+                var jsTreeBuilt = false;
+
+                var changeModalOffering = function(language) {
                     $.getJSON("/configurations/book/modules", function(d) {
-                        var setIcons = function(elem) {
-                            if (elem.type === "category") {
-                                $.each(elem.children, function(i, child) {
-                                    setIcons(child);
+                        var offerings;
+                        // Searches the children for the correct child
+                        for (var i = 0; i < d.children.length; i++) {
+                            var currentChild = d.children[i];
+                            if (currentChild.text === language) {
+                                offerings = currentChild;
+                            }
+                        }
+                        if(offerings){
+                            var setIcons = function(elem) {
+                                if (elem.type === "category") {
+                                    $.each(elem.children, function(i, child) {
+                                        setIcons(child);
+                                    });
+                                } else if (elem.type === "module") {
+                                    elem.icon = 'jstree-file';
+                                }
+                            };
+                            setIcons(offerings);
+                            var moduleDiv = $("#module-div");
+                            if(jsTreeBuilt === false){
+                                moduleDiv.jstree({
+                                    core: {
+                                        data: offerings
+                                    }
                                 });
-                            } else if (elem.type === "module") {
-                                elem.icon = 'jstree-file';
+                                moduleDiv.on("select_node.jstree", function(e, data) {
+                                    $ngModel.$setViewValue(data.node.original);
+                                });
+                                jsTreeBuilt = true;
                             }
-                        };
-                        setIcons(d);
-                        var moduleDiv = $("#module-div");
-                        moduleDiv.jstree({
-                            core: {
-                                data: d
+                            else{
+                                moduleDiv.jstree(true).settings.core.data = offerings;
+                                moduleDiv.jstree(true).refresh();
                             }
-                        });
-                        moduleDiv.on("select_node.jstree", function(e, data) {
-                            $ngModel.$setViewValue(data.node.original);
-                        });
+                        }
                     });
+                };
+
+                $scope.$watch(function() {return scope.watchValue;},
+                    function(newVal, oldVal) {
+                        // Update the offerings when the value is changed
+                        changeModalOffering(newVal);
+                    }
+                );
+
+                $(document).ready(function() {
+                    changeModalOffering("en");
                 });
             }
         };
@@ -160,7 +185,7 @@
                 input: "@",
                 id: "@"
             },
-            templateUrl: "<%= asset_path("new-chapter-modal.html") %>",
+            templateUrl: "<%= asset_path('new-chapter-modal.html') %>",
             link: function($scope, $elem, $attrs, $ngModel) {
                 var id = $attrs.id.value;
                 $elem.removeAttr('id');
@@ -183,7 +208,7 @@
                 dataTarget: "@",
                 chapterIndex: "@"
             },
-            templateUrl: "<%= asset_path("chapter-entry.html") %>",
+            templateUrl:"<%= asset_path('chapter-entry.html') %>",
             link: function($scope, $elem, $attrs) {
 
                 /* Get the attributes */
@@ -287,7 +312,7 @@
                 moduleIndex: "@", // the index of the module in the array of modules of this chapter
                 chapterIndex: "@" // Chapter index in the array of indexes
             },
-            templateUrl: "<%= asset_path("module-entry.html") %>",
+            templateUrl: "<%= asset_path('module-entry.html') %>",
             link: function($scope, $elem, $attr) {
                 var del = $elem.find(".module-entry-delete");
                 del.click(function() {
@@ -366,13 +391,13 @@
 
         /* Set up the book config save on click listner*/
         var saveBtn = $("#saveConfigBtn");
-        saveBtn.click(function(){
+        saveBtn.click(function() {
             // Set a post request with JSON representing the book configuration
             $.ajax({
                 data: JSON.stringify(vm.bookConfig),
                 dataType: 'json',
                 method: 'POST',
-                success: function(data, textStatus, jqXHR){
+                success: function(data, textStatus, jqXHR) {
                     alert(JSON.stringify(data));
                 }
             });
@@ -380,11 +405,11 @@
 
         $scope.languages = [];
         //TODO modules should be a function that retrieves the modules async and returns the options based on that
-        $.getJSON('/configurations/book/modules', function(d){
+        $.getJSON('/configurations/book/modules', function(d) {
             var temp = d.children;
             langs = [];
-            $.each(temp, function(i, val){
-                if(val.text.length <= 2){
+            $.each(temp, function(i, val) {
+                if (val.text.length <= 2) {
                     langs.push(val.text);
                 }
             });

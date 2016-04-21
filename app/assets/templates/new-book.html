@@ -41,7 +41,7 @@
                         <button id="saveConfigBtn" style="float: right;" type="button" class="btn btn-primary">Save</button>
                     </span>
                 </div>
-                <modules-modal id="modulesModal" add-module="addModule()" ng-model="newBookCtrl.selectedModule"></modules-modal>
+                <modules-modal id="modulesModal" add-module="addModule()" ng-model="newBookCtrl.selectedModule" watch-value="newBookCtrl.bookConfig.lang"></modules-modal>
                 <new-chapter-modal id="newChapterModal"></new-chapter-modal>
                 {{newBookCtrl.bookConfig}}
             </form>
