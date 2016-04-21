@@ -48,6 +48,26 @@
         };
     });
 
+    app.directive("selectInput", function() {
+        return {
+            restrict: 'E',
+            scope: {
+                label: "@",
+                input: "@",
+                placeholder: "@",
+                ngModel: "=",
+                options: "="
+            },
+            templateUrl: "<%= asset_path("select-input.html") %>",
+            link: function($scope, $elem, $attrs){
+                var select = $elem.find('select');
+                $.each($scope.options, function(key, value){
+                    select.append($("<option></option>").attr("value", value).text(value));
+                });
+            }
+        };
+    });
+
     app.directive("chapterMenu", function() {
         return {
             restrict: 'E',
@@ -343,6 +363,33 @@
         this.toggleOptional = false;
         this.bookConfig.chapters = [];
         var vm = this; // Store this so functions can refer to it later
+
+        /* Set up the book config save on click listner*/
+        var saveBtn = $("#saveConfigBtn");
+        saveBtn.click(function(){
+            // Set a post request with JSON representing the book configuration
+            $.ajax({
+                data: JSON.stringify(vm.bookConfig),
+                dataType: 'json',
+                method: 'POST',
+                success: function(data, textStatus, jqXHR){
+                    alert(JSON.stringify(data));
+                }
+            });
+        });
+
+        $scope.languages = [];
+        //TODO modules should be a function that retrieves the modules async and returns the options based on that
+        $.getJSON('/configurations/book/modules', function(d){
+            var temp = d.children;
+            langs = [];
+            $.each(temp, function(i, val){
+                if(val.text.length <= 2){
+                    langs.push(val.text);
+                }
+            });
+            $scope.languages = langs;
+        });
 
         /* used to add modules to the selected chapter */
         var addModule = function() {

@@ -1,3 +1,5 @@
+require 'json'
+
 class FileSystemToJSON
     @@searchDirs = ["en", "fi", "fr", "pt", "sv"]
     def self.convert(path)
@@ -30,10 +32,44 @@ class FileSystemToJSON
     end
 end
 
+class BookConfiguration
+    @@requiredMembers = ["chapters", "title"]# Required members within the configuration
+
+    def initialize(json)
+        @json = json
+    end
+
+    def valid?() # Checks to see if the json is a valid configuration
+        return true
+        @@requiredMembers.each do |member|
+            if json.key?(member) == false #If it is missing a member
+                return false
+            end
+        end
+        # Should have returned false if there were required members missing from the configuration
+        # Now check if all of the modules are valid
+
+    end
+
+    def self.validModule(path)
+        return File.exists?(path)
+    end
+
+    def save
+        newConfigFile = File.open("JSON.txt", "w")
+        newConfigFile.write(@json.to_json)
+        newConfigFile.close
+    end
+end
+
 class Configurations::BookController < ApplicationController
     def create
         if request.post?
-            render json: {success: true}
+            # request.params will be the json object sent in the form of a Hash
+            json = request.POST
+            config = BookConfiguration.new(json)
+            config.save
+            render json: {received: true, valid: config.valid?}
         end
     end
 
