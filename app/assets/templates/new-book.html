@@ -6,7 +6,7 @@
             <form method="post" ng-controller="NewBookController as newBookCtrl">
                 <text-input ng-model="newBookCtrl.bookConfig.title" label="Title" input="title" placeholder="Title"></text-input>
                 <text-input ng-model="newBookCtrl.bookConfig.modOrigin" label="Module Origin" input="modOrigin" placeholder="e.g. http://algoviz.org"></text-input>
-                <select-input ng-model="newBookCtrl.bookConfig.lang"  label="Language" input="lang" options="languages" ></select-input>
+                <select-input ng-model="newBookCtrl.bookConfig.lang"  label="Language" input="lang" options="newBookCtrl.languages" ></select-input>
                 <!-- optional triangle button; it shows/hides the optional fields when clicked -->
                 <div class="row" ng-click="newBookCtrl.toggleOptional = !newBookCtrl.toggleOptional;">
                     <span class="col-sm-2 glyphicon glyphicon-menu-right center-block" ng-class="{'glyphicon-menu-down' : newBookCtrl.toggleOptional}" ng-class="{'glyphicon-menu-right' : !newBookCtrl.toggleOptional}"></span>

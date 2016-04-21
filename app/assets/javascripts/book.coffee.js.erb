@@ -388,6 +388,7 @@
         this.toggleOptional = false;
         this.bookConfig.chapters = [];
         var vm = this; // Store this so functions can refer to it later
+        var scope = $scope; // Also save to use later
 
         /* Set up the book config save on click listner*/
         var saveBtn = $("#saveConfigBtn");
@@ -403,17 +404,19 @@
             });
         });
 
-        $scope.languages = [];
-        //TODO modules should be a function that retrieves the modules async and returns the options based on that
+        // This retrieves the languages available to choose from
+        vm.languages = [];
         $.getJSON('/configurations/book/modules', function(d) {
-            var temp = d.children;
-            langs = [];
+            var temp = d.children; // Get the children of the RST folder
+            langs = []; // Languages available
             $.each(temp, function(i, val) {
-                if (val.text.length <= 2) {
+                // During the time of creation, all languages were only 2 characters long
+                if (val.text.length === 2) {
                     langs.push(val.text);
                 }
             });
-            $scope.languages = langs;
+            vm.languages = langs;
+            scope.$apply(); // Must apply the changes so the UI handler will update
         });
 
         /* used to add modules to the selected chapter */
