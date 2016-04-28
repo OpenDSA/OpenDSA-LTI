@@ -1,5 +1,6 @@
 require 'json'
 
+# Helper classes
 class FileSystemToJSON
     @@searchDirs = ["en", "fi", "fr", "pt", "sv"]
     def self.convert(path)
@@ -32,17 +33,28 @@ class FileSystemToJSON
     end
 end
 
+# Class which represents a book configuration
 class BookConfiguration
     @@requiredMembers = ["chapters", "title"]# Required members within the configuration
+    # Not sure if these are actually required so modify if needed
 
-    def initialize(json)
-        @json = json
+    # Constructor
+    def initialize(configPath, fileName, json)
+        @json = json # The json in the form of a hash object
+        @configPath = configPath # The path to the configuration folder
+        @fullPath = File.join(configPath, fileName)
+    end
+
+    # The path of this BookConfiguration
+    def path
+        return @fullPath
     end
 
     def valid?() # Checks to see if the json is a valid configuration
-        return true
+        # TODO Should use this method to check if JSON is valid
+        return true # Just returning true for now.
         @@requiredMembers.each do |member|
-            if json.key?(member) == false #If it is missing a member
+            if @json.key?(member) == false #If it is missing a member
                 return false
             end
         end
@@ -51,28 +63,68 @@ class BookConfiguration
 
     end
 
+    # Checks to see if the module exists on the system. Should be used in the valid? method
     def self.validModule(path)
         return File.exists?(path)
     end
 
-    def save
-        newConfigFile = File.open("JSON.txt", "w")
-        newConfigFile.write(@json.to_json)
+    # Saves this book configuration
+    def save(fileName="JSON.txt") #TODO remove default JSON.txt:
+        # It's purpose is just to keep old code from breaking
+
+        # Just open the file with write permissions
+        newConfigFile = File.open(fileName, "w")
+        # Write file and close it
+        # TODO make sure output is up to the OpenDSA standard
+        newConfigFile.write(JSON.pretty_generate(@json))
         newConfigFile.close
     end
 end
 
+# Class that manages book configurations
+class BookConfigurationManager
+    # Sets the path of the configuration folder that should be managed
+    def initialize(configPath)
+        @configPath = configPath
+    end
+
+    def self.configExists?(fileName)
+        return File.exists?(File.join(@configPath, fileName))
+    end
+
+    # Creates a new book configuration and saves it
+    # Returns true or false based on whether or not it was saved
+    def newBookConfig(fileName, json) # The file name and the json as a hash
+        newConfig = BookConfiguration.new(@configPath, fileName, json)
+        if newConfig.valid? && !self.configExists?(fileName)
+            # Check if the json is valid the config doesn't exist
+            newConfig.save
+            return true
+        else
+            return false
+        end
+    end
+end
+
+# The actual rails controller
 class Configurations::BookController < ApplicationController
     def create
+        # If this is a HTTP post request
         if request.post?
             # request.params will be the json object sent in the form of a Hash
             json = request.POST
-            config = BookConfiguration.new(json)
-            config.save
-            render json: {received: true, valid: config.valid?}
+            # Get the configuration
+            configuration = json.config
+            # Get the name for the configuration
+            name = json.name
+            # Create a new manager to manage the config directory
+            manager = BookConfigurationManager.new("./config")
+            # 'saved' will be true if the new book configuration is saved
+            render json: {received: true, saved: manager.newBookConfig(name+".txt", configuration)}
         end
     end
 
+    # Returns JSON which represents the folder structure within the RST directory
     def modules
         render json: FileSystemToJSON.convert("./RST")
     end
