@@ -12,6 +12,12 @@ Rails.application.routes.draw do
 
   post 'configurations/book/create'
 
+  get 'configurations/book/edit'
+
+  post 'configurations/book/edit'
+
   get 'configurations/book/modules'
+
+  get 'configurations/book/configs' # Gets the configuration file names that already exist
 
 end

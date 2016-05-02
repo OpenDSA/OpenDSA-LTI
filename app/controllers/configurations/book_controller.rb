@@ -1,7 +1,7 @@
 require 'json'
 
 # Helper classes
-class FileSystemToJSON
+class RSTtoJSON
     @@searchDirs = ["en", "fi", "fr", "pt", "sv"]
     def self.convert(path)
         json = {} # The json for this directory
@@ -108,6 +108,25 @@ class BookConfigurationManager
             return false
         end
     end
+
+    def list
+        # Create the hash for the configuration files
+        files = Hash.new
+        # Iterate over all the entries within this directory
+        Dir.foreach(@configPath) do |entry|
+            if entry == '..' or entry == '.'
+                next # Obviously skip over these entries
+            end
+            # Subpath is just a simple concatenation
+            subpath = File.join(@configPath, entry)
+            # Only return files that are not LMSconfigurations and are folders
+            if File.file?(subpath) && !entry.include?("LMSconf")
+                files[entry] = nil # Just nil for right now but could be used
+                    # in the future to associate information with the files
+            end
+        end
+        return files
+    end
 end
 
 # The actual rails controller
@@ -119,17 +138,39 @@ class Configurations::BookController < ApplicationController
             json = request.POST
             # Get the configuration
             configuration = json["config"]
+            if !configuration
+                render json: {saved: false, message: "Did not give a configuration to save."}
+            end
             # Get the name for the configuration
             name = json["name"]
+            if !name
+                render json: {saved: false, message: "Did not give a name for the configuration."}
+            end
             # Create a new manager to manage the config directory
-            manager = BookConfigurationManager.new("./config")
+            manager = BookConfigurationManager.new("./Configuration")
             # 'saved' will be true if the new book configuration is saved
-            render json: {received: true, saved: manager.newBookConfig(name+".txt", configuration)}
+            render json: {saved: manager.newBookConfig(name+".txt", configuration)}
         end
+
+        # Rails makes GET the default for the template
+    end
+
+    def edit
+        if request.post?
+
+        end
+
+        # Rails makes GET the default for the template
     end
 
     # Returns JSON which represents the folder structure within the RST directory
     def modules
-        render json: FileSystemToJSON.convert("./RST")
+        render json: RSTtoJSON.convert("./RST")
+    end
+
+    # Returns JSON where each key is an existing configuration file name
+    def configs
+        manager = BookConfigurationManager.new("./Configuration")
+        render json: manager.list
     end
 end
