@@ -390,13 +390,138 @@
         var vm = this; // Store this so functions can refer to it later
         var scope = $scope; // Also save to use later
 
+        // Formats the configuration right before it is sent to the server
+        // Adds default values when needed
+        // Converts chapters to key value pairs
+        var formatConfiguration = function(bookConfig){
+            var configuration = {}; // Create empty json object
+            for(var prop in bookConfig){
+                if(bookConfig.hasOwnProperty(prop)){ // Only non inherited properties
+                    if(prop === 'chapters'){ // Skip chapters
+                        continue;
+                    }
+                    // Skip others here if necessary
+                    else{
+                        configuration[prop] = bookConfig[prop] // Assign values from bookConfig
+                    }
+                }
+            }
+
+            // Converts chapters to Key-value pairs
+            var chaptersToKV = function(chapters){
+                var newChapters = {};
+
+                var removeName = function(chapter){
+                    var newChapter = {}
+                    for(var prop in chapter){
+                        if(chapter.hasOwnProperty(prop)){
+                            if(prop === 'name'){
+                                continue;
+                            }else{
+                                newChapter[prop] = chapter[prop];
+                            }
+                        }
+                    }
+                    return newChapter;
+                };
+
+                chapters.forEach(function(chapter, index){
+                    if(newChapters[chapter.name] === undefined){
+                        newChapters[chapter.name] = removeName(chapter);
+                    }
+                });
+
+                return newChapters;
+            };
+
+            // Add defaults
+            var addDefaults = function(config){
+                if(config['code_dir'] === undefined){
+                    config['code_dir'] = "SourceCode";
+                }
+                if(config['code_lang'] === undefined){
+                    config['code_lang'] = {
+                       "C++": {"ext": ["cpp","h"],"label":"C++","lang":"C++"},
+                       "Java": {"ext":["java"], "label":"Java", "lang":"java"},
+                       "Processing": {"ext":["pde"], "label":"Processing","lang":"java"}
+                    };
+                }
+                if(config['build_dir'] === undefined){
+                    config['build_dir'] = "Books";
+                }
+                if(config['tabbed_codeinc'] === undefined){
+                    config['tabbed_codeinc'] = true;
+                }
+                if(config['lang'] === undefined){
+                    config['lang'] = "en";
+                }
+                if(config['av_root_dir'] === undefined){
+                    config['av_root_dir'] = "~OpenDSA/";
+                }
+                if(config['av_origin '] === undefined){
+                    config['av_origin'] = config['module_origin'];
+                }
+                if(config['exercises_root_dir'] === undefined){
+                    config['exercises_root_dir'] = "~OpenDSA/";
+                }
+                if(config['exercise_origin'] === undefined){
+                    config['exercise_origin'] = config['module_origin']
+                }
+                if(config['exercise_server'] === undefined){
+                    config['exercise_server'] = "";
+                }
+                if(config['logging_server'] === undefined){
+                    config['exercise_server'] = "";
+                }
+                if(config['score_server'] === undefined){
+                    config['score_server'] = "";
+                }
+                if(config['build_JSAV'] === undefined){
+                    config['build_JSAV'] = false;
+                }
+                if(config['build_cmap'] === undefined){
+                    config['build_cmap'] = false;
+                }
+                if(config['allow_anonymous_credit'] === undefined){
+                    config['allow_anonymous_credit'] = true;
+                }
+                if(config['req_full_ss'] === undefined){
+                    config['req_full_ss'] = true;
+                }
+                if(config['start_chap_num'] === undefined){
+                    config['start_chap_num'] = 0;
+                }
+                if(config['suppress_todo'] === undefined){
+                    config['suppress_todo'] = false;
+                }
+                if(config['tag'] === undefined){
+                    config['tag'] = "";
+                }
+                if(config['assumes'] === undefined){
+                    config['assumes'] = "";
+                }
+            }
+
+            // Add chapters and key value pairs
+            configuration.chapters = chaptersToKV(bookConfig.chapters)
+            addDefaults(configuration); //  Add default values
+            return configuration;
+        };
+
+
+
         /* Set up the book config save on click listner*/
         var saveBtn = $("#saveConfigBtn");
         saveBtn.click(function() {
             // Set a post request with JSON representing the book configuration
+            var d = {
+                config: formatConfiguration(vm.bookConfig),
+                name: vm.name
+            };
             $.ajax({
-                data: JSON.stringify(vm.bookConfig),
+                data: JSON.stringify(d),
                 dataType: 'json',
+                contentType: 'application/json',
                 method: 'POST',
                 success: function(data, textStatus, jqXHR) {
                     alert(JSON.stringify(data));

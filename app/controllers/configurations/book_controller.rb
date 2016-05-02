@@ -88,17 +88,21 @@ class BookConfigurationManager
         @configPath = configPath
     end
 
-    def self.configExists?(fileName)
-        return File.exists?(File.join(@configPath, fileName))
+    def configExists?(fileName)
+        return File.exists?(path(fileName))
+    end
+
+    def path(fileName)
+        return File.join(@configPath, fileName)
     end
 
     # Creates a new book configuration and saves it
     # Returns true or false based on whether or not it was saved
     def newBookConfig(fileName, json) # The file name and the json as a hash
         newConfig = BookConfiguration.new(@configPath, fileName, json)
-        if newConfig.valid? && !self.configExists?(fileName)
+        if newConfig.valid? && !configExists?(fileName)
             # Check if the json is valid the config doesn't exist
-            newConfig.save
+            newConfig.save(path(fileName))
             return true
         else
             return false
@@ -114,9 +118,9 @@ class Configurations::BookController < ApplicationController
             # request.params will be the json object sent in the form of a Hash
             json = request.POST
             # Get the configuration
-            configuration = json.config
+            configuration = json["config"]
             # Get the name for the configuration
-            name = json.name
+            name = json["name"]
             # Create a new manager to manage the config directory
             manager = BookConfigurationManager.new("./config")
             # 'saved' will be true if the new book configuration is saved
