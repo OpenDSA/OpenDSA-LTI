@@ -127,6 +127,10 @@ class BookConfigurationManager
         end
         return files
     end
+
+    def read(name)
+        return JSON.parse(File.read(File.join(@configPath, name)))
+    end
 end
 
 # The actual rails controller
@@ -166,6 +170,11 @@ class Configurations::BookController < ApplicationController
     # Returns JSON which represents the folder structure within the RST directory
     def modules
         render json: RSTtoJSON.convert("./RST")
+    end
+
+    def load
+        manager = BookConfigurationManager.new("./Configuration")
+        render json: manager.read(params["name"])
     end
 
     # Returns JSON where each key is an existing configuration file name

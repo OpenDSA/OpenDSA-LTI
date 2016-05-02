@@ -18,6 +18,8 @@ Rails.application.routes.draw do
 
   get 'configurations/book/modules'
 
+  get 'configurations/book/load'
+
   get 'configurations/book/configs' # Gets the configuration file names that already exist
 
 end

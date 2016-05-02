@@ -1,8 +1,20 @@
 //= require 'angular/angular'
 //= require 'jstree/dist/jstree.min'
 (function() {
+
+    var getParameterByName = function(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    } // Taken from http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+
     /* Book Configuration module */
     var app = angular.module("bookConfig", []);
+
 
     /* This is a variable used to house the dragging type. This will either be
     'chapter' or 'module' which denotes the type of the element being dragged.
@@ -384,11 +396,42 @@
 
     /* The new book controller */
     app.controller("NewBookController", function($scope) {
+
         this.bookConfig = {};
         this.toggleOptional = false;
         this.bookConfig.chapters = [];
         var vm = this; // Store this so functions can refer to it later
         var scope = $scope; // Also save to use later
+
+        var name = getParameterByName('name');
+        if (name){
+            $.getJSON('/configurations/book/load?name='+name, function(data){
+                receiveConfiguration(data);
+                console.log(vm.bookConfig)
+            });
+        }
+
+        // Takes a configuration loaded from the server and assigns bookConfig appropriately
+        // Used to load existing configuration files
+        var receiveConfiguration = function(config){
+            for(var key in config){
+                if(config.hasOwnProperty(key)){
+                    if (key !== 'chapters'){
+                        // Add all the fields to bookConfig except for chapters
+                        var value = config[key];
+                        vm.bookConfig[key] = value;
+                    }else{
+                        // Go through chapters and format correctly
+                        var chapters = config['chapters'];
+                        for(var chap in chapters){
+                            var current = chapters[chap];
+                            current.name = chap; // Reassign name
+                            vm.bookConfig.chapters.push(current);
+                        }
+                    }
+                }
+            }
+        };
 
         // Formats the configuration right before it is sent to the server
         // Adds default values when needed
