@@ -5,7 +5,7 @@ Vagrant.configure(2) do |config|
   config.vm.network "forwarded_port", guest: 9292, host: 9292
   config.vm.network "private_network", ip: "192.168.33.10"
   config.vm.provider "virtualbox" do |vb|
+  config.vm.provision "shell", path: "OpenDSA-LTI.sh"
     vb.memory = "2048"
-    override.vm.provision :shell, path: "openDSA-LTI.sh", args: "vagrant"
   end
 end

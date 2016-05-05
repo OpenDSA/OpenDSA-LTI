@@ -97,3 +97,6 @@ pickle-email-*.html
 
 # Bower components
 *bower_components
+
+#vagrant
+.vagrant/
