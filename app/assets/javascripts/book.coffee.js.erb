@@ -206,6 +206,23 @@
         };
     });
 
+    app.directive("loadConfigModal", function() {
+        return {
+            restrict: 'E',
+            scope: {
+                label: "@",
+                input: "@",
+                id: "@"
+            },
+            templateUrl: "<%= asset_path('load-config-modal.html') %>",
+            link: function($scope, $elem, $attrs, $ngModel) {
+                var id = $attrs.id.value;
+                $elem.removeAttr('id');
+                $elem.find("div").attr('id', id);
+            },
+        };
+    });
+
     app.directive("chapterEntry", function() {
         return {
             restrict: 'E',
@@ -406,14 +423,15 @@
         var name = getParameterByName('name');
         if (name){
             $.getJSON('/configurations/book/load?name='+name, function(data){
-                receiveConfiguration(data);
+                receiveConfiguration(name, data);
                 console.log(vm.bookConfig)
             });
         }
 
         // Takes a configuration loaded from the server and assigns bookConfig appropriately
         // Used to load existing configuration files
-        var receiveConfiguration = function(config){
+        var receiveConfiguration = function(name, config){
+
             for(var key in config){
                 if(config.hasOwnProperty(key)){
                     if (key !== 'chapters'){
@@ -701,6 +719,16 @@
             /* Sends addChapter event with the chapter object */
             vm.chapter.modules = [];
             $scope.$emit('addChapter', vm.chapter);
+            vm.chapter = {};
+        };
+    });
+
+    app.controller("LoadConfigController", function($scope) {
+        this.chapter = {};
+        var vm = this;
+        $scope.loadConfig = function() {
+            /* Sends addChapter event with the chapter object */
+            vm.chapter.modules = [];
             vm.chapter = {};
         };
     });
