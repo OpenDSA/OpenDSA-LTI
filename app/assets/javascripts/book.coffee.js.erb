@@ -33,6 +33,10 @@
         };
     });
 
+    /* The new book directive */
+    /* Not so much a new book directive as much as just a book directive
+     because it allows you to load existing configurations
+     */
     app.directive("newBook", function() {
         return {
             restrict: 'E',
@@ -40,6 +44,8 @@
         };
     });
 
+    /* Text input directive. */
+    /* Contains styles and attributes to easily add text fields */
     app.directive("textInput", function() {
         return {
             restrict: 'E',
@@ -53,6 +59,8 @@
         };
     });
 
+    /* Select input directive. */
+    /* Contains styles and attributes to easily add select fields */
     app.directive("selectInput", function() {
         return {
             restrict: 'E',
@@ -89,6 +97,8 @@
         };
     });
 
+    /* The chapter menu directive */
+    /* Includes an 'Add' button that allows the user to add chapters */
     app.directive("chapterMenu", function() {
         return {
             restrict: 'E',
@@ -117,6 +127,8 @@
         };
     });
 
+    /* Check input directive. */
+    /* Contains styles and attributes to easily add check fields */
     app.directive("checkInput", function() {
         return {
             restrict: 'E',
@@ -129,6 +141,7 @@
         };
     });
 
+    /* The modules modal */
     app.directive("modulesModal", function() {
         return {
             restrict: 'E',
@@ -255,6 +268,7 @@
             },
             templateUrl:"<%= asset_path('chapter-entry.html') %>",
             link: function($scope, $elem, $attrs) {
+                /* Chapter drag and drop functionality */
 
                 /* Get the attributes */
                 var dataToggle = $elem.attr('data-toggle');
@@ -435,14 +449,6 @@
         this.bookConfig.chapters = [];
         var vm = this; // Store this so functions can refer to it later
         var scope = $scope; // Also save to use later
-
-        var name = getParameterByName('name');
-        if (name){
-            $.getJSON('/configurations/book/load?name='+name, function(data){
-                receiveConfiguration(name, data);
-                console.log(vm.bookConfig)
-            });
-        }
 
         // Takes a configuration loaded from the server and assigns bookConfig appropriately
         // Used to load existing configuration files
@@ -711,6 +717,7 @@
         };
 
         /* Setup events that can be broadcasted to angular */
+        /* Any controller can emit an event which is then handled here */
         $scope.$on('addChapter', function(event, args) {
             addChapter(args);
         });
@@ -724,6 +731,14 @@
         });
         $scope.$on('copyModule', function(event, fromChapterIndex, fromModuleIndex, toChapterIndex, toModuleIndex) {
             copyModule(fromChapterIndex, fromModuleIndex, toChapterIndex, toModuleIndex);
+            $scope.$apply();
+        });
+        $scope.$on('loadConfig', function(event, name, config){
+            // Reset the configuration file
+            vm.bookConfig = {chapters: []};
+            vm.name = name;
+            // Format the configuration file
+            receiveConfiguration(name, config);
             $scope.$apply();
         });
     });
@@ -740,12 +755,17 @@
     });
 
     app.controller("LoadConfigController", function($scope) {
-        this.chapter = {};
         var vm = this;
         $scope.loadConfig = function() {
-            /* Sends addChapter event with the chapter object */
-            vm.chapter.modules = [];
-            vm.chapter = {};
+            $.ajax({
+                url: "/configurations/book/load",
+                data: {name: vm.selection},
+                success: function(data, textStatus, jqXHR){
+                    var name = vm.selection;
+                    $scope.$emit('loadConfig', name, data);
+                    vm.selection = null;
+                }
+            });
         };
         $.ajax({
             url: "/configurations/book/configs",

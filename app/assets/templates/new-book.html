@@ -42,7 +42,7 @@
                     <hr />
                     <div class="row" style="margin-bottom: 10px;"><!-- Space holder --></div>
                     <!-- Optional values here -->
-                    <text-input ng-model="newBookCtrl.bookConfig.buildDir" label="Build Directory" ></text-input>
+                    <text-input ng-model="newBookCtrl.bookConfig.build_dir" label="Build Directory" ></text-input>
                     <check-input ng-model="newBookCtrl.bookConfig.tabbed_codeinc" label="Tabbed Code Inc" input="tabbedCodeInc"></check-input>
                 </div>
                 <div class="row">
@@ -64,6 +64,7 @@
                 <modules-modal id="modulesModal" add-module="addModule()" ng-model="newBookCtrl.selectedModule" watch-value="newBookCtrl.bookConfig.lang"></modules-modal>
                 <load-config-modal id="loadConfigModal"></load-config-modal>
                 <new-chapter-modal id="newChapterModal"></new-chapter-modal>
+                <!-- Just for debug purposess -->
                 {{newBookCtrl.bookConfig}}
             </form>
         </div>
