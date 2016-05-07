@@ -25,7 +25,7 @@
                 <text-input ng-model="newBookCtrl.name" label="Configuration Name" input="name" placeholder="Configuration Name"></text-input>
                 <text-input ng-model="newBookCtrl.bookConfig.title" label="title" input="title" placeholder="Title"></text-input>
                 <text-input ng-model="newBookCtrl.bookConfig.module_origin" label="Module Origin" input="title" placeholder="example: http://algoviz.org"></text-input>
-                <select-input ng-model="newBookCtrl.bookConfig.lang"  label="Language" input="lang" options="newBookCtrl.languages" ></select-input>
+                <select-input ng-model="newBookCtrl.bookConfig.lang"  array="true" label="Language" input="lang" options="newBookCtrl.languages" ></select-input>
 
                 <!-- optional triangle button; it shows/hides the optional fields when clicked -->
                 <div class="row" ng-click="newBookCtrl.toggleOptional = !newBookCtrl.toggleOptional;">

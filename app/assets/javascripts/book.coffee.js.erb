@@ -61,14 +61,30 @@
                 input: "@",
                 placeholder: "@",
                 ngModel: "=",
-                options: "="
+                options: "=",
+                array: "="
             },
             templateUrl:"<%= asset_path('select-input.html') %>",
             link: function($scope, $elem, $attrs) {
                 var select = $elem.find('select');
-                $.each($scope.options, function(key, value) {
-                    select.append($("<option></option>").attr("value", value).text(value));
-                });
+                $scope.$watch(
+                    function(){
+                        return $scope.options;
+                    },
+                    function(newVal, oldVal){
+                        if($scope.array){
+                            /* This works for arrays */
+                            $.each($scope.options, function(key, value) {
+                                select.append($("<option></option>").attr("value", value).text(value));
+                            });
+                        }else{
+                            /* Works for JSON objects */
+                            $.each($scope.options, function(key, value){
+                                select.append($("<option></option>").attr("value", value).text(key));
+                            });
+                        }
+                    }
+                );
             }
         };
     });
@@ -731,5 +747,17 @@
             vm.chapter.modules = [];
             vm.chapter = {};
         };
+        $.ajax({
+            url: "/configurations/book/configs",
+            success: function(data, textStatus, jqXHR){
+                // This is needed because the values are set to null right now
+                $.each(data, function(key, value){
+                    // Just set the key to itself
+                    data[key] = key;
+                });
+                vm.options = data;
+                $scope.$apply(); // Let angular know that it needs to process this
+            }
+        });
     });
 })();
