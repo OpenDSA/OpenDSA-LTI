@@ -98,5 +98,9 @@ pickle-email-*.html
 # Bower components
 *bower_components
 
+# Symbolic links
+RST
+Configuration
+
 #vagrant
 .vagrant/
