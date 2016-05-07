@@ -150,8 +150,7 @@
                 label: "@",
                 input: "@",
                 id: "@",
-                addModule: "&",
-                watchValue: "="
+                addModule: "&"
             },
             templateUrl: "<%= asset_path('modules-modal.html') %>",
             link: function($scope, $elem, $attrs, $ngModel) {
@@ -163,56 +162,35 @@
                 var scope = $scope;
                 var jsTreeBuilt = false;
 
-                var changeModalOffering = function(language) {
-                    $.getJSON("/configurations/book/modules", function(d) {
-                        var offerings;
-                        // Searches the children for the correct child
-                        for (var i = 0; i < d.children.length; i++) {
-                            var currentChild = d.children[i];
-                            if (currentChild.text === language) {
-                                offerings = currentChild;
+                $.getJSON("/configurations/book/modules", function(d) {
+                    // Searches the children for the correct child
+                        var setIcons = function(elem) {
+                            if (elem.type === "category") {
+                                $.each(elem.children, function(i, child) {
+                                    setIcons(child);
+                                });
+                            } else if (elem.type === "module") {
+                                elem.icon = 'jstree-file';
                             }
-                        }
-                        if(offerings){
-                            var setIcons = function(elem) {
-                                if (elem.type === "category") {
-                                    $.each(elem.children, function(i, child) {
-                                        setIcons(child);
-                                    });
-                                } else if (elem.type === "module") {
-                                    elem.icon = 'jstree-file';
+                        };
+                        setIcons(d);
+                        var moduleDiv = $("#module-div");
+                        if(jsTreeBuilt === false){
+                            moduleDiv.jstree({
+                                core: {
+                                    data: d
                                 }
-                            };
-                            setIcons(offerings);
-                            var moduleDiv = $("#module-div");
-                            if(jsTreeBuilt === false){
-                                moduleDiv.jstree({
-                                    core: {
-                                        data: offerings
-                                    }
-                                });
-                                moduleDiv.on("select_node.jstree", function(e, data) {
-                                    $ngModel.$setViewValue(data.node.original);
-                                });
-                                jsTreeBuilt = true;
-                            }
-                            else{
-                                moduleDiv.jstree(true).settings.core.data = offerings;
-                                moduleDiv.jstree(true).refresh();
-                            }
+                            });
+                            moduleDiv.on("select_node.jstree", function(e, data) {
+                                $ngModel.$setViewValue(data.node.original);
+                            });
+                            jsTreeBuilt = true;
                         }
-                    });
-                };
+                        else{
+                            moduleDiv.jstree(true).settings.core.data = d;
+                            moduleDiv.jstree(true).refresh();
+                        }
 
-                $scope.$watch(function() {return scope.watchValue;},
-                    function(newVal, oldVal) {
-                        // Update the offerings when the value is changed
-                        changeModalOffering(newVal);
-                    }
-                );
-
-                $(document).ready(function() {
-                    changeModalOffering("en");
                 });
             }
         };
