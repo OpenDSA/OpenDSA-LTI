@@ -10,6 +10,7 @@ This application requires:
 
 - Ruby 2.3.0
 - Rails 4.2.6
+- Bower 1.7.7+
 
 Learn more about [Installing Rails](http://railsapps.github.io/installing-rails.html).
 
@@ -22,12 +23,13 @@ Getting Started
  * RST - link this to the **RST** folder inside the OpenDSA repository
  * Configuration - link this to the **config** folder within the OpenDSA repository
 5. Run a developer instance with ** rails server ** in the root directory  
+6. Now just access the site from localhost.
 
 Documentation and Support
 -------------------------
 
 ### Project (Configuration Editor)
-This is a basic rails application and follows the conventions of a rails application for the most part. In addition to a rails application, this project uses [AngularJS](https://docs.angularjs.org/guide/directive) heavily. I'll go over some of the important pieces specific to this project.
+This is a basic rails application and follows the conventions of a rails application for the most part. In addition to a rails application, this project uses [AngularJS](https://docs.angularjs.org/guide/directive) heavily. The UI uses [Bootstrap](http://getbootstrap.com) heavily. I'll go over some of the important pieces specific to this project.
 
 **vendor/assets/bower_components** - this is where bower components are installed.
 
@@ -42,8 +44,14 @@ This is a basic rails application and follows the conventions of a rails applica
 **config/routes.rb** - The routes file.
 
 ### book.coffee.js.erb
+It's called book.coffee.js.erb, but it's just a JavaScript file. Rails names it this by default.
+
+There are several angular controllers defined in this file. I'm using Angular's **$emit** and **$on** functions to pass data between the controllers.
+
+Drag and drop is implemented in the corresponding Angular directive code for the  draggable elements. I'm using the HTML5 drag and drop API. The API has some restrictions on the type of data that is being transported with the dragging element. One of these restrictions did not inherently allow for knowing the type of the element being dragged. Therefore, there is a variable called **draggingType** defined globally that is used to check the type of element being dragged. This is useful so we can handle modules and chapters differently when they are being dragged.
 
 ### templates folder
+This is where all the html for the Angular directives is defined. Each file corresponds to a different directive. Their associated JavaScript Code can be found in the book.coffee.js.erb.
 
 Issues
 -------------
