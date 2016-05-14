@@ -26,7 +26,8 @@ group :development do
   gem 'rails_layout'
 end
 group :development, :test do
-  gem 'sqlite3'
+  # gem 'sqlite3'
+  gem 'mysql2'
   gem 'thin'
 end
 group :production do
