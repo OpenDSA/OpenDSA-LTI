@@ -38,3 +38,4 @@ end
 
 gem 'ims-lti', '~> 1.1.8'
 gem 'json'
+gem 'rare_map'

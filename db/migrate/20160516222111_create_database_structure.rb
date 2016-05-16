@@ -425,5 +425,4 @@ class CreateDatabaseStructure < ActiveRecord::Migration
     # drop all the tables if you really need
     # to support migration back to version 0
   end
-
 end
