@@ -1,5 +1,5 @@
 
-  class Module < ActiveRecord::Base
+  class Module < OldDbBase
     self.table_name = 'modules'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

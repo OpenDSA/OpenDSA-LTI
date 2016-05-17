@@ -1,5 +1,5 @@
 
-  class Organization < ActiveRecord::Base
+  class Organization < OldDbBase
     self.table_name = 'organizations'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

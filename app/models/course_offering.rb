@@ -1,11 +1,11 @@
 
-  class CourseOffering < ActiveRecord::Base
+  class CourseOffering < OldDbBase
     self.table_name = 'course_offerings'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'
 
     if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-      attr_accessible :course_id, :term_id, :label, :url, :self_enrollment_allowed, :created_at, :updated_at, :cutoff_date, :lms_course_code, :lms_course_id, :late_policy_id
+      attr_accessible :course_id, :term_id, :late_policy_id, :label, :url, :self_enrollment_allowed, :created_at, :updated_at, :cutoff_date, :lms_course_code, :lms_course_id
     end
 
     belongs_to :course, :foreign_key => 'course_id', :class_name => 'Course'
@@ -15,4 +15,5 @@
     has_many :inst_books, :foreign_key => 'course_offering_id', :class_name => 'InstBook'
     has_many :course_roles, :through => :course_enrollments, :foreign_key => 'course_role_id', :class_name => 'CourseRole'
     has_many :users, :through => :course_enrollments, :foreign_key => 'user_id', :class_name => 'User'
+    has_many :inst_book_owners, :through => :inst_books, :foreign_key => 'inst_book_owner_id', :class_name => 'InstBookOwner'
   end

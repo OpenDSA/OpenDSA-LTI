@@ -1,5 +1,5 @@
 
-  class GlobalRole < ActiveRecord::Base
+  class GlobalRole < OldDbBase
     self.table_name = 'global_roles'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

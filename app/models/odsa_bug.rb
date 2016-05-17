@@ -1,5 +1,5 @@
 
-  class OdsaBug < ActiveRecord::Base
+  class OdsaBug < OldDbBase
     self.table_name = 'odsa_bugs'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

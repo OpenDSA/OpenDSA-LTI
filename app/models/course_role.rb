@@ -1,5 +1,5 @@
 
-  class CourseRole < ActiveRecord::Base
+  class CourseRole < OldDbBase
     self.table_name = 'course_roles'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'
