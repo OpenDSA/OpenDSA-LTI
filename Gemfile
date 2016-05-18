@@ -12,6 +12,10 @@ gem 'rare_map'
 gem 'friendly_id', '~> 5'
 gem 'faker'
 gem 'haml-rails'
+gem 'cancancan'
+gem 'activeadmin', github: 'activeadmin'
+gem "active_admin_import" , github: 'activeadmin-plugins/active_admin_import'
+gem 'active_skin', github: 'rstgroup/active_skin'
 
 group :development, :test do
   gem 'byebug'
