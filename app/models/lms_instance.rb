@@ -1,5 +1,5 @@
 
-  class LmsInstance < OldDbBase
+  class LmsInstance < ActiveRecord::Base
     self.table_name = 'lms_instance'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

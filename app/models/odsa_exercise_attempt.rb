@@ -1,5 +1,5 @@
 
-  class OdsaExerciseAttempt < OldDbBase
+  class OdsaExerciseAttempt < ActiveRecord::Base
     self.table_name = 'odsa_exercise_attempts'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

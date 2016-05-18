@@ -1,5 +1,5 @@
 
-  class OdsaModuleProgress < OldDbBase
+  class OdsaModuleProgress < ActiveRecord::Base
     self.table_name = 'odsa_module_progress'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

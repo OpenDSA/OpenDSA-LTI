@@ -1,5 +1,5 @@
 
-  class BookRole < OldDbBase
+  class BookRole < ActiveRecord::Base
     self.table_name = 'book_roles'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

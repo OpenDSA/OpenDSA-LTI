@@ -1,5 +1,5 @@
 
-  class InstChapter < OldDbBase
+  class InstChapter < ActiveRecord::Base
     self.table_name = 'inst_chapters'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

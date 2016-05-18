@@ -1,5 +1,5 @@
 
-  class InstBookOwner < OldDbBase
+  class InstBookOwner < ActiveRecord::Base
     self.table_name = 'inst_book_owners'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

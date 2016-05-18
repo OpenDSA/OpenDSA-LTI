@@ -1,5 +1,5 @@
 
-  class OdsaStudentExtension < OldDbBase
+  class OdsaStudentExtension < ActiveRecord::Base
     self.table_name = 'odsa_student_extensions'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

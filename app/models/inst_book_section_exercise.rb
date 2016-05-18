@@ -1,5 +1,5 @@
 
-  class InstBookSectionExercise < OldDbBase
+  class InstBookSectionExercise < ActiveRecord::Base
     self.table_name = 'inst_book_section_exercises'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

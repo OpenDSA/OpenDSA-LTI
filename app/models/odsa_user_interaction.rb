@@ -1,5 +1,5 @@
 
-  class OdsaUserInteraction < OldDbBase
+  class OdsaUserInteraction < ActiveRecord::Base
     self.table_name = 'odsa_user_interactions'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

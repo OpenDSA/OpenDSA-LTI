@@ -1,5 +1,5 @@
 
-  class OdsaBookProgress < OldDbBase
+  class OdsaBookProgress < ActiveRecord::Base
     self.table_name = 'odsa_book_progress'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

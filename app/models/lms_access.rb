@@ -1,5 +1,5 @@
 
-  class LmsAccess < OldDbBase
+  class LmsAccess < ActiveRecord::Base
     self.table_name = 'lms_access'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

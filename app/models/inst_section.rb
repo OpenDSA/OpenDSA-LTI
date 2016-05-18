@@ -1,5 +1,5 @@
 
-  class InstSection < OldDbBase
+  class InstSection < ActiveRecord::Base
     self.table_name = 'inst_sections'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

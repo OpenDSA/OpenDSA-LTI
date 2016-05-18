@@ -11,6 +11,7 @@ gem 'json'
 gem 'rare_map'
 gem 'friendly_id', '~> 5'
 gem 'faker'
+gem 'haml-rails'
 
 group :development, :test do
   gem 'byebug'

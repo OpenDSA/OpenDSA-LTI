@@ -1,5 +1,5 @@
 
-  class Error < OldDbBase
+  class Error < ActiveRecord::Base
     self.table_name = 'errors'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

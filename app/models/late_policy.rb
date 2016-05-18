@@ -1,5 +1,5 @@
 
-  class LatePolicy < OldDbBase
+  class LatePolicy < ActiveRecord::Base
     self.table_name = 'late_policies'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

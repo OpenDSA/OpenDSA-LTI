@@ -87,7 +87,18 @@ GEM
       activesupport (>= 4.1.0)
     haml (4.0.7)
       tilt
+    haml-rails (0.9.0)
+      actionpack (>= 4.0.1)
+      activesupport (>= 4.0.1)
+      haml (>= 4.0.6, < 5.0)
+      html2haml (>= 1.0.1)
+      railties (>= 4.0.1)
     high_voltage (2.4.0)
+    html2haml (2.0.0)
+      erubis (~> 2.7.0)
+      haml (~> 4.0.0)
+      nokogiri (~> 1.6.0)
+      ruby_parser (~> 3.5)
     hub (1.12.4)
     i18n (0.7.0)
     ims-lti (1.1.10)
@@ -192,6 +203,8 @@ GEM
       rspec-mocks (~> 3.4.0)
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
+    ruby_parser (3.8.2)
+      sexp_processor (~> 4.1)
     sass (3.4.22)
     sass-rails (5.0.4)
       railties (>= 4.0.0, < 5.0)
@@ -199,6 +212,7 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
+    sexp_processor (4.7.0)
     spring (1.6.4)
     sprockets (3.5.2)
       concurrent-ruby (~> 1.0)
@@ -252,6 +266,7 @@ DEPENDENCIES
   factory_girl_rails
   faker
   friendly_id (~> 5)
+  haml-rails
   high_voltage
   hub
   ims-lti (~> 1.1.8)

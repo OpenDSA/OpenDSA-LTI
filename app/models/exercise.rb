@@ -1,5 +1,5 @@
 
-  class Exercise < OldDbBase
+  class Exercise < ActiveRecord::Base
     self.table_name = 'exercises'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'
