@@ -1,5 +1,5 @@
 
-  class TimeZone < OldDbBase
+  class TimeZone < ActiveRecord::Base
     self.table_name = 'time_zones'
     self.inheritance_column = 'ruby_type'
     self.primary_key = 'id'

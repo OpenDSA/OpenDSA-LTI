@@ -70,9 +70,19 @@ GEM
       responders
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
+    diff-lcs (1.2.5)
     erubis (2.7.0)
     eventmachine (1.2.0.1)
     execjs (2.6.0)
+    factory_girl (4.7.0)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.7.0)
+      factory_girl (~> 4.7.0)
+      railties (>= 3.0.0)
+    faker (1.6.3)
+      i18n (~> 0.5)
+    friendly_id (5.1.0)
+      activerecord (>= 4.0.0)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
     haml (4.0.7)
@@ -165,6 +175,23 @@ GEM
     ref (2.0.0)
     responders (2.1.2)
       railties (>= 4.2.0, < 5.1)
+    rspec-core (3.4.4)
+      rspec-support (~> 3.4.0)
+    rspec-expectations (3.4.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-mocks (3.4.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-rails (3.4.2)
+      actionpack (>= 3.0, < 4.3)
+      activesupport (>= 3.0, < 4.3)
+      railties (>= 3.0, < 4.3)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
+      rspec-support (~> 3.4.0)
+    rspec-support (3.4.1)
     sass (3.4.22)
     sass-rails (5.0.4)
       railties (>= 4.0.0, < 5.0)
@@ -222,6 +249,9 @@ DEPENDENCIES
   byebug
   coffee-rails (~> 4.1.0)
   devise
+  factory_girl_rails
+  faker
+  friendly_id (~> 5)
   high_voltage
   hub
   ims-lti (~> 1.1.8)
@@ -236,6 +266,7 @@ DEPENDENCIES
   rails_12factor
   rails_layout
   rare_map
+  rspec-rails
   sass-rails (~> 5.0)
   spring
   therubyracer
