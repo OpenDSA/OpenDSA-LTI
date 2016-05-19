@@ -88,8 +88,6 @@ GEM
     bootstrap-sass (3.3.6)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
-    bootstrap-wysihtml5-rails (0.3.3.8)
-      railties (>= 3.0)
     bourbon (4.2.7)
       sass (~> 3.4)
       thor (~> 0.19)
@@ -315,7 +313,6 @@ DEPENDENCIES
   activeadmin!
   better_errors
   bootstrap-sass
-  bootstrap-wysihtml5-rails
   byebug
   cancancan
   coffee-rails (~> 4.1.0)
