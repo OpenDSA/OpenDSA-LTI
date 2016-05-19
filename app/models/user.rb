@@ -1,4 +1,7 @@
 class User < ActiveRecord::Base
+  include Gravtastic
+  gravtastic secure: true, default: 'monsterid'
+
   extend FriendlyId
   friendly_id :email_or_id, use: :slugged
 

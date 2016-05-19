@@ -88,6 +88,8 @@ GEM
     bootstrap-sass (3.3.6)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
+    bootstrap-wysihtml5-rails (0.3.3.8)
+      railties (>= 3.0)
     bourbon (4.2.7)
       sass (~> 3.4)
       thor (~> 0.19)
@@ -132,6 +134,7 @@ GEM
       activerecord (>= 4.0.0)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
+    gravtastic (3.2.6)
     haml (4.0.7)
       tilt
     haml-rails (0.9.0)
@@ -312,6 +315,7 @@ DEPENDENCIES
   activeadmin!
   better_errors
   bootstrap-sass
+  bootstrap-wysihtml5-rails
   byebug
   cancancan
   coffee-rails (~> 4.1.0)
@@ -320,6 +324,7 @@ DEPENDENCIES
   faker
   font-awesome-rails
   friendly_id (~> 5)
+  gravtastic
   haml-rails
   high_voltage
   hub
@@ -347,4 +352,4 @@ RUBY VERSION
    ruby 2.3.1p112
 
 BUNDLED WITH
-   1.12.3
+   1.12.4

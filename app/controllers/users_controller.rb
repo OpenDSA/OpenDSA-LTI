@@ -1,23 +1,27 @@
 class UsersController < ApplicationController
-  # load_and_authorize_resource :find_by => :slug
-  before_action :authenticate_user!
-  after_action :verify_authorized
+  load_and_authorize_resource :find_by => :slug
+  # before_action :authenticate_user!
+  # after_action :verify_authorized
 
   def index
     @users = User.all
-    authorize! User
   end
 
   def show
     @user = User.friendly.find(params[:id])
-    authorize! @user
+    # authorize! @user
+  end
+
+  def edit
+    @user = User.friendly.find(params[:id])
+    # authorize! @user
   end
 
   def update
     @user = User.friendly.find(params[:id])
-    authorize! @user
+    # authorize! @user
     if @user.update_attributes(secure_params)
-      redirect_to users_path, :notice => "User updated."
+      redirect_to user_path(@user), :notice => "User updated."
     else
       redirect_to users_path, :alert => "Unable to update user."
     end
@@ -25,7 +29,7 @@ class UsersController < ApplicationController
 
   def destroy
     user = User.friendly.find(params[:id])
-    authorize! user
+    # authorize! user
     user.destroy
     redirect_to users_path, :notice => "User deleted."
   end
