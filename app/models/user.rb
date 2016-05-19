@@ -287,8 +287,13 @@ class User < ActiveRecord::Base
 
 
     # -------------------------------------------------------------
+    def replace_dot(email)
+      # HACK: because rails doesn't like periods in urls.
+      email.gsub(/\./, '-dot-')
+    end
+
     def email_or_id
-      email || id
+      replace_dot(email) || id
     end
 
 
