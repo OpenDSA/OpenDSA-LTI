@@ -16,6 +16,7 @@ gem 'cancancan'
 gem 'activeadmin', github: 'activeadmin'
 gem "active_admin_import" , github: 'activeadmin-plugins/active_admin_import'
 gem 'active_skin', github: 'rstgroup/active_skin'
+gem 'font-awesome-rails'
 
 group :development, :test do
   gem 'byebug'
