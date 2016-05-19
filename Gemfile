@@ -23,27 +23,32 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'factory_girl_rails'
 end
+
 group :development do
   gem 'web-console', '~> 2.0'
   gem 'spring'
 end
+
 gem 'bootstrap-sass'
 gem 'devise'
 gem 'high_voltage'
-gem 'pundit'
+# gem 'pundit'
 gem 'therubyracer', :platform=>:ruby
-gem 'upmin-admin'
+# gem 'upmin-admin'
+
 group :development do
   gem 'better_errors'
   gem 'hub', :require=>nil
   gem 'quiet_assets'
   gem 'rails_layout'
 end
+
 group :development, :test do
   # gem 'sqlite3'
   gem 'mysql2'
   gem 'thin'
 end
+
 group :production do
   gem 'pg'
   gem 'rails_12factor'
