@@ -1,6 +1,4 @@
 class LtiController < ApplicationController
-
-
   after_action :allow_iframe, only: :launch
   # the consumer keys/secrets
   $oauth_creds = {"test" => "secret"}

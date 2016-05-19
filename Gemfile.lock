@@ -55,6 +55,7 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    active_admin_theme (1.0.3)
     activejob (4.2.6)
       activesupport (= 4.2.6)
       globalid (>= 0.3.0)
@@ -319,6 +320,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_admin_import!
+  active_admin_theme
   active_skin!
   activeadmin!
   better_errors
