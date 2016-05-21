@@ -10,7 +10,68 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+//= require modernizr.min.js
 //= require jquery
 //= require jquery_ujs
 //= require bootstrap-sprockets
-//= require_tree .
+//= require bootstrap-editable
+//= require bootstrap-editable-rails
+//= require js-routes
+//= require bootstrap-wysihtml5
+//= require cm
+
+// Add the route helpers directly into the window object for easy access.
+$.extend(window, Routes);
+
+//use wysihtml5 rich text editor
+$(document).ready(function() {
+
+  $('.richtexteditor').each(function(i, elem) {
+    $(elem).wysihtml5({
+      "font-styles": false,
+      "emphasis": true,
+      "lists": true,
+      "link": false,
+      "html": true,
+      "image": false
+    });
+  });
+});
+
+function progress(percent, $element) {
+  var progressBarWidth = percent * $element.width() / 100;
+  $element.find('div').animate({
+    width: progressBarWidth
+  }, 200).html(percent + "%&nbsp;");
+}
+
+function percentBar(filled, capacity, id) {
+  var myCanvas = document.getElementById(id);
+  var back = myCanvas.getContext("2d");
+  var text = myCanvas.getContext("2d");
+  var textSize = 10;
+  var w = myCanvas.width;
+  var h = myCanvas.height;
+  var fillW = filled * w;
+  var capW = capacity * w;
+  var per = parseInt(filled * 100);
+  var gradient = back.createLinearGradient(100, 100, 0, 100, 100, 50);
+  gradient.addColorStop(0, "#3da2b4");
+  gradient.addColorStop(1, "white");
+
+  text.textBaseline = "middle";
+  text.fillText("Text is here to stay", 0, myCanvas.height / 2);
+
+  back.fillStyle = "#000000";
+  back.fillRect(0, 0, w, h);
+  back.fillStyle = "#276874";
+  back.fillRect(0, 0, capW, h);
+  back.fillStyle = gradient;
+  back.fillRect(0, 0, fillW, h);
+
+}
+$.fn.editable.defaults.mode = 'inline';
+
+$(document).ready(function() {
+  $('.xeditable').editable();
+});

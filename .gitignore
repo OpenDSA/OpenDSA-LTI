@@ -106,3 +106,4 @@ Configuration
 #vagrant
 .vagrant/
 *.mwb.bak
+tasks.todo
