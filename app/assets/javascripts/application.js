@@ -18,8 +18,6 @@
 //= require bootstrap-editable-rails
 //= require js-routes
 //= require bootstrap-wysihtml5
-//= require cm
-
 // Add the route helpers directly into the window object for easy access.
 $.extend(window, Routes);
 
