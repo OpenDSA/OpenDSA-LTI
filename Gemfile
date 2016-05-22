@@ -22,10 +22,21 @@ gem 'formtastic-bootstrap'
 # gems for rich text editing
 gem 'bootstrap-wysihtml5-rails'
 gem 'gravtastic' # For Gravatar integration
-gem 'js-routes'       # Route helpers in Javascript
-#for multi-color progress bar
+gem 'js-routes' # Route helpers in Javascript
+# for multi-color progress bar
 gem 'css3-progress-bar-rails'
 gem 'bootstrap-editable-rails'
+gem 'andand', github: 'raganwald/andand'
+gem 'responders'
+# gem 'active_record-acts_as'
+gem 'acts_as_list'
+# gem 'acts-as-taggable-on'
+gem 'representable'
+gem 'redcarpet'
+gem 'loofah'
+gem 'truncate_html'
+gem 'puma'
+gem 'tzinfo' # For timezone support
 
 
 group :development, :test do
@@ -42,9 +53,7 @@ end
 gem 'bootstrap-sass'
 gem 'devise'
 gem 'high_voltage'
-# gem 'pundit'
 gem 'therubyracer', :platform=>:ruby
-# gem 'upmin-admin'
 
 group :development do
   gem 'better_errors'

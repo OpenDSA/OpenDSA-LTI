@@ -1,15 +1,15 @@
 class LtiController < ApplicationController
+
+  # load_and_authorize_resource
   after_action :allow_iframe, only: :launch
   # the consumer keys/secrets
-  $oauth_creds = {"test" => "secret"}
+  $oauth_creds = {"test" => "secret1"}
 
   def launch
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
 
-    render('error') and return unless authorize!
-
-    @section_html = File.read(File.join('public/OpenDSA/Books', params["book_folder_name"], '/lti_html/', "#{params['section_file_name'].to_s}.html")) and return
+    render('error') and return unless lti_authorize!
   end
 
   def assessment
@@ -47,7 +47,7 @@ class LtiController < ApplicationController
   end
 
   private
-    def authorize!
+    def lti_authorize!
       if key = params['oauth_consumer_key']
         if secret = $oauth_creds[key]
           @tp = IMS::LTI::ToolProvider.new(key, secret, params)

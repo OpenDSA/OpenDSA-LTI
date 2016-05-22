@@ -43,11 +43,6 @@ Rails.application.configure do
   # Send email in development mode?
   config.action_mailer.perform_deliveries = true
 
-
-  # Asset digests allow you to set far-future HTTP expiration dates on all assets,
-  # yet still be able to expire them through the digest params.
-  config.assets.digest = true
-
   # Adds additional error checking when serving assets at runtime.
   # Checks for improperly declared sprockets dependencies.
   # Raises helpful error messages.
@@ -55,4 +50,40 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  # Do not fallback to assets pipeline if a precompiled asset is missed.
+  # config.assets.compile = false
+
+  # Generate digests for assets URLs.
+  # config.assets.digest = true
+
+  config.assets.initialize_on_precompile = true
+
+  # config.middleware.use LogFile::Display
+#  config.log_level = :info
+  config.log_formatter = proc do |severity, datetime, progname, msg|
+    if severity == 'DEBUG' && msg.blank?
+      ''
+    else
+      case severity
+      when 'DEBUG'
+        severity_colored = "\033[36;40m[DEBUG]\033[0m" # cyan
+      when 'INFO'
+        severity_colored = "\033[32;40m[INFO]\033[0m" # green
+      when 'WARN'
+        severity_colored = "\033[35;40m[WARNING]\033[0m" # magenta
+      when 'ERROR'
+        severity_colored = "\033[31;40m[ERROR]\033[0m" # red
+      when 'FATAL'
+        severity_colored = "\033[7;31;40m[FATAL]\033[0m" # black, red bg
+      else
+        severity_colored = "[#{severity}]" # none
+      end
+      "%s %s %s\n" % [
+        datetime.strftime('%Y-%m-%d %H:%M:%S'),
+        severity_colored,
+        String === msg ? msg : msg.inspect
+        ]
+    end
+  end
 end

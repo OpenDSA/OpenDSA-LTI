@@ -2,7 +2,7 @@ ActiveAdmin.register Term do
   active_admin_import
 
   menu parent: 'University-oriented', priority: 10
-  permit_params :year, :starts_on, :ends_on, :season
+  permit_params :year, :starts_on, :ends_on, :season, :slug
   actions :all, except: [:destroy]
 
   index do

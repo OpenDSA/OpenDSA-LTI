@@ -4,16 +4,24 @@ namespace :db do
   desc "Reset database and then fill it with sample data"
   task populate: [:environment] do
     FactoryGirl.create(:organization)
-    FactoryGirl.create(:term)
-    FactoryGirl.create(:term2)
+    FactoryGirl.create(:term100)
+    FactoryGirl.create(:term200)
+    FactoryGirl.create(:term300)
+    FactoryGirl.create(:term400)
+    FactoryGirl.create(:term500)
     FactoryGirl.create(:course)
-    c = FactoryGirl.create(:course_offering)
-    FactoryGirl.create(:course_offering2)
+    c = FactoryGirl.create(:course_offering_term_1_tr)
+    FactoryGirl.create(:course_offering_term_1_mwf)
+    FactoryGirl.create(:course_offering_term_2_tr)
+    FactoryGirl.create(:course_offering_term_2_mwf)
+    FactoryGirl.create(:course_offering_term_3_tr)
+    FactoryGirl.create(:course_offering_term_3_mwf)
 
     FactoryGirl.create(:course_enrollment,
       user: FactoryGirl.create(:admin),
       course_offering: c,
       course_role: CourseRole.instructor)
+
     FactoryGirl.create(:course_enrollment,
       user: FactoryGirl.create(:instructor_user,
         first_name: 'Ima',
@@ -21,6 +29,7 @@ namespace :db do
         email:      "example-1@railstutorial.org"),
       course_offering: c,
       course_role: CourseRole.instructor)
+
     50.times do |n|
       FactoryGirl.create(:course_enrollment,
         user: FactoryGirl.create(:confirmed_user,
@@ -30,9 +39,6 @@ namespace :db do
         course_offering: c)
     end
 
-    # Create a workout with one exercise, and a second exercise
-    # FactoryGirl.create :workout_with_exercises
-    # FactoryGirl.create :coding_exercise, name: 'Factorial 3'
   end
 
   desc "Reset database and then fill it with Summer I 2015 data"
@@ -56,5 +62,5 @@ namespace :db do
   end
 
   desc "Drop, create, and migrate"
-  task :reset_all => [:drop, :create, :migrate, :seed]
+  task :reset_all => [:drop, :create, :migrate, :seed, :populate]
 end

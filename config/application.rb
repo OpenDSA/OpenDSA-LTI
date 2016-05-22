@@ -23,5 +23,7 @@ module OpenDSALti
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
     config.assets.paths << Rails.root.join('vendor', 'assets', 'bower_components')
+    config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
+
   end
 end
