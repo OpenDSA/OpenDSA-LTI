@@ -16,7 +16,7 @@
 /tmp
 .secret
 test-*.txt
-lib/assets/
+# lib/assets/
 public/assets/
 **/.DS_Store
 usr/attempts/

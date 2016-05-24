@@ -32,8 +32,8 @@ debconf-set-selections <<< 'mysql-server mysql-server/root_password password roo
 debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
 install MySQL mysql-server libmysqlclient-dev
 mysql -uroot -proot <<SQL
-CREATE DATABASE opendsa_lti DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-GRANT ALL PRIVILEGES ON opendsa_lti.* to 'opendsa'@'localhost' IDENTIFIED BY 'opendsa';
+CREATE DATABASE codeworkout DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON codeworkout.* to 'codeworkout'@'localhost' IDENTIFIED BY 'codeworkout';
 FLUSH PRIVILEGES;
 SQL
 

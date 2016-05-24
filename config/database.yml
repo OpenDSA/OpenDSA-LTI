@@ -5,9 +5,9 @@
 #   gem 'sqlite3'
 development:
    adapter: mysql2
-   database: opendsa_lti
-   username: opendsa
-   password: opendsa
+   database: codeworkout
+   username: codeworkout
+   password: codeworkout
    host: localhost
 
 # development:
