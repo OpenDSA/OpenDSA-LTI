@@ -1,0 +1,27 @@
+%p#notice= notice
+
+= image_tag @user.avatar_url
+
+%p
+  %strong First name:
+  = @user.first_name
+
+%p
+  %strong Last name:
+  = @user.last_name
+
+%p
+  %strong Timezone:
+  = @user.time_zone
+
+%p
+  %strong Email:
+  = link_to @user.email, 'mailto:' + @user.email
+
+%br
+
+- if can? :update, @user
+  = button_link 'Edit', edit_user_path(@user)
+- if @user.global_role.is_instructor?
+  = button_link 'Update Access Token', "/admin/lms_accesses"
+= button_link 'Back', users_path
