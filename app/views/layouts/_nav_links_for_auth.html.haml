@@ -1,6 +1,0 @@
-- if current_user.global_role.can_edit_system_configuration?
-  %li= link_to icon_tag_for('wrench'), admin_dashboard_path
-%li= link_to current_user.email, current_user
-%li
-  = link_to destroy_user_session_path, method: :delete do
-    %i.fa.fa-sign-out
