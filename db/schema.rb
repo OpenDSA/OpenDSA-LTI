@@ -148,10 +148,12 @@ ActiveRecord::Schema.define(version: 20160523150926) do
   add_index "inst_book_owners", ["user_id"], name: "inst_book_owners_user_id_fk", using: :btree
 
   create_table "inst_book_section_exercises", force: true do |t|
-    t.integer  "inst_book_id",                             null: false
-    t.integer  "inst_section_id",                          null: false
-    t.integer  "inst_exercise_id",                         null: false
-    t.decimal  "points",           precision: 5, scale: 2, null: false
+    t.integer  "inst_book_id",                                             null: false
+    t.integer  "inst_section_id",                                          null: false
+    t.integer  "inst_exercise_id",                                         null: false
+    t.decimal  "points",           precision: 5, scale: 2,                 null: false
+    t.boolean  "required",                                 default: false
+    t.integer  "threshold",                                                null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -196,24 +198,24 @@ ActiveRecord::Schema.define(version: 20160523150926) do
   add_index "inst_chapters", ["inst_book_id"], name: "inst_chapters_inst_book_id_fk", using: :btree
 
   create_table "inst_exercises", force: true do |t|
-    t.string   "name",               limit: 50, null: false
-    t.string   "short_display_name", limit: 45
-    t.string   "ex_type",            limit: 50
+    t.string   "name"
+    t.string   "short_name",             null: false
+    t.string   "ex_type",     limit: 50
     t.string   "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "inst_exercises", ["name"], name: "index_inst_exercises_on_name", unique: true, using: :btree
+  add_index "inst_exercises", ["short_name"], name: "index_inst_exercises_on_short_name", unique: true, using: :btree
 
   create_table "inst_modules", force: true do |t|
-    t.string   "name",                          null: false
-    t.string   "short_display_name", limit: 50
+    t.string   "path",       null: false
+    t.string   "name",       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "inst_modules", ["name"], name: "index_inst_modules_on_name", unique: true, using: :btree
+  add_index "inst_modules", ["path"], name: "index_inst_modules_on_path", unique: true, using: :btree
 
   create_table "inst_sections", force: true do |t|
     t.integer  "inst_module_id",                                    null: false
@@ -225,6 +227,7 @@ ActiveRecord::Schema.define(version: 20160523150926) do
     t.datetime "soft_deadline"
     t.datetime "hard_deadline"
     t.integer  "time_limit"
+    t.boolean  "show",                              default: true
     t.datetime "created_at"
     t.datetime "updated_at"
   end

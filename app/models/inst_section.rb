@@ -20,6 +20,7 @@ class InstSection < ActiveRecord::Base
     inst_sec.inst_module_id = module_rec.id
     inst_sec.inst_chapter_module_id = inst_chapter_module_rec.id
     inst_sec.name = section_name
+    inst_sec.show = section_obj['showsection'] || false
     inst_sec.save
 
     section_obj.each do |k, v|

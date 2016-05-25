@@ -8,11 +8,12 @@ class InstModule < ActiveRecord::Base
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
-  def self.save_data_from_json(book, chapter, module_name, module_obj, module_position)
-    mod = InstModule.find_by name: module_name
+  def self.save_data_from_json(book, chapter, module_path, module_obj, module_position)
+    mod = InstModule.find_by path: module_path
     if !mod
       mod = InstModule.new
-      mod.name = module_name
+      mod.path = module_path
+      mod.name = module_obj['long_name']
       mod.save
     end
 
