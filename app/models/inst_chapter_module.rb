@@ -1,6 +1,7 @@
 class InstChapterModule < ActiveRecord::Base
   #~ Relationships ............................................................
   belongs_to :inst_chapter
+  belongs_to :inst_module
   has_many :inst_sections
 
   #~ Validation ...............................................................

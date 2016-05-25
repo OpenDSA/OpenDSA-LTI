@@ -21,11 +21,6 @@ class InstExercise < ActiveRecord::Base
     book_sec_ex.points = exercise_obj['points'] || 0
     book_sec_ex.save
 
-    if exercise_obj['points'] > 0
-      return true
-    else
-      return false
-    end
   end
   #~ Instance methods .........................................................
   #~ Private instance methods .................................................

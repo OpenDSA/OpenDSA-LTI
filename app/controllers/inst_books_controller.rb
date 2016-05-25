@@ -56,6 +56,10 @@ class InstBooksController < ApplicationController
   # -------------------------------------------------------------
   # GET /exercises/1
   def show
+    # respond_to do |format|
+    #   format.html
+    #   format.json {render json: @inst_book}
+    # end
   end
 
 
@@ -227,8 +231,8 @@ class InstBooksController < ApplicationController
     # client = Pandarus::Client.new(
     #   prefix: "https://canvas.instructure.com/api",
     #   token: "Access token here")
+    # puts client.get_single_course_courses(1029701).inspect
 
-    puts client.get_single_course_courses(1029701).inspect
     redirect_to inst_books_url + '/upload', notice: 'Exercise upload complete.'
   end
 

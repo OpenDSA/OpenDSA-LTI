@@ -11,6 +11,7 @@ class InstSection < ActiveRecord::Base
   has_many :users_by_odsa_user_interactions, :source => :user, :through => :odsa_user_interactions
 
   #~ Validation ...............................................................
+
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
@@ -21,17 +22,19 @@ class InstSection < ActiveRecord::Base
     inst_sec.name = section_name
     inst_sec.save
 
-    gradable_ex = false
-    gradable_sec = false
     section_obj.each do |k, v|
-      if v.is_a?(Hash) && !v.empty?
-        gradable_ex = InstExercise.save_data_from_json(book, inst_sec, k, v)
-        gradable_sec = true if gradable_ex
-      end
+     InstExercise.save_data_from_json(book, inst_sec, k, v) if v.is_a?(Hash) && !v.empty?
     end
-    inst_sec.gradable = gradable_sec
-    inst_sec.save
   end
   #~ Instance methods .........................................................
+
+  # -------------------------------------------------------------
+  # TODO
+  # check that only one child exercise in inst_book_section_exercises table
+  # is gradable (has points > 0)
+
+  def one_gradable_ex_only
+
+  end
   #~ Private instance methods .................................................
 end
