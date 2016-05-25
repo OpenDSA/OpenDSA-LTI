@@ -28,16 +28,6 @@ ActiveRecord::Schema.define(version: 20160523150926) do
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
 
-  create_table "book_roles", force: true do |t|
-    t.string   "name",        limit: 45,                null: false
-    t.boolean  "can_modify",             default: true
-    t.boolean  "can_compile",            default: true
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "book_roles", ["name"], name: "index_book_roles_on_name", unique: true, using: :btree
-
   create_table "course_enrollments", force: true do |t|
     t.integer "user_id",            null: false
     t.integer "course_offering_id", null: false
@@ -138,12 +128,10 @@ ActiveRecord::Schema.define(version: 20160523150926) do
   create_table "inst_book_owners", force: true do |t|
     t.integer  "user_id",      null: false
     t.integer  "inst_book_id", null: false
-    t.integer  "book_role_id", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "inst_book_owners", ["book_role_id"], name: "inst_book_owners_book_role_id_fk", using: :btree
   add_index "inst_book_owners", ["inst_book_id", "user_id"], name: "index_inst_book_owners_on_inst_book_id_and_user_id", unique: true, using: :btree
   add_index "inst_book_owners", ["user_id"], name: "inst_book_owners_user_id_fk", using: :btree
 
@@ -473,7 +461,6 @@ ActiveRecord::Schema.define(version: 20160523150926) do
 
   add_foreign_key "identities", "users", name: "identities_user_id_fk", dependent: :delete
 
-  add_foreign_key "inst_book_owners", "book_roles", name: "inst_book_owners_book_role_id_fk"
   add_foreign_key "inst_book_owners", "inst_books", name: "inst_book_owners_inst_book_id_fk"
   add_foreign_key "inst_book_owners", "users", name: "inst_book_owners_user_id_fk"
 

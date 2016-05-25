@@ -3,26 +3,6 @@
 # the rake db:seed (or created alongside the db with db:setup).
 
 # ---------------------------------------------------------------
-# Create the default book roles.
-#
-BookRole.delete_all
-
-BookRole.create!(
-  name:'Administrator',
-  can_modify: true,
-  can_compile:true)
-
-BookRole.create!(
-  name:'Modifier',
-  can_modify: true,
-  can_compile:false)
-
-BookRole.create!(
-  name:'Viewer',
-  can_modify: false,
-  can_compile:false)
-
-# ---------------------------------------------------------------
 # Create the default LMS types.
 #
 LmsType.delete_all
