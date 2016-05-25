@@ -18,6 +18,7 @@
 test-*.txt
 # lib/assets/
 public/assets/
+public/OpenDSA
 **/.DS_Store
 usr/attempts/
 usr/resources/*/tests
@@ -29,6 +30,8 @@ timezones.txt
 /homeworks
 #server.crt
 #server.key
+/RST
+/Configuration
 
 # cache files for sublime text
 *.tmlanguage.cache

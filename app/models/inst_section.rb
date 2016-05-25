@@ -19,12 +19,18 @@ class InstSection < ActiveRecord::Base
     inst_sec.inst_module_id = module_rec.id
     inst_sec.inst_chapter_module_id = inst_chapter_module_rec.id
     inst_sec.name = section_name
-    inst_sec.position = section_position
     inst_sec.save
 
+    gradable_ex = false
+    gradable_sec = false
     section_obj.each do |k, v|
-      exercise = InstExercise.save_data_from_json(book, inst_sec, k, v) if v.is_a?(Hash)
+      if v.is_a?(Hash) && !v.empty?
+        gradable_ex = InstExercise.save_data_from_json(book, inst_sec, k, v)
+        gradable_sec = true if gradable_ex
+      end
     end
+    inst_sec.gradable = gradable_sec
+    inst_sec.save
   end
   #~ Instance methods .........................................................
   #~ Private instance methods .................................................

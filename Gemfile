@@ -93,6 +93,9 @@ gem 'gravtastic'      # For Gravatar integration
 gem 'js-routes'       # Route helpers in Javascript
 gem 'awesome_print'   # For debugging/logging output
 
+# Ruby wrapper for Canvas API
+gem 'pandarus', '~> 0.6.7'
+
 #gems for rich text editing
 gem 'bootstrap-wysihtml5-rails'
 

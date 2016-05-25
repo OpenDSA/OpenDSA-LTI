@@ -218,10 +218,17 @@ class InstBooksController < ApplicationController
 
 
   # -------------------------------------------------------------
-  # POST /books/upload_create
+  # POST /inst_books/upload_create
   def upload_create
     hash = JSON.load(File.read(params[:form][:file].path))
     InstBook.save_data_from_json(hash)
+
+    # require 'pandarus'
+    # client = Pandarus::Client.new(
+    #   prefix: "https://canvas.instructure.com/api",
+    #   token: "Access token here")
+
+    puts client.get_single_course_courses(1029701).inspect
     redirect_to inst_books_url + '/upload', notice: 'Exercise upload complete.'
   end
 
