@@ -8,7 +8,7 @@
 class InstBook < ActiveRecord::Base
 
   #~ Relationships ............................................................
-  belongs_to :course_offering
+  belongs_to :course_offering, inverse_of: :inst_books
   has_many    :inst_book_owners, inverse_of: :inst_book
   has_many :inst_book_section_exercises
   has_many :inst_chapters
@@ -19,6 +19,8 @@ class InstBook < ActiveRecord::Base
   has_many :inst_book_section_exercises_by_odsa_user_interactions, :source => :inst_book_section_exercise, :through => :odsa_user_interactions
   has_many :inst_sections_by_odsa_user_interactions, :source => :inst_section, :through => :odsa_user_interactions
   has_many :users_by_odsa_user_interactions, :source => :user, :through => :odsa_user_interactions
+
+  paginates_per 100
 
   #~ Validation ...............................................................
   #~ Constants ................................................................

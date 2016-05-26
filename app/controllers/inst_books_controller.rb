@@ -3,8 +3,6 @@ class InstBooksController < ApplicationController
   load_and_authorize_resource
 
   #~ Action methods ...........................................................
-  # after_action :allow_iframe, only: :practice
-  # -------------------------------------------------------------
 
   # GET /exercises
   def index
@@ -77,7 +75,6 @@ class InstBooksController < ApplicationController
   # GET /exercises/1/edit
   def edit
   end
-
 
   # -------------------------------------------------------------
   # POST /exercises
@@ -236,6 +233,11 @@ class InstBooksController < ApplicationController
     redirect_to inst_books_url + '/upload', notice: 'Exercise upload complete.'
   end
 
+  # -------------------------------------------------------------
+  # POST /inst_books/:id/compile
+  def compile
+    redirect_to inst_books_url + '/upload', notice: 'Exercise upload complete.'
+  end
 
   # -------------------------------------------------------------
   def practice
