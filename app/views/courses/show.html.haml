@@ -78,14 +78,15 @@
       .tab-pane.fade{ id: 'odsa' }
         - @course_offerings.each do |offering|
           - if @course_offerings.size > 1
-            %h2 = offering.display_name
+            %h2= offering.display_name
             = link_to
           %table.table.table-striped
             %thead
               %tr
                 %th Title
                 %th Code
-                %th Compile
+                %th
+                %th
             %tbody#odsa
               - @odsa = offering.inst_books
               = render @odsa

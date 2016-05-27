@@ -1,6 +1,5 @@
 class InstBookOwner < ActiveRecord::Base
   #~ Relationships ............................................................
-  belongs_to :book_role
   belongs_to :user
   belongs_to :inst_book
 

@@ -25,6 +25,7 @@ class CourseOffering < ActiveRecord::Base
 
   #~ Relationships ............................................................
 
+  belongs_to :lms_instance, inverse_of: :course_offerings
   belongs_to :course, inverse_of: :course_offerings
   belongs_to :term, inverse_of: :course_offerings
   belongs_to :late_policy, inverse_of: :course_offerings

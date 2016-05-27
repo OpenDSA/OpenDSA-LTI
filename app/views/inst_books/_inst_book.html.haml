@@ -3,5 +3,8 @@
   %td= inst_book.book_code
   %td
     = form_tag '/inst_books/'+ inst_book.id.to_s + '/compile', multipart: true do
+      = submit_tag "Configure Book"
+  %td
+    = form_tag '/inst_books/'+ inst_book.id.to_s + '/compile', multipart: true do
       = submit_tag "Compile Book"
 

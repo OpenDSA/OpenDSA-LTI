@@ -93,6 +93,8 @@ class Ability
     if user.global_role.is_instructor?
       # Everyone can manage their own LMS access_token
       can :manage, LmsAccess, user_id: user.id
+      # Everyone can compile his book
+      can [:compile, :upload], InstBook
     end
 
   end

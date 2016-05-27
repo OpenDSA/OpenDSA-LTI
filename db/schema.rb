@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160523150926) do
+ActiveRecord::Schema.define(version: 20160527005634) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -49,10 +49,14 @@ ActiveRecord::Schema.define(version: 20160523150926) do
     t.datetime "updated_at"
     t.date     "cutoff_date"
     t.integer  "late_policy_id"
+    t.integer  "lms_instance_id"
+    t.string   "lms_course_code"
+    t.integer  "lms_course_num"
   end
 
   add_index "course_offerings", ["course_id"], name: "index_course_offerings_on_course_id", using: :btree
   add_index "course_offerings", ["late_policy_id"], name: "course_offerings_late_policy_id_fk", using: :btree
+  add_index "course_offerings", ["lms_instance_id"], name: "course_offerings_lms_instance_id_fk", using: :btree
   add_index "course_offerings", ["term_id"], name: "index_course_offerings_on_term_id", using: :btree
 
   create_table "course_roles", force: true do |t|
@@ -455,6 +459,7 @@ ActiveRecord::Schema.define(version: 20160523150926) do
 
   add_foreign_key "course_offerings", "courses", name: "course_offerings_course_id_fk", dependent: :delete
   add_foreign_key "course_offerings", "late_policies", name: "course_offerings_late_policy_id_fk"
+  add_foreign_key "course_offerings", "lms_instances", name: "course_offerings_lms_instance_id_fk"
   add_foreign_key "course_offerings", "terms", name: "course_offerings_term_id_fk", dependent: :delete
 
   add_foreign_key "courses", "organizations", name: "courses_organization_id_fk", dependent: :delete
