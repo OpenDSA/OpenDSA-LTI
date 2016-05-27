@@ -256,12 +256,12 @@ ActiveRecord::Schema.define(version: 20160527005634) do
   add_index "lms_accesses", ["user_id"], name: "lms_accesses_user_id_fk", using: :btree
 
   create_table "lms_instances", force: true do |t|
-    t.string   "url",         null: false
+    t.string   "url",             null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "lms_type_id"
-    t.string   "lti_key"
-    t.string   "lti_secret"
+    t.string   "consumer_key"
+    t.string   "consumer_secret"
   end
 
   add_index "lms_instances", ["lms_type_id"], name: "lms_instances_lms_type_id_fk", using: :btree

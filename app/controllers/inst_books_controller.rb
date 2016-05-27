@@ -225,7 +225,7 @@ class InstBooksController < ApplicationController
     InstBook.save_data_from_json(hash)
 
 
-    redirect_to inst_books_url + '/upload', notice: 'Exercise upload complete.'
+    redirect_to inst_books_url + '/upload', notice: 'Book configuration upload complete.'
   end
 
   # -------------------------------------------------------------
@@ -233,6 +233,10 @@ class InstBooksController < ApplicationController
   def compile
     inst_book = InstBook.find_by(id: params[:id])
     lms_instance_id = inst_book.course_offering.lms_instance['id']
+    consumer_key = inst_book.course_offering.lms_instance['consumer_key']
+    consumer_secret = inst_book.course_offering.lms_instance['consumer_secret']
+    launch_url = request.protocol + request.host_with_port + "/lti/launch"
+    privacy_level = "public"
     user_id = current_user['id']
     user_lms_access = LmsAccess.where(lms_instance_id: lms_instance_id).where(user_id: user_id).first
     lms_course_id = inst_book.course_offering.lms_course_num
@@ -242,9 +246,18 @@ class InstBooksController < ApplicationController
       prefix: inst_book.course_offering.lms_instance.url + '/api',
       token: user_lms_access.access_token)
 
-    puts client.get_single_course_courses(lms_course_id).inspect
+        # def create_external_tool_courses(course_id,name,privacy_level,consumer_key,shared_secret,opts={})
+    res = client.create_external_tool_courses(lms_course_id, "OpenDSA-LTI", privacy_level, consumer_key, consumer_secret, {:url => launch_url})
+    puts res.inspect
+    # res = create_lti_tool(client, consumer_key, lms_secret, launch_url)
+    # save_lms_course(client, inst_book, lms_course_id)
 
-    redirect_to inst_books_url + '/upload', notice: 'Exercise upload complete.'
+    # configure the course external_tool
+    # results = external_tools.create_external_tool_courses(
+    #     request_ctx, course_id, "OpenDSA-LTI",
+    #     privacy_level, config.LTI_consumer_key, config.LTI_secret,
+    #     url=LTI_url + "/lti/launch")
+    redirect_to :back, notice: 'Book was compiled successfully!.'
   end
 
   # -------------------------------------------------------------
