@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160527005634) do
+ActiveRecord::Schema.define(version: 20160527135945) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 20160527005634) do
     t.integer  "lms_instance_id"
     t.string   "lms_course_code"
     t.integer  "lms_course_num"
+    t.integer  "lms_tool_num"
   end
 
   add_index "course_offerings", ["course_id"], name: "index_course_offerings_on_course_id", using: :btree
