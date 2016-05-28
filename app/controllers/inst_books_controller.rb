@@ -670,11 +670,14 @@ class InstBooksController < ApplicationController
                      :module__position__ => chapter.position}
 
         if chapter.lms_chapter_id
+          opts[:module__published__] = true
           res = client.update_module(lms_course_id, chapter.lms_chapter_id, opts)
         else
           res = client.create_module(lms_course_id, chapter.name, opts)
           chapter.lms_chapter_id = res['id']
           chapter.save
+          opts[:module__published__] = true
+          res = client.update_module(lms_course_id, chapter.lms_chapter_id, opts)
         end
 
         save_lms_chapter(client, lms_course_id, chapter)
