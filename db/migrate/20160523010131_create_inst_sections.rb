@@ -11,6 +11,8 @@ class CreateInstSections < ActiveRecord::Migration
       t.datetime "hard_deadline"
       t.integer  "time_limit",             limit: 4
       t.boolean "show", default: true
+      t.integer  "lms_item_id"
+      t.integer  "lms_assignment_id"
       t.timestamps
     end
   end

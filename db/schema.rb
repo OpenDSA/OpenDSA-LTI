@@ -170,6 +170,7 @@ ActiveRecord::Schema.define(version: 20160527135945) do
     t.integer  "inst_chapter_id", null: false
     t.integer  "inst_module_id",  null: false
     t.integer  "module_position"
+    t.integer  "lms_item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -221,6 +222,8 @@ ActiveRecord::Schema.define(version: 20160527135945) do
     t.datetime "hard_deadline"
     t.integer  "time_limit"
     t.boolean  "show",                              default: true
+    t.integer  "lms_item_id"
+    t.integer  "lms_assignment_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

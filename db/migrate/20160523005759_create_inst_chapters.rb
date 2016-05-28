@@ -5,8 +5,8 @@ class CreateInstChapters < ActiveRecord::Migration
       t.string   "name",                    limit: 100, null: false
       t.string   "short_display_name",      limit: 45
       t.integer  "position",                limit: 4,   null: true
-      t.integer  "lms_chapter_id",          limit: 4
-      t.integer  "lms_assignment_group_id", limit: 4
+      t.integer  "lms_chapter_id"
+      t.integer  "lms_assignment_group_id"
       t.timestamps
     end
 

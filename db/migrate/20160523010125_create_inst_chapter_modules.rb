@@ -4,6 +4,7 @@ class CreateInstChapterModules < ActiveRecord::Migration
       t.integer  "inst_chapter_id", limit: 4, null: false
       t.integer  "inst_module_id",  limit: 4, null: false
       t.integer  "module_position", limit: 4
+      t.integer  "lms_item_id"
 
       t.timestamps
     end

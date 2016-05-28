@@ -246,11 +246,18 @@ class InstBooksController < ApplicationController
       prefix: inst_book.course_offering.lms_instance.url + '/api',
       token: user_lms_access.access_token)
 
-        # def create_external_tool_courses(course_id,name,privacy_level,consumer_key,shared_secret,opts={})
-    res = client.create_external_tool_courses(lms_course_id, "OpenDSA-LTI", privacy_level, consumer_key, consumer_secret, {:url => launch_url})
-    puts res.inspect
+    # create LTI tool in canvas if it is not defined
+    if !inst_book.course_offering.lms_tool_num || inst_book.course_offering.lms_tool_num = 0
+      res = client.create_external_tool_courses(lms_course_id, "OpenDSA-LTI", privacy_level, consumer_key, consumer_secret, {:url => launch_url})
+      inst_book.course_offering.lms_tool_num = res["id"]
+      inst_book.course_offering.save
+    end
+
+    # generate canvas course modules, items and assignments out of inst_book configurations
+    save_lms_course(client, lms_course_id, inst_book)
+
+    # puts res.inspect
     # res = create_lti_tool(client, consumer_key, lms_secret, launch_url)
-    # save_lms_course(client, inst_book, lms_course_id)
 
     # configure the course external_tool
     # results = external_tools.create_external_tool_courses(
@@ -653,5 +660,81 @@ class InstBooksController < ApplicationController
         session[:submit_num] +=  1
       end
     end
+
+    def save_lms_course(client, lms_course_id, inst_book)
+
+      chapters = InstChapter.where(inst_book_id: inst_book.id)
+
+      chapters.each do |chapter|
+        opts = {:module__name__ => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name,
+                     :module__position__ => chapter.position}
+
+        if chapter.lms_chapter_id
+          res = client.update_module(lms_course_id, chapter.lms_chapter_id, opts)
+        else
+          res = client.create_module(lms_course_id, chapter.name, opts)
+          chapter.lms_chapter_id = res['id']
+          chapter.save
+        end
+
+        save_lms_chapter(client, lms_course_id, chapter)
+
+      end
+    end
+
+    def save_lms_chapter(client, lms_course_id, chapter)
+
+      modules = InstChapterModule.where(inst_chapter_id: chapter.id)
+
+      modules.each do |inst_ch_module|
+        title = (chapter.position.to_s||"")+"."+(inst_ch_module.module_position.to_s||"")+"."+InstModule.where(:id => inst_ch_module.inst_module_id).first.name
+        opts = {:module_item__title__ => title,
+                      :module_item__type__ => 'SubHeader',
+                      :module_item__position__ => (inst_ch_module.module_position) * 100}
+
+        if inst_ch_module.lms_item_id
+          res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_item_id, opts)
+        else
+          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'SubHeader', '', opts)
+          inst_ch_module.lms_item_id = res['id']
+          inst_ch_module.save
+        end
+
+        save_lms_section(client, lms_course_id, chapter, inst_ch_module, opts[:module_item__position__] )
+      end
+    end
+
+    def save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_position = 0)
+
+      sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
+      launch_url = request.protocol + request.host_with_port + "/lti/launch"
+
+      section_position = 1
+      sections.each do |section|
+        title = (chapter.position.to_s.rjust(2, "0")||"")+"."+
+                   (inst_ch_module.module_position.to_s.rjust(2, "0")||"")+"."+
+                   section_position.to_s.rjust(2, "0")+" - "+
+                   section.name
+        opts = {:module_item__title__ => title,
+                      :module_item__type__ => 'ExternalTool',
+                      :module_item__position__ => section_position + module_position,
+                      :module_item__content_id__ => '',
+                      :module_item__external_url__ => launch_url,
+                       :module_item__indent__ => 1
+                    }
+
+        if section.lms_item_id
+          res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
+        else
+          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
+          section.lms_item_id = res['id']
+          section.save
+        end
+
+        section_position += 1
+
+      end
+    end
+
 
 end

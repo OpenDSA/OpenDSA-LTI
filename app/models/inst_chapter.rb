@@ -14,7 +14,7 @@ class InstChapter < ActiveRecord::Base
     ch.position = chapter_position
     ch.save
 
-    mod_position = 0
+    mod_position = 1
     chapter_obj.each do |k, v|
       inst_module = InstModule.save_data_from_json(book, ch, k, v, mod_position)
       mod_position += 1
