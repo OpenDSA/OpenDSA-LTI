@@ -167,10 +167,11 @@ ActiveRecord::Schema.define(version: 20160527135945) do
   add_index "inst_books", ["course_offering_id"], name: "inst_books_course_offering_id_fk", using: :btree
 
   create_table "inst_chapter_modules", force: true do |t|
-    t.integer  "inst_chapter_id", null: false
-    t.integer  "inst_module_id",  null: false
+    t.integer  "inst_chapter_id",     null: false
+    t.integer  "inst_module_id",      null: false
     t.integer  "module_position"
-    t.integer  "lms_item_id"
+    t.integer  "lms_module_item_id"
+    t.integer  "lms_section_item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

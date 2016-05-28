@@ -686,108 +686,74 @@ class InstBooksController < ApplicationController
 
       modules = InstChapterModule.where(inst_chapter_id: chapter.id)
 
-      module_item_position = 1
       modules.each do |inst_ch_module|
         title = (chapter.position.to_s||"")+"."+
                    (inst_ch_module.module_position.to_s||"")+"."+
-                   InstModule.where(:id => inst_ch_module.inst_module_id).first.name
+                  InstModule.where(:id => inst_ch_module.inst_module_id).first.name
         opts = {:module_item__title__ => title,
                       :module_item__type__ => 'SubHeader',
-                      :module_item__position__ => module_item_position}
+                      :module_item__position__ => (inst_ch_module.module_position) * 100}
 
-        if inst_ch_module.lms_module_item_id
-          res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_module_item_id, opts)
+        if inst_ch_module.lms_item_id
+          res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_item_id, opts)
         else
           res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'SubHeader', '', opts)
-          inst_ch_module.lms_module_item_id = res['id']
+          inst_ch_module.lms_item_id = res['id']
           inst_ch_module.save
         end
 
-        module_item_position = save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_item_position)
-        module_item_position += 1
+        save_lms_section(client, lms_course_id, chapter, inst_ch_module, opts[:module_item__position__] )
       end
     end
 
-    def save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_item_position)
+    def save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_position = 0)
 
       sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
       launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
-      section_item_position = 1
-
-      if !sections.empty?
+      section_position = 1
+      if sections
         sections.each do |section|
           save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                                           section, module_item_position, section_item_position,
-                                                           launch_url)
-          section_item_position += 1
+                                                           section, module_position = 0, section_position = 0,
+                                                           launch_url, sections: true)
+          section_position += 1
         end
       else
-        save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                                         nil, module_item_position, section_item_position,
-                                                         launch_url)
+          save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
+                                                           section, module_position = 0, section_position = 0,
+                                                           launch_url, sections: false)
       end
-
-      module_item_position + section_item_position
 
     end
 
+
     def save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                                            section, module_item_position, section_item_position, launch_url)
+                                                            section, module_position = 0, section_position = 0,
+                                                            launch_url, sections)
 
       title = (chapter.position.to_s.rjust(2, "0")||"")+"."+
                  (inst_ch_module.module_position.to_s.rjust(2, "0")||"")+"."+
-                 section_item_position.to_s.rjust(2, "0")+" - "
-      opts = {:module_item__title__ => '',
+                 section_position.to_s.rjust(2, "0")+" - "
+      opts = {:module_item__title__ => title,
                     :module_item__type__ => 'ExternalTool',
-                    :module_item__position__ => module_item_position + section_item_position,
+                    :module_item__position__ => section_position + module_position,
+                    :module_item__content_id__ => '',
                     :module_item__external_url__ => launch_url,
-                    :module_item__indent__ => 1
+                     :module_item__indent__ => 1
                   }
 
-      if section
-        save_section_as_assignment(client, lms_course_id, chapter, section, title, opts)
-      else
-        opts[:module_item__title__] = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
-        if inst_ch_module.lms_section_item_id
-          res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_section_item_id, opts)
-        else
-          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
-          inst_ch_module.lms_section_item_id = res['id']
-          inst_ch_module.save
-        end
-      end
-    end
-
-
-    def save_section_as_assignment(client, lms_course_id, chapter, section, title, opts)
-      assignment_opts = {
-        :assignment__name__ => title + section.name,
-        :assignment__submission_types__ => "external_tool",
-        :assignment__external_tool_tag_attributes__ => {:url => "www.google.com" },
-        :assignment__points_possible__ => 5
-        # :assignment__grading_type__ => "",
-        # :assignment__due_at__ => "",
-        # :assignment__assignment_group_id__ => "",
-        # :assignment__published__ => ""
-      }
-
-      opts[:module_item__title__] = title + section.name
-      if section.gradable
-        opts[:module_item__type__] = 'Assignment'
-        if section.lms_item_id && section.lms_assignment_id
-          opts[:module_item__content_id__] = section.lms_assignment_id
-          assignment_res = client.edit_assignment(lms_course_id, section.lms_assignment_id, assignment_opts )
+      if sections
+        opts[:module_item__title__] = title + section.name
+        if section.lms_item_id
           res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
         else
-          assignment_res = client.create_assignment(lms_course_id, title + section.name, assignment_opts)
-          opts[:module_item__content_id__] = assignment_res['id']
-          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
-          section.lms_assignment_id = assignment_res['id']
+          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
           section.lms_item_id = res['id']
           section.save
         end
       else
+        opts[:module_item__title__] = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
         if section.lms_item_id
           res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
         else
@@ -799,5 +765,36 @@ class InstBooksController < ApplicationController
 
     end
 
+    def save_section_as_assignment(client, lms_course_id, chapter, inst_ch_module, module_position = 0)
+
+      sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
+      launch_url = request.protocol + request.host_with_port + "/lti/launch"
+
+      section_position = 1
+      sections.each do |section|
+        title = (chapter.position.to_s.rjust(2, "0")||"")+"."+
+                   (inst_ch_module.module_position.to_s.rjust(2, "0")||"")+"."+
+                   section_position.to_s.rjust(2, "0")+" - "+
+                   section.name
+        opts = {:module_item__title__ => title,
+                      :module_item__type__ => 'ExternalTool',
+                      :module_item__position__ => section_position + module_position,
+                      :module_item__content_id__ => '',
+                      :module_item__external_url__ => launch_url,
+                       :module_item__indent__ => 1
+                    }
+
+        if section.lms_item_id
+          res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
+        else
+          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
+          section.lms_item_id = res['id']
+          section.save
+        end
+
+        section_position += 1
+
+      end
+    end
 
 end
