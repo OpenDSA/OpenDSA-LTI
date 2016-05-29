@@ -1,5 +1,4 @@
 class InstBooksController < ApplicationController
-
   load_and_authorize_resource
 
   #~ Action methods ...........................................................
@@ -743,7 +742,7 @@ class InstBooksController < ApplicationController
       title = (title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name) if !section else title
 
       url_opts = {
-        :inst_book_id => @inst_book.id,
+        :book_path => book_path(@inst_book),
         :section_file_name => section_file_name,
         :section_title => title
       }
