@@ -37,5 +37,6 @@ class InstSection < ActiveRecord::Base
   def one_gradable_ex_only
 
   end
+
   #~ Private instance methods .................................................
 end

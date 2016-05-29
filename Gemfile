@@ -33,6 +33,10 @@ gem 'truncate_html'
 gem 'puma'
 gem 'tzinfo' # For timezone support
 
+# Addressable is a replacement for the URI implementation that is part of Ruby's standard library.
+# It more closely conforms to the relevant RFCs and adds support for IRIs and URI templates.
+gem 'addressable', '~> 2.3', '>= 2.3.8'
+
 # For JSON support
 gem 'rabl'
 gem 'oj'

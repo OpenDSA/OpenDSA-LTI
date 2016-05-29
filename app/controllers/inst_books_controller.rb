@@ -231,39 +231,31 @@ class InstBooksController < ApplicationController
   # -------------------------------------------------------------
   # POST /inst_books/:id/compile
   def compile
-    inst_book = InstBook.find_by(id: params[:id])
-    lms_instance_id = inst_book.course_offering.lms_instance['id']
-    consumer_key = inst_book.course_offering.lms_instance['consumer_key']
-    consumer_secret = inst_book.course_offering.lms_instance['consumer_secret']
-    launch_url = request.protocol + request.host_with_port + "/lti/launch"
+    @inst_book = InstBook.find_by(id: params[:id])
+    lms_instance_id = @inst_book.course_offering.lms_instance['id']
+    consumer_key = @inst_book.course_offering.lms_instance['consumer_key']
+    consumer_secret = @inst_book.course_offering.lms_instance['consumer_secret']
+    @launch_url = request.protocol + request.host_with_port + "/lti/launch"
     privacy_level = "public"
     user_id = current_user['id']
     user_lms_access = LmsAccess.where(lms_instance_id: lms_instance_id).where(user_id: user_id).first
-    lms_course_id = inst_book.course_offering.lms_course_num
+    lms_course_id = @inst_book.course_offering.lms_course_num
 
     require 'pandarus'
     client = Pandarus::Client.new(
-      prefix: inst_book.course_offering.lms_instance.url + '/api',
+      prefix: @inst_book.course_offering.lms_instance.url + '/api',
       token: user_lms_access.access_token)
 
     # create LTI tool in canvas if it is not defined
-    if !inst_book.course_offering.lms_tool_num || inst_book.course_offering.lms_tool_num = 0
-      res = client.create_external_tool_courses(lms_course_id, "OpenDSA-LTI", privacy_level, consumer_key, consumer_secret, {:url => launch_url})
-      inst_book.course_offering.lms_tool_num = res["id"]
-      inst_book.course_offering.save
+    if !@inst_book.course_offering.lms_tool_num || @inst_book.course_offering.lms_tool_num = 0
+      res = client.create_external_tool_courses(lms_course_id, "OpenDSA-LTI", privacy_level, consumer_key, consumer_secret, {:url => @launch_url})
+      @inst_book.course_offering.lms_tool_num = res["id"]
+      @inst_book.course_offering.save
     end
 
     # generate canvas course modules, items and assignments out of inst_book configurations
-    save_lms_course(client, lms_course_id, inst_book)
+    save_lms_course(client, lms_course_id)
 
-    # puts res.inspect
-    # res = create_lti_tool(client, consumer_key, lms_secret, launch_url)
-
-    # configure the course external_tool
-    # results = external_tools.create_external_tool_courses(
-    #     request_ctx, course_id, "OpenDSA-LTI",
-    #     privacy_level, config.LTI_consumer_key, config.LTI_secret,
-    #     url=LTI_url + "/lti/launch")
     redirect_to :back, notice: 'Book was compiled successfully!.'
   end
 
@@ -661,9 +653,9 @@ class InstBooksController < ApplicationController
       end
     end
 
-    def save_lms_course(client, lms_course_id, inst_book)
+    def save_lms_course(client, lms_course_id)
 
-      chapters = InstChapter.where(inst_book_id: inst_book.id)
+      chapters = InstChapter.where(inst_book_id: @inst_book.id)
 
       chapters.each do |chapter|
         opts = {:module__name__ => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name,
@@ -714,21 +706,18 @@ class InstBooksController < ApplicationController
     def save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_item_position)
 
       sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
-      launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
       section_item_position = 1
 
       if !sections.empty?
         sections.each do |section|
           save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                                           section, module_item_position, section_item_position,
-                                                           launch_url)
+                                                           section, module_item_position, section_item_position)
           section_item_position += 1
         end
       else
         save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                                         nil, module_item_position, section_item_position,
-                                                         launch_url)
+                                                         nil, module_item_position, section_item_position)
       end
 
       module_item_position + section_item_position
@@ -736,22 +725,43 @@ class InstBooksController < ApplicationController
     end
 
     def save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                                            section, module_item_position, section_item_position, launch_url)
+                                                            section, module_item_position, section_item_position)
+
+      module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
+      if module_name.include? '/'
+        module_name = module_name.split('/')[1]
+      end
+      if section
+        section_file_name = module_name + "-" + section.position.to_s.rjust(2, "0")
+      else
+        section_file_name = module_name
+      end
 
       title = (chapter.position.to_s.rjust(2, "0")||"")+"."+
                  (inst_ch_module.module_position.to_s.rjust(2, "0")||"")+"."+
                  section_item_position.to_s.rjust(2, "0")+" - "
-      opts = {:module_item__title__ => '',
+      title = (title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name) if !section else title
+
+      url_opts = {
+        :inst_book_id => @inst_book.id,
+        :section_file_name => section_file_name,
+        :section_title => title
+      }
+
+      require "addressable/uri"
+      uri = Addressable::URI.new
+      uri.query_values = url_opts
+
+      opts = {:module_item__title__ => title,
                     :module_item__type__ => 'ExternalTool',
                     :module_item__position__ => module_item_position + section_item_position,
-                    :module_item__external_url__ => launch_url,
+                    :module_item__external_url__ => @launch_url + '?' + uri.query,
                     :module_item__indent__ => 1
                   }
 
       if section
-        save_section_as_assignment(client, lms_course_id, chapter, section, title, opts)
+        save_section_as_assignment(client, lms_course_id, chapter, section, title, opts, url_opts)
       else
-        opts[:module_item__title__] = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
         if inst_ch_module.lms_section_item_id
           res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_section_item_id, opts)
         else
@@ -763,20 +773,21 @@ class InstBooksController < ApplicationController
     end
 
 
-    def save_section_as_assignment(client, lms_course_id, chapter, section, title, opts)
+    def save_section_as_assignment(client, lms_course_id, chapter, section, title, opts, url_opts)
+
+      url_opts[:section_title] = title + section.name
+      uri = Addressable::URI.new
+      uri.query_values = url_opts
+
       assignment_opts = {
         :assignment__name__ => title + section.name,
         :assignment__submission_types__ => "external_tool",
-        :assignment__external_tool_tag_attributes__ => {:url => "www.google.com" },
-        :assignment__points_possible__ => 5
-        # :assignment__grading_type__ => "",
-        # :assignment__due_at__ => "",
-        # :assignment__assignment_group_id__ => "",
-        # :assignment__published__ => ""
+        :assignment__external_tool_tag_attributes__ => {:url => @launch_url + '?' + uri.query },
       }
 
       opts[:module_item__title__] = title + section.name
       if section.gradable
+        assignment_opts[:assignment__points_possible__] = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", section.id).first.points
         opts[:module_item__type__] = 'Assignment'
         if section.lms_item_id && section.lms_assignment_id
           opts[:module_item__content_id__] = section.lms_assignment_id
