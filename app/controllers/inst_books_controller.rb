@@ -731,7 +731,7 @@ class InstBooksController < ApplicationController
         module_name = module_name.split('/')[1]
       end
       if section
-        section_file_name = module_name + "-" + section.position.to_s.rjust(2, "0")
+        section_file_name = module_name + "-" + section_item_position.to_s.rjust(2, "0")
       else
         section_file_name = module_name
       end

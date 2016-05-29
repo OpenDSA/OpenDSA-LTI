@@ -65,14 +65,9 @@ class ApplicationController < ActionController::Base
 
   # -------------------------------------------------------------
   def sanitize_filename(filename)
-     filename.strip do |name|
-       # NOTE: File.basename doesn't work right with Windows paths on Unix
-       # get only the filename, not the whole path
-       name.gsub!(/^.*(\\|\/)/, '')
-
-       # Strip out the non-ascii character
-       name.gsub!(/[^0-9A-Za-z.\-]/, '_')
-    end
+      filename.gsub(/[^\w\s_-]+/, '')
+                    .gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2')
+                    .gsub(/\s+/, '_')
   end
 
   # -------------------------------------------------------------
@@ -82,9 +77,11 @@ class ApplicationController < ActionController::Base
     course = Course.where(:id => course_offering.course_id).first
     organization = Organization.where(:id => course.organization_id).first
 
+
     sanitize_filename(organization.slug)+"/"+
     sanitize_filename(course.slug)+"/"+
     sanitize_filename(term.slug)+"/"+
     sanitize_filename(course_offering.label)
+
   end
 end
