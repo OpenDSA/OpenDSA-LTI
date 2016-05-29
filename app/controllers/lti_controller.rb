@@ -1,4 +1,5 @@
 class LtiController < ApplicationController
+layout 'lti', only: [:launch]
 
   after_action :allow_iframe, only: :launch
   # the consumer keys/secrets
@@ -13,6 +14,7 @@ class LtiController < ApplicationController
     @section_html = File.read(File.join('public/OpenDSA/Books',
                                                             params["book_path"],
                                                             '/lti_html/', "#{params['section_file_name'].to_s}.html")) and return
+
   end
 
   def assessment

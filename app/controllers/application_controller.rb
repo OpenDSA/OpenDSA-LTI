@@ -10,7 +10,6 @@ class ApplicationController < ActionController::Base
   self.responder = ApplicationResponder
   respond_to :html
 
-
   # -------------------------------------------------------------
   # On access errors, redirect to home page with flash of error message.
   # This is enabled, even for development, since the default error
