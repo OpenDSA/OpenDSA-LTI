@@ -11,7 +11,9 @@ class CreateOdsaExerciseProgresses < ActiveRecord::Migration
       t.integer  "total_correct",                 limit: 4,                         null: false
       t.datetime "proficient_date",                                                 null: false
       t.decimal  "progress",                                precision: 5, scale: 2, null: false
-
+      t.string "current_exercise"
+      t.string "correct_exercises"
+      t.string "hinted_exercise"
       t.timestamps
     end
   end

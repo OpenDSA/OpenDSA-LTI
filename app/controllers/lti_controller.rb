@@ -3,13 +3,28 @@ layout 'lti', only: [:launch]
 
   after_action :allow_iframe, only: :launch
   # the consumer keys/secrets
-  $oauth_creds = {"test" => "secret"}
 
   def launch
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
+    @inst_book = InstBook.find_by(id: params[:inst_book_id])
+    $oauth_creds = @inst_book.lms_creds
 
     render('error') and return unless lti_authorize!
+
+    # TODO: get user info from @tp object
+    # register the user if he is not yet registered.
+    email = params[:lis_person_contact_email_primary]
+    first_name = params[:lis_person_name_given]
+    last_name = params[:lis_person_name_family]
+    @user = User.where(email: email).first
+    if @user.blank?
+      # TODO: should mark this as LMS user then prevent this user from login to codeworkout domain
+      @user = User.new(:email => email, :password => email, :password_confirmation => email, :first_name => first_name, :last_name => last_name)
+      @user.save
+    end
+    sign_in @user
+    lti_enroll
 
     @section_html = File.read(File.join('public/OpenDSA/Books',
                                                             params["book_path"],
@@ -52,6 +67,21 @@ layout 'lti', only: [:launch]
   end
 
   private
+    def lti_enroll
+      inst_book = InstBook.find_by(id: params[:inst_book_id])
+      course_offering = CourseOffering.find_by(id: inst_book.course_offering_id)
+
+      if course_offering &&
+        course_offering.can_enroll? &&
+        !course_offering.is_enrolled?(current_user)
+
+        CourseEnrollment.create(
+        course_offering: course_offering,
+        user: current_user,
+        course_role: CourseRole.student)
+      end
+    end
+
     def lti_authorize!
       if key = params['oauth_consumer_key']
         if secret = $oauth_creds[key]

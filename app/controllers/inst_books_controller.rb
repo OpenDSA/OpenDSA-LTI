@@ -652,6 +652,8 @@ class InstBooksController < ApplicationController
       end
     end
 
+    # -------------------------------------------------------------
+    # Create canvas modules that maps to OpenDSA chapters
     def save_lms_course(client, lms_course_id)
 
       chapters = InstChapter.where(inst_book_id: @inst_book.id)
@@ -676,6 +678,8 @@ class InstBooksController < ApplicationController
       end
     end
 
+    # -------------------------------------------------------------
+    # For each canvas module, create text items (just a label) that maps to OpenDSA modules
     def save_lms_chapter(client, lms_course_id, chapter)
 
       modules = InstChapterModule.where(inst_chapter_id: chapter.id)
@@ -702,6 +706,12 @@ class InstBooksController < ApplicationController
       end
     end
 
+    # -------------------------------------------------------------
+    # Under each text item in canvas create external links the maps to OpenDSA sections
+    # Section can be non-gradable as:
+    # 1- OpenDSA module that doesn't contain any sections, the entire module will be considered as one non-gradable section
+    # 2- section contains one or more exercsies which all of them have 0 points
+    # in canvas, module item that has external link will map OpenDSA non-gradable section
     def save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_item_position)
 
       sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
@@ -723,6 +733,8 @@ class InstBooksController < ApplicationController
 
     end
 
+    # -------------------------------------------------------------
+    # in canvas, module item that has external link will map OpenDSA non-gradable section
     def save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
                                                             section, module_item_position, section_item_position)
 
@@ -742,6 +754,7 @@ class InstBooksController < ApplicationController
       title = (title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name) if !section else title
 
       url_opts = {
+        :inst_book_id => @inst_book.id,
         :book_path => book_path(@inst_book),
         :section_file_name => section_file_name,
         :section_title => title
@@ -772,6 +785,9 @@ class InstBooksController < ApplicationController
     end
 
 
+    # -------------------------------------------------------------
+    # If OpenDSA section is gradable, it has only one exercises with points greater than zero.
+    # in canvas, module item that refer to an assignment will map OpenDSA gradable section
     def save_section_as_assignment(client, lms_course_id, chapter, section, title, opts, url_opts)
 
       url_opts[:section_title] = title + section.name
