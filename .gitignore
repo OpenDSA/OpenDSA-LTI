@@ -45,3 +45,8 @@ timezones.txt
 # proportion of contributors will probably not be using SublimeText
 # *.sublime-project
 tasks.todo
+
+# if using bower-rails ignore default bower_components path bower.json files
+/vendor/assets/bower_components
+*.bowerrc
+bower.json

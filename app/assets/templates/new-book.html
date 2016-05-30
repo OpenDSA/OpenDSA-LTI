@@ -1,0 +1,72 @@
+<style>
+.bookMenu  {
+    float: right;
+    list-style-type: none;
+}
+.bookMenu > li > a {
+    float: right;
+    text-decoration: none;
+    color: rgb(41, 39, 45);
+}
+</style>
+<div class="create-content">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+                New Book
+                <ul class="bookMenu">
+                    <li>
+                        <a id="loadBookBtn" data-toggle="modal" data-target="#loadConfigModal" href="#Load">Load</a>
+                    </li>
+                </ul>
+        </div>
+        <div class="panel-body container-fluid">
+            <!-- Set up the new book controller for use within this form element -->
+            <form method="post" ng-controller="NewBookController as newBookCtrl">
+                <text-input ng-model="newBookCtrl.name" label="Configuration Name" input="name" placeholder="Configuration Name"></text-input>
+                <text-input ng-model="newBookCtrl.bookConfig.title" label="title" input="title" placeholder="Title"></text-input>
+                <text-input ng-model="newBookCtrl.bookConfig.module_origin" label="Module Origin" input="title" placeholder="example: http://algoviz.org"></text-input>
+                <select-input ng-model="newBookCtrl.bookConfig.lang"  array="true" label="Language" input="lang" options="newBookCtrl.languages" ></select-input>
+
+                <!-- optional triangle button; it shows/hides the optional fields when clicked -->
+                <div class="row" ng-click="newBookCtrl.toggleOptional = !newBookCtrl.toggleOptional;">
+                    <span class="col-sm-2 glyphicon glyphicon-menu-right center-block" ng-class="{'glyphicon-menu-down' : newBookCtrl.toggleOptional}" ng-class="{'glyphicon-menu-right' : !newBookCtrl.toggleOptional}"></span>
+                    <div class="col-sm-10">
+                        <!-- Very hacky, but it looks fine :D -->
+                        <label class="text-left" style="margin-bottom: 0px;">
+                            Optional Values
+                        </label>
+                    </div>
+                </div>
+                <!-- The optional fields -->
+                <div ng-show="newBookCtrl.toggleOptional">
+                    <hr />
+                    <div class="row" style="margin-bottom: 10px;"><!-- Space holder --></div>
+                    <!-- Optional values here -->
+                    <text-input ng-model="newBookCtrl.bookConfig.build_dir" label="Build Directory" ></text-input>
+                    <check-input ng-model="newBookCtrl.bookConfig.tabbed_codeinc" label="Tabbed Code Inc" input="tabbedCodeInc"></check-input>
+                </div>
+                <div class="row">
+                    <!-- The chapter menu row that spans the entire panel -->
+                    <chapter-menu data-toggle="modal" data-target="#newChapterModal"></chapter-menu>
+                </div>
+                <div style="padding: 0px 10px;" class="row">
+                    <ul style="padding: 0px">
+                        <!-- Each currently in the book has it's own entry -->
+                        <chapter-entry ng-repeat="chapter in newBookCtrl.bookConfig.chapters track by $index" chapter-index="{{$index}}" show="chapter.open" modules="chapter.modules" data-toggle="modal" data-target="#modulesModal" on-toggle="openChapter($index)" on-edit="selectChapter($index)" on-delete="deleteChapter($index)"  name="{{chapter.name}}"></chapter-entry>
+                    </ul>
+                </div>
+                <div class="form-group row">
+                    <span class="col-sm-10"><!-- Space holder --></span>
+                    <span class="col-sm-2">
+                        <button id="saveConfigBtn" style="float: right;" type="button" class="btn btn-primary">Save</button>
+                    </span>
+                </div>
+                <modules-modal id="modulesModal" add-module="addModule()" ng-model="newBookCtrl.selectedModule" watch-value="newBookCtrl.bookConfig.lang"></modules-modal>
+                <load-config-modal id="loadConfigModal"></load-config-modal>
+                <new-chapter-modal id="newChapterModal"></new-chapter-modal>
+                <!-- Just for debug purposess -->
+                {{newBookCtrl.bookConfig}}
+            </form>
+        </div>
+    </div>
+</div>

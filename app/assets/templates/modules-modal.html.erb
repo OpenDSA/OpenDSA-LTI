@@ -1,0 +1,21 @@
+<link type="text/css" rel="stylesheet" href="<%= asset_path("jstree/dist/themes/default/style.min.css")%>" />
+<div id="{{id}}" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button"class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Select Modules</h4>
+            </div>
+            <div class="modal-body">
+                <div id="module-div">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" ng-click="addModule()" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    <script src="<%= asset_path("jstree/dist/jstree.min.js") %>"></script>
+</div>

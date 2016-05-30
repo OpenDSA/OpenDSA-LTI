@@ -6,7 +6,9 @@ CodeWorkout::Application.routes.draw do
 
   post 'lti/assessment'
 
-  get 'configurations/book/create'
+  post 'configurations/book/create_redirect' # to be deleted later
+
+  get 'configurations/book/create', as: :book_config_cerate
 
   post 'configurations/book/create'
 

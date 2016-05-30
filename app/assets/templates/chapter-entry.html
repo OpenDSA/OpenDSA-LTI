@@ -1,0 +1,86 @@
+<style>
+    li.chapter-entry {
+        list-style-type: none;
+        margin-bottom: 5px;
+        padding: 0px 0px;
+        overflow: hidden;
+        background-color: white;
+        border-radius: 3px;
+        border: thin solid #ddd;
+    }
+
+    .over {
+        border: thin dashed #000 !important;
+    }
+
+    .chapter-entry-hover {
+        background-color:rgb(201, 235, 251) !important;
+    }
+
+    ul.chapter-entry-wrapper {
+        list-style-type: none;
+        margin: 0px;
+        padding: 0px;
+        overflow: hidden;
+        background-color: #f5f5f5;
+    }
+
+    li.chapter-entry-name {
+        padding: 14px 16px;
+        display: block;
+        float: left;
+        margin: 0;
+        width: 85%;
+    }
+
+    li.chapter-entry-body {
+        padding: 14px 16px;
+        display: block;
+        float: right;
+        margin: 0;
+        width: 15%;
+    }
+
+    span.chapter-entry-body-edit {
+        float: right;
+    }
+
+    span.chapter-entry-body-delete {
+        float: right;
+    }
+
+    .chapter-entry-body-elem {
+        margin: 0px 5px;
+    }
+
+    .chapter-entry-body-elem:hover {
+        color: white;
+    }
+
+    .chapter-entry-modules {
+        border-top: thin solid #ddd;
+        padding: 20px 20px;
+    }
+
+    .chapter-entry-modules-list {
+        padding: 0px;
+    }
+
+</style>
+<li draggable="true" class="chapter-entry">
+    <ul class="chapter-entry-wrapper">
+        <li class="chapter-entry-name">
+            {{name}}
+        </li>
+        <li class="chapter-entry-body">
+            <span class="chapter-entry-body-delete chapter-entry-body-elem glyphicon glyphicon-trash"></span>
+            <span class="chapter-entry-body-edit chapter-entry-body-elem glyphicon glyphicon-plus"></span>
+        </li>
+    </ul>
+    <div class="chapter-entry-modules" ng-show="show">
+        <ul class="chapter-entry-modules-list">
+            <module-entry ng-repeat="module in modules track by $index" chapter-index="{{chapterIndex}}" module-index="{{$index}}"module="module">
+            </module-entry>
+        </ul>
+    </div>
+</li>

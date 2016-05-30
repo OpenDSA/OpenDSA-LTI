@@ -1,0 +1,18 @@
+<div id="{{id}}" ng-controller="LoadConfigController as loadConfigCtrl" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Load Config</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Add content here! -->
+                <select-input ng-model="loadConfigCtrl.selection" label="Configuration" input="config" options="loadConfigCtrl.options"></select-input>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="loadConfig()">Load</button>
+            </div>
+        </div>
+    </div>
+</div>

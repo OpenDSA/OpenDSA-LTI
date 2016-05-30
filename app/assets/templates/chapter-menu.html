@@ -1,0 +1,42 @@
+<style>
+ul.chapter-menu {
+    list-style-type: none;
+    margin: 0;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    border-color: #ddd;
+    border-style: solid;
+    border-width: thin 0px;
+}
+
+ul.chapter-menu > li > a {
+    display: block;
+    color: rgb(41, 39, 45);
+    text-align: center;
+    padding: 10px 15px;
+    text-decoration: none;
+}
+
+ul.chapter-menu > li > a.chapter-menu-title {
+    float: left;
+}
+
+ul.chapter-menu > li > a.chapter-menu-add-elem {
+    float: right;
+    background-color: #59e441;
+    text-decoration: none;
+    border-radius: 3px;
+    border-color: #ddd;
+}
+
+ul.chapter-menu > li > a.chapter-menu-add-elem:hover {
+    background-color: #8ff27e;
+}
+</style>
+<ul class="chapter-menu">
+    <li><a class="chapter-menu-title">Chapters</a></li>
+    <li><a class="chapter-menu-add-elem" href="#AddChapter">Add</a></li>
+</ul>

@@ -1,0 +1,50 @@
+// Place all the styles related to the Configurations controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+.banner {
+    background-color:lightgrey;
+    height: 75px;
+}
+
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    background-color: #eee;
+}
+
+img.banner-logo{
+    height:20px;
+    width:20px;
+}
+
+.banner > h1 {
+    margin: 0;
+}
+
+.banner > div.container {
+    padding: 0px;
+    margin: 0px;
+}
+
+.create-content {
+    margin-top: 20px;
+}
+
+.dropdown-btn{
+    height: 80px;
+    text-align: center;
+    background-image: url(/static/img/arrow_down.png);
+    transform: rotate(90deg) scale(0.30, 0.30);
+}
+
+.dropdown-active{
+    transform: rotate(0deg) scale(0.30, 0.30);
+}
+
+hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

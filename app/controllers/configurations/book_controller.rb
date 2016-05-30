@@ -135,6 +135,12 @@ end
 
 # The actual rails controller
 class Configurations::BookController < ApplicationController
+
+    # This action should be deleted and configuraiton json file should be send directly to edit action for editing
+    def create_redirect
+        redirect_to :book_config_cerate
+    end
+
     def create
         # If this is a HTTP post request
         if request.post?
