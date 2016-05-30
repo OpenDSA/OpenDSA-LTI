@@ -6,6 +6,21 @@ CodeWorkout::Application.routes.draw do
 
   post 'lti/assessment'
 
+  get 'configurations/book/create'
+
+  post 'configurations/book/create'
+
+  get 'configurations/book/edit'
+
+  post 'configurations/book/edit'
+
+  get 'configurations/book/modules'
+
+  get 'configurations/book/load'
+
+  get 'configurations/book/configs' # Gets the configuration file names that already exist
+
+
   get 'home' => 'home#index'
   get 'main' => 'home#index'
   get 'home/about'
