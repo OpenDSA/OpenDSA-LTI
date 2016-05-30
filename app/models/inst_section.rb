@@ -33,9 +33,17 @@ class InstSection < ActiveRecord::Base
   # TODO
   # check that only one child exercise in inst_book_section_exercises table
   # is gradable (has points > 0)
-
   def one_gradable_ex_only
 
+  end
+
+  # -------------------------------------------------------------
+  # return the gradable exercise name from inst_exercises table and
+  # id from inst_book_section_exercises table
+  def get_gradable_ex
+    inst_bk_sec_ex = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", id).first
+    inst_ex = InstExercise.where(id: inst_bk_sec_ex['inst_exercise_id']).first
+    {'ex_name' => inst_ex.short_name, "inst_bk_sec_ex" => inst_bk_sec_ex.id}
   end
 
   #~ Private instance methods .................................................

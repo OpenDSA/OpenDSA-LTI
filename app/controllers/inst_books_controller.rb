@@ -742,6 +742,7 @@ class InstBooksController < ApplicationController
       if module_name.include? '/'
         module_name = module_name.split('/')[1]
       end
+
       if section
         section_file_name = module_name + "-" + section_item_position.to_s.rjust(2, "0")
       else
@@ -755,6 +756,7 @@ class InstBooksController < ApplicationController
 
       url_opts = {
         :inst_book_id => @inst_book.id,
+        :inst_section_id => (section.id if section),
         :book_path => book_path(@inst_book),
         :section_file_name => section_file_name,
         :section_title => title
@@ -790,7 +792,13 @@ class InstBooksController < ApplicationController
     # in canvas, module item that refer to an assignment will map OpenDSA gradable section
     def save_section_as_assignment(client, lms_course_id, chapter, section, title, opts, url_opts)
 
-      url_opts[:section_title] = title + section.name
+      if section.gradable
+        gradable_ex = section.get_gradable_ex
+        url_opts[:ex_name] = gradable_ex['ex_name']
+        url_opts[:inst_bk_sec_ex] = gradable_ex['inst_bk_sec_ex']
+        url_opts[:section_title] = title + section.name
+      end
+
       uri = Addressable::URI.new
       uri.query_values = url_opts
 
