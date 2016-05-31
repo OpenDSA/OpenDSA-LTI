@@ -5,7 +5,7 @@
     = form_tag '/configurations/book/create_redirect' do
       = submit_tag "Configure Book"
   %td
-    = form_tag '/inst_books/'+ inst_book.id.to_s + '/compile', data: {type: "script"}, format: 'js' do
+    = form_tag '/inst_books/'+ inst_book.id.to_s + '/compile', data: {type: "script"}, format: 'js', remote: true do
       = submit_tag "Compile Book"
 
 

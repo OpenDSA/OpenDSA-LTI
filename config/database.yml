@@ -9,6 +9,7 @@ development:
    username: opendsa
    password: opendsa
    host: localhost
+   strict: false
 
 # development:
 #   adapter: sqlite3

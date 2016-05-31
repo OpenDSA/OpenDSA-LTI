@@ -47,7 +47,7 @@ class CompileBookJob < ProgressJob::Base
       opts = {:module__name__ => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name,
                    :module__position__ => chapter.position}
 
-      update_stage('Generate Chapter: ' + opts[:module__name__])
+      update_stage('Generating: ' + opts[:module__name__])
 
       if chapter.lms_chapter_id
         opts[:module__published__] = true

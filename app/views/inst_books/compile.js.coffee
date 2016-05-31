@@ -14,16 +14,16 @@ interval = setInterval((->
       progress = progress.toFixed(2)
       # In job stage
       if progress.toString() != 'NaN'
-        $('.progress-status').text job.progress_current + '/' + job.progress_max
+        $('.progress-status').text job.progress_current + '/' + job.progress_max + ' (' +job.progress_stage + ')'
         $('.progress-bar').css('width', progress + '%').text progress + '%'
       return
     error: ->
       # Job is no loger in database which means it finished successfuly
       $('.progress').removeClass 'active'
       $('.progress-bar').css('width', '100%').text '100%'
-      $('.progress-status').text 'Successfully exported!'
+      $('.progress-status').text 'Book generated successfully.'
       $('.export-link').show()
       clearInterval interval
       return
   return
-), 1000)
+), 5000)
