@@ -37,6 +37,11 @@ gem 'tzinfo' # For timezone support
 # It more closely conforms to the relevant RFCs and adds support for IRIs and URI templates.
 gem 'addressable', '~> 2.3', '>= 2.3.8'
 
+gem 'daemons'
+gem 'delayed_job_active_record'
+gem 'progress_job'
+
+
 # For JSON support
 gem 'rabl'
 gem 'oj'

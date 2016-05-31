@@ -62,25 +62,4 @@ class ApplicationController < ActionController::Base
     response.headers.except! 'X-Frame-Options'
   end
 
-  # -------------------------------------------------------------
-  def sanitize_filename(filename)
-      filename.gsub(/[^\w\s_-]+/, '')
-                    .gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2')
-                    .gsub(/\s+/, '_')
-  end
-
-  # -------------------------------------------------------------
-  def book_path(inst_book)
-    course_offering = CourseOffering.where(:id => inst_book.course_offering_id).first
-    term = Term.where(:id => course_offering.term_id).first
-    course = Course.where(:id => course_offering.course_id).first
-    organization = Organization.where(:id => course.organization_id).first
-
-
-    sanitize_filename(organization.slug)+"/"+
-    sanitize_filename(course.slug)+"/"+
-    sanitize_filename(term.slug)+"/"+
-    sanitize_filename(course_offering.label)
-
-  end
 end

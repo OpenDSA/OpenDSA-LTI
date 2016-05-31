@@ -150,6 +150,11 @@ GEM
     csv_shaper (1.1.1)
       activesupport (>= 3.0.0)
     daemons (1.2.3)
+    delayed_job (4.1.2)
+      activesupport (>= 3.0, < 5.1)
+    delayed_job_active_record (4.1.1)
+      activerecord (>= 3.0, < 5.1)
+      delayed_job (>= 3.0, < 5)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     devise (3.4.0)
@@ -286,6 +291,8 @@ GEM
     polyamorous (1.1.0)
       activerecord (>= 3.0)
     power_assert (0.2.2)
+    progress_job (0.0.4)
+      delayed_job
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -437,6 +444,8 @@ DEPENDENCIES
   coffee-script-source
   css3-progress-bar-rails
   csv_shaper
+  daemons
+  delayed_job_active_record
   devise
   exception_handler
   factory_girl_rails
@@ -467,6 +476,7 @@ DEPENDENCIES
   omniauth-facebook
   omniauth-google-oauth2
   pandarus (~> 0.6.7)
+  progress_job
   pry
   puma
   rabl

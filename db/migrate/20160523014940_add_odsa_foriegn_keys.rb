@@ -22,9 +22,10 @@ class AddOdsaForiegnKeys < ActiveRecord::Migration
     add_foreign_key "odsa_module_progresses", "users"
     add_foreign_key "odsa_student_extensions", "inst_sections"
     add_foreign_key "odsa_student_extensions", "users"
-    add_foreign_key "odsa_user_interactions", "inst_book_section_exercises"
-    add_foreign_key "odsa_user_interactions", "inst_books"
-    add_foreign_key "odsa_user_interactions", "inst_sections"
     add_foreign_key "odsa_user_interactions", "users"
+    add_foreign_key "odsa_user_interactions", "inst_books"
+    add_foreign_key "odsa_user_interactions", "inst_chapter_modules"
+    add_foreign_key "odsa_user_interactions", "inst_sections"
+    add_foreign_key "odsa_user_interactions", "inst_book_section_exercises"
   end
 end

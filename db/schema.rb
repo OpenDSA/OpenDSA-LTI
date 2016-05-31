@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160527135945) do
+ActiveRecord::Schema.define(version: 20160530232554) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -81,6 +81,25 @@ ActiveRecord::Schema.define(version: 20160527135945) do
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
   add_index "courses", ["slug"], name: "index_courses_on_slug", using: :btree
+
+  create_table "delayed_jobs", force: true do |t|
+    t.integer  "priority",         default: 0, null: false
+    t.integer  "attempts",         default: 0, null: false
+    t.text     "handler",                      null: false
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.string   "queue"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "progress_stage"
+    t.integer  "progress_current", default: 0
+    t.integer  "progress_max",     default: 0
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
 
   create_table "errors", force: true do |t|
     t.string   "usable_type"
@@ -334,6 +353,9 @@ ActiveRecord::Schema.define(version: 20160527135945) do
     t.integer  "total_correct",                                         null: false
     t.datetime "proficient_date",                                       null: false
     t.decimal  "progress",                      precision: 5, scale: 2, null: false
+    t.string   "current_exercise"
+    t.string   "correct_exercises"
+    t.string   "hinted_exercise"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -373,8 +395,9 @@ ActiveRecord::Schema.define(version: 20160527135945) do
   create_table "odsa_user_interactions", force: true do |t|
     t.integer  "inst_book_id",                                     null: false
     t.integer  "user_id",                                          null: false
-    t.integer  "inst_section_id",                                  null: false
-    t.integer  "inst_book_section_exercise_id",                    null: false
+    t.integer  "inst_chapter_module_id",                           null: false
+    t.integer  "inst_section_id"
+    t.integer  "inst_book_section_exercise_id"
     t.string   "name",                          limit: 50,         null: false
     t.text     "description",                   limit: 2147483647, null: false
     t.datetime "action_time",                                      null: false
@@ -391,6 +414,7 @@ ActiveRecord::Schema.define(version: 20160527135945) do
 
   add_index "odsa_user_interactions", ["inst_book_id"], name: "odsa_user_interactions_inst_book_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_book_section_exercise_id"], name: "odsa_user_interactions_inst_book_section_exercise_id_fk", using: :btree
+  add_index "odsa_user_interactions", ["inst_chapter_module_id"], name: "odsa_user_interactions_inst_chapter_module_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_section_id"], name: "odsa_user_interactions_inst_section_id_fk", using: :btree
   add_index "odsa_user_interactions", ["user_id"], name: "odsa_user_interactions_user_id_fk", using: :btree
 
@@ -511,6 +535,7 @@ ActiveRecord::Schema.define(version: 20160527135945) do
 
   add_foreign_key "odsa_user_interactions", "inst_book_section_exercises", name: "odsa_user_interactions_inst_book_section_exercise_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_books", name: "odsa_user_interactions_inst_book_id_fk"
+  add_foreign_key "odsa_user_interactions", "inst_chapter_modules", name: "odsa_user_interactions_inst_chapter_module_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_sections", name: "odsa_user_interactions_inst_section_id_fk"
   add_foreign_key "odsa_user_interactions", "users", name: "odsa_user_interactions_user_id_fk"
 

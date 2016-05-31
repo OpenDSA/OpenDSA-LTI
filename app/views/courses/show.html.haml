@@ -90,6 +90,18 @@
             %tbody#odsa
               - @odsa = offering.inst_books
               = render @odsa
+        .well
+          .row
+            .col-xs-12
+              .progress-status.text-primary
+                0/0
+          .row
+            .col-xs-12
+              .progress.progress-striped.active
+                .progress-bar
+                  .text-primary
+                    0%
+
 
 -else
 
