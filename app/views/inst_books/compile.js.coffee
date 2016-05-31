@@ -22,7 +22,8 @@ interval = setInterval((->
       $('.progress').removeClass 'active'
       $('.progress-bar').css('width', '100%').text '100%'
       $('.progress-status').text 'Book generated successfully.'
-      $('.export-link').show()
+      $('[name="compile_commit"]')[0].disabled = false;
+      $('[name="compile_commit"]')[0].value = "Recompile Book";
       clearInterval interval
       return
   return
