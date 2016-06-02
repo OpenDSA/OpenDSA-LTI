@@ -94,7 +94,7 @@ class Ability
       # Everyone can manage their own LMS access_token
       can :manage, LmsAccess, user_id: user.id
       # Everyone can compile his book
-      can [:compile, :upload], InstBook
+      can [:compile], InstBook
     end
 
   end
