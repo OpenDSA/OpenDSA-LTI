@@ -1,13 +1,25 @@
+class InstChapter < ActiveRecord::Base
+  #~ Relationships ............................................................
+  belongs_to :inst_book
+  has_many :inst_chapter_modules
 
-  class InstChapter < ActiveRecord::Base
-    self.table_name = 'inst_chapters'
-    self.inheritance_column = 'ruby_type'
-    self.primary_key = 'id'
+  #~ Validation ...............................................................
+  #~ Constants ................................................................
+  #~ Hooks ....................................................................
+  #~ Class methods ............................................................
+  def self.save_data_from_json(book, chapter_name, chapter_obj, chapter_position)
+    ch = InstChapter.new
+    ch.inst_book_id = book.id
+    ch.name = chapter_name
+    ch.position = chapter_position
+    ch.save
 
-    if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-      attr_accessible :inst_book_id, :name, :short_display_name, :position, :lms_chapter_id, :lms_assignment_group_id, :created_at, :updated_at
+    mod_position = 1
+    chapter_obj.each do |k, v|
+      inst_module = InstModule.save_data_from_json(book, ch, k, v, mod_position)
+      mod_position += 1
     end
-
-    belongs_to :inst_book, :foreign_key => 'inst_book_id', :class_name => 'InstBook'
-    has_many :inst_chapter_modules, :foreign_key => 'inst_chapter_id', :class_name => 'InstChapterModule'
   end
+  #~ Instance methods .........................................................
+  #~ Private instance methods .................................................
+end

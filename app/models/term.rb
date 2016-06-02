@@ -1,18 +1,33 @@
+# == Schema Information
+#
+# Table name: terms
+#
+#  id         :integer          not null, primary key
+#  season     :integer          not null
+#  starts_on  :date             not null
+#  ends_on    :date             not null
+#  year       :integer          not null
+#  created_at :datetime
+#  updated_at :datetime
+#  slug       :string(255)      default(""), not null
+#
+# Indexes
+#
+#  index_terms_on_slug             (slug) UNIQUE
+#  index_terms_on_year_and_season  (year,season)
+#
+
+# =============================================================================
+# Represents an academic term or semester, which indicates the time period
+# for one or more course offerings.
+#
 class Term < ActiveRecord::Base
   extend FriendlyId
   friendly_id :display_name, use: :history
 
-  self.table_name = 'terms'
-  self.inheritance_column = 'ruby_type'
-  self.primary_key = 'id'
+  #~ Relationships ............................................................
 
-  if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-    attr_accessible :season, :starts_on, :ends_on, :year, :created_at, :updated_at, :slug
-  end
-
-  has_many :course_offerings, :foreign_key => 'term_id', :class_name => 'CourseOffering'
-  has_many :courses, :through => :course_offerings, :foreign_key => 'course_id', :class_name => 'Course'
-  has_many :late_policies, :through => :course_offerings, :foreign_key => 'late_policy_id', :class_name => 'LatePolicy'
+  has_many :course_offerings, inverse_of: :term, dependent: :destroy
 
   # Orders terms in descending order (latest time first).
   # default_scope { order('ends_on desc') }
@@ -45,6 +60,7 @@ class Term < ActiveRecord::Base
   #~ Validation ...............................................................
 
   validates_presence_of :season, :year, :starts_on, :ends_on, :slug
+
 
   #~ Class methods ............................................................
 

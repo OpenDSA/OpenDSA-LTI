@@ -1,13 +1,11 @@
+class LmsAccess < ActiveRecord::Base
+  #~ Relationships ............................................................
 
-  class LmsAccess < ActiveRecord::Base
-    self.table_name = 'lms_access'
-    self.inheritance_column = 'ruby_type'
-    self.primary_key = 'id'
+  belongs_to :lms_instance, inverse_of: :lms_accesses
+  belongs_to :user, inverse_of: :lms_accesses
 
-    if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-      attr_accessible :user_id, :lms_instance_id, :access_token, :created_at, :updated_at
-    end
+  #~ Validation ...............................................................
 
-    belongs_to :lms_instance, :foreign_key => 'lms_instance_id', :class_name => 'LmsInstance'
-    belongs_to :user, :foreign_key => 'user_id', :class_name => 'User'
-  end
+  validates :access_token, presence: true
+
+end

@@ -1,13 +1,22 @@
+# == Schema Information
+#
+# Table name: time_zones
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  zone       :string(255)
+#  display_as :string(255)
+#  created_at :datetime
+#  updated_at :datetime
+#
 
-  class TimeZone < ActiveRecord::Base
-    self.table_name = 'time_zones'
-    self.inheritance_column = 'ruby_type'
-    self.primary_key = 'id'
-
-    if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-      attr_accessible :name, :zone, :display_as, :created_at, :updated_at
-    end
-
-    has_many :users, :foreign_key => 'time_zone_id', :class_name => 'User'
-    has_many :global_roles, :through => :users, :foreign_key => 'global_role_id', :class_name => 'GlobalRole'
+class TimeZone < ActiveRecord::Base
+  has_many :users
+  def to_s
+    return display_as
   end
+  
+  def to_label
+    return display_as
+  end
+end

@@ -1,12 +1,12 @@
+class LmsType < ActiveRecord::Base
 
-  class LmsType < ActiveRecord::Base
-    self.table_name = 'lms_types'
-    self.inheritance_column = 'ruby_type'
-    self.primary_key = 'id'
+  #~ Relationships ............................................................
+  has_many :lms_instances, inverse_of: :lms_types
 
-    if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-      attr_accessible :name, :created_at, :updated_at
-    end
+  #~ Validation ...............................................................
 
-    has_many :lms_instances, :foreign_key => 'lms_type_id', :class_name => 'LmsInstance'
-  end
+  validates :name, presence: true,
+    uniqueness: { case_sensitive: true }
+
+  #~ Private instance methods .................................................
+end

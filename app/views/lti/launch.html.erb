@@ -1,0 +1,24 @@
+<script>
+  (function() {
+    var TP = {};
+  <% if @tp.outcome_service? %>
+    TP.outcomeService = true;
+    TP.passback = {"lis_result_sourcedid": "<%= params["lis_result_sourcedid"] %>",
+                              "lis_outcome_service_url": "<%= params["lis_outcome_service_url"] %>"};
+    TP.exericseName = "<%= params["ex_name"] %>";
+    TP.instBookSectionExerciseId = "<%= params["inst_bk_sec_ex"] %>";
+    TP.outcomeService = true;
+  <% else %>
+    TP.outcomeService = false;
+  <% end %>
+    TP.userEmail = "<%= @user.email %>";
+    TP.sectionTitle = "<%= params["section_title"] %>";
+    TP.instBookId = "<%= params["inst_book_id"] %>";
+    TP.instSectionId = "<%= params["inst_section_id"] %>";
+
+    window.ODSA = window.ODSA || {};
+    window.ODSA.TP = TP;
+  }());
+</script>
+
+<%= @section_html.html_safe %>

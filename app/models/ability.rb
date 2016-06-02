@@ -39,9 +39,6 @@ class Ability
         process_global_role user
         process_instructor user
         process_courses user
-        process_exercises user
-        process_workouts user
-        process_resource_files user
       end
     end
   end
@@ -70,23 +67,17 @@ class Ability
         User,
         Course,
         CourseOffering,
-        CourseEnrollment,
-        Workout,
-        Exercise,
-        Attempt,
-        ResourceFile
+        CourseEnrollment
       ]
     end
 
     # Grant broad course management access through the
     # GlobalRole.can_manage_all_courses? permission.
     if user.global_role.can_manage_all_courses?
-      can :manage, [Course, CourseOffering, CourseEnrollment,
-        Workout, Exercise, Attempt, ResourceFile]
+      can :manage, [Course, CourseOffering, CourseEnrollment]
     end
 
   end
-
 
   # -------------------------------------------------------------
   def process_instructor(user)
@@ -95,11 +86,17 @@ class Ability
       # FIXME: The exercise/workout permissions need to be role-based
       # with respect to the course offering, rather than depending on the
       # global role.
-      can [:create], [Course, CourseOffering, CourseEnrollment,
-        Workout, Exercise, Attempt, ResourceFile]
+      can [:create], [Course, CourseOffering, CourseEnrollment]
 
-      can [:index], [Workout, Exercise, Attempt, ResourceFile]
     end
+
+    if user.global_role.is_instructor?
+      # Everyone can manage their own LMS access_token
+      can :manage, LmsAccess, user_id: user.id
+      # Everyone can compile his book
+      can [:compile], InstBook
+    end
+
   end
 
 
@@ -111,6 +108,7 @@ class Ability
   def process_courses(user)
     if !user.global_role.can_edit_system_configuration? &&
       !user.global_role.can_manage_all_courses?
+
 
       # Everyone can manage their own course enrollments
       can :manage, CourseEnrollment, user_id: user.id
@@ -138,96 +136,6 @@ class Ability
         enrollment.course_offering.is_manager? user
       end
     end
-  end
-
-
-  # -------------------------------------------------------------
-  def process_exercises(user)
-    # Everyone can search exercises
-    can [:search, :random_exercise], Exercise
-
-    if !user.global_role.can_edit_system_configuration? &&
-      !user.global_role.can_manage_all_courses? &&
-      !user.global_role.is_instructor?
-
-      # Still needs revision
-      can [:index, :read, :practice, :evaluate], Exercise,
-        Exercise.visible_to_user(user) do |e|
-        e.visible_to?(user)
-      end
-      can [:show], WorkoutOffering do |o|
-        o.can_be_seen_by? user
-#        now = Time.now
-#        ((o.opening_date == nil) || (o.opening_date <= now)) &&
-#          o.course_offering.course_enrollments.where(user_id: user.id).any?
-      end
-      can [:review], WorkoutOffering, course_offering: {course_enrollments: {user: user, course_role: {can_manage_assignments: true}}}
-      can [:practice], WorkoutOffering do |o|
-        o.can_be_seen_by? user
-#        now = Time.now
-#        ((o.opening_date == nil) || (o.opening_date <= now)) &&
-#          ((o.hard_deadline >= now) || (o.soft_deadline >= now)) &&
-#          o.course_offering.course_enrollments.where(user_id: user.id).any?
-      end
-      can :practice, Exercise do |e|
-        now = Time.now
-        e.is_public? || WorkoutOffering.
-#          joins{workout.exercises}.joins{course_offering.course_enrollments}.
-#          where{
-#            course_offering.course_enrollments.user_id == user.id &
-#            course_offering.course_enrollments.course_role_id.not_eq
-#              CourseRole.STUDENT_ID
-#             }.any? || WorkoutOffering.
-          joins{workout.exercises}.joins{course_offering.course_enrollments}.
-          where{
-            ((starts_on == nil) | (starts_on <= now)) &
-            course_offering.course_enrollments.user_id == user.id
-             }.any?
-#        e.workouts.workout_offerings.where(
-#          '(starts_on is NULL or starts_on < :time) and ' \
-#          '(hard_deadline >= :time or soft_deadline >= :time)',
-#          { time: Time.now }).course_offering.course_enrollments.
-#          where(user: user)
-      end
-      can :evaluate, Exercise do |e|
-        now = Time.now
-        WorkoutOffering.
-          joins{workout.exercises}.joins{course_offering.course_enrollments}.
-          where{
-            ((starts_on == nil) | (starts_on <= now)) &
-            ((hard_deadline >= now) | (soft_deadline >= now)) &
-            course_offering.course_enrollments.user_id == user.id
-             }.any?
-#        e.workouts.workout_offerings.where(
-#          '(starts_on is NULL or starts_on < :time) and ' \
-#          '(hard_deadline >= :time or soft_deadline >= :time)',
-#          { time: Time.now }).course_offering.course_enrollments.
-#          where(user: user)
-      end
-      can :create, Exercise if user.global_role.is_instructor?
-      can [:update], Exercise, exercise_owners: { owner: user }
-
-      can :read, Attempt, workout_score:
-        { workout_offering:
-          { course_offering:
-            { course_enrollments:
-              { user: user, course_role:
-                { can_manage_assignments: true } } } } }
-      can [:create, :read], Attempt, user: user
-    end
-  end
-
-
-  # -------------------------------------------------------------
-  def process_workouts(user)
-    can [:read, :update, :destroy], Workout, creator_id: user.id
-    can :practice, Workout, is_public: true
-  end
-
-
-  # -------------------------------------------------------------
-  def process_resource_files(user)
-    can [:read, :update, :destroy], ResourceFile, user_id: user.id
   end
 
 end

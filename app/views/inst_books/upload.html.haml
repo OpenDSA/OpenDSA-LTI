@@ -1,0 +1,3 @@
+= form_tag inst_books_url + '/upload_create', multipart: true do
+  = file_field('form', 'file')
+  = submit_tag 'Submit File'

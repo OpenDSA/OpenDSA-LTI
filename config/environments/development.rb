@@ -1,5 +1,6 @@
-Rails.application.configure do
-  # Settings specified here will take precedence over those in config/application.rb.
+CodeWorkout::Application.configure do
+  # Settings specified here will take precedence over those in
+  # config/application.rb.
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
@@ -13,13 +14,18 @@ Rails.application.configure do
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
+  # For SSEs
+  config.preload_frameworks = true
+  config.allow_concurrency = true
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
-  # Raise an error on page load if there are pending migrations.
+  # Raise an error on page load if there are pending migrations
   config.active_record.migration_error = :page_load
 
   # Debug mode disables concatenation and preprocessing of assets.
@@ -27,32 +33,40 @@ Rails.application.configure do
   # number of complex assets.
   config.assets.debug = true
 
-  config.action_mailer.smtp_settings = {
-    address: "smtp.gmail.com",
-    port: 587,
-    domain: Rails.application.secrets.domain_name,
-    authentication: "plain",
-    enable_starttls_auto: true,
-    user_name: Rails.application.secrets.email_provider_username,
-    password: Rails.application.secrets.email_provider_password
-  }
-  # ActionMailer Config
-  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.raise_delivery_errors = true
-  # Send email in development mode?
-  config.action_mailer.perform_deliveries = true
+  # Do not fallback to assets pipeline if a precompiled asset is missed.
+  # config.assets.compile = false
+
+  # Generate digests for assets URLs.
+  # config.assets.digest = true
 
 
-  # Asset digests allow you to set far-future HTTP expiration dates on all assets,
-  # yet still be able to expire them through the digest params.
-  config.assets.digest = true
+  config.assets.initialize_on_precompile = true
 
-  # Adds additional error checking when serving assets at runtime.
-  # Checks for improperly declared sprockets dependencies.
-  # Raises helpful error messages.
-  config.assets.raise_runtime_errors = true
-
-  # Raises error for missing translations
-  # config.action_view.raise_on_missing_translations = true
+  config.middleware.use LogFile::Display
+#  config.log_level = :info
+  config.log_formatter = proc do |severity, datetime, progname, msg|
+    if severity == 'DEBUG' && msg.blank?
+      ''
+    else
+      case severity
+      when 'DEBUG'
+        severity_colored = "\033[36;40m[DEBUG]\033[0m" # cyan
+      when 'INFO'
+        severity_colored = "\033[32;40m[INFO]\033[0m" # green
+      when 'WARN'
+        severity_colored = "\033[35;40m[WARNING]\033[0m" # magenta
+      when 'ERROR'
+        severity_colored = "\033[31;40m[ERROR]\033[0m" # red
+      when 'FATAL'
+        severity_colored = "\033[7;31;40m[FATAL]\033[0m" # black, red bg
+      else
+        severity_colored = "[#{severity}]" # none
+      end
+      "%s %s %s\n" % [
+        datetime.strftime('%Y-%m-%d %H:%M:%S'),
+        severity_colored,
+        String === msg ? msg : msg.inspect
+        ]
+    end
+  end
 end

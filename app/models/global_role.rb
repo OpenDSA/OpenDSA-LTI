@@ -1,14 +1,19 @@
+# == Schema Information
+#
+# Table name: global_roles
+#
+#  id                            :integer          not null, primary key
+#  name                          :string(255)      default(""), not null
+#  can_manage_all_courses        :boolean          default(FALSE), not null
+#  can_edit_system_configuration :boolean          default(FALSE), not null
+#  builtin                       :boolean          default(FALSE), not null
+#
+
+# =============================================================================
+# Represents a user's global permissions on the system.  This has now
+# degenerated into what ammounts to a global "administrator" flag.
+#
 class GlobalRole < ActiveRecord::Base
-  self.table_name = 'global_roles'
-  self.inheritance_column = 'ruby_type'
-  self.primary_key = 'id'
-
-  if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-    attr_accessible :name, :can_manage_all_courses, :can_edit_system_configuration, :builtin, :created_at, :updated_at
-  end
-
-  has_many :users, :foreign_key => 'global_role_id', :class_name => 'User'
-  has_many :time_zones, :through => :users, :foreign_key => 'time_zone_id', :class_name => 'TimeZone'
 
   #~ Validation ...............................................................
 

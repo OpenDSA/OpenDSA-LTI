@@ -1,14 +1,18 @@
+class LmsInstance < ActiveRecord::Base
+  #~ Relationships ............................................................
+  has_many  :lms_accesses, inverse_of: :lms_instances
+  has_many  :course_offerings, inverse_of: :lms_instances
+  belongs_to  :lms_type, inverse_of: :lms_instances
+  has_many :users, :through => :lms_accesses
 
-  class LmsInstance < ActiveRecord::Base
-    self.table_name = 'lms_instance'
-    self.inheritance_column = 'ruby_type'
-    self.primary_key = 'id'
+  #~ Validation ...............................................................
 
-    if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-      attr_accessible :lms_type_id, :url, :created_at, :updated_at
-    end
+  validates_presence_of :url
 
-    belongs_to :lms_type, :foreign_key => 'lms_type_id', :class_name => 'LmsType'
-    has_many :lms_accesses, :foreign_key => 'lms_instance_id', :class_name => 'LmsAccess'
-    has_many :users, :through => :lms_accesses, :foreign_key => 'user_id', :class_name => 'User'
+
+  def display_name
+    "#{url}"
   end
+
+  #~ Private instance methods .................................................
+end

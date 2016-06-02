@@ -1,0 +1,286 @@
+@import "yamm";
+@import "radial";
+
+/* Main two-column layout tweaks */
+
+html, body { height: 100%; }
+
+.non-scrollable { overflow-y: hidden; }
+.scrollable { overflow-y: auto; }
+.max-height { height: 100%; }
+.full-height { min-height: 100%; }
+.no-overflow { overflow-y: hidden; }
+.below-nav { padding: 60px 10px 0; }
+.breadcrumb { margin-bottom: 15px; }
+
+.sidebar, .content, .maincol {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.content, .maincol {
+  padding-bottom: 40px;
+}
+.below-nav > .alert { margin: 10px 15px 20px; }
+
+#main { margin: 0 0 40px; }
+
+.navbar .nav > li > a, .navbar-inverse .navbar-link { padding: 2px 6px; }
+.navbar .nav > li { padding: 8px 9px; }
+.navbar .nav > li.nav-text { padding: 8px 9px 0 0; }
+.navbar { min-height: 44px; }
+.navbar .nav-top { margin-top: 4px; }
+.navbar .form-control.search-query { padding: 0 6px; }
+.navbar .search .btn-sm {  padding: 7px 10px; }
+
+/* yamm */
+
+.dropdown-menu { border-radius: 6px; }
+.yamm .navbar-right .dropdown-menu.signin { right: 0; }
+
+.dropdown-menu.signin { width: 30%; }
+.signin .yamm-content { padding: 5px 30px; }
+.signin .yamm-content .form-horizontal .form-group label.control-label {
+  width: 20%;
+}
+.signin .yamm-content .form-horizontal .form-group .form-wrapper {
+  width: 80%;
+}
+.signin .yamm-content .form-horizontal .form-group { margin-bottom: 5px; }
+.dropdown-menu.signin .btn { margin: 5px 15px; font-size: larger; }
+
+/* Codemirror */
+
+.CodeMirror { height: auto; margin-bottom: 9px; }
+.CodeMirror-scroll { max-height: 400px; }
+/* .practice .CodeMirror { min-height: 18px * 15; } */
+
+
+/* Right sidebar text */
+
+.sidebar h2 {
+  padding-left: 4px;
+}
+.sidebar h3, .sidebar h3 a {
+  margin-bottom: 0;
+}
+
+.sidebar article time { float: right; margin-right: 10px; }
+.sidebar article p { margin: 0; }
+.sidebar article { margin-bottom: 15px; }
+
+.form-actions { padding: 0; margin: 0; }
+
+.form-horizontal .form-group label.control-label {
+  width: 16.6666666667%;
+}
+.form-horizontal .form-group .form-wrapper {
+  width: 83.3333333333%;
+  display: inline-block;
+}
+.form-horizontal .form-group label.control-label,
+.form-horizontal .form-group .form-wrapper {
+  float: left;
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.form-actions {
+  margin-bottom: 15px;
+  margin-left: 16.666666666666664%;
+  padding-left: 8px;
+}
+
+/* for consistent font awesome icons */
+[class^="icon-"]::before, [class*=" icon-"]::before {
+  font-weight: 400;
+}
+
+/* improve icon display on bootstrap buttons */
+.btn i { padding-right: 5px; }
+.btn i:last-child { padding-right: 0; }
+.answers .radio { margin-left: 20px; margin-top: 0; margin-bottom: 0; }
+.tag { font-weight: inherit; }
+.debug {
+  position: fixed;
+  bottom: 45px;
+  left: 0;
+  right: 0;
+  margin-bottom: 0;
+  z-index: 1030;
+}
+.debug .CodeMirror { margin-bottom: 0; }
+.navbar .badge { vertical-align: text-top; }
+
+/* Authoring form */
+
+ul.wysihtml5-toolbar { padding: 0; margin: 0; }
+ul.wysihtml5-toolbar li {
+  display:inline;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Search results */
+.teaser-title p { padding-left: 4px; padding-bottom: 0px; }
+.slim { margin: 0; }
+.one-line{ overflow: hidden; white-space: nowrap; }
+
+/* home page */
+.home .cta {
+  background-image: image-url('bg1.jpg');
+  background-repeat: no-repeat;
+  background-position: top right;
+  background-size: cover;
+  margin-bottom: 40px;
+  margin-top: -6px;
+  padding-top: 6px;
+}
+.home .row.blurb { margin: 40px 0; text-align: center; }
+
+.home .cta .row { margin-left: 0; margin-right: 0; }
+.home .cta .pitch {
+  color: white;
+  background-image: image-url('black-30.png');
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-right: 15px;
+  font-size: x-large;
+  text-align: center;
+}
+.home .cta .pitch strong {
+  font-size: larger;
+  color: #efb04f;
+}
+
+.home .cta .pitch p a {
+  font-weight: bold;
+  color: #efb04f;
+}
+
+.home.contact .form-wrapper { margin-top: 7px; }
+
+
+/* exercise and workout thumbnails */
+.thumbnail {
+  padding-left: 0;
+  padding-right: 0;
+
+  .title {
+    @extend .one-line;
+    text-overflow: ellipsis;
+    padding-left: 9px;
+    .badge { vertical-align: top; }
+    .fa-stack {
+      line-height: 1.2em;
+      height: 1.2em;
+      width: 1.2em;
+      vertical-align: text-bottom;
+    }
+    .fa-stack-1x { font-size: 0.7em; }
+    .fa-stack-2x { font-size: 1.2em; }
+  }
+  .due {
+    display: block;
+    font-size: 75%;
+    float: right;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 5px;
+    min-width: 57px;
+    z-index: 1;
+    text-align: center;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+  }
+
+  .summary {
+    display: table-cell;
+    vertical-align: center;
+    float: right;
+    width: 57px;
+    padding-right: 5px;
+    text-align: center;
+    .xp { display: block; font-size: 75%; color: black; }
+    .xp:after { content: 'xp'; }
+  }
+
+  .body, .info { padding: 0 63px 0 9px; width: 100%; }
+  .body {
+    $font-size: 12px;
+    $line-height: 1.4;
+    $lines-to-show: 3;
+    font-size: $font-size;
+    line-height: $line-height;
+    height: $font-size * $line-height * $lines-to-show;
+    .text {
+      display: block;
+      display: -webkit-box;
+      height: $font-size * $line-height * $lines-to-show;
+      -webkit-line-clamp: $lines-to-show;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .info {
+    padding-bottom: 5px;
+    .taglist {
+      @extend .one-line;
+      min-height: 17px;
+      text-overflow: ellipsis;
+    }
+    .difficulty { float: right; margin: 5px -52px 0 0; }
+  }
+}
+
+.thumbnail.lg {
+  width: 45%;
+  margin-right: 2%;
+  margin-left: 2%;
+  padding-bottom: 0;
+  display: block;
+  float: left;
+  .body {
+    $font-size: 14px;
+    $line-height: 1.4;
+    $lines-to-show: 3;
+    font-size: $font-size;
+    line-height: $line-height;
+    height: $font-size * $line-height * $lines-to-show;
+    .text {
+      height: $font-size * $line-height * $lines-to-show;
+    }
+  }
+}
+.workout.thumbnail.lg {
+  .summary { padding-top: 3px; }
+}
+.thumbnail.closed .title,
+.thumbnail.closed .title a { color: #888; }
+.thumbnail.closed .due { background-color: #ddd; color: black; }
+
+/* Exercise practice page */
+.practice .control-label { display: none; }
+.form-horizontal .answers .form-group { margin-left: 0; margin-right: 0; }
+
+.tab-content { margin-top: 1em; }
+.tab-content.under-collapsible { padding-left: 15px; padding-right: 15px; }
+
+.feedback .pass, .feedback .fail { text-align: center; vertical-align: middle; }
+.feedback .pass { color: #468847; }
+.feedback .fail { color: #dd514c; }
+.feedback .out { font-style: italic; }
+/* img.difficulty { float: right; } */
+.form-control.inline { display: inline-block; width: auto; }
+
+.answers > .form-group { margin-bottom: 0; }
+
+.due {
+  text-align: center;
+  font-weight: bold;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+}

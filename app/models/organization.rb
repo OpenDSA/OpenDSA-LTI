@@ -1,17 +1,42 @@
+# == Schema Information
+#
+# Table name: organizations
+#
+#  id           :integer          not null, primary key
+#  name         :string(255)      default(""), not null
+#  created_at   :datetime
+#  updated_at   :datetime
+#  abbreviation :string(255)
+#  slug         :string(255)      default(""), not null
+#
+# Indexes
+#
+#  index_organizations_on_slug  (slug) UNIQUE
+#
+
+# =============================================================================
+# Represents a university, college, school, or other organization that
+# has courses.
+#
 class Organization < ActiveRecord::Base
   extend FriendlyId
   friendly_id :abbreviation, use: :history
 
+  #~ Relationships ............................................................
 
-  self.table_name = 'organizations'
-  self.inheritance_column = 'ruby_type'
-  self.primary_key = 'id'
+  has_many :courses,
+    -> { order('number asc') },
+    inverse_of: :organization,
+    dependent: :destroy
 
-  if ActiveRecord::VERSION::STRING < '4.0.0' || defined?(ProtectedAttributes)
-    attr_accessible :name, :created_at, :updated_at, :abbreviation, :slug
-  end
 
-  has_many :courses, :foreign_key => 'organization_id', :class_name => 'Course'
+  #~ Validation ...............................................................
+
+  validates :name, presence: true,
+    uniqueness: { case_sensitive: false }
+  validates :abbreviation, presence: true,
+    uniqueness: { case_sensitive: false }
+
 
   #~ Private instance methods .................................................
   private
@@ -53,4 +78,5 @@ class Organization < ActiveRecord::Base
       set_abbreviation_if_necessary
       slug.blank? || abbreviation_changed?
     end
+
 end
