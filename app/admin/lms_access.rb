@@ -1,5 +1,4 @@
 ActiveAdmin.register LmsAccess do
-  scope_to :current_user, unless: proc{ current_user.global_role.is_admin? }
   includes :lms_instance, :user
   active_admin_import
 

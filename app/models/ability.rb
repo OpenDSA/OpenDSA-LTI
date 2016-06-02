@@ -86,7 +86,7 @@ class Ability
       # FIXME: The exercise/workout permissions need to be role-based
       # with respect to the course offering, rather than depending on the
       # global role.
-      can [:create], [Course, CourseOffering, CourseEnrollment, LmsAccess]
+      can [:create], [Course, CourseOffering, CourseEnrollment]
 
     end
 
