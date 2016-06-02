@@ -18,7 +18,7 @@ ActiveAdmin.register InstBook do
   form do |f|
     f.semantic_errors *f.object.errors.keys
     f.inputs do
-      f.input :course_offering, :collection => CourseOffering.all.map{ |course_offering| "#{course_offering.course.organization.abbreviation} #{course_offering.term.slug} #{course_offering.course.number} (#{course_offering.label})"}
+      f.input :course_offering
       f.input :title
       f.input :book_url
       f.input :book_code
