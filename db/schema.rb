@@ -149,16 +149,6 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   add_index "identities", ["uid", "provider"], name: "index_identities_on_uid_and_provider", using: :btree
   add_index "identities", ["user_id"], name: "index_identities_on_user_id", using: :btree
 
-  create_table "inst_book_owners", force: true do |t|
-    t.integer  "user_id",      null: false
-    t.integer  "inst_book_id", null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "inst_book_owners", ["inst_book_id", "user_id"], name: "index_inst_book_owners_on_inst_book_id_and_user_id", unique: true, using: :btree
-  add_index "inst_book_owners", ["user_id"], name: "inst_book_owners_user_id_fk", using: :btree
-
   create_table "inst_book_section_exercises", force: true do |t|
     t.integer  "inst_book_id",                                             null: false
     t.integer  "inst_section_id",                                          null: false
@@ -494,9 +484,6 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   add_foreign_key "courses", "organizations", name: "courses_organization_id_fk", dependent: :delete
 
   add_foreign_key "identities", "users", name: "identities_user_id_fk", dependent: :delete
-
-  add_foreign_key "inst_book_owners", "inst_books", name: "inst_book_owners_inst_book_id_fk"
-  add_foreign_key "inst_book_owners", "users", name: "inst_book_owners_user_id_fk"
 
   add_foreign_key "inst_book_section_exercises", "inst_books", name: "inst_book_section_exercises_inst_book_id_fk"
   add_foreign_key "inst_book_section_exercises", "inst_exercises", name: "inst_book_section_exercises_inst_exercise_id_fk"

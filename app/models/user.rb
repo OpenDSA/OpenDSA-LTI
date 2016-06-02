@@ -69,8 +69,6 @@ class User < ActiveRecord::Base
   # belongs_to  :current_workout_score, class_name: 'WorkoutScore'
   # has_many   :test_case_results, inverse_of: :user, dependent: :destroy
   has_many  :lms_accesses, inverse_of: :user
-  has_many    :inst_book_owners, inverse_of: :user
-
   #~ Hooks ....................................................................
 
   delegate :can?, :cannot?, to: :ability

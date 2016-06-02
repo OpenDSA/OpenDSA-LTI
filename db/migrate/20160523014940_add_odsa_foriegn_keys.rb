@@ -1,7 +1,5 @@
 class AddOdsaForiegnKeys < ActiveRecord::Migration
   def change
-    add_foreign_key "inst_book_owners", "users"
-    add_foreign_key "inst_book_owners", "inst_books"
     add_foreign_key "inst_book_section_exercises", "inst_exercises"
     add_foreign_key "inst_book_section_exercises", "inst_books"
     add_foreign_key "inst_book_section_exercises", "inst_sections"
