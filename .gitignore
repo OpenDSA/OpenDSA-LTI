@@ -19,6 +19,7 @@ test-*.txt
 # lib/assets/
 public/assets/
 public/OpenDSA
+.settings
 **/.DS_Store
 usr/attempts/
 usr/resources/*/tests
