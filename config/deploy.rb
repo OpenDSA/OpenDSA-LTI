@@ -39,7 +39,8 @@ set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public
 
 set :bower_flags, '--quiet --config.interactive=false'
 set :bower_roles, :web
-set :bower_target_path, nil
+# set :bower_target_path, nil
+# set :bower_target_path, "#{release_path}"
 set :bower_bin, :bower
 
 namespace :deploy do
