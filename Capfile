@@ -12,14 +12,20 @@ require 'capistrano/deploy'
 #   https://github.com/capistrano/rbenv
 #   https://github.com/capistrano/chruby
 #   https://github.com/capistrano/bundler
-#   https://github.com/capistrano/rails/tree/master/assets
-#   https://github.com/capistrano/rails/tree/master/migrations
+#   https://github.com/capistrano/rails
 #
-# require 'capistrano/rvm'
-# require 'capistrano/rbenv'
-# require 'capistrano/chruby'
+require 'capistrano/bundler'
 require 'capistrano/rails'
-#require 'sidekiq/capistrano'
+require 'capistrano/rbenv'
+set :rbenv_type, :user
+set :rbenv_ruby, '2.3.1'
+
+# require 'capistrano/passenger'
+
+# require 'capistrano/rvm'
+# require 'capistrano/chruby'
+# require 'capistrano/rails/assets'
+# require 'capistrano/rails/migrations'
 
 # Loads custom tasks from `lib/capistrano/tasks' if you have any defined.
-Dir.glob('lib/capistrano/tasks/*.cap').each { |r| import r }
+Dir.glob('lib/capistrano/tasks/*.rake').each { |r| import r }

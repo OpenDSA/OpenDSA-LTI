@@ -122,6 +122,7 @@ gem 'wannabe_bool'
 gem 'capistrano'
 gem 'capistrano-bundler'
 gem 'capistrano-rails'
+gem 'capistrano-rbenv', github: "capistrano/rbenv"
 
 #for multi-color progress bar
 gem 'css3-progress-bar-rails'
