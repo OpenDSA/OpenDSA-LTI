@@ -2,7 +2,7 @@
 lock '3.2.1'
 
 set :application, 'OpenDSA-LTI'
-set :repo_url, 'git@github.com/OpenDSA/OpenDSA-LTI.git'
+set :repo_url, 'git://github.com/OpenDSA/OpenDSA-LTI.git'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
@@ -36,6 +36,11 @@ set :keep_releases, 5
 
 set :linked_files, %w{config/database.yml config/secrets.yml}
 set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
+
+set :bower_flags, '--quiet --config.interactive=false'
+set :bower_roles, :web
+set :bower_target_path, nil
+set :bower_bin, :bower
 
 namespace :deploy do
 

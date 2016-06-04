@@ -119,6 +119,7 @@ gem 'cocoon'
 gem 'wannabe_bool'
 
 # Gems for deployment.
+gem 'capistrano-bower'
 gem 'capistrano'
 gem 'capistrano-bundler'
 gem 'capistrano-rails'
