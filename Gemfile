@@ -60,7 +60,6 @@ group :development, :test do
   gem 'annotate'
   gem 'rails-erd', github: 'voormedia/rails-erd'
   gem 'immigrant'
-  gem 'faker'
   # Needed for debugging support in Aptana Studio.  Disabled, since these
   # two gems do not support Ruby 2.0 yet :-(.
   # gem 'ruby-debug-base'
@@ -69,6 +68,7 @@ group :development, :test do
   gem 'thin'
   gem 'request-log-analyzer'
 end
+gem 'faker'
 gem 'factory_girl_rails'
 gem 'log_file'
 
