@@ -20,6 +20,7 @@ require 'capistrano/bower'
 require 'capistrano/bundler'
 require 'capistrano/passenger'
 require 'capistrano/rbenv'
+require 'capistrano/delayed_job'
 set :rbenv_type, :user
 set :rbenv_ruby, '2.3.1'
 

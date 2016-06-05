@@ -120,6 +120,7 @@ gem 'cocoon'
 gem 'wannabe_bool'
 
 # Gems for deployment.
+gem 'capistrano3-delayed-job', '~> 1.0'
 gem 'capistrano-bower'
 gem 'capistrano'
 gem 'capistrano-bundler'
