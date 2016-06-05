@@ -78,6 +78,7 @@ end
 
 group :production, :staging do
   gem 'mysql2'
+  gem 'faker'
 end
 
 group :doc do
