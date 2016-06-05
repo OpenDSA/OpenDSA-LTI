@@ -13,6 +13,7 @@
 //= require modernizr.min.js
 //= require jquery
 //= require jquery_ujs
+//= require bootstrap-sprockets
 //= require bootstrap-editable
 //= require bootstrap-editable-rails
 //= require js-routes
