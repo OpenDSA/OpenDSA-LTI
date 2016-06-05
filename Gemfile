@@ -125,6 +125,7 @@ gem 'capistrano'
 gem 'capistrano-bundler'
 gem 'capistrano-rails'
 gem 'capistrano-rbenv', github: "capistrano/rbenv"
+gem 'capistrano-passenger'
 gem 'capistrano-rake', require: false
 #for multi-color progress bar
 gem 'css3-progress-bar-rails'

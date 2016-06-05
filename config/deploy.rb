@@ -43,6 +43,8 @@ set :bower_roles, :web
 # set :bower_target_path, "#{release_path}"
 set :bower_bin, :bower
 
+set :passenger_restart_with_touch, true
+
 namespace :deploy do
 
   desc 'Restart application'
