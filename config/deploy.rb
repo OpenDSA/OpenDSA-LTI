@@ -117,12 +117,6 @@ set :delayed_job_workers, 2
 
 namespace :deploy do
 
-  desc 'Link OpenDSA to public'
-  task :link_opendsa_to_public do
-    run "cd ~"
-    run "ln -s ~/OpenDSA ~/#{current_path}/public"
-  end
-
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
@@ -131,7 +125,7 @@ namespace :deploy do
     end
   end
 
-  after :restart, :clear_cache, :link_opendsa_to_public do
+  after :restart, :clear_cache do
     on roles(:web), in: :groups, limit: 3, wait: 10 do
       # Here we can do anything such as:
       # within release_path do
@@ -141,6 +135,11 @@ namespace :deploy do
   end
 
   after :finishing, 'deploy:cleanup'
+
+  # Link OpenDSA to public
+  after 'deploy:update_code' do
+    run "ln -s ~/OpenDSA ~/#{current_path}/public"
+  end
 
 end
 
