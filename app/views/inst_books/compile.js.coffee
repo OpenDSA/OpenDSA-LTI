@@ -12,7 +12,7 @@ interval = setInterval((->
           $('[name="compile_commit"]')[0].disabled = false;
           $('[name="compile_commit"]')[0].value = "Recompile Book";
           clearInterval interval
-        return
+          return
       # If there are errors
       if job.last_error != null
         $('.progress-status').addClass('text-danger').text job.progress_stage
