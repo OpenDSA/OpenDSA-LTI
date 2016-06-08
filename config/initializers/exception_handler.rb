@@ -4,5 +4,5 @@
 # Use the docs at http://github.com/richpeck/exception_handler for info
 ###
 ExceptionHandler.setup do |config|
-	config.db = true
+	config.db = false
 end
