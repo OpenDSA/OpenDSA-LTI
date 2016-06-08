@@ -137,9 +137,10 @@ namespace :deploy do
   after :finishing, 'deploy:cleanup'
 
   # Link OpenDSA to public
-  after 'deploy:update_code' do
-    run "ln -s ~/OpenDSA ~/#{current_path}/public"
+  after :finishing, 'deploy:update_code' do
+    on roles :all do
+      execute :ln, "-s /home/deploy/OpenDSA #{current_path}/public"
+    end
   end
 
 end
-
