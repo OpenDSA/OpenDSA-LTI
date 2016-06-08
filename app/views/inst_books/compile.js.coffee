@@ -4,6 +4,15 @@ interval = setInterval((->
     success: (job) ->
       stage = undefined
       progress = undefined
+      # if no job object then job is completed successfuly
+      if !job
+          $('.progress').removeClass 'active'
+          $('.progress-bar').css('width', '100%').text '100%'
+          $('.progress-status').text 'Book generated successfully.'
+          $('[name="compile_commit"]')[0].disabled = false;
+          $('[name="compile_commit"]')[0].value = "Recompile Book";
+          clearInterval interval
+        return
       # If there are errors
       if job.last_error != null
         $('.progress-status').addClass('text-danger').text job.progress_stage
