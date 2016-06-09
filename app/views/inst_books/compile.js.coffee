@@ -6,7 +6,7 @@ interval = setInterval((->
       stage = undefined
       progress = undefined
       # if no job object then job is completed successfuly
-      if job === null
+      if job == null
           $('.progress').removeClass 'active'
           $('.progress-bar').css('width', '100%').text '100%'
           $('.progress-status').text 'Book generated successfully.'
