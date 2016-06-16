@@ -19,7 +19,7 @@
         Want to
         %strong try
         OpenDSA?
-      = button_link 'See OpenDSA eTextbooks', '/gym/exercises/any', color: 'primary', size: 'lg'
+      = button_link 'See OpenDSA eTextbooks', sample_books_path, color: 'primary', size: 'lg'
       %p{ style: 'margin-top: 10px;' }
 
 .row.blurb
@@ -42,7 +42,8 @@
       proficiency exercises where students demonstrate knowledge of an
       algorithm by interacting with a data structure, and questions
       about knowledge.
-      For more information, look "HERE" [LINK].
+      For more information, look
+      =link_to "HERE", odsa_into_path
 
   .col-md-4
     = image_tag("heapsort.png", :class => "img-responsive", :alt => "heapsort")
@@ -55,8 +56,10 @@
       OpenDSA provides comprehensive support for teachers who want
       to use our materials for their textbook or homeworks.
       But we also support independent learners who are just practicing
-      on their own. See our "sample books" list [LINK], where you can
-      practice any exercises or view any materials that you wish.
+      on their own. See our
+      =link_to "sample books", sample_books_path
+      list , where you can practice any exercises or view
+      any materials that you wish.
 
 .row.blurb
   .col-md-4
@@ -70,7 +73,8 @@
       eTextbooks, selecting from our comprehensive body of materials
       and exercises. Use OpenDSA as supplementary reading material, or
       use it as your primary textbook and homeworks.
-      See "MORE INFORMATION" [LINK].
+      See
+      =link_to "MORE INFORMATION", instructor_guide_path
 
   .col-md-4
     = image_tag("Shellsort_perf.png", :class => "img-responsive", :alt => "heapsort")
@@ -81,8 +85,9 @@
       %i.fa.fa-thumbs-o-up
       OpenDSA is Free to Use
     %p
-      OpenDSA is open-source software that is "free to use" [LICENSE].
-      You can find us on github at
+      OpenDSA is open-source software that is
+      =link_to "free to use", home_license_path
+      ,You can find us on github at
       = succeed '.' do
         %a{ href: 'https://github.com/OpenDSA' }
           https://github.com/OpenDSA
@@ -95,4 +100,4 @@
     %p
       Contact us at
       %a{ href: 'mailto:opendsa@cs.vt.edu' }
-        mailto:opendsa@cs.vt.edu
+        opendsa@cs.vt.edu

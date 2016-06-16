@@ -37,6 +37,9 @@ CodeWorkout::Application.routes.draw do
   get 'home/about'
   get 'home/license'
   get 'home/contact'
+  get 'home/guide' => 'home#instructor_guide', as: :instructor_guide
+  get 'home/introduction' => 'home#odsa_into', as: :odsa_into
+  get 'home/books' => 'home#sample_books', as: :sample_books
   get 'home/new_course_modal', as: :new_course_modal
 
   get 'static_pages/home'
