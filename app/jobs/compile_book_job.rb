@@ -6,14 +6,28 @@ class CompileBookJob < ProgressJob::Base
   end
 
   def perform
-    update_stage('Generate Book in LMS')
+    update_stage('Generating course in LMS')
 
     chapters = InstChapter.where(inst_book_id: @inst_book.id)
-    update_progress_max(chapters.count)
+    update_progress_max(chapters.count + 1)
     inst_book_compile
-    # value = %x(python /vagrant/OpenDSA/tools/configure.py /vagrant/OpenDSA/config/CS3.json -b vt/cs1114/spring-2016/TR_1100am)
-    # puts value
-    # update_stage(value)
+
+    update_stage('Compiling OpenDSA book')
+    inst_book_json = ApplicationController.new.render_to_string(
+      template: 'inst_books/show.json.jbuilder',
+      locals: {:@inst_book => @inst_book})
+
+    require 'json'
+    config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getutc.to_s) + '.json'
+    config_file_path = "public/OpenDSA/config/#{config_file}"
+    File.open(config_file_path,"w") do |f|
+      f.write(inst_book_json)
+    end
+
+    script_path = "public/OpenDSA/tools/configure.py"
+    build_path = book_path(@inst_book)
+    value = %x(python #{script_path} #{config_file_path} -b #{build_path})
+    update_progress
   end
 
   def inst_book_compile

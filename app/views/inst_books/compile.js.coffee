@@ -1,3 +1,5 @@
+$('.progress-status').text 0 + '/' + 0 + ' (' + 'Please wait...'+ ')'
+$('.progress-bar').css('width', 0 + '%').text 0 + '%'
 interval = setInterval((->
   $.ajax
     url: '/progress-job/' + <%= "#{@job.id}" %>

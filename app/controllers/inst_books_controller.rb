@@ -18,7 +18,6 @@ class InstBooksController < ApplicationController
   def compile
     launch_url = request.protocol + request.host_with_port + "/lti/launch"
     @job = Delayed::Job.enqueue CompileBookJob.new(params[:id], launch_url, current_user.id)
-
   end
 
   #~ Private instance methods .................................................

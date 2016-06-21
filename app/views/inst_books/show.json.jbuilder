@@ -1,4 +1,4 @@
-json.(@inst_book, :title, :book_url, :book_code)
+json.course_id CourseOffering.where(:id => @inst_book.course_offering_id).first.lms_course_num
 
 # chapters
 json.chapters do
@@ -9,11 +9,16 @@ json.chapters do
     # chapter object
     json.set! chapter_name do
 
+      json.canvas_module_id inst_chapter.lms_chapter_id
+      json.assignment_group_id inst_chapter.lms_assignment_group_id
+
       for inst_chapter_module in inst_chapter.inst_chapter_modules
         module_path = InstModule.where(:id => inst_chapter_module.inst_module_id).first.path
 
         # module Object
         json.set! module_path do
+          json.set! :module_subheader_id, inst_chapter_module.lms_module_item_id
+          json.set! :item_id, inst_chapter_module.lms_section_item_id
           json.set! :long_name, InstModule.where(:id => inst_chapter_module.inst_module_id).first.name
           # sections
           json.sections do
@@ -25,6 +30,8 @@ json.chapters do
 
                # section object
                 json.set! section_name do
+                  json.set! :module_item_id, inst_section.lms_item_id
+                  json.set! :item_id, inst_section.lms_assignment_id
                   if !inst_section.show
                     json.set! :show, inst_section.show
                   end
@@ -41,12 +48,12 @@ json.chapters do
                       end
                     end
                   else
-                    json.empty :empty
+                    json.nil!
                   end
                 end
               end
             else
-              json.empty :empty
+              json.nil!
             end
           end
         end
