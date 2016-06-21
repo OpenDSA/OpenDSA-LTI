@@ -155,7 +155,7 @@ ActiveRecord::Schema.define(version: 20160530232554) do
     t.integer  "inst_exercise_id",                                         null: false
     t.decimal  "points",           precision: 5, scale: 2,                 null: false
     t.boolean  "required",                                 default: false
-    t.integer  "threshold",                                                null: false
+    t.decimal  "threshold",        precision: 5, scale: 2,                 null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

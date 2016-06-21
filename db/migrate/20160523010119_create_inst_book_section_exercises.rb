@@ -6,7 +6,7 @@ class CreateInstBookSectionExercises < ActiveRecord::Migration
       t.integer  "inst_exercise_id", limit: 4,                         null: false
       t.decimal  "points",                     precision: 5, scale: 2, null: false
       t.boolean  "required",             default: false
-      t.integer  "threshold", limit: 4,                         null: false
+      t.decimal  "threshold",                     precision: 5, scale: 2, null: false
       t.timestamps
     end
   end

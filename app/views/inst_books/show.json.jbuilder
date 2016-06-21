@@ -1,33 +1,53 @@
 json.(@inst_book, :title, :book_url, :book_code)
 
+# chapters
 json.chapters do
-  json.array!(@inst_book.inst_chapters) do |inst_chapter|
-    json.id inst_chapter.id
-    json.name inst_chapter.name
 
-    json.modules do
-      json.array!(inst_chapter.inst_chapter_modules) do |inst_chapter_module|
-        json.id inst_chapter_module.id
-        json.path InstModule.where(:id => inst_chapter_module.inst_module_id).first.path
-        json.name InstModule.where(:id => inst_chapter_module.inst_module_id).first.name
+  for inst_chapter in @inst_book.inst_chapters
 
-        json.sections do
-          json.array!(inst_chapter_module.inst_sections) do |inst_section|
-            json.id inst_section.id
-            json.name inst_section.name
-            json.show inst_section.show
+    chapter_name = inst_chapter.name
+    # chapter object
+    json.set! chapter_name do
 
-            json.exercises do
-              json.array!(inst_section.inst_book_section_exercises) do |inst_book_section_exercise|
-                json.id inst_book_section_exercise.id
-                json.name inst_section.name
-                json.name InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.name
-                json.short_name InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
-                json.required inst_book_section_exercise.required
-                json.threshold inst_book_section_exercise.threshold
+      for inst_chapter_module in inst_chapter.inst_chapter_modules
+        module_path = InstModule.where(:id => inst_chapter_module.inst_module_id).first.path
+
+        # module Object
+        json.set! module_path do
+          json.set! :long_name, InstModule.where(:id => inst_chapter_module.inst_module_id).first.name
+          # sections
+          json.sections do
+            sections = inst_chapter_module.inst_sections
+            if !sections.empty?
+
+              for inst_section in inst_chapter_module.inst_sections
+                section_name = inst_section.name
+
+               # section object
+                json.set! section_name do
+                  if !inst_section.show
+                    json.set! :show, inst_section.show
+                  end
+
+                  exercises = inst_section.inst_book_section_exercises
+                  if !exercises.empty?
+                    for inst_book_section_exercise in exercises
+                      exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
+                      json.set! exercise_name do
+                        json.set! :long_name, InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.name
+                        json.set! :required, inst_book_section_exercise.required
+                        json.set! :points, inst_book_section_exercise.points.to_f
+                        json.set! :threshold, inst_book_section_exercise.threshold.to_f
+                      end
+                    end
+                  else
+                    json.empty :empty
+                  end
+                end
               end
+            else
+              json.empty :empty
             end
-
           end
         end
 
@@ -35,4 +55,5 @@ json.chapters do
     end
 
   end
+
 end

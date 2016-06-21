@@ -11,6 +11,9 @@ class CompileBookJob < ProgressJob::Base
     chapters = InstChapter.where(inst_book_id: @inst_book.id)
     update_progress_max(chapters.count)
     inst_book_compile
+    # value = %x(python /vagrant/OpenDSA/tools/configure.py /vagrant/OpenDSA/config/CS3.json -b vt/cs1114/spring-2016/TR_1100am)
+    # puts value
+    # update_stage(value)
   end
 
   def inst_book_compile
