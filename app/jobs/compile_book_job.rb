@@ -18,8 +18,8 @@ class CompileBookJob < ProgressJob::Base
       locals: {:@inst_book => @inst_book})
 
     require 'json'
-    config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getutc.to_s) + '.json'
-    config_file_path = "public/OpenDSA/config/#{config_file}"
+    config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
+    config_file_path = "public/OpenDSA/config/temp/#{config_file}"
     File.open(config_file_path,"w") do |f|
       f.write(inst_book_json)
     end

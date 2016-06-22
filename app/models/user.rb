@@ -54,20 +54,8 @@ class User < ActiveRecord::Base
   belongs_to  :time_zone
   has_many    :course_enrollments, -> { includes :course_role, :course_offering }, inverse_of: :user, dependent: :destroy
   has_many    :course_offerings, through: :course_enrollments
-  # has_many    :workout_scores, -> { includes :workout }, inverse_of: :user, dependent: :destroy
-  # has_many    :workouts, through: :workout_scores
-  # has_many    :exercise_owners, inverse_of: :owner
-  # has_many    :exercises, through: :exercise_owners
-  # has_many    :workout_owners, inverse_of: :owner
-  # has_many    :workouts, through: :workout_owners
-  # has_many    :attempts, dependent: :destroy
-  # has_many    :tag_user_scores, -> { includes :tag }, inverse_of: :user, dependent: :destroy
-  # has_many    :resource_files, inverse_of: :user
   has_many    :identities, inverse_of: :user, dependent: :destroy
-  has_many    :student_extensions
-  # has_many    :workout_offerings, through: :student_extensions
-  # belongs_to  :current_workout_score, class_name: 'WorkoutScore'
-  # has_many   :test_case_results, inverse_of: :user, dependent: :destroy
+  # has_many    :student_extensions
   has_many  :lms_accesses, inverse_of: :user
   #~ Hooks ....................................................................
 
