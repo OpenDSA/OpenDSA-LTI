@@ -3,7 +3,7 @@ ActiveAdmin.register CourseOffering do
   active_admin_import
 
   menu parent: 'University-oriented', priority: 40
-  permit_params :course_id, :term_id, :name, :label, :url,
+  permit_params :course_id, :term_id, :label, :url,
     :self_enrollment_allowed, :late_policy_id, :lms_instance_id, :lms_course_code, :lms_course_num
 
   index do
@@ -35,7 +35,7 @@ ActiveAdmin.register CourseOffering do
       row :self_enrollment_allowed
       row :created_at
       row :updated_at
-      row :lms_instance_id
+      row :lms_instance
       row :lms_course_code
       row :lms_course_num
     end

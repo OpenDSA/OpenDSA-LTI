@@ -64,7 +64,7 @@ class CourseOffering < ActiveRecord::Base
   end
 
   def display_name
-    "#{course.number} (#{label})"
+    "#{course.organization.abbreviation} #{term.slug} #{course.number} (#{label})"
   end
 
   def name
