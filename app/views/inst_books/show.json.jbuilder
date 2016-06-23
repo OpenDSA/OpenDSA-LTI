@@ -1,4 +1,3 @@
-
 # chapters
 json.chapters do
 
@@ -7,13 +6,16 @@ json.chapters do
     chapter_name = inst_chapter.name
     # chapter object
     json.set! chapter_name do
-
+      json.set! :lms_chapter_id, inst_chapter.lms_chapter_id
+      json.set! :lms_assignment_group_id, inst_chapter.lms_assignment_group_id
 
       for inst_chapter_module in inst_chapter.inst_chapter_modules
         module_path = InstModule.where(:id => inst_chapter_module.inst_module_id).first.path
 
         # module Object
         json.set! module_path do
+          json.set! :lms_module_item_id, inst_chapter_module.lms_module_item_id
+          json.set! :lms_section_item_id, inst_chapter_module.lms_section_item_id
           json.set! :long_name, InstModule.where(:id => inst_chapter_module.inst_module_id).first.name
           # sections
           json.sections do
@@ -25,11 +27,11 @@ json.chapters do
 
                # section object
                 json.set! section_name do
-                  # json.set! :module_item_id, inst_section.lms_item_id
-                  # json.set! :item_id, inst_section.lms_assignment_id
                   if !inst_section.show
                     json.set! :show, inst_section.show
                   end
+                  json.set! :lms_item_id, inst_section.lms_item_id
+                  json.set! :lms_assignment_id, inst_section.lms_assignment_id
 
                   exercises = inst_section.inst_book_section_exercises
                   if !exercises.empty?
@@ -42,15 +44,9 @@ json.chapters do
                         json.set! :threshold, inst_book_section_exercise.threshold.to_f
                       end
                     end
-                    json.set! :module_item_id, inst_section.lms_item_id
-                    json.set! :item_id, inst_section.lms_assignment_id
-                  else
-                    json.nil!
                   end
                 end
               end
-              json.set! :module_subheader_id, inst_chapter_module.lms_module_item_id
-              json.set! :item_id, inst_chapter_module.lms_section_item_id
             else
               json.nil!
             end
@@ -58,8 +54,6 @@ json.chapters do
         end
 
       end
-      json.set! :canvas_module_id, inst_chapter.lms_chapter_id
-      json.set! :assignment_group_id, inst_chapter.lms_assignment_group_id
 
     end
 
