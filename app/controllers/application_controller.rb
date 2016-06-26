@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   skip_before_action :verify_authenticity_token
 
   self.responder = ApplicationResponder
-  respond_to :html
+  respond_to :html, :json
 
   # -------------------------------------------------------------
   # On access errors, redirect to home page with flash of error message.

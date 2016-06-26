@@ -385,7 +385,6 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   create_table "odsa_user_interactions", force: true do |t|
     t.integer  "inst_book_id",                                     null: false
     t.integer  "user_id",                                          null: false
-    t.integer  "inst_chapter_module_id",                           null: false
     t.integer  "inst_section_id"
     t.integer  "inst_book_section_exercise_id"
     t.string   "name",                          limit: 50,         null: false
@@ -404,7 +403,6 @@ ActiveRecord::Schema.define(version: 20160530232554) do
 
   add_index "odsa_user_interactions", ["inst_book_id"], name: "odsa_user_interactions_inst_book_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_book_section_exercise_id"], name: "odsa_user_interactions_inst_book_section_exercise_id_fk", using: :btree
-  add_index "odsa_user_interactions", ["inst_chapter_module_id"], name: "odsa_user_interactions_inst_chapter_module_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_section_id"], name: "odsa_user_interactions_inst_section_id_fk", using: :btree
   add_index "odsa_user_interactions", ["user_id"], name: "odsa_user_interactions_user_id_fk", using: :btree
 
@@ -522,7 +520,6 @@ ActiveRecord::Schema.define(version: 20160530232554) do
 
   add_foreign_key "odsa_user_interactions", "inst_book_section_exercises", name: "odsa_user_interactions_inst_book_section_exercise_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_books", name: "odsa_user_interactions_inst_book_id_fk"
-  add_foreign_key "odsa_user_interactions", "inst_chapter_modules", name: "odsa_user_interactions_inst_chapter_module_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_sections", name: "odsa_user_interactions_inst_section_id_fk"
   add_foreign_key "odsa_user_interactions", "users", name: "odsa_user_interactions_user_id_fk"
 

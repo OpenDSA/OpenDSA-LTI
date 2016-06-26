@@ -3,7 +3,6 @@ class CreateOdsaUserInteractions < ActiveRecord::Migration
     create_table :odsa_user_interactions do |t|
       t.integer  "inst_book_id",                  null: false
       t.integer  "user_id",                       null: false
-      t.integer  "inst_chapter_module_id", null: false
       t.integer  "inst_section_id"
       t.integer  "inst_book_section_exercise_id"
       t.string   "name",                          limit: 50,         null: false
