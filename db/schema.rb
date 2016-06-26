@@ -314,6 +314,8 @@ ActiveRecord::Schema.define(version: 20160530232554) do
 
   create_table "odsa_exercise_attempts", force: true do |t|
     t.integer  "user_id",                                                          null: false
+    t.integer  "inst_book_id",                                                     null: false
+    t.integer  "inst_section_id",                                                  null: false
     t.integer  "inst_book_section_exercise_id",                                    null: false
     t.boolean  "correct",                                                          null: false
     t.datetime "time_done",                                                        null: false
@@ -324,12 +326,15 @@ ActiveRecord::Schema.define(version: 20160530232554) do
     t.boolean  "earned_proficiency",                                               null: false
     t.integer  "count_attempts",                limit: 8,                          null: false
     t.string   "ip_address",                    limit: 20,                         null: false
-    t.string   "ex_question",                   limit: 50,                         null: false
+    t.string   "question_name",                 limit: 50,                         null: false
+    t.string   "request_type",                  limit: 50
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
+  add_index "odsa_exercise_attempts", ["inst_book_id"], name: "odsa_exercise_attempts_inst_book_id_fk", using: :btree
   add_index "odsa_exercise_attempts", ["inst_book_section_exercise_id"], name: "odsa_exercise_attempts_inst_book_section_exercise_id_fk", using: :btree
+  add_index "odsa_exercise_attempts", ["inst_section_id"], name: "odsa_exercise_attempts_inst_section_id_fk", using: :btree
   add_index "odsa_exercise_attempts", ["user_id"], name: "odsa_exercise_attempts_user_id_fk", using: :btree
 
   create_table "odsa_exercise_progresses", force: true do |t|
@@ -383,8 +388,8 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   add_index "odsa_student_extensions", ["user_id"], name: "odsa_student_extensions_user_id_fk", using: :btree
 
   create_table "odsa_user_interactions", force: true do |t|
-    t.integer  "inst_book_id",                                     null: false
     t.integer  "user_id",                                          null: false
+    t.integer  "inst_book_id",                                     null: false
     t.integer  "inst_section_id"
     t.integer  "inst_book_section_exercise_id"
     t.string   "name",                          limit: 50,         null: false
@@ -506,6 +511,8 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   add_foreign_key "odsa_book_progresses", "users", name: "odsa_book_progresses_user_id_fk"
 
   add_foreign_key "odsa_exercise_attempts", "inst_book_section_exercises", name: "odsa_exercise_attempts_inst_book_section_exercise_id_fk"
+  add_foreign_key "odsa_exercise_attempts", "inst_books", name: "odsa_exercise_attempts_inst_book_id_fk"
+  add_foreign_key "odsa_exercise_attempts", "inst_sections", name: "odsa_exercise_attempts_inst_section_id_fk"
   add_foreign_key "odsa_exercise_attempts", "users", name: "odsa_exercise_attempts_user_id_fk"
 
   add_foreign_key "odsa_exercise_progresses", "inst_book_section_exercises", name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk"

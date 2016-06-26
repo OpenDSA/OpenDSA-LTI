@@ -3,36 +3,21 @@ class OdsaUserInteractionsController < ApplicationController
 
   #~ Action methods ...........................................................
 
-  def create
-    @map = Map.new(map_params)
-       respond_to do |format|
-      if @map.save
-        format.json {
-          render :show, status: :created, location: @map
-        }
-      else
-        format.json { render json: @map.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
   # -------------------------------------------------------------
   # POST /odsa_user_interactions/create
   def create
-    print params[:av]
     inst_book = InstBook.find_by(id: params[:inst_book_id])
-    if params[:inst_section_id]
-      inst_section = InstSection.find_by(id: params[:inst_section_id])
-    end
 
     failed_to_save = false
     params[:eventList].each do |event|
+      if event[:inst_section_id] !=""
+        inst_section = InstSection.find_by(id: event[:inst_section_id])
+      end
       if event[:av] != ""
         inst_exercise = InstExercise.find_by(short_name: event[:av])
-        print inst_exercise.id
         inst_book_section_exercise = InstBookSectionExercise.where(
                                                   "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-                                                    params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+                                                    params[:inst_book_id], inst_section.id, inst_exercise.id).first
       end
       # if browser.mobile?
       #   device = "Mobile"
