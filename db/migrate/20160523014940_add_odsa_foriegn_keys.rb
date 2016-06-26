@@ -13,6 +13,8 @@ class AddOdsaForiegnKeys < ActiveRecord::Migration
     add_foreign_key "odsa_book_progresses", "users"
     add_foreign_key "odsa_exercise_attempts", "inst_book_section_exercises"
     add_foreign_key "odsa_exercise_attempts", "users"
+    add_foreign_key "odsa_exercise_attempts", "inst_books"
+    add_foreign_key "odsa_exercise_attempts", "inst_sections"
     add_foreign_key "odsa_exercise_progresses", "inst_book_section_exercises"
     add_foreign_key "odsa_exercise_progresses", "users"
     add_foreign_key "odsa_module_progresses", "inst_books"

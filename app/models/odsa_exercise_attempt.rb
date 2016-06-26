@@ -1,7 +1,9 @@
 class OdsaExerciseAttempt < ActiveRecord::Base
   #~ Relationships ............................................................
-    belongs_to :inst_book_section_exercise
     belongs_to :user
+    belongs_to :inst_book
+    belongs_to :inst_section
+    belongs_to :inst_book_section_exercise
 
   #~ Validation ...............................................................
   #~ Constants ................................................................

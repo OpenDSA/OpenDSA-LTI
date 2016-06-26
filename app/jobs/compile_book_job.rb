@@ -147,16 +147,17 @@ class CompileBookJob < ProgressJob::Base
       module_name = module_name.split('/')[1]
     end
 
-    if section
-      section_file_name = module_name + "-" + section_item_position.to_s.rjust(2, "0")
-    else
-      section_file_name = module_name
-    end
-
     title = (chapter.position.to_s.rjust(2, "0")||"")+"."+
                (inst_ch_module.module_position.to_s.rjust(2, "0")||"")+"."+
                section_item_position.to_s.rjust(2, "0")+" - "
-    title = (title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name) if !section else title
+
+    if section
+      section_file_name = module_name + "-" + section_item_position.to_s.rjust(2, "0")
+      title = title + section.name
+    else
+      section_file_name = module_name
+      title = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
+    end
 
     url_opts = {
       :inst_book_id => @inst_book.id,

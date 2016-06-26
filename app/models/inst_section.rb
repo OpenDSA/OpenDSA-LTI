@@ -4,6 +4,7 @@ class InstSection < ActiveRecord::Base
   has_many :inst_book_section_exercises
   has_many :odsa_student_extensions
   has_many :odsa_user_interactions
+  has_many :odsa_exercise_atempts
   has_many :inst_books_by_inst_book_section_exercises, :source => :inst_book, :through => :inst_book_section_exercises
   has_many :users_by_odsa_student_extensions, :source => :user, :through => :odsa_student_extensions
   has_many :inst_book_section_exercises_by_odsa_user_interactions, :source => :inst_book_section_exercise, :through => :odsa_user_interactions
