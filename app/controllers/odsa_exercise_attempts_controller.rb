@@ -3,28 +3,6 @@ class OdsaExerciseAttemptsController < ApplicationController
 
   #~ Action methods ...........................................................
 
-# sha1:IntroSumm
-# seed:168
-# problem_type:IntroMCQgoalsp
-# key:phantom-key
-# inst_book_id:1
-# inst_section_id:1
-# module_name:IntroDSA
-# casing:camel
-# complete:1
-# count_hints:0
-# time_taken:37
-# attempt_number:1
-# attempt_content:{"isNone":null,"value":"How to design and maintain large programs","index":0}
-# skipped:0
-# opt_out:0
-# client_dt:2016-06-26T14:17:47-04:00
-# code:
-# genlist:
-# summexname:
-# checkdefvar:
-# listoftypes:
-# progexType:
   # -------------------------------------------------------------
   # POST /odsa_exercise_attempts
   def create
