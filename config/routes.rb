@@ -32,10 +32,8 @@ CodeWorkout::Application.routes.draw do
 
   post 'lti/user_module'
 
-  post 'odsa_exercise_attempts/attempt', to: 'odsa_exercise_attempts#attempt'
-  post 'odsa_exercise_attempts/hint', to: 'odsa_exercise_attempts#hint'
-
   resources :odsa_user_interactions
+  resources :odsa_exercise_attempts
 
   namespace :api, path: '/', constraints: { subdomain: 'api' } do
     namespace :v1 do

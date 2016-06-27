@@ -26,8 +26,8 @@ class OdsaExerciseAttemptsController < ApplicationController
 # listoftypes:
 # progexType:
   # -------------------------------------------------------------
-  # POST /odsa_exercise_attempts/attempt
-  def attempt
+  # POST /odsa_exercise_attempts
+  def create
     print params
     inst_book = InstBook.find_by(id: params[:inst_book_id])
     inst_section = InstSection.find_by(id: params[:inst_section_id])
@@ -39,6 +39,11 @@ class OdsaExerciseAttemptsController < ApplicationController
     question_name = params['problem_type']
     if params[:non_summative]
       question_name = params[:non_summative]
+    end
+    if params[:attempt_content] == "hint"
+      request_type = "hint"
+    else
+      request_type = "attempt"
     end
 
     @exercise_attempt = OdsaExerciseAttempt.new(
@@ -52,7 +57,7 @@ class OdsaExerciseAttemptsController < ApplicationController
                                           count_hints: params[:count_hints],
                                           hint_used: params[:count_hints].to_i > 0,
                                           question_name: question_name,
-                                          request_type: "attempt",
+                                          request_type: request_type ,
                                           points_earned: 1,
                                           earned_proficiency: true,
                                           ip_address: request.ip)
