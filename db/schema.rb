@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(version: 20160530232554) do
     t.string   "name",            null: false
     t.string   "number",          null: false
     t.integer  "organization_id", null: false
+    t.integer  "user_id",         null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "creator_id"
@@ -81,6 +82,7 @@ ActiveRecord::Schema.define(version: 20160530232554) do
 
   add_index "courses", ["organization_id"], name: "index_courses_on_organization_id", using: :btree
   add_index "courses", ["slug"], name: "index_courses_on_slug", using: :btree
+  add_index "courses", ["user_id"], name: "index_courses_on_user_id", using: :btree
 
   create_table "delayed_jobs", force: true do |t|
     t.integer  "priority",         default: 0, null: false
@@ -166,6 +168,7 @@ ActiveRecord::Schema.define(version: 20160530232554) do
 
   create_table "inst_books", force: true do |t|
     t.integer  "course_offering_id"
+    t.integer  "user_id",                       null: false
     t.string   "title",              limit: 50, null: false
     t.string   "book_url",           limit: 80, null: false
     t.string   "book_code",          limit: 80, null: false
@@ -174,6 +177,7 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   end
 
   add_index "inst_books", ["course_offering_id"], name: "inst_books_course_offering_id_fk", using: :btree
+  add_index "inst_books", ["user_id"], name: "inst_books_user_id_fk", using: :btree
 
   create_table "inst_chapter_modules", force: true do |t|
     t.integer  "inst_chapter_id",     null: false
@@ -493,6 +497,7 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   add_foreign_key "inst_book_section_exercises", "inst_sections", name: "inst_book_section_exercises_inst_section_id_fk"
 
   add_foreign_key "inst_books", "course_offerings", name: "inst_books_course_offering_id_fk"
+  add_foreign_key "inst_books", "users", name: "inst_books_user_id_fk"
 
   add_foreign_key "inst_chapter_modules", "inst_chapters", name: "inst_chapter_modules_inst_chapter_id_fk"
   add_foreign_key "inst_chapter_modules", "inst_modules", name: "inst_chapter_modules_inst_module_id_fk"

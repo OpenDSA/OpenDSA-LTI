@@ -57,6 +57,7 @@ class User < ActiveRecord::Base
   has_many    :identities, inverse_of: :user, dependent: :destroy
   # has_many    :student_extensions
   has_many  :lms_accesses, inverse_of: :user
+  has_many  :inst_books, inverse_of: :user
   #~ Hooks ....................................................................
 
   delegate :can?, :cannot?, to: :ability

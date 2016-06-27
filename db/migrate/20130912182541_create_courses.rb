@@ -4,6 +4,7 @@ class CreateCourses < ActiveRecord::Migration
       t.string :name, null: false
       t.string :number, null: false
       t.references :organization, null: false, index: true
+      t.references :user, null: false, index: true
       t.string :url_part, null: false
 
       t.timestamps

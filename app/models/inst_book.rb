@@ -9,6 +9,7 @@ class InstBook < ActiveRecord::Base
 
   #~ Relationships ............................................................
   belongs_to :course_offering, inverse_of: :inst_books
+  belongs_to :user, inverse_of: :inst_books
   has_many :inst_book_section_exercises
   has_many :inst_chapters
   has_many :odsa_module_progresses
@@ -26,12 +27,13 @@ class InstBook < ActiveRecord::Base
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
-  def self.save_data_from_json(json)
+  def self.save_data_from_json(json, current_user)
     book_data = json
     b = InstBook.new
     b.title = book_data['title']
     b.book_url = book_data['book_url']
     b.book_code = book_data['book_code']
+    b.user_id = current_user.id
     b.save
 
     chapters = book_data['chapters']

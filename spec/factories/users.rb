@@ -42,7 +42,7 @@ FactoryGirl.define do
  factory :user do
    first_name 'Joe'
    last_name  'Hokie'
-   email      'hokie@codeworkout.org'
+   email      'hokie@opendsa.org'
    password   'hokiehokie'
 #    password_confirmation 'hokiehokie'
    global_role { GlobalRole.regular_user }
@@ -57,7 +57,7 @@ FactoryGirl.define do
      factory :admin do
        first_name 'Admin'
        last_name  'Istrator'
-       email      'admin@codeworkout.org'
+       email      'admin@opendsa.org'
        password   'adminadmin'
 #       passsword_confirmation 'adminadmin'
        global_role { GlobalRole.administrator }

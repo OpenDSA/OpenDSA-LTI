@@ -2,43 +2,23 @@
   %li= link_to 'Home', root_path
   %li.active Instructor Guide
 
-%h1 CodeWorkout License
+%h1 Instructor Guide
 
-%p
-  CodeWorkout is Copyright &copy; 2015 by Virginia Tech.
-  %br
-  All rights reserved.
+%ol
+  %li Login to the application with admin account
+  %li Click Upload Books in the navigation bar, then click Choose File. Navigate to OpenDSA-DevStack/OpenDSA-LTI and choose test_CS3.json. Click Submit File.
+  %li Go to <a href="https://canvas.instructure.com">https://canvas.instructure.com</a> and create a course with the name OpenDSA-LTI. Copy the course ID from the URL, you will use it later.
+  %li Go to the admin area by clicking on the little wrench icon to the left of "admin@codworkout.org" in the top menu bar. Click the University-oriented menu and select Course Offerings. There are six course offerings in three semesters, Spring-2016 (1/1-5/31), Summer-I (6/1-7/15), and Summer-II (7/16-8/15). Pick one and click edit. At the top of the form, select https://canvas.instructure.com from the menu. Also, modify LMS COURSE CODE to be 'OpenDSA-LTI' and LMS COURSE NUM to the course ID you copied in point #6. Click on Update Course offering at the bottom of the page.
+  %li Under the ODSA Books menu, select Inst Book. Then click on edit for the chosen book-to-course mapping entry. On the edit form, select the proper course instance (the one that you updated in the previous step). Click Update Inst book.
+  %li Under the ODSA Books menu, select Inst Book. Then click on edit for the chosen book-to-course mapping entry. On the edit form, select the proper course instance (the one that you updated in the previous step). Click Update Inst book.
+  %li Under the LMS config menu, click Lms Access. Give instructor Ima Teacher access to the Canvas instance. Click create access, then set the LMS instance and the User. Put some dummy value in the token field. Click Create Lms access.
+  %li Log out and log in again using the instructor account example-1@railstutorial.org, password: 'hokiehokie'. This is the Ima Teacher account. Click on the instructor email address in the navigation bar, then click Update Access Token. If you don't have Canvas access token follow the instructions here. Click Edit for the LMS instance. Set the access token, and click Update Lms access.
+  %li Go back to the application main page by following this link https://192.168.33.10:9292. Click the Course button and then navigate to the course that you have previously selected. Under the OpenDSA tab you will find the book linked to that offering. You can click Configure Book to go to book configuration view. This allows an instructor to add/remove book modules and chapters. It also allows an instructor to define exercises points and due dates. Clicking the Compile Book button will then generate the book's html files on the server file system, and send book details to the linked Canvas instance as well. Click Compile Book and you should see the progress bar moving forward while the course is being generated in Canvas.
 
-%p
-  CodeWorkout is free software; you can redistribute it and/or modify
-  it under the terms of the
-  <a href="http://www.gnu.org/licenses/agpl-3.0.html">
-  GNU Affero General Public License</a>
-  as published
-  by the Free Software Foundation; either version 3 of the License, or
-  (at your option) any later version.
-
-%p
-  CodeWorkout is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-%p
-  You can obtain a copp of the GNU Affero General Public License
-  on-line at:
-  <a href="http://www.gnu.org/licenses/agpl-3.0.html">
-  http://www.gnu.org/licenses/agpl-3.0.html</a>.
-
-%p
-  CodeWorkout's source code is available at:
-  <a href="https://github.com/web-cat/code-workout">
-  https://github.com/web-cat/code-workout</a>.
-
-%p
-  All publicly available exercises on this site are copyrighted by
-  each individual exercise's author, and are made available for use under
-  the Creative Commons
-  <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
-  Attribution-NonCommercial-ShareAlike 4.0 International</a>
-  license.
+  %li At this point the book is generated in Canvas and linked to a compiled book on the server file system. But Since we don't have the book compilation step automated yet, you should compile the book manually. I've updated the Makefile for CS3 book to compile it in the right folder. So you need to open a new terminal and do the following:
+  cd ~/OpenDSA-DevStack
+  vagrant ssh
+  cd /vagrant/OpenDSA
+  make pull
+  make CS3
+  Once the compilation step is done, go to Canvas and open course modules you should find the book pushed and published.
