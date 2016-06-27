@@ -90,14 +90,14 @@ class CourseOfferingsController < ApplicationController
       redirect_to root_path
     end
   end
-  
+
   # -------------------------------------------------------------
   # GET /course_offerings/:id/upload_roster
   # Method to enroll students from an uploaded roster.
   # TODO: Needs to be redone so that it will read an actual CSV
   #       file of student enrollment info and not just a list of
   #       e-mail addresses.
-  
+
   def upload_roster
     form_contents = params[:form]
     puts form_contents.fetch(:rosterfile).path

@@ -54,6 +54,8 @@ class CourseOffering < ActiveRecord::Base
   validates :course, presence: true
   validates :term, presence: true
 
+  #~ Hooks ....................................................................
+  after_create :auto_enroll_instructor
 
   #~ Public instance methods ..................................................
 
@@ -172,6 +174,17 @@ class CourseOffering < ActiveRecord::Base
   # -------------------------------------------------------------
   def role_for_user(user)
     user && course_enrollments.where(user: user).first.andand.course_role
+  end
+
+  private
+
+  # -------------------------------------------------------------
+  def auto_enroll_instructor
+    enrollment = CourseEnrollment.new
+    enrollment.course_offering_id = self.id
+    enrollment.user_id = course.user_id
+    enrollment.course_role_id = CourseRole.instructor.id
+    enrollment.save
   end
 
 end

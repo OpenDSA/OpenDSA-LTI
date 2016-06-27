@@ -9,7 +9,6 @@ class InstBooksController < ApplicationController
     hash = JSON.load(File.read(params[:form][:file].path))
     InstBook.save_data_from_json(hash, current_user)
 
-
     redirect_to inst_books_url + '/upload', notice: 'Book configuration upload complete.'
   end
 

@@ -76,7 +76,6 @@ ActiveRecord::Schema.define(version: 20160530232554) do
     t.integer  "user_id",         null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "creator_id"
     t.string   "slug",            null: false
   end
 

@@ -2,6 +2,10 @@ ActiveAdmin.register LmsAccess do
   includes :lms_instance, :user
   active_admin_import
 
+  before_build do |record|
+    record.user = current_user
+  end
+
   menu parent: 'LMS config', priority: 30
   permit_params :lms_instance_id, :user_id, :access_token
 

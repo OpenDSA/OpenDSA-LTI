@@ -10,16 +10,11 @@ class InstBook < ActiveRecord::Base
   #~ Relationships ............................................................
   belongs_to :course_offering, inverse_of: :inst_books
   belongs_to :user, inverse_of: :inst_books
-  has_many :inst_book_section_exercises
   has_many :inst_chapters
+  has_many :inst_book_section_exercises
+  has_many :odsa_user_interactions
   has_many :odsa_module_progresses
   has_many :odsa_exercise_attempts
-  has_many :odsa_user_interactions
-  has_many :inst_sections_by_inst_book_section_exercises, :source => :inst_section, :through => :inst_book_section_exercises
-  has_many :users_by_odsa_module_progress, :source => :user, :through => :odsa_module_progresses
-  has_many :inst_book_section_exercises_by_odsa_user_interactions, :source => :inst_book_section_exercise, :through => :odsa_user_interactions
-  has_many :inst_sections_by_odsa_user_interactions, :source => :inst_section, :through => :odsa_user_interactions
-  has_many :users_by_odsa_user_interactions, :source => :user, :through => :odsa_user_interactions
 
   paginates_per 100
 

@@ -31,6 +31,7 @@ class Course < ActiveRecord::Base
   #~ Relationships ............................................................
 
   belongs_to  :organization, inverse_of: :courses
+  belongs_to  :user, inverse_of: :courses
   has_many    :course_offerings, inverse_of: :course, dependent: :destroy
   # # Associating with exercises through course_exercises
   # has_many    :course_exercises, inverse_of: :course, dependent: :destroy

@@ -86,14 +86,21 @@ class Ability
       # FIXME: The exercise/workout permissions need to be role-based
       # with respect to the course offering, rather than depending on the
       # global role.
-      can [:create], [Course, CourseOffering, CourseEnrollment]
-
+      can [:create], [CourseOffering]
     end
 
     if user.global_role.is_instructor?
       # Everyone can manage their own LMS access_token
-      can :manage, LmsAccess, user_id: user.id
-      can :manage, InstBook, user_id: user.id
+      can :create, LmsAccess
+      can [:read, :index, :update, :destroy], LmsAccess, user_id: user.id
+
+      can :manage, CourseEnrollment do |enrollment|
+        enrollment.course_offering.is_manager? user
+      end
+
+      can  [:create, :read, :update], InstBook, user_id: user.id
+      can :manage, Course, user_id: user.id
+      can :manage, CourseEnrollment, user_id: user.id
       # Everyone can upload and compile his book
       can [:upload, :upload_create, :compile], InstBook
     end
