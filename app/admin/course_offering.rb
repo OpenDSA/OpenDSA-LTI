@@ -18,7 +18,7 @@ ActiveAdmin.register CourseOffering do
       link_to c.label, admin_course_offering_path(c)
     end
     column 'Self-enroll?', :self_enrollment_allowed
-    column(:url) { |c| link_to c.url, c.url }
+    # column(:url) { |c| link_to c.url, c.url }
     column :created_at
     column :late_policy, sortable: 'late_policy.name'
     column :lms_instance, sortable: 'lms_instance.url'
