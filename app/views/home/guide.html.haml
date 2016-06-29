@@ -6,34 +6,97 @@
 
 %ol
   %li
-    Sign Up to create a new account and send email to
+    Get access to an instructor account.
+    Click "Sign Up" to create a new account and send email to
     %a{ href: 'mailto:opendsa@cs.vt.edu' }
       opendsa@cs.vt.edu
-    to get an instructor privilege.
+    to get instructor access.
+    Or use the test instructor: example-1@railstutorial.org
+    (pass: hokiehokie)
 
   %li
-    Log in using your instructor account. Click "Upload Books" button in the navigation bar, then click "Choose File". Navigate to OpenDSA-LTI repository folder and choose test_CS3.json. Then Click "Submit File" button.
+    Log in using your instructor account. Click "Upload Books" in the
+    navigation bar, then click "Choose File". Navigate to OpenDSA-LTI
+    repository folder and choose test_CS3.json. Then Click "Submit
+    File".
 
   %li
-    Go to <a href="https://canvas.instructure.com">https://canvas.instructure.com</a> and create a course, give it a name and copy the course ID from the URL, you will use it later.
+    Go
+    to <a href="https://canvas.instructure.com">https://canvas.instructure.com</a>
+    and create a course. Give it a name, and copy the course ID from
+    the end of the URL. You will use this ID later.
 
   %li
-    Go to the admin area by clicking on the little wrench icon to the left of your email address in the top menu bar. Click the "University-oriented" menu and select "Courses". Create a new course, choose its organization, give it a number (e.g. CS2114) and name.
+    Back on the OpenDSA instructor page, go to the admin area by
+    clicking on the little wrench icon to the left of your email
+    address in the top menu bar.
+    Click the "University-oriented" menu and select "Courses".
+    Click on "New Course".
+    Create your new course by choosing its organization, giving it a
+    number (e.g. CS2114) and a name, then click "Create Course".
 
   %li
-    Click the "University-oriented" menu and select "Courses Offerings". Create a new course offering for your course and check "self enrollment enabled" check box. Note: all fields marked with asterisk "*" are required.
+    Click the "University-oriented" menu again and select "Course
+    Offerings".
+    Now you will create a new course offering for your course.
+    Note: all fields marked with asterisk "*" are required. 
+
+    %ul
+
+      %li
+        Link your course offering to a LMS by choosing "LMS INSTANCE"
+        from the drop down list.
+
+      %li
+        Check "self enrollment enabled".
+
+      %li
+        Fill "LMS COURSE CODE" and "LMS COURSE NUM" with the Canvas
+        course name and course ID that you created in step (3). 
 
   %li
-    While in the "Courses Offerings" submenu, link your course offering to a LMS by choosing "LMS INSTANCE" from the drop down list. Also fill "LMS COURSE CODE" and "LMS COURSE NUM" with canvas course name and course ID you have created in step number (3).
+    Under the "ODSA Books" menu, select "Inst Book". Then click on
+    "edit" for the proper entry in the table. (This table will map
+    books to course offerings.) On the edit form, select the proper
+    course offering (the one that you created in the previous
+    step). Click "Update Inst Book". 
 
   %li
-    Under the "ODSA Books" menu, select "Inst Book". Then click on edit for the chosen book-to-course offering mapping entry. On the edit form, select the proper course offering (the one that you created in the previous step). Click Update Inst book.
+    Under the "LMS config" menu, click "Lms Access".
+    Here you will provide your LMS access token for this LMS
+    instance. (If you have not already created a Canvas access token,
+    then follow the instructions <a href="https://guides.instructure.com/m/4214/l/40399-how-do-i-obtain-an-api-access-token-for-an-account">here</a>
+    to make one.)
+    Choose the LMS instance and put in your access token.
+    If you are doing this for the first time, then you probably do not
+    have an entry in the table, so click on "Create one".
+    Then click "Update Lms access".
 
   %li
-    Under the "LMS config" menu, click "Lms Access". Choose the LMS instance and put your access token. If you don't have Canvas access token follow the instructions <a href="https://guides.instructure.com/m/4214/l/40399-how-do-i-obtain-an-api-access-token-for-an-account">here</a> to obtain one. The click Update Lms access.
+    Now click "Back to OpenDSA" in the top menu to go back to the book
+    compilation application.
+    Click the "Course" button and then navigate to the course offering
+    that you have previously created.
+    (You might need to click "Browse all" and navigate to the proper
+    organization and term.)
+    Once you find your course offering, click on it.
 
   %li
-    Click "Back to OpenDSA" menu option to go back to application. Click the "Course" button and then navigate to the course offering that you have previously created. Under the OpenDSA tab you will find the book linked to that offering. You can click "Configure Book" to go to book configuration view (still under development). This allows an instructor to add/remove book modules and chapters. It also allows an instructor to define exercises points and due dates. Clicking the "Compile Book" button will then generate the book's html files on the server file system, and send book details to the linked Canvas instance as well. Click "Compile Book" and you should see the progress bar moving forward while the course is being generated in Canvas.
+    Under the "OpenDSA" tab you will find the book linked to that
+    offering.
+    You can click "Configure Book" to go to book configuration view
+    (WARNING: This is still under development, and not ready for use yet!).
+    This allows an instructor to add/remove book modules and chapters.
+    It also allows an instructor to define exercises points and due
+    dates.
+    Once the book is configured, click "Compile Book" to
+    generate the book's html files on the server file system, and send
+    book details to the linked Canvas instance.
+    During the compilation process, you should see the progress bar
+    moving forward while the course is being generated in Canvas. 
 
   %li
-    At this point the book is generated in Canvas and linked to a compiled book on the server file system. Go to Canvas instance URL and navigate to "Modules" submenu, you should see OpenDSA chapters created and published.
+    Once the compilation process is complete, the book is available at
+    your Canvas site. Go to Canvas and navigate to the "Modules"
+    submenu for your course.
+    You should see OpenDSA chapters created and published.
