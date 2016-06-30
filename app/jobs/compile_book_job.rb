@@ -44,9 +44,16 @@ class CompileBookJob < ProgressJob::Base
       token: user_lms_access.access_token)
 
     # create LTI tool in canvas if it is not defined
-    if !@inst_book.course_offering.lms_tool_num || @inst_book.course_offering.lms_tool_num = 0
+    res = client.list_external_tools_courses(lms_course_id)
+    opendsa_tool = false
+    if res
+      res.each do |tool|
+        opendsa_tool = true if tool['name'] == "OpenDSA-LTI"
+      end
+    end
+
+    if !opendsa_tool
       res = client.create_external_tool_courses(lms_course_id, "OpenDSA-LTI", privacy_level, consumer_key, consumer_secret, {:url => @launch_url})
-      @inst_book.course_offering.lms_tool_num = res["id"]
       @inst_book.course_offering.save
     end
 

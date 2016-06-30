@@ -52,7 +52,6 @@ ActiveRecord::Schema.define(version: 20160530232554) do
     t.integer  "lms_instance_id"
     t.string   "lms_course_code"
     t.integer  "lms_course_num"
-    t.integer  "lms_tool_num"
   end
 
   add_index "course_offerings", ["course_id"], name: "index_course_offerings_on_course_id", using: :btree
@@ -169,8 +168,6 @@ ActiveRecord::Schema.define(version: 20160530232554) do
     t.integer  "course_offering_id"
     t.integer  "user_id",                       null: false
     t.string   "title",              limit: 50, null: false
-    t.string   "book_url",           limit: 80, null: false
-    t.string   "book_code",          limit: 80, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

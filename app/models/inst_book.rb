@@ -26,8 +26,6 @@ class InstBook < ActiveRecord::Base
     book_data = json
     b = InstBook.new
     b.title = book_data['title']
-    b.book_url = book_data['book_url']
-    b.book_code = book_data['book_code']
     b.user_id = current_user.id
     b.save
 

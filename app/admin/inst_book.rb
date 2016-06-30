@@ -3,7 +3,7 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
   active_admin_import
 
   menu parent: 'ODSA Books', priority: 20
-  permit_params :title, :book_url, :book_code, :course_offering_id, :user_id
+  permit_params :title, :course_offering_id, :user_id
 
   index do
     id_column
@@ -22,8 +22,6 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
         f.input :user
       end
       f.input :title
-      f.input :book_url
-      f.input :book_code
     end
     f.actions
   end

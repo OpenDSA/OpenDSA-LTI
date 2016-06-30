@@ -35,13 +35,6 @@ CodeWorkout::Application.routes.draw do
   resources :odsa_user_interactions
   resources :odsa_exercise_attempts
 
-  namespace :api, path: '/', constraints: { subdomain: 'api' } do
-    namespace :v1 do
-      resources :inst_books, only: [:show, :index]
-      resources :odsa_user_interactions, only: [:show, :create]
-    end
-  end
-
   # namespace path_helper hackery!
   get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book
 

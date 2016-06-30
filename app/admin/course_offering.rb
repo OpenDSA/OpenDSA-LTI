@@ -25,13 +25,26 @@ ActiveAdmin.register CourseOffering do
     actions
   end
 
+  form do |f|
+    f.semantic_errors
+    f.inputs do
+      f.input :lms_instance
+      f.input :course
+      f.input :term
+      f.input :label
+      f.input :self_enrollment_allowed
+      f.input :lms_course_code
+      f.input :lms_course_num
+    end
+    f.actions
+  end
+
   show do
     attributes_table do
       row :id
       row :course
       row :term
       row :label
-      row(:url) { |c| link_to c.url, c.url }
       row :self_enrollment_allowed
       row :created_at
       row :updated_at

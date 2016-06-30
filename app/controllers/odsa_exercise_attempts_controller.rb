@@ -6,7 +6,6 @@ class OdsaExerciseAttemptsController < ApplicationController
   # -------------------------------------------------------------
   # POST /odsa_exercise_attempts
   def create
-    print params
     inst_book = InstBook.find_by(id: params[:inst_book_id])
     inst_section = InstSection.find_by(id: params[:inst_section_id])
     inst_exercise = InstExercise.find_by(short_name: params[:sha1])
