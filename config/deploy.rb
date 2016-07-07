@@ -143,4 +143,11 @@ namespace :deploy do
     end
   end
 
+  # Link OpenDSA to public
+  after :finishing, 'deploy:pull_opendsa' do
+    on roles :all do
+      execute "cd ~/OpenDSA; make pull;"
+    end
+  end
+
 end
