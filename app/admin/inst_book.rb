@@ -1,6 +1,7 @@
 ActiveAdmin.register InstBook, sort_order: :title_asc do
   includes :course_offering, :user
   active_admin_import
+  actions :all, except: [:new]
 
   menu parent: 'ODSA Books', priority: 20
   permit_params :title, :course_offering_id, :user_id

@@ -340,8 +340,8 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   create_table "odsa_exercise_progresses", force: true do |t|
     t.integer  "user_id",                                               null: false
     t.integer  "inst_book_section_exercise_id",                         null: false
-    t.integer  "streak",                                                null: false
-    t.integer  "longest_streak",                                        null: false
+    t.integer  "current_score",                                         null: false
+    t.integer  "highest_score",                                         null: false
     t.datetime "first_done",                                            null: false
     t.datetime "last_done",                                             null: false
     t.integer  "total_done",                                            null: false
@@ -356,7 +356,7 @@ ActiveRecord::Schema.define(version: 20160530232554) do
   end
 
   add_index "odsa_exercise_progresses", ["inst_book_section_exercise_id"], name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk", using: :btree
-  add_index "odsa_exercise_progresses", ["user_id"], name: "odsa_exercise_progresses_user_id_fk", using: :btree
+  add_index "odsa_exercise_progresses", ["user_id", "inst_book_section_exercise_id"], name: "index_odsa_ex_prog_on_user_id_and_inst_bk_sec_ex_id", unique: true, using: :btree
 
   create_table "odsa_module_progresses", force: true do |t|
     t.integer  "user_id",         null: false
