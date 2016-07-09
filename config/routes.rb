@@ -47,13 +47,6 @@ CodeWorkout::Application.routes.draw do
   get 'home/books'
   get 'home/new_course_modal', as: :new_course_modal
 
-  get 'static_pages/home'
-  get 'static_pages/help'
-  get 'static_pages/mockup1'
-  get 'static_pages/mockup2'
-  get 'static_pages/mockup3'
-  get 'static_pages/typography'
-  get 'static_pages/thumbnails'
   # routes anchored at /admin
   # First, we have to override some of the ActiveAdmin auto-generated
   # routes, since our user ids and file ids use restricted characters

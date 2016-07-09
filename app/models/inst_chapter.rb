@@ -1,7 +1,7 @@
 class InstChapter < ActiveRecord::Base
   #~ Relationships ............................................................
   belongs_to :inst_book
-  has_many :inst_chapter_modules
+  has_many :inst_chapter_modules, dependent: :destroy
 
   #~ Validation ...............................................................
   #~ Constants ................................................................
@@ -21,5 +21,20 @@ class InstChapter < ActiveRecord::Base
     end
   end
   #~ Instance methods .........................................................
+  # --------------------------------------------------------------------------
+  # clone chapter
+  def clone(inst_book)
+    ch = InstChapter.new
+    ch.inst_book_id = inst_book.id
+    ch.name = self.name
+    ch.short_display_name = self.short_display_name
+    ch.position = self.position
+    ch.save
+
+    inst_chapter_modules.each do |chapter_module|
+      inst_chapter_module = chapter_module.clone(ch)
+    end
+  end
+
   #~ Private instance methods .................................................
 end

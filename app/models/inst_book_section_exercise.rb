@@ -23,6 +23,19 @@ class InstBookSectionExercise < ActiveRecord::Base
 
   #~ Class methods ............................................................
   #~ Instance methods .........................................................
+  # -------------------------------------------------------------
+  # clone inst_book_section_exercise
+  def clone(inst_section)
+    book_section_exercise = InstBookSectionExercise.new
+    book_section_exercise.inst_section_id = inst_section.id
+    book_section_exercise.inst_book_id = self.inst_book_id
+    book_section_exercise.inst_exercise_id = self.inst_exercise_id
+    book_section_exercise.points = self.points
+    book_section_exercise.required = self.required
+    book_section_exercise.threshold = self.threshold
+    book_section_exercise.save
+  end
+
   #~ Private instance methods .................................................
 
 end

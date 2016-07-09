@@ -31,6 +31,7 @@ class CourseOffering < ActiveRecord::Base
   belongs_to :late_policy, inverse_of: :course_offerings
 
   has_many :inst_books, inverse_of: :course_offering
+  accepts_nested_attributes_for :inst_books, allow_destroy: true
 
   has_many :course_enrollments,
     -> { includes(:course_role, :user).order(
