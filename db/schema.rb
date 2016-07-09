@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160708141945) do
+ActiveRecord::Schema.define(version: 20160708150751) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -166,10 +166,12 @@ ActiveRecord::Schema.define(version: 20160708141945) do
 
   create_table "inst_books", force: true do |t|
     t.integer  "course_offering_id"
-    t.integer  "user_id",                       null: false
-    t.string   "title",              limit: 50, null: false
+    t.integer  "user_id",                                       null: false
+    t.string   "title",              limit: 50,                 null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "template",                      default: false
+    t.string   "desc"
   end
 
   add_index "inst_books", ["course_offering_id"], name: "inst_books_course_offering_id_fk", using: :btree

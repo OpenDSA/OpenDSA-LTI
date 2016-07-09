@@ -4,15 +4,6 @@ class InstBooksController < ApplicationController
   #~ Action methods ...........................................................
 
   # -------------------------------------------------------------
-  # POST /inst_books/upload_create
-  def upload_create
-    hash = JSON.load(File.read(params[:form][:file].path))
-    InstBook.save_data_from_json(hash, current_user)
-
-    redirect_to inst_books_url + '/upload', notice: 'Book configuration upload complete.'
-  end
-
-  # -------------------------------------------------------------
   # POST /inst_books/:id/compile
   def compile
     launch_url = request.protocol + request.host_with_port + "/lti/launch"

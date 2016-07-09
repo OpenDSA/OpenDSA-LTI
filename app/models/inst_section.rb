@@ -1,7 +1,7 @@
 class InstSection < ActiveRecord::Base
   #~ Relationships ............................................................
   belongs_to :inst_chapter_module
-  has_many :inst_book_section_exercises
+  has_many :inst_book_section_exercises, dependent: :destroy
   has_many :odsa_student_extensions
   has_many :odsa_user_interactions
   has_many :odsa_exercise_atempts
@@ -46,6 +46,28 @@ class InstSection < ActiveRecord::Base
     inst_ex = InstExercise.where(id: inst_bk_sec_ex['inst_exercise_id']).first
     {'ex_name' => inst_ex.short_name, "inst_bk_sec_ex" => inst_bk_sec_ex.id}
   end
+
+  # -------------------------------------------------------------
+  # clone inst_section
+  def clone(inst_chapter_module)
+    section = InstSection.new
+    section.inst_chapter_module_id = inst_chapter_module.id
+    section.inst_module_id = self.inst_module_id
+    section.short_display_name = self.short_display_name
+    section.name = self.name
+    section.position = self.position
+    section.gradable = self.gradable
+    section.soft_deadline = self.soft_deadline
+    section.hard_deadline = self.hard_deadline
+    section.time_limit = self.time_limit
+    section.show = self.show
+    section.save
+
+    inst_book_section_exercises.each do |book_section_exercise|
+      inst_book_section_exercise = book_section_exercise.clone(section)
+    end
+  end
+
 
   #~ Private instance methods .................................................
 end

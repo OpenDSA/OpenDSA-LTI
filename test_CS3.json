@@ -1,6 +1,6 @@
 {
   "title": "CS3 generic title",
-  "book_url": "https://opendsa.org",
+  "desc": "CS3 generic desc",
   "book_code": "CS3",
   "chapters": {
     "Preface": {

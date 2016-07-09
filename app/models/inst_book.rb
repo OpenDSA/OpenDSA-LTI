@@ -10,7 +10,7 @@ class InstBook < ActiveRecord::Base
   #~ Relationships ............................................................
   belongs_to :course_offering, inverse_of: :inst_books
   belongs_to :user, inverse_of: :inst_books
-  has_many :inst_chapters
+  has_many :inst_chapters, dependent: :destroy
   has_many :inst_book_section_exercises
   has_many :odsa_user_interactions
   has_many :odsa_module_progresses
@@ -21,12 +21,15 @@ class InstBook < ActiveRecord::Base
   #~ Validation ...............................................................
   #~ Constants ................................................................
   #~ Hooks ....................................................................
+  after_save :clone
   #~ Class methods ............................................................
   def self.save_data_from_json(json, current_user)
     book_data = json
     b = InstBook.new
     b.title = book_data['title']
+    b.desc = book_data['desc']
     b.user_id = current_user.id
+    b.template = true
     b.save
 
     chapters = book_data['chapters']
@@ -45,6 +48,22 @@ class InstBook < ActiveRecord::Base
     consumer_key = course_offering.lms_instance['consumer_key']
     consumer_secret = course_offering.lms_instance['consumer_secret']
     {consumer_key => consumer_secret}
+  end
+
+  # --------------------------------------------------------------------------
+  # clone book configuration
+  def clone(current_user=nil)
+    if self.parent_id and current_user.blank? == true
+      b = InstBook.new
+      b.title = self.title
+      b.desc = self.desc
+      b.user_id = current_user.id || self.user_id
+      b.save
+
+      inst_chapters.each do |chapter|
+        inst_chapter = chapter.clone(b)
+      end
+    end
   end
   #~ Private instance methods .................................................
 end
