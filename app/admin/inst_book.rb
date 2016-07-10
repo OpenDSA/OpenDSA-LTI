@@ -10,6 +10,9 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
   member_action :clone, method: :get do
   end
 
+  member_action :destroy, method: :delete do
+  end
+
   collection_action :upload_books, method: :get do
   end
 
@@ -25,27 +28,8 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
   end
 
   action_item only: [:show, :edit]  do
-    book_title = inst_book.title
-    last_compiled = inst_book.last_compiled
-    course_offering = CourseOffering.where(:id => inst_book.course_offering_id)
-    if !course_offering.empty?
-      course_offering = course_offering.first
-      course_offering_name = course_offering.display_name
-      lms_course_num = course_offering.lms_course_num
-      lms_url = LmsInstance.where(:id => course_offering.lms_instance_id).first.url
-    end
-    trailer = "Are you sure you want to proceed with the delete?"
-    message1 = "You are about to delete '#{book_title}' book instance. "
-    message2 = "The book is linked to '#{course_offering_name}' course offering. "
-    message3 = "It was last compiled on '#{last_compiled}', and linked to '#{lms_url}' Instance, course number (#{lms_course_num}). If you delete this book the LMS course won't work and you will have to link a new book instance to the course offering and recompile it. "
-    message = message1 + trailer
-    if !last_compiled and course_offering_name
-      message = message1 + message2 + trailer
-    elsif last_compiled and course_offering_name
-      message = message1 + message2 + message3 + trailer
-    end
-
-    link_to "Delete", { action: :destroy }, method: :delete, data: { confirm:  message}
+    message = confirmation_message(inst_book)
+    link_to "Delete", { action: :destroy }, method: :delete, data: { confirm: message}
   end
 
 
@@ -71,10 +55,16 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
     # inst_book cannot be template and linked to a course offering at the same time
     # in such cases reset the template flag
     def data_check(inst_book)
-      # inst_book = InstBook.find(params[:id])
       if inst_book.course_offering_id and inst_book.template
         inst_book.template = false
       end
+    end
+
+    def destroy
+      inst_book = InstBook.find(params[:id])
+      title = inst_book.title
+      inst_book.destroy
+      redirect_to admin_inst_books_path, notice: "Instance book '#{title}' was deleted successfully!"
     end
   end
 
@@ -90,9 +80,17 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
     end
     column :course_offering
     column :last_compiled
-    actions defaults: true do |inst_book|
-      link_to "Clone", clone_admin_inst_book_path(inst_book)
+    column "Actions" do |inst_book|
+      message = confirmation_message(inst_book)
+      links = ''.html_safe
+      links += link_to "Edit", edit_admin_inst_book_path(inst_book)
+      links += ' '
+      links += link_to "Clone", clone_admin_inst_book_path(inst_book)
+      links += ' '
+      links += link_to "Delete", admin_inst_book_path(inst_book), method: :delete, data: {confirm: message}
+      links
     end
+
   end
 
   form do |f|

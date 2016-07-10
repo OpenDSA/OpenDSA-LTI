@@ -11,7 +11,7 @@ class InstBook < ActiveRecord::Base
   belongs_to :course_offering, inverse_of: :inst_books
   belongs_to :user, inverse_of: :inst_books
   has_many :inst_chapters, dependent: :destroy
-  has_many :inst_book_section_exercises
+  has_many :inst_book_section_exercises, dependent: :destroy
   has_many :odsa_user_interactions
   has_many :odsa_module_progresses
   has_many :odsa_exercise_attempts
