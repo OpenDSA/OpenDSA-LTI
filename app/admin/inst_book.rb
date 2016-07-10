@@ -19,9 +19,11 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
   collection_action :upload_create, method: :post do
   end
 
-  action_item only: :index do
-    link_to 'Upload Books', upload_books_admin_inst_books_path()
+  action_item only: :index do |inst_book|
+    link_to 'Upload Books', upload_books_admin_inst_books_path() if authorized? :upload_books, inst_book
   end
+
+
 
   action_item only: :show  do
     link_to "Clone", clone_admin_inst_book_path(inst_book)
@@ -42,6 +44,9 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
     end
 
     def upload_books
+      if !authorized? :upload_books
+        redirect_to admin_inst_books_path
+      end
     end
 
     def upload_create
