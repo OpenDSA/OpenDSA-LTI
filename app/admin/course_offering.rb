@@ -8,6 +8,18 @@ ActiveAdmin.register CourseOffering, sort_order: :id_asc do
     :lms_instance_id, :lms_course_code, :lms_course_num,
     inst_books_attributes: [ :id, :course_offering_id, :user_id, :title, :desc, :template, :_destroy ]
 
+  controller do
+    def auto_enroll_instructor(course_offering)
+      enrollment = CourseEnrollment.new
+      enrollment.course_offering_id = course_offering.id
+      enrollment.user_id = current_user.id
+      enrollment.course_role_id = CourseRole.instructor.id
+      enrollment.save
+    end
+  end
+
+  after_create :auto_enroll_instructor
+
   index do
     id_column
     column :course, sortable: 'courses.number' do |c|
