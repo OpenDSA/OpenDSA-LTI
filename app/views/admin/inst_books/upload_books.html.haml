@@ -1,0 +1,12 @@
+= form_tag upload_create_admin_inst_books_path, id: :upload_book, multipart: true do
+  = file_field('form', 'file')
+  = submit_tag 'Submit File'
+  :javascript
+    $(function(){
+      $('#upload_book').submit(function (e) {
+        if ($(this).find('#form_file').val() == '') {
+          e.preventDefault();
+          alert('Please select a book configuration file to upload!');
+        }
+      });
+    })
