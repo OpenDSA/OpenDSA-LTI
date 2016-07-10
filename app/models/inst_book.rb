@@ -21,7 +21,6 @@ class InstBook < ActiveRecord::Base
   #~ Validation ...............................................................
   #~ Constants ................................................................
   #~ Hooks ....................................................................
-  after_save :clone
   #~ Class methods ............................................................
   def self.save_data_from_json(json, current_user)
     book_data = json
@@ -52,18 +51,18 @@ class InstBook < ActiveRecord::Base
 
   # --------------------------------------------------------------------------
   # clone book configuration
-  def clone(current_user=nil)
-    if self.parent_id and current_user.blank? == true
+  def clone(current_user)
+    # if self.parent_id and current_user.blank? == true
       b = InstBook.new
       b.title = self.title
       b.desc = self.desc
-      b.user_id = current_user.id || self.user_id
+      b.user_id = current_user.id
       b.save
 
       inst_chapters.each do |chapter|
         inst_chapter = chapter.clone(b)
       end
-    end
+    # end
   end
   #~ Private instance methods .................................................
 end

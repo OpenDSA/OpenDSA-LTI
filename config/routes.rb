@@ -36,7 +36,7 @@ CodeWorkout::Application.routes.draw do
   resources :odsa_exercise_attempts
 
   # namespace path_helper hackery!
-  get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book
+  # get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book
 
   get 'home' => 'home#index'
   get 'main' => 'home#index'

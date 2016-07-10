@@ -59,6 +59,8 @@ class CompileBookJob < ProgressJob::Base
 
     # generate canvas course modules, items and assignments out of inst_book configurations
     save_lms_course(client, lms_course_id)
+    @inst_book.last_compiled = Time.now
+    @inst_book.save
   end
 
   # -------------------------------------------------------------

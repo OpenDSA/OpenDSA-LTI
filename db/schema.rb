@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160708150751) do
+ActiveRecord::Schema.define(version: 20160710052239) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -49,9 +49,9 @@ ActiveRecord::Schema.define(version: 20160708150751) do
     t.datetime "updated_at"
     t.date     "cutoff_date"
     t.integer  "late_policy_id"
-    t.integer  "lms_instance_id"
-    t.string   "lms_course_code"
-    t.integer  "lms_course_num"
+    t.integer  "lms_instance_id",         null: false
+    t.string   "lms_course_code",         null: false
+    t.integer  "lms_course_num",          null: false
   end
 
   add_index "course_offerings", ["course_id"], name: "index_course_offerings_on_course_id", using: :btree
@@ -172,6 +172,7 @@ ActiveRecord::Schema.define(version: 20160708150751) do
     t.datetime "updated_at"
     t.boolean  "template",                      default: false
     t.string   "desc"
+    t.datetime "last_compiled"
   end
 
   add_index "inst_books", ["course_offering_id"], name: "inst_books_course_offering_id_fk", using: :btree
