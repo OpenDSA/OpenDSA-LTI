@@ -52,7 +52,6 @@ class InstBook < ActiveRecord::Base
   # --------------------------------------------------------------------------
   # clone book configuration
   def clone(current_user)
-    # if self.parent_id and current_user.blank? == true
       b = InstBook.new
       b.title = self.title
       b.desc = self.desc
@@ -62,7 +61,7 @@ class InstBook < ActiveRecord::Base
       inst_chapters.each do |chapter|
         inst_chapter = chapter.clone(b)
       end
-    # end
+      return b
   end
   #~ Private instance methods .................................................
 end

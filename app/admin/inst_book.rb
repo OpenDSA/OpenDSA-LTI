@@ -23,8 +23,6 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
     link_to 'Upload Books', upload_books_admin_inst_books_path() if authorized? :upload_books, inst_book
   end
 
-
-
   action_item only: :show  do
     link_to "Clone", clone_admin_inst_book_path(inst_book)
   end
@@ -37,10 +35,10 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
 
   controller do
     def clone
-      @inst_book = InstBook.find(params[:id])
-      title = @inst_book.title
-      @inst_book.clone(current_user)
-      redirect_to admin_inst_books_path, notice: "Instance book '#{title}' was cloned successfully!"
+      inst_book = InstBook.find(params[:id])
+      title = inst_book.title
+      cloned_inst_book = inst_book.clone(current_user)
+      redirect_to admin_inst_books_path, notice: "Book instance ID:'#{inst_book.id}' title:'#{title}' was cloned successfully!. The new Book Instance ID is '#{cloned_inst_book.id}'"
     end
 
     def upload_books
@@ -69,7 +67,7 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
       inst_book = InstBook.find(params[:id])
       title = inst_book.title
       inst_book.destroy
-      redirect_to admin_inst_books_path, notice: "Instance book '#{title}' was deleted successfully!"
+      redirect_to admin_inst_books_path, notice: "Book instance '#{title}' was deleted successfully!"
     end
   end
 
@@ -88,11 +86,15 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
     column "Actions" do |inst_book|
       message = confirmation_message(inst_book)
       links = ''.html_safe
-      links += link_to "Edit", edit_admin_inst_book_path(inst_book)
-      links += ' '
+      if authorized? :update, inst_book
+        links += link_to "Edit", edit_admin_inst_book_path(inst_book)
+        links += ' '
+      end
+      if authorized? :destroy, inst_book
+        links += link_to "Delete", admin_inst_book_path(inst_book), method: :delete, data: {confirm: message}
+        links += ' '
+      end
       links += link_to "Clone", clone_admin_inst_book_path(inst_book)
-      links += ' '
-      links += link_to "Delete", admin_inst_book_path(inst_book), method: :delete, data: {confirm: message}
       links
     end
 

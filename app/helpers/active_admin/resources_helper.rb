@@ -13,7 +13,7 @@ module ActiveAdmin
       trailer = "Are you sure you want to proceed with the delete?"
       message1 = "You are about to delete '#{book_title}' book instance. "
       message2 = "The book is linked to '#{course_offering_name}' course offering. "
-      message3 = "It was last compiled on '#{last_compiled}', and linked to '#{lms_url}' Instance, course number (#{lms_course_num}). If you delete this book the LMS course won't work and you will have to link a new book instance to the course offering and recompile it. "
+      message3 = "It was last compiled on '#{last_compiled}', and linked to '#{lms_url}' Instance, course number (#{lms_course_num}). If you delete this book the LMS course won't work and you will have to link a new book instance to the course offering and recompile it again. "
 
       message = message1 + trailer
       if !last_compiled and course_offering_name
