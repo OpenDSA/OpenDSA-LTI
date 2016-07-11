@@ -143,10 +143,17 @@ namespace :deploy do
     end
   end
 
-  # Link OpenDSA to public
+  # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
       execute "cd ~/OpenDSA; make pull;"
+    end
+  end
+
+  # manually checkout master for khan-exercises repository
+  after :finishing, 'deploy:checkout_ka' do
+    on roles :all do
+      execute "cd ~/OpenDSA/khan-exercises; git pull; git checkout master;"
     end
   end
 
