@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160710052239) do
+ActiveRecord::Schema.define(version: 20160710220745) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -320,7 +320,7 @@ ActiveRecord::Schema.define(version: 20160710052239) do
     t.integer  "inst_book_id",                                                     null: false
     t.integer  "inst_section_id",                                                  null: false
     t.integer  "inst_book_section_exercise_id",                                    null: false
-    t.boolean  "correct",                                                          null: false
+    t.boolean  "worth_credit",                                                     null: false
     t.datetime "time_done",                                                        null: false
     t.integer  "time_taken",                                                       null: false
     t.integer  "count_hints",                                                      null: false
@@ -333,6 +333,7 @@ ActiveRecord::Schema.define(version: 20160710052239) do
     t.string   "request_type",                  limit: 50
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "correct"
   end
 
   add_index "odsa_exercise_attempts", ["inst_book_id"], name: "odsa_exercise_attempts_inst_book_id_fk", using: :btree

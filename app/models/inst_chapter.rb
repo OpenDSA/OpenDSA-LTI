@@ -32,7 +32,7 @@ class InstChapter < ActiveRecord::Base
     ch.save
 
     inst_chapter_modules.each do |chapter_module|
-      inst_chapter_module = chapter_module.clone(ch)
+      inst_chapter_module = chapter_module.clone(inst_book, ch)
     end
   end
 

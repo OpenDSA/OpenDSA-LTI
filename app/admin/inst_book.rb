@@ -4,7 +4,7 @@ ActiveAdmin.register InstBook, sort_order: :title_asc do
   config.clear_action_items!
   actions :all, except: [:new]
 
-  menu parent: 'ODSA Books', priority: 20
+  menu :label => "Book Instances",parent: 'OpenDSA Books', priority: 20
   permit_params :template, :title, :desc, :course_offering_id, :user_id
 
   member_action :clone, method: :get do

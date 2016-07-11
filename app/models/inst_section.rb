@@ -49,7 +49,7 @@ class InstSection < ActiveRecord::Base
 
   # -------------------------------------------------------------
   # clone inst_section
-  def clone(inst_chapter_module)
+  def clone(inst_book, inst_chapter_module)
     section = InstSection.new
     section.inst_chapter_module_id = inst_chapter_module.id
     section.inst_module_id = self.inst_module_id
@@ -64,7 +64,7 @@ class InstSection < ActiveRecord::Base
     section.save
 
     inst_book_section_exercises.each do |book_section_exercise|
-      inst_book_section_exercise = book_section_exercise.clone(section)
+      inst_book_section_exercise = book_section_exercise.clone(inst_book, section)
     end
   end
 

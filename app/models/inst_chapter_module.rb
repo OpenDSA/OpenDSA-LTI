@@ -11,7 +11,7 @@ class InstChapterModule < ActiveRecord::Base
   #~ Instance methods .........................................................
   # --------------------------------------------------------------------------
   # clone inst_chapter_module
-  def clone(chapter)
+  def clone(book, chapter)
     ch_mod = InstChapterModule.new
     ch_mod.inst_chapter_id = chapter.id
     ch_mod.inst_module_id = self.inst_module_id
@@ -19,7 +19,7 @@ class InstChapterModule < ActiveRecord::Base
     ch_mod.save
 
     inst_sections.each do |section|
-      inst_section = section.clone(ch_mod)
+      inst_section = section.clone(book, ch_mod)
     end
   end
 

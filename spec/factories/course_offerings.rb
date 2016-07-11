@@ -25,6 +25,8 @@ FactoryGirl.define do
     late_policy_id 1
     url "http://courses.cs.vt.edu/~cs2114/Fall2013"
     self_enrollment_allowed true
+    lms_instance_id 1
+    lms_course_num 1
 
     factory :course_offering_term_1_tr do
       term_id 1

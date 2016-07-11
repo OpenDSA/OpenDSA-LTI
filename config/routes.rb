@@ -34,6 +34,8 @@ CodeWorkout::Application.routes.draw do
 
   resources :odsa_user_interactions
   resources :odsa_exercise_attempts
+  # resources :odsa_exercise_progresses
+  get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show'
 
   # namespace path_helper hackery!
   # get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book
@@ -155,13 +157,13 @@ CodeWorkout::Application.routes.draw do
       constraints: { id: /[^\/]+/ }
     # This route is broken, since there is no such method
     # post 'resource_files/uploadFile' => 'resource_files#uploadFile'
-    get 'performance' => :calc_performance, as: :calc_performance
+    # get 'performance' => :calc_performance, as: :calc_performance
   end
 
   #OmniAuth for Facebook
   devise_for :users,
-    controllers: { omniauth_callbacks: 'users/omniauth_callbacks',
-                          registrations: "registrations" },
+    controllers: {omniauth_callbacks: 'users/omniauth_callbacks',
+                  registrations: "registrations" },
     skip: [:registrations, :sessions]
   as :user do
     get '/signup' => 'registrations#new', as: :new_user_registration
