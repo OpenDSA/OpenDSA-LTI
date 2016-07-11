@@ -1,4 +1,4 @@
-ActiveAdmin.register LmsAccess do
+ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
   includes :lms_instance, :user
   active_admin_import
 

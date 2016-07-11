@@ -1,6 +1,5 @@
-ActiveAdmin.register Course, sort_order: :number_asc do
+ActiveAdmin.register Course, sort_order: :created_at_asc do
   includes :organization, :user
-  active_admin_import
 
   before_build do |record|
     record.user = current_user

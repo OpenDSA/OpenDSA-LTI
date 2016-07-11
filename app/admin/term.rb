@@ -1,6 +1,4 @@
-ActiveAdmin.register Term do
-  active_admin_import
-
+ActiveAdmin.register Term, sort_order: :created_at_asc do
   menu parent: 'University-oriented', priority: 10
   permit_params :year, :starts_on, :ends_on, :season
   actions :all, except: [:destroy]

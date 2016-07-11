@@ -1,6 +1,5 @@
-ActiveAdmin.register CourseOffering, sort_order: :id_asc do
+ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
   includes :course, :term, :late_policy, :lms_instance
-  active_admin_import
 
   menu parent: 'University-oriented', priority: 40
   permit_params :course_id, :term_id, :label, :url,

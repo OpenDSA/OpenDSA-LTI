@@ -1,5 +1,4 @@
 ActiveAdmin.register LmsType do
-  active_admin_import
 
   menu :label => "LMS Types",parent: 'LMS config', priority: 10
   permit_params :name

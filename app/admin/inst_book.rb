@@ -1,6 +1,5 @@
-ActiveAdmin.register InstBook, sort_order: :title_asc do
+ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   includes :course_offering, :user
-  # active_admin_import
   config.clear_action_items!
   actions :all, except: [:new]
 

@@ -1,5 +1,4 @@
-ActiveAdmin.register Organization do
-  active_admin_import
+ActiveAdmin.register Organization, sort_order: :created_at_asc do
 
   menu parent: 'University-oriented', priority: 20
   permit_params :name, :abbreviation

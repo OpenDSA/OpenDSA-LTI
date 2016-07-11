@@ -1,6 +1,5 @@
 ActiveAdmin.register LmsInstance do
   includes :lms_type
-  active_admin_import
 
   menu :label => "LMS Instances",parent: 'LMS config', priority: 20
   permit_params :url, :lms_type_id, :consumer_key, :consumer_secret
