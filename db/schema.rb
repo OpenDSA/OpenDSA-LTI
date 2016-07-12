@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160710220745) do
+ActiveRecord::Schema.define(version: 20160712011703) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -40,18 +40,18 @@ ActiveRecord::Schema.define(version: 20160710220745) do
   add_index "course_enrollments", ["user_id"], name: "index_course_enrollments_on_user_id", using: :btree
 
   create_table "course_offerings", force: true do |t|
-    t.integer  "course_id",               null: false
-    t.integer  "term_id",                 null: false
-    t.string   "label",                   null: false
+    t.integer  "course_id",                              null: false
+    t.integer  "term_id",                                null: false
+    t.string   "label",                                  null: false
     t.string   "url"
-    t.boolean  "self_enrollment_allowed"
+    t.boolean  "self_enrollment_allowed", default: true
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date     "cutoff_date"
     t.integer  "late_policy_id"
-    t.integer  "lms_instance_id",         null: false
-    t.string   "lms_course_code",         null: false
-    t.integer  "lms_course_num",          null: false
+    t.integer  "lms_instance_id",                        null: false
+    t.string   "lms_course_code",                        null: false
+    t.integer  "lms_course_num",                         null: false
   end
 
   add_index "course_offerings", ["course_id"], name: "index_course_offerings_on_course_id", using: :btree
@@ -293,16 +293,16 @@ ActiveRecord::Schema.define(version: 20160710220745) do
   add_index "lms_types", ["name"], name: "index_lms_types_on_name", unique: true, using: :btree
 
   create_table "odsa_book_progresses", force: true do |t|
-    t.integer  "user_id",                                     null: false
-    t.integer  "inst_book_id",                                null: false
-    t.text     "started_exercises",        limit: 2147483647, null: false
-    t.text     "all_proficient_exercises", limit: 2147483647, null: false
+    t.integer  "user_id",                                 null: false
+    t.integer  "inst_book_id",                            null: false
+    t.text     "started_exercises",    limit: 2147483647, null: false
+    t.text     "proficient_exercises", limit: 2147483647, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "odsa_book_progresses", ["inst_book_id"], name: "odsa_book_progresses_inst_book_id_fk", using: :btree
-  add_index "odsa_book_progresses", ["user_id"], name: "odsa_book_progresses_user_id_fk", using: :btree
+  add_index "odsa_book_progresses", ["user_id", "inst_book_id"], name: "index_odsa_book_progresses_on_user_id_and_inst_book_id", unique: true, using: :btree
 
   create_table "odsa_bugs", force: true do |t|
     t.integer  "user_id",                           null: false
@@ -348,8 +348,8 @@ ActiveRecord::Schema.define(version: 20160710220745) do
     t.integer  "highest_score",                                         null: false
     t.datetime "first_done",                                            null: false
     t.datetime "last_done",                                             null: false
-    t.integer  "total_done",                                            null: false
     t.integer  "total_correct",                                         null: false
+    t.integer  "total_worth_credit",                                    null: false
     t.datetime "proficient_date",                                       null: false
     t.decimal  "progress",                      precision: 5, scale: 2, null: false
     t.string   "current_exercise"

@@ -153,7 +153,7 @@ namespace :deploy do
   # manually checkout master for khan-exercises repository
   after :finishing, 'deploy:checkout_ka' do
     on roles :all do
-      execute "cd ~/OpenDSA/khan-exercises; git pull; git checkout master;"
+      execute "cd ~/OpenDSA/khan-exercises; git pull; git checkout LTI_ruby;"
     end
   end
 

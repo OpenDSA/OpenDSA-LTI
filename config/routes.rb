@@ -36,6 +36,7 @@ CodeWorkout::Application.routes.draw do
   resources :odsa_exercise_attempts
   # resources :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show'
+  post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
 
   # namespace path_helper hackery!
   # get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book

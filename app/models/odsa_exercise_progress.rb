@@ -11,8 +11,8 @@ class OdsaExerciseProgress < ActiveRecord::Base
   def set_defaults
     self.current_score ||= 0
     self.highest_score ||= 0
-    self.first_done ||= DateTime.now
-    self.total_done ||= 0
+    self.total_correct ||= 0
+    self.total_worth_credit ||= 0
   end
   #~ Instance methods .........................................................
   #~ Private instance methods .................................................

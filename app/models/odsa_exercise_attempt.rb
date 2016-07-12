@@ -32,20 +32,28 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   #~ Class methods ............................................................
   #~ Instance methods .........................................................
   def update_exercise_progress
+      inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
       exercise_progress = self.get_exercise_progress
+      book_progress = self.get_book_progress
 
+      exercise_progress.first_done ||= DateTime.now
       exercise_progress.last_done = DateTime.now
 
       first_response = (self.count_attempts == 1 and self.count_hints == 0) ||
                        (self.count_attempts == 0 and self.count_hints == 1)
 
 
+      book_progress.update_started(inst_exercise)
+
       if self.correct
-        exercise_progress['total_done'] += 1
+        exercise_progress['total_correct'] += 1
         if self.worth_credit
-          exercise_progress['total_correct'] += 1
+          exercise_progress['total_worth_credit'] += 1
           exercise_progress['current_score'] += 1
           exercise_progress['highest_score'] = [exercise_progress['highest_score'], exercise_progress['current_score']].max
+
+          book_progress.update_proficiency(exercise_progress)
+
           if exercise_progress['correct_exercises'].to_s.strip.length == 0
             exercise_progress['correct_exercises'] = self['question_name']
           else
@@ -54,8 +62,14 @@ class OdsaExerciseAttempt < ActiveRecord::Base
         else
           # progress thing goes here
         end
+
+        # when student answer an exercise correctly from first time then clear the hint
+        if self.request_type != 'hint'
+          exercise_progress['hinted_exercise'] = ""
+        end
       else
         if self.count_hints == 0 and self.request_type != 'hint' and self.count_attempts == 1
+          # Only count wrong answer at most once per problem
           if exercise_progress['current_score'] - 1 > 0
             exercise_progress['current_score'] -= 1
           else
@@ -67,14 +81,12 @@ class OdsaExerciseAttempt < ActiveRecord::Base
         # if first_response
         #   exercise_progress['earned_proficiency'] = false
         # end
-
       end
 
-      if self.request_type != 'hint'
-        exercise_progress['hinted_exercise'] = ""
+      # save exercise_name to hinted_exercise so that student won't get credit if he saw the hint then refreshes the page
+      if self.request_type == 'hint' and inst_exercise.short_name.include? "Summ"
+        exercise_progress['hinted_exercise'] = self['question_name']
       end
-
-      # puts first_response
 
       exercise_progress.save
   end
@@ -84,6 +96,18 @@ class OdsaExerciseAttempt < ActiveRecord::Base
                                                  user.id,
                                                  inst_book_section_exercise.id).first
   end
+
+  def get_book_progress
+    unless book_progress = OdsaBookProgress.where("user_id=? and inst_book_id=?",
+                                                 user.id, inst_book.id).first
+      book_progress = OdsaBookProgress.new(
+        user: user,
+                                           inst_book: inst_book)
+    end
+    book_progress.save
+  end
+
+
   #~ Private instance methods .................................................
 
  end

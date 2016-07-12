@@ -12,6 +12,15 @@ ActiveAdmin.register Organization, sort_order: :created_at_asc do
     actions
   end
 
+  form do |f|
+    f.semantic_errors
+    f.inputs do
+      f.input :name
+      f.input :abbreviation
+    end
+    f.actions
+  end
+
   sidebar 'Courses', only: :show do
     table_for organization.courses do
       column :number

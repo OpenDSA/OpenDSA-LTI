@@ -39,22 +39,22 @@ class OdsaExerciseAttemptsController < ApplicationController
     end
 
     exercise_attempt = OdsaExerciseAttempt.new(
-                                                inst_book: inst_book,
-                                                user: current_user,
-                                                inst_section: inst_section,
-                                                inst_book_section_exercise: inst_book_section_exercise,
-                                                worth_credit: worth_credit,
-                                                correct: params[:complete],
-                                                time_done: Time.now,
-                                                time_taken: params[:time_taken],
-                                                count_hints: params[:count_hints],
-                                                count_attempts: params[:attempt_number],
-                                                hint_used: params[:count_hints].to_i > 0,
-                                                question_name: question_name,
-                                                request_type: request_type ,
-                                                points_earned: 1, # TODO: relace with the correct value
-                                                earned_proficiency: true, # TODO: relace with the correct value
-                                                ip_address: request.ip)
+                                              inst_book: inst_book,
+                                              user: current_user,
+                                              inst_section: inst_section,
+                                              inst_book_section_exercise: inst_book_section_exercise,
+                                              worth_credit: worth_credit,
+                                              correct: params[:complete],
+                                              time_done: Time.now,
+                                              time_taken: params[:time_taken],
+                                              count_hints: params[:count_hints],
+                                              count_attempts: params[:attempt_number],
+                                              hint_used: params[:count_hints].to_i > 0,
+                                              question_name: question_name,
+                                              request_type: request_type ,
+                                              points_earned: 1, # TODO: relace with the correct value
+                                              earned_proficiency: true, # TODO: relace with the correct value
+                                              ip_address: request.ip)
 
     respond_to do |format|
       if exercise_attempt.save
