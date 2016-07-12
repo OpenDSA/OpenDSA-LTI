@@ -28,7 +28,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   #~ Validation ...............................................................
   #~ Constants ................................................................
   #~ Hooks ....................................................................
-  after_save :update_exercise_progress
+  after_create :update_exercise_progress
   #~ Class methods ............................................................
   #~ Instance methods .........................................................
   def update_exercise_progress
@@ -42,7 +42,6 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       first_response = (self.count_attempts == 1 and self.count_hints == 0) ||
                        (self.count_attempts == 0 and self.count_hints == 1)
 
-
       book_progress.update_started(inst_exercise)
 
       if self.correct
@@ -52,7 +51,12 @@ class OdsaExerciseAttempt < ActiveRecord::Base
           exercise_progress['current_score'] += 1
           exercise_progress['highest_score'] = [exercise_progress['highest_score'], exercise_progress['current_score']].max
 
-          book_progress.update_proficiency(exercise_progress)
+          proficient = book_progress.update_proficiency(exercise_progress)
+          if proficient
+            self.earned_proficiency = true
+            self.save!
+            exercise_progress.proficient_date ||= DateTime.now
+          end
 
           if exercise_progress['correct_exercises'].to_s.strip.length == 0
             exercise_progress['correct_exercises'] = self['question_name']
@@ -99,12 +103,11 @@ class OdsaExerciseAttempt < ActiveRecord::Base
 
   def get_book_progress
     unless book_progress = OdsaBookProgress.where("user_id=? and inst_book_id=?",
-                                                 user.id, inst_book.id).first
-      book_progress = OdsaBookProgress.new(
-        user: user,
-                                           inst_book: inst_book)
+                                                                                      user.id, inst_book.id).first
+      book_progress = OdsaBookProgress.create(user: user,
+                                                                            inst_book: inst_book)
     end
-    book_progress.save
+    book_progress
   end
 
 

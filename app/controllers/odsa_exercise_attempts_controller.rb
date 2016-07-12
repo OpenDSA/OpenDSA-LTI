@@ -53,7 +53,6 @@ class OdsaExerciseAttemptsController < ApplicationController
                                               question_name: question_name,
                                               request_type: request_type ,
                                               points_earned: 1, # TODO: relace with the correct value
-                                              earned_proficiency: true, # TODO: relace with the correct value
                                               ip_address: request.ip)
 
     respond_to do |format|

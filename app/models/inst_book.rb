@@ -13,6 +13,7 @@ class InstBook < ActiveRecord::Base
   has_many :inst_chapters, dependent: :destroy
   has_many :inst_book_section_exercises, dependent: :destroy
   has_many :odsa_user_interactions
+  has_many :odsa_book_progresses
   has_many :odsa_module_progresses
   has_many :odsa_exercise_attempts
 

@@ -1,7 +1,7 @@
 class OdsaBookProgress < ActiveRecord::Base
   #~ Relationships ............................................................
-  belongs_to :users
-  belongs_to :inst_books
+  belongs_to :user
+  belongs_to :inst_book
   #~ Validation ...............................................................
   #~ Constants ................................................................
   #~ Hooks ....................................................................
@@ -12,7 +12,7 @@ class OdsaBookProgress < ActiveRecord::Base
       if self.started_exercises.to_s.strip.length == 0
         self.started_exercises = inst_exercise.id
       else
-        self.started_exercises += ',' + inst_exercise.id
+        self.started_exercises += ',' + inst_exercise.id.to_s
       end
     end
     self.save
@@ -24,26 +24,29 @@ class OdsaBookProgress < ActiveRecord::Base
 
     threshold = inst_book_section_exercise.threshold
     highest_score = exercise_progress.highest_score
+    proficient = false
     if highest_score >= threshold
+      proficient = true
       unless self.proficient?(inst_exercise)
         if self.proficient_exercises.to_s.strip.length == 0
           self.proficient_exercises = inst_exercise.id
         else
-          self.proficient_exercises += ',' + inst_exercise.id
+          self.proficient_exercises += ',' + inst_exercise.id.to_s
         end
       end
     end
     self.save
+    return proficient
   end
 
   def started?(inst_exercise)
     started_exercises = self.started_exercises.split(',')
-    started_exercises.include? inst_exercise.id
+    return started_exercises.include? inst_exercise.id.to_s
   end
 
   def proficient?(inst_exercise)
     proficient_exercises = self.proficient_exercises.split(',')
-    proficient_exercises.include? inst_exercise.id
+    return proficient_exercises.include? inst_exercise.id.to_s
   end
   #~ Private instance methods .................................................
 end
