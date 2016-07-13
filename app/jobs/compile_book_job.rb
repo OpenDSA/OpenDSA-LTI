@@ -2,7 +2,7 @@ class CompileBookJob < ProgressJob::Base
   def initialize(inst_book_id, launch_url, user_id)
     @user_id = user_id
     @inst_book = InstBook.find_by(id: inst_book_id)
-    @launch_url = launch_url
+    @odsa_launch_url = launch_url
   end
 
   def perform
@@ -32,35 +32,56 @@ class CompileBookJob < ProgressJob::Base
 
   def inst_book_compile
     lms_instance_id = @inst_book.course_offering.lms_instance['id']
-    consumer_key = @inst_book.course_offering.lms_instance['consumer_key']
-    consumer_secret = @inst_book.course_offering.lms_instance['consumer_secret']
-    privacy_level = "public"
     user_lms_access = LmsAccess.where(lms_instance_id: lms_instance_id).where(user_id: @user_id).first
-    lms_course_id = @inst_book.course_offering.lms_course_num
-
+    @created_LTI_tools = []
     require 'pandarus'
     client = Pandarus::Client.new(
       prefix: @inst_book.course_offering.lms_instance.url + '/api',
       token: user_lms_access.access_token)
+    lms_course_id = @inst_book.course_offering.lms_course_num
 
-    # create LTI tool in canvas if it is not defined
-    res = client.list_external_tools_courses(lms_course_id)
-    opendsa_tool = false
-    if res
-      res.each do |tool|
-        opendsa_tool = true if tool['name'] == "OpenDSA-LTI"
-      end
-    end
+    tool_data ={
+      "tool_name" => "OpenDSA-LTI",
+      "privacy_level" => "public",
+      "consumer_key" => @inst_book.course_offering.lms_instance['consumer_key'],
+      "consumer_secret" => @inst_book.course_offering.lms_instance['consumer_secret'],
+      "launch_url" => @odsa_launch_url
+    }
 
-    if !opendsa_tool
-      res = client.create_external_tool_courses(lms_course_id, "OpenDSA-LTI", privacy_level, consumer_key, consumer_secret, {:url => @launch_url})
-      @inst_book.course_offering.save
-    end
+    save_lti_app(client, lms_course_id, tool_data)
 
     # generate canvas course modules, items and assignments out of inst_book configurations
     save_lms_course(client, lms_course_id)
     @inst_book.last_compiled = Time.now
     @inst_book.save
+  end
+
+  # -------------------------------------------------------------
+  # Create LTI app in canvas course
+  def save_lti_app(client, lms_course_id, tool_data)
+    # create LTI tool in canvas if it is not defined
+    tool_name = tool_data["tool_name"]
+    privacy_level = tool_data["privacy_level"]
+    consumer_key = tool_data["consumer_key"]
+    consumer_secret = tool_data["consumer_secret"]
+    launch_url = tool_data["launch_url"]
+    res = client.list_external_tools_courses(lms_course_id)
+    tool_exists = false
+    if res
+      res.each do |tool|
+        tool_exists = true if tool['name'] == tool_name
+      end
+    end
+
+    opts = {:custom_fields => {"label"=>"opendsa"},
+            :url => launch_url}
+
+    if !tool_exists and !@created_LTI_tools.include? tool_name
+      res = client.create_external_tool_courses(lms_course_id, tool_name,
+      privacy_level, consumer_key, consumer_secret, opts)
+      @created_LTI_tools.push(tool_name)
+    end
+
   end
 
   # -------------------------------------------------------------
@@ -159,44 +180,104 @@ class CompileBookJob < ProgressJob::Base
     title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
             (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
             section_item_position.to_s.rjust(2, "0") + " - "
+
+    learning_tool = nil
     if section
       section_file_name = module_name + "-" + section_item_position.to_s.rjust(2, "0")
       title = title + section.name
+
+      learning_tool = section.learning_tool
+      if learning_tool
+        title = section.name
+        learning_tool_obj = LearningTool.where(:name => learning_tool).first
+        launch_url = learning_tool_obj.launch_url
+        tool_data ={
+          "tool_name" => learning_tool_obj['name'],
+          "privacy_level" => "public",
+          "consumer_key" => learning_tool_obj['key'],
+          "consumer_secret" => learning_tool_obj['secret'],
+          "launch_url" => launch_url
+        }
+        save_lti_app(client, lms_course_id, tool_data)
+      end
     else
       section_file_name = module_name
       title = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
     end
 
-    url_opts = {
-      :inst_book_id => @inst_book.id,
-      :inst_section_id => (section.id if section),
-      :book_path => book_path(@inst_book),
-      :section_file_name => section_file_name,
-      :section_title => title
-    }
+    if !learning_tool
+      odsa_url_opts = {
+        :inst_book_id => @inst_book.id,
+        :inst_section_id => (section.id if section),
+        :book_path => book_path(@inst_book),
+        :section_file_name => section_file_name,
+        :section_title => title
+      }
 
-    require "addressable/uri"
-    uri = Addressable::URI.new
-    uri.query_values = url_opts
+      require "addressable/uri"
+      uri = Addressable::URI.new
+      uri.query_values = odsa_url_opts
+      launch_url = @odsa_launch_url + '?' + uri.query
+    end
 
     opts = {:module_item__title__ => title,
             :module_item__type__ => 'ExternalTool',
             :module_item__position__ => module_item_position + section_item_position,
-            :module_item__external_url__ => @launch_url + '?' + uri.query,
+            :module_item__external_url__ => launch_url,
             :module_item__indent__ => 1
             }
 
-    if section
-      save_section_as_assignment(client, lms_course_id, chapter, section, title, opts, url_opts)
+    if learning_tool
+      save_learning_tool(client, lms_course_id, chapter, section, title, opts)
     else
-      if inst_ch_module.lms_section_item_id
-        res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_section_item_id, opts)
+      if section
+        save_section_as_assignment(client, lms_course_id, chapter, section, title, opts, odsa_url_opts)
       else
-        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
-        inst_ch_module.lms_section_item_id = res['id']
-        inst_ch_module.save
+        if inst_ch_module.lms_section_item_id
+          res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_section_item_id, opts)
+        else
+          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
+          inst_ch_module.lms_section_item_id = res['id']
+          inst_ch_module.save
+        end
       end
     end
+
+  end
+
+  def save_learning_tool(client, lms_course_id, chapter, section, title, opts)
+
+    assignment_opts = {
+      :assignment__name__ => title,
+      :assignment__submission_types__ => "external_tool",
+      :assignment__external_tool_tag_attributes__ => {:url => opts[:module_item__external_url__] },
+    }
+
+    if section.gradable
+      assignment_opts[:assignment__points_possible__] = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", section.id).first.points
+      opts[:module_item__type__] = 'Assignment'
+      if section.lms_item_id && section.lms_assignment_id
+        opts[:module_item__content_id__] = section.lms_assignment_id
+        assignment_res = client.edit_assignment(lms_course_id, section.lms_assignment_id, assignment_opts )
+        res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
+      else
+        assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
+        opts[:module_item__content_id__] = assignment_res['id']
+        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
+        section.lms_assignment_id = assignment_res['id']
+        section.lms_item_id = res['id']
+        section.save
+      end
+    else
+      if section.lms_item_id
+        res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
+      else
+        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
+        section.lms_item_id = res['id']
+        section.save
+      end
+    end
+
   end
 
 
@@ -218,7 +299,7 @@ class CompileBookJob < ProgressJob::Base
     assignment_opts = {
       :assignment__name__ => title,
       :assignment__submission_types__ => "external_tool",
-      :assignment__external_tool_tag_attributes__ => {:url => @launch_url + '?' + uri.query },
+      :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query },
     }
 
     opts[:module_item__title__] = title

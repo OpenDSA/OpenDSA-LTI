@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160713013121) do
+ActiveRecord::Schema.define(version: 20160713134709) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -152,7 +152,7 @@ ActiveRecord::Schema.define(version: 20160713013121) do
   create_table "inst_book_section_exercises", force: true do |t|
     t.integer  "inst_book_id",                                             null: false
     t.integer  "inst_section_id",                                          null: false
-    t.integer  "inst_exercise_id",                                         null: false
+    t.integer  "inst_exercise_id"
     t.decimal  "points",           precision: 5, scale: 2,                 null: false
     t.boolean  "required",                                 default: false
     t.decimal  "threshold",        precision: 5, scale: 2,                 null: false
@@ -239,6 +239,9 @@ ActiveRecord::Schema.define(version: 20160713013121) do
     t.integer  "lms_assignment_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "learning_tool"
+    t.string   "resource_type"
+    t.string   "resource_name"
   end
 
   add_index "inst_sections", ["inst_chapter_module_id"], name: "inst_sections_inst_chapter_module_id_fk", using: :btree
@@ -261,10 +264,12 @@ ActiveRecord::Schema.define(version: 20160713013121) do
   add_index "late_policies", ["name"], name: "index_late_policies_on_name", unique: true, using: :btree
 
   create_table "learning_tools", force: true do |t|
-    t.string "name",       null: false
-    t.string "key",        null: false
-    t.string "secret",     null: false
-    t.string "launch_rul", null: false
+    t.string   "name",       null: false
+    t.string   "key",        null: false
+    t.string   "secret",     null: false
+    t.string   "launch_url", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "learning_tools", ["name"], name: "index_learning_tools_on_name", unique: true, using: :btree

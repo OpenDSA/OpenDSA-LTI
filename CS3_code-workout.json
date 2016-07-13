@@ -1,6 +1,6 @@
 {
   "title": "CS3 generic title",
-  "desc": "CS3 generic desc",
+  "desc": "CS3 with code-workout",
   "book_code": "CS3",
   "chapters": {
     "Preface": {
@@ -23,6 +23,12 @@
           },
           "Some Software Engineering Topics": {
             "showsection": false
+          },
+          "Workout from Factory": {
+            "learning_tool": "code-workout",
+            "resource_type": "external_assignment",
+            "resource_name": "Factorial",
+            "points": 5.0
           }
         }
       },

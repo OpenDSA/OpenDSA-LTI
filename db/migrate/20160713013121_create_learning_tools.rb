@@ -4,7 +4,8 @@ class CreateLearningTools < ActiveRecord::Migration
       t.string :name, null: false
       t.string :key, null: false
       t.string :secret, null: false
-      t.string :launch_rul, null: false
+      t.string :launch_url, null: false
+      t.timestamps
     end
     add_index :learning_tools, :name, unique: true
   end

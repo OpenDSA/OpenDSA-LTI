@@ -8,7 +8,7 @@ class InstExercise < ActiveRecord::Base
   #~ Class methods ............................................................
   def self.save_data_from_json(book, inst_section, exercise_name, exercise_obj)
     ex = InstExercise.find_by short_name: exercise_name
-    if !ex
+    if !ex and !exercise_obj['learning_tool']
       ex = InstExercise.new
       ex.short_name = exercise_name
       ex.name = exercise_obj['long_name']
@@ -18,10 +18,16 @@ class InstExercise < ActiveRecord::Base
     book_sec_ex = InstBookSectionExercise.new
     book_sec_ex.inst_book_id = book.id
     book_sec_ex.inst_section_id = inst_section.id
-    book_sec_ex.inst_exercise_id = ex.id
-    book_sec_ex.points = exercise_obj['points'] || 0
-    book_sec_ex.required = exercise_obj['required'] || false
-    book_sec_ex.threshold = exercise_obj['threshold'] || 5
+
+    if exercise_obj['learning_tool']
+      book_sec_ex.points = exercise_obj['points'] || 0
+    else # OpenDSA exercise
+      book_sec_ex.inst_exercise_id = ex.id
+      book_sec_ex.points = exercise_obj['points'] || 0
+      book_sec_ex.required = exercise_obj['required'] || false
+      book_sec_ex.threshold = exercise_obj['threshold'] || 5
+    end
+
     book_sec_ex.save
 
   end

@@ -3,6 +3,7 @@ require 'factory_girl'
 namespace :db do
   desc "Reset database and then fill it with sample data"
   task populate: [:environment] do
+    FactoryGirl.create(:learning_tool)
     FactoryGirl.create(:organization)
     FactoryGirl.create(:term100)
     FactoryGirl.create(:term200)

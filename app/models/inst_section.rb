@@ -21,12 +21,22 @@ class InstSection < ActiveRecord::Base
     inst_sec.inst_module_id = module_rec.id
     inst_sec.inst_chapter_module_id = inst_chapter_module_rec.id
     inst_sec.name = section_name
+    inst_sec.learning_tool = section_obj['learning_tool']
+    inst_sec.resource_type = section_obj['resource_type']
+    inst_sec.resource_name = section_obj['resource_name']
+    inst_sec.name = section_name
     inst_sec.show = section_obj['showsection'] || true
     inst_sec.save
 
-    section_obj.each do |k, v|
-     InstExercise.save_data_from_json(book, inst_sec, k, v) if v.is_a?(Hash) && !v.empty?
+    # learning tool section
+    if section_obj['learning_tool'] and section_obj['resource_type'] == 'external_assignment'
+     InstExercise.save_data_from_json(book, inst_sec, section_name, section_obj)
+    else # OpenDSA section
+      section_obj.each do |k, v|
+       InstExercise.save_data_from_json(book, inst_sec, k, v) if v.is_a?(Hash) && !v.empty?
+      end
     end
+
   end
   #~ Instance methods .........................................................
 
@@ -35,14 +45,13 @@ class InstSection < ActiveRecord::Base
   # check that only one child exercise in inst_book_section_exercises table
   # is gradable (has points > 0)
   def one_gradable_ex_only
-
   end
 
   # -------------------------------------------------------------
   # return the gradable exercise name from inst_exercises table and
   # id from inst_book_section_exercises table
   def get_gradable_ex
-    inst_bk_sec_ex = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", id).first
+    inst_bk_sec_ex = InstBookSectionExercise.where("inst_section_id = ? AND points > 0 AND inst_exercise_id IS NOT NULL", id).first
     inst_ex = InstExercise.where(id: inst_bk_sec_ex['inst_exercise_id']).first
     {'ex_name' => inst_ex.short_name, "inst_bk_sec_ex" => inst_bk_sec_ex.id}
   end
@@ -61,6 +70,9 @@ class InstSection < ActiveRecord::Base
     section.hard_deadline = self.hard_deadline
     section.time_limit = self.time_limit
     section.show = self.show
+    section.learning_tool = self.learning_tool
+    section.resource_type = self.resource_type
+    section.resource_name = self.resource_name
     section.save
 
     inst_book_section_exercises.each do |book_section_exercise|
