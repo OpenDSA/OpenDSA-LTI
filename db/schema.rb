@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160712171303) do
+ActiveRecord::Schema.define(version: 20160713013121) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -259,6 +259,15 @@ ActiveRecord::Schema.define(version: 20160712171303) do
   end
 
   add_index "late_policies", ["name"], name: "index_late_policies_on_name", unique: true, using: :btree
+
+  create_table "learning_tools", force: true do |t|
+    t.string "name",       null: false
+    t.string "key",        null: false
+    t.string "secret",     null: false
+    t.string "launch_rul", null: false
+  end
+
+  add_index "learning_tools", ["name"], name: "index_learning_tools_on_name", unique: true, using: :btree
 
   create_table "lms_accesses", force: true do |t|
     t.string   "access_token",    null: false

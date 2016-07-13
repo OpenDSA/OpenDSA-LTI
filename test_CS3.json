@@ -23,6 +23,11 @@
           },
           "Some Software Engineering Topics": {
             "showsection": false
+          },
+          "programming exercise": {
+            "learning_tool": "code-workout",
+            "workout_name": "Factorial",
+            "points": 5.0
           }
         }
       },
