@@ -45,8 +45,16 @@ class OdsaBookProgress < ActiveRecord::Base
   end
 
   def proficient?(inst_exercise)
-    proficient_exercises = self.proficient_exercises.split(',')
+    proficient_exercises = self.get_proficient_exercises
     return proficient_exercises.include? inst_exercise.id.to_s
   end
+
+  def get_proficient_exercises
+    proficient_exercises = []
+    proficient_exercises.concat self.proficient_exercises.split(',').map(&:to_i)
+    puts proficient_exercises.inspect
+    return proficient_exercises
+  end
+
   #~ Private instance methods .................................................
 end

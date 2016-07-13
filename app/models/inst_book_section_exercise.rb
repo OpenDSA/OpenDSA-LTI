@@ -36,6 +36,10 @@ class InstBookSectionExercise < ActiveRecord::Base
     book_section_exercise.save
   end
 
+  def get_chapter_module
+    return InstChapterModule.find_by(id: inst_section.inst_chapter_module_id)
+  end
+
   #~ Private instance methods .................................................
 
 end

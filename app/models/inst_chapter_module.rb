@@ -3,12 +3,14 @@ class InstChapterModule < ActiveRecord::Base
   belongs_to :inst_chapter
   belongs_to :inst_module
   has_many :inst_sections, dependent: :destroy
+  has_many :odsa_module_progresses, inverse_of: :inst_chapter_module
 
   #~ Validation ...............................................................
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
   #~ Instance methods .........................................................
+
   # --------------------------------------------------------------------------
   # clone inst_chapter_module
   def clone(book, chapter)
@@ -21,6 +23,17 @@ class InstChapterModule < ActiveRecord::Base
     inst_sections.each do |section|
       inst_section = section.clone(book, ch_mod)
     end
+  end
+
+  # --------------------------------------------------------------------------
+  # gets all the exercises in one module
+  def get_exercises_list
+    exercises_list = []
+    inst_sections.each do |inst_section|
+      exercises_list.concat inst_section.inst_book_section_exercises.collect(&:inst_exercise_id)
+    end
+    puts exercises_list.inspect
+    return exercises_list
   end
 
   #~ Private instance methods .................................................

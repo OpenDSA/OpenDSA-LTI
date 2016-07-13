@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160712011703) do
+ActiveRecord::Schema.define(version: 20160712171303) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -363,18 +363,18 @@ ActiveRecord::Schema.define(version: 20160712011703) do
   add_index "odsa_exercise_progresses", ["user_id", "inst_book_section_exercise_id"], name: "index_odsa_ex_prog_on_user_id_and_inst_bk_sec_ex_id", unique: true, using: :btree
 
   create_table "odsa_module_progresses", force: true do |t|
-    t.integer  "user_id",         null: false
-    t.integer  "inst_book_id",    null: false
-    t.integer  "inst_module_id",  null: false
-    t.datetime "first_done",      null: false
-    t.datetime "last_done",       null: false
-    t.datetime "proficient_date", null: false
+    t.integer  "user_id",                null: false
+    t.integer  "inst_book_id",           null: false
+    t.datetime "first_done",             null: false
+    t.datetime "last_done",              null: false
+    t.datetime "proficient_date",        null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "inst_chapter_module_id"
   end
 
   add_index "odsa_module_progresses", ["inst_book_id"], name: "odsa_module_progresses_inst_book_id_fk", using: :btree
-  add_index "odsa_module_progresses", ["inst_module_id"], name: "odsa_module_progresses_inst_module_id_fk", using: :btree
+  add_index "odsa_module_progresses", ["inst_chapter_module_id"], name: "odsa_module_progresses_inst_chapter_module_id_fk", using: :btree
   add_index "odsa_module_progresses", ["user_id"], name: "odsa_module_progresses_user_id_fk", using: :btree
 
   create_table "odsa_student_extensions", force: true do |t|
@@ -524,7 +524,7 @@ ActiveRecord::Schema.define(version: 20160712011703) do
   add_foreign_key "odsa_exercise_progresses", "users", name: "odsa_exercise_progresses_user_id_fk"
 
   add_foreign_key "odsa_module_progresses", "inst_books", name: "odsa_module_progresses_inst_book_id_fk"
-  add_foreign_key "odsa_module_progresses", "inst_modules", name: "odsa_module_progresses_inst_module_id_fk"
+  add_foreign_key "odsa_module_progresses", "inst_chapter_modules", name: "odsa_module_progresses_inst_chapter_module_id_fk"
   add_foreign_key "odsa_module_progresses", "users", name: "odsa_module_progresses_user_id_fk"
 
   add_foreign_key "odsa_student_extensions", "inst_sections", name: "odsa_student_extensions_inst_section_id_fk"

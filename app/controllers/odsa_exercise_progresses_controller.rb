@@ -29,7 +29,7 @@ class OdsaExerciseProgressesController < ApplicationController
 
   end
 
-  def show
+  def show_exercise
     inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
     inst_book_section_exercise = InstBookSectionExercise.where(
                                   "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
@@ -42,6 +42,22 @@ class OdsaExerciseProgressesController < ApplicationController
       format.json  { render :json => {
                                       :exercise_progress => exercise_progress,
                                       :threshold => inst_book_section_exercise.threshold}}
+    end
+  end
+
+  def show_section
+    # inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
+    # inst_book_section_exercise = InstBookSectionExercise.where(
+    #                               "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+    #                               params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+    # exercise_progress = OdsaExerciseProgress.where(
+    #                               "inst_book_section_exercise_id=? and user_id=?",
+    #                               inst_book_section_exercise.id, current_user.id).first
+    # inst_book_section_exercise = InstBookSectionExercise.find_by(id: exercise_progress.inst_book_section_exercise_id)
+    respond_to do |format|
+      format.json  { render :json => {
+                                      :exercise_progress => "exercise_progress",
+                                      :threshold => "threshold"}}
     end
   end
 

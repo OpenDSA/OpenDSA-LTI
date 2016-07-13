@@ -32,9 +32,11 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   #~ Class methods ............................................................
   #~ Instance methods .........................................................
   def update_exercise_progress
+      @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
-      exercise_progress = self.get_exercise_progress
       book_progress = self.get_book_progress
+      module_progress = self.get_module_progress
+      exercise_progress = self.get_exercise_progress
 
       exercise_progress.first_done ||= DateTime.now
       exercise_progress.last_done = DateTime.now
@@ -56,6 +58,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
             self.earned_proficiency = true
             self.save!
             exercise_progress.proficient_date ||= DateTime.now
+            module_progress.update_proficiency(inst_exercise)
           end
 
           if exercise_progress['correct_exercises'].to_s.strip.length == 0
@@ -63,8 +66,6 @@ class OdsaExerciseAttempt < ActiveRecord::Base
           else
             exercise_progress['correct_exercises'] += ',' + self['question_name']
           end
-        else
-          # progress thing goes here
         end
 
         # when student answer an exercise correctly from first time then clear the hint
@@ -80,11 +81,6 @@ class OdsaExerciseAttempt < ActiveRecord::Base
             exercise_progress['current_score'] = 0
           end
         end
-
-        # progress thing goes here
-        # if first_response
-        #   exercise_progress['earned_proficiency'] = false
-        # end
       end
 
       # save exercise_name to hinted_exercise so that student won't get credit if he saw the hint then refreshes the page
@@ -103,11 +99,17 @@ class OdsaExerciseAttempt < ActiveRecord::Base
 
   def get_book_progress
     unless book_progress = OdsaBookProgress.where("user_id=? and inst_book_id=?",
-                                                                                      user.id, inst_book.id).first
-      book_progress = OdsaBookProgress.create(user: user,
-                                                                            inst_book: inst_book)
+                                                  user.id, inst_book.id).first
+      book_progress = OdsaBookProgress.create(user: user,inst_book: inst_book)
     end
     book_progress
+  end
+
+  def get_module_progress
+    unless module_progress = OdsaModuleProgress.where(user: user,inst_book: inst_book,inst_chapter_module: @inst_chapter_module).first
+      module_progress = OdsaModuleProgress.create(user: user,inst_book: inst_book,inst_chapter_module: @inst_chapter_module)
+    end
+    module_progress
   end
 
 
