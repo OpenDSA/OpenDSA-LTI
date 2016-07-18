@@ -6,27 +6,26 @@
 
 .form-horizontal.formtastic{ style: 'margin-left: 20px;' }
   .form-group
-    %label.control-label Project Lead:
+    %label.control-label Project Director:
     .form-wrapper
-      Stephen Edwards,
-      =link_to 'edwards@cs.vt.edu', 'mailto:edwards@cs.vt.edu'
-
-  .form-group
-    %label.control-label Developer:
-    .form-wrapper
-      Krishnan Panamalai Murali,
-      =link_to 'pmk1433@vt.edu', 'mailto:pmk1433@vt.edu'
+      Cliff Shaffer,
+      =link_to 'shaffer@vt.edu', 'mailto:shaffer@vt.edu'
 
   .form-group
     %label.control-label Source Code:
     .form-wrapper
-      =link_to 'https://github.com/web-cat/code-workout',
-        'https://github.com/web-cat/code-workout'
+      =link_to 'https://github.com/OpenDSA',
+        'https://github.com/OpenDSA'
 
   .form-group
     %label.control-label Issue Tracker:
     .form-wrapper
-      =link_to 'https://github.com/web-cat/code-workout/issues',
-        'https://github.com/web-cat/code-workout/issues'
+      =link_to 'https://github.com/OpenDSA/OpenDSA/issues',
+        'https://github.com/OpenDSA/OpenDSA/issues'
 
-=render partial: 'home/send_us_exercises'
+  %p
+    For more information about OpenDSA, and how you can contribute to
+    the OpenDSA project, please see
+    = succeed '.' do
+      %a{ href: 'https://github.com/OpenDSA/OpenDSA/wiki' }
+        https://github.com/OpenDSA/OpenDSA/wiki

@@ -2,7 +2,169 @@
   %li= link_to 'Home', root_path
   %li.active About OpenDSA
 
-%h1 About OpenDSA
+%h1 About OpenDSA: Open Source Interactive Computer Science Instruction
 
 %p
-  UNDER CONSTRUCTION!!
+  [Click on any of the images to try things out!]
+
+%p
+  Welcome to the homepage for the OpenDSA Active-eBook Project. We
+  have created infrastructure and materials to support courses in a
+  wide variety of Computer Science-related topics such as Data
+  Structures and Algorithms (DSA), Formal Languages, Finite Automata,
+  and Programming Languages.
+
+%p
+  OpenDSA materials include many visualizations and interactive
+  exercises. Our philosophy is that students learn this material best
+  when they engage the material and then practice it until they have
+  demonstrated their proficiency. This page shows a sampling of
+  screenshots (if you click on a screenshot, you will be taken to the
+  actual artifact). In the same way, a given visualization or exercise
+  could be incorporated individually into an instructor's own web
+  pages.
+
+%p
+  But these visualizations and exercises were designed to be
+  integrated with explanatory tutorials, with the basic unit of
+  instruction being a "module". A module is a single HTML page,
+  corresponding to a single section in a textbook, or a single topic
+  that might be part of a lecture. Modules are collected together to
+  form an OpenDSA "book instance". Book instances can be integrated
+  into courses in the Canvas LMS.
+
+%ul
+  %li
+    %a{ href: 'http://lti.cs.vt.edu/NewKA/OpenDSA/Books/CS2114' }
+      Here
+    is an example book instance for the data structures component of a
+    typical CS2-level course.
+
+  %li
+    %a{ href: 'http://lti.cs.vt.edu/NewKA/OpenDSA/Books/CS3114' }
+      Here
+    is an example book instance for a typical Data Structures and
+    Algorithms course taken after a traditional CS2 course.
+    (that we refer to as "CS3").
+
+  %li
+    %a{ href: 'http://lti.cs.vt.edu/NewKA/OpenDSA/Books/Everything' }
+      Here
+    is a book instance that shows all of the exisiting modules,
+    including ones that are not fully ready for classroom use.
+
+%p
+  For instructors, we have support for making assignments and tracking
+  your students' progress through the material. Materials are created
+  using the OpenDSA authoring and configuration tools.
+
+%p
+  If you would like to contribute to our open-source project, please
+  take a look at our
+  %a{ href: 'https://github.com/OpenDSA/OpenDSA/wiki' }
+    contributor's guide.
+
+%p
+  OpenDSA materials are continuing to increase and improve. Already,
+  our project includes:
+
+%ul
+  %li
+    Nearly two hundred instructional modules, where each module is the
+    equivalent to one topic, such as one sorting algorithm,
+    corresponding to a couple of pages in a standard textbook. Each
+    module is of textbook quality. An "eTextbook" can be created from
+    any
+    =link_to "collection of modules,", home_books_path
+    as defined by an editable configuration file,
+    making it easy for an instructor to create a custom textbook
+    for a class.
+
+  = link_to image_tag("Inssort.png", :alt => "Insertion sort module", :width => '400'),
+            "http://lti.cs.vt.edu/NewKA/OpenDSA/Books/CS3114/html/InsertionSort.html"
+
+  %li
+    Every algorithm or data structure is illustrated by an interactive
+    algorithm visualization. Students could enter their own test cases
+    to see how the algorithm or data structure works on that input,
+    and they can control the pacing of the visualization.
+
+  = link_to image_tag("insertionsort.png", :alt => "Insertion sort AV", :width => '400'),
+            "http://lti.cs.vt.edu/NewKA/OpenDSA/AV/Sorting/insertionsortAV.html"
+
+  %li
+    Every module contains interactive assessment activities that give
+    students immediate feedback on their proficiency with the
+    material. There are many hundreds of exercises.
+
+  = link_to image_tag("Shellsort_prof.png", :alt => "Shellsort AV", :width => '400'),
+            "http://lti.cs.vt.edu/NewKA/OpenDSA/AV/Sorting/shellsortPRO.html"
+  = link_to image_tag("heapsort.png", :alt => "Heapsort AV", :width => '400'),
+            "http://lti.cs.vt.edu/NewKA/OpenDSA/AV/Sorting/heapsortPRO.html"
+
+%p
+  We accomplish this through an open-source, creative commons
+  environment. "Open Source" means that not only can anyone use the
+  materials, they can also access the source code that generates the
+  materials. "Creative Commons" means that anyone has permission to
+  modify or remix the materials for their own purposes. You as an
+  instructor (or even a student or professional who wants to self
+  study) will be able to pick and choose from the selection of
+  modules and exercises, automatically generating a custom textbook
+  that contains exactly the topics you want. Since all materials are
+  open source, you can rewrite any part if you don't like what is
+  already there. Infrastructure will be included that lets you
+  register students and then track their progress through the
+  modules and exercises.
+
+%p
+  A major complaint of students in DSA classes is that they do not get
+  enough practice problems, or sufficient other means of testing their
+  proficiency. One of the most important aspects of our vision is a
+  rich set of exercises to ensure that the student understands the
+  material as he/she progresses through the book. Our modules will
+  contain a mix of content, visualizations, and exercises. We make
+  extensive use of the
+  %a{ href: 'https://github.com/Khan/khan-exercises' }
+    Khan Academy exercise infrastructure
+  to build interactive exercises.
+
+= link_to image_tag("ka.png", :alt => "Indexing KA Exercise", :width => '400'),
+          "http://lti.cs.vt.edu/NewKA/OpenDSA/Exercises/Indexing/IndexChoice.html"
+= link_to image_tag("huffman.png", :alt => "Huffman Tree Exercise", :width => '400'),
+          "http://lti.cs.vt.edu/NewKA/OpenDSA/AV/Binary/huffmanBuildAV.html"
+
+%p
+  For more details on our project infrastructure, status, and issues,
+  see our
+  %a{ href: 'https://github.com/OpenDSA' }
+    GitHub Organization
+  and our
+  %a{ href: 'https://github.com/OpenDSA/OpenDSA' }
+    main development repository.
+  Our
+  %a{ href: 'https://piazza.com/class/i1v25wdagpr6sn' }
+    OpenDSA Piazza Forum
+  contains discussions among project
+  participants. Contact us at
+  =link_to 'opendsa@cs.vt.edu', 'mailto:opendsa@cs.vt.edu'
+  if you would like to
+  become involved. You can also see our materials for
+  %a{ href: 'https://github.com/OpenDSA/OpenDSA/wiki' }
+    potential contributors.
+
+%p
+  If you are a new developer on the project, see the
+  %a{ href: 'http://opendsa.readthedocs.io/en/latest/GettingStarted.html' }
+    OpenDSA developer's Getting Started Guide.
+  Further documentation for the OpenDSA infrastructure is available
+  %a{ href: 'http://opendsa.readthedocs.io/' }
+    here.
+
+= link_to image_tag("Shellsort_perf.png", :alt => "Shellsort Performance Activity", :width => '400'),
+          "http://lti.cs.vt.edu/NewKA/OpenDSA/AV/Sorting/shellsortPerf.html"
+
+%p
+  See
+  =link_to "here", home_books_path
+  for a list of papers and presentations about the OpenDSA project.
