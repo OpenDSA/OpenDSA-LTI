@@ -258,6 +258,8 @@ The following server requirements will be fine for supporting hundreds of users.
   ...  
   ```
 
+  - Finally, if you have staging server you need to open up `/vagrant/OpenDSA-LTI/config/deploy/staging.rb` file to set the server IP address of you staging server. Replace `128.173.236.221` with your staging server IP address.
+
   - Commit your changes and push it to `forked` remote 
   ```
   cd /vagrant/OpenDSA-LTI
