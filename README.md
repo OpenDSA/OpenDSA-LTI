@@ -13,35 +13,12 @@ The following server requirements will be fine for supporting hundreds of users.
 ## Installation Instructions
 
 ### Install OpenDSA-DevStack on your local machine
-  - OpenDSA-LTI is using a remote server automation and deployment tool called Capistrano[http://capistranorb.com/]. Capistrano will automate the deplyment  tasks on a reamote production server. Each time you want to deploy new changes to OpenDSA-LTI production server you have to initiate the deployment command from within the develpment environment OpenDSA-DevStack.
-  - Once you have OpenDSA-DevStack up and running open a new terminal and do the following to generate a pair of authentication keys: **Do not enter a passphrase**
+  - OpenDSA-LTI is using a remote server automation and deployment tool called [Capistrano](http://capistranorb.com/). Capistrano will automate the deplyment  tasks on a reamote production server. Each time you want to deploy new changes to OpenDSA-LTI production server you have to initiate the deployment command from within the develpment environment OpenDSA-DevStack.
+  - Once you have OpenDSA-DevStack up and running open a new terminal and do the following to generate a pair of authentication keys **Do not enter a passphrase**
   ```
   cd OpenDSA-DevStack
   vagrant ssh
   ssh-keygen -t rsa
-  ```
-  - You will see something similar to the following
-  ```
-  Generating public/private rsa key pair.
-  Enter file in which to save the key (/home/vagrant/.ssh/id_rsa): 
-  Enter passphrase (empty for no passphrase): 
-  Enter same passphrase again: 
-  Your identification has been saved in /home/vagrant/.ssh/id_rsa.
-  Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub.
-  The key fingerprint is:
-  00:54:14:9d:c2:3d:d8:5a:d0:12:ae:0c:d6:09:e6:88 vagrant@vagrant-ubuntu-trusty-64
-  The key's randomart image is:
-  +--[ RSA 2048]----+
-  |  o.o+*X .       |
-  |.+ o += x        |
-  |E + o o= .       |
-  | . o ...         |
-  |    o   S        |
-  |                 |
-  |                 |
-  |                 |
-  |                 |
-  +-----------------+
   ```
 
 ### Creating `deploy` user on production server
