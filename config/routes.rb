@@ -49,6 +49,8 @@ CodeWorkout::Application.routes.draw do
   get 'home/contact'
   get 'home/guide'
   get 'home/books'
+  get 'home/papers'
+  get 'home/support'
   get 'home/new_course_modal', as: :new_course_modal
 
   # routes anchored at /admin
