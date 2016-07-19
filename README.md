@@ -344,6 +344,6 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
   - **TO BE REMOVED:** To populate your database with initial starter data execute the following
   ```
-  bundle exec cap production rake:invoke task=reset_populate
+  bundle exec cap production invoke:rake TASK=db:reset_populate
   ```
   - Go to https://prod_server_name you should see OpenDSA Rails application landing page. Congradulations!!!
