@@ -208,20 +208,20 @@ The following server requirements will be fine for supporting hundreds of users.
   git checkout LTI_ruby
   ```
 
-  - **Note:** As of this writing `OpenDSA/LTI_ruby` branch is used, however in the near future this branch will be merged into `OpenDSA/master` branch. So make sure you monitor OpenDSA reposiroty to know when these two branches got merged to update your production server accordingly.
+  - **Note:** As of this writing `OpenDSA/LTI_ruby` branch is used, however in the near future this branch will be merged into `OpenDSA/master` branch. So make sure you monitor OpenDSA repository to know when these two branches got merged to update your production server accordingly.
 
 
   - For the next steps, **Switch back to OpenDSA-DevStack termainal**
 
 ### Deploy OpenDSA-LTI
   - You need to make some changes to OpenDSA-LTI repository related to your spesific production server. To do that you need to fork [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA-LTI) to your github account and then add your own repository as a remote to OpenDSA-LTI in OpenDSA-DevStack. This way you can make your own changes to OpenDSA-LTI and keep up to date with the latest changes done in the originial reposiroty.
-  - In your OpenDSA-DevStack terminal, add your forked repository
+  - In your OpenDSA-DevStack terminal, add your forked repository, replace `your_username` with you github account
   ```
   cd /vagrant/OpenDSA-LTI
   git remote add forked https://github.com/your_username/OpenDSA-LTI.git
   ```
 
-  - First, in `/vagrant/OpenDSA-LTI/config/deploy.rb` file, change `repo_url` to match you cloned repository url
+  - First, in `/vagrant/OpenDSA-LTI/config/deploy.rb` file, change `repo_url` to match you forked repository url. Again replace `your_username` with you github account
   ```
   # config valid only for Capistrano 3.1
   lock '3.2.1'
@@ -322,7 +322,14 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Now production server is ready for deployment, switch back to OpenDSA-DevStack termainal and execute the following
   ```
+  cd /vagrant/OpenDSA-LTI
   bundle exec cap production deploy
+  ```
+
+  - If you have configured a staging server you can deploy your changes to the staging server the same way as the production. Switch to OpenDSA-DevStack termainal and execute the following
+  ```
+  cd /vagrant/OpenDSA-LTI
+  bundle exec cap staging deploy
   ```
 
 ### Final Steps
@@ -353,7 +360,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
   ```
 
-  - Replace /etc/nginx/ssl/nginx.crt and /etc/nginx/ssl/nginx.key with you valid certificate and key. 
+  - Replace /etc/nginx/ssl/nginx.crt and /etc/nginx/ssl/nginx.key with your valid certificate and key. 
 
   - Restart Nginix web server
 
