@@ -181,7 +181,9 @@ The following server requirements will be fine for supporting hundreds of users.
   FLUSH PRIVILEGES;
   exit
   ```
+
 ### Install Node.js and bower
+
   - Node.js is required by Rails assets pipeline.
 
   ```
