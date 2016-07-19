@@ -14,8 +14,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
 ### Install OpenDSA-DevStack on your local machine
   - OpenDSA-LTI is using a remote server automation and deployment tool called [Capistrano](http://capistranorb.com/). Capistrano will automate the deplyment  tasks on a reamote production server. Each time you want to deploy new changes to OpenDSA-LTI production server you have to initiate the deployment command from within the develpment environment OpenDSA-DevStack.
-  - Once you have OpenDSA-DevStack up and running open a new terminal and do the following to generate a pair of authentication keys 
-  - **Do not enter a passphrase**.
+  - Once you have OpenDSA-DevStack up and running open a new terminal and do the following to generate a pair of authentication keys. **Note:** Do not enter a passphrase
   ```
   cd OpenDSA-DevStack
   vagrant ssh
