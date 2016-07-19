@@ -22,6 +22,30 @@ The following server requirements will be fine for supporting hundreds of users.
   ssh-keygen -t rsa
   ```
 
+  - You will see something similar to the following
+  ```
+  Generating public/private rsa key pair.
+  Enter file in which to save the key (/home/vagrant/.ssh/id_rsa): 
+  Enter passphrase (empty for no passphrase): 
+  Enter same passphrase again: 
+  Your identification has been saved in /home/vagrant/.ssh/id_rsa.
+  Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub.
+  The key fingerprint is:
+  00:54:14:9d:c2:3d:d8:5a:d0:12:ae:0c:d6:09:e6:88 vagrant@vagrant-ubuntu-trusty-64
+  The key's randomart image is:
+  +--[ RSA 2048]----+
+  |  o.o+*X .       |
+  |.+ o += x        |
+  |E + o o= .       |
+  | . o ...         |
+  |    o   S        |
+  |                 |
+  |                 |
+  |                 |
+  |                 |
+  +-----------------+
+  ```
+
 ### Creating `deploy` user on production server
   - The first thing we will do on our new server is create the user account we'll be using to run OpenDSA-LTI and work from there.
   ```
