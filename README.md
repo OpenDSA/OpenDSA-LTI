@@ -13,7 +13,7 @@ The following server requirements will be fine for supporting hundreds of users.
 ## Installation Instructions
 
 ### Install OpenDSA-DevStack on your local machine
-  - OpenDSA-LTI is using a remote server automation and deployment tool called [Capistrano](http://capistranorb.com/). Capistrano will automate the deplyment  tasks on a reamote production server. Each time you want to deploy new changes to OpenDSA-LTI production server you have to initiate the deployment command from within the develpment environment OpenDSA-DevStack.
+  - OpenDSA-LTI is using a remote server automation and deployment tool called [Capistrano](http://capistranorb.com/). Each time you want to deploy new changes to OpenDSA-LTI production server you have to initiate the deployment command from within the develpment environment [OpenDSA-DevStack](https://github.com/OpenDSA/OpenDSA-DevStack).
 
   - Once you have OpenDSA-DevStack up and running open a new terminal and do the following to generate a pair of authentication keys. **Note:** Do not enter a passphrase.
   ```
@@ -46,8 +46,8 @@ The following server requirements will be fine for supporting hundreds of users.
   +-----------------+
   ```
 
-### Creating `deploy` user on production server
-  - The first thing we will do on our new server is create the user account we'll be using to run OpenDSA-LTI and work from there.
+### Creating `deploy` user on your production server
+  - The first thing we will do on our new server is create the user account we'll be using to run OpenDSA-LTI and work from there. Open a new terminal, ssh to your production server, and do the following
   ```
   sudo adduser deploy
   sudo adduser deploy sudo
@@ -130,7 +130,7 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
   sudo nano /etc/nginx/nginx.conf
   ```
-  - First change user from `www-data` to `deploy` 
+  - First, change user from `www-data` to `deploy` 
   ```
   user `deploy`;
   worker_processes auto;
@@ -142,7 +142,7 @@ The following server requirements will be fine for supporting hundreds of users.
   }
   ...
   ```
-  - Second point Passenger to the version of Ruby that we're using. Find the following lines in the configuration file 
+  - Second, point Passenger to the version of Ruby that we're using. Find the following lines in the configuration file 
   ```
   ##
   # Phusion Passenger
@@ -159,7 +159,7 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
   sudo service nginx start
   ```
-  - Now that we've restarted Nginx, the OpenDSA-LTI will be served up using the `deploy` user just how we want.
+  - Now that we've restarted Nginx, the OpenDSA-LTI will be served up using the `deploy` user.
 
 ### Setting Up MySQL server
   - You can install MySQL server and client from the packages in the Ubuntu repository. As part of the installation process, you'll set the password for the root user. This information will go into your OpenDSA-LTI database.yml file in the future.
@@ -169,7 +169,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Installing the libmysqlclient-dev gives you the necessary files to compile the mysql2 gem which is what Rails will use to connect to MySQL when you setup OpenDSA-LTI application.
 
-  - Now we will create a new database and user `opendsa` for Open-LTI application. First login to mysql
+  - Now we will create a new database and user `opendsa` for OpenDSA-LTI application. First login to mysql
   ```
   mysql -uroot -p
   ```
@@ -182,6 +182,8 @@ The following server requirements will be fine for supporting hundreds of users.
   exit
   ```
 ### Install Node.js and bower
+  - Node.js is required by Rails assets pipeline.
+
   ```
   sudo apt-get install -y nodejs
   sudo ln -s /usr/bin/nodejs /usr/sbin/node
@@ -191,6 +193,7 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
 
 ### Clone OpenDSA repository in your production server
+
   - OpenDSA contains all the book contents that will be served by OpenDSA-LTI Rails application. You only need to clone OpenDSA under `deploy` home directory, Then all the linking between OpenDSA and OpenDSA-LTI will happen automatically through the automated deployment tasks.
 
   ```
@@ -202,20 +205,21 @@ The following server requirements will be fine for supporting hundreds of users.
   cd khan-exercises
   git checkout LTI_ruby
   ```
+
   - **Note:** As of this writing `OpenDSA/LTI_ruby` branch is used, however in the near future this branch will be merged into `OpenDSA/master` branch. So make sure you monitor OpenDSA reposiroty to know when these two branches got merged to update your production server accordingly.
 
 
   - For the next steps, **Switch back to OpenDSA-DevStack termainal**
 
 ### Deploy OpenDSA-LTI
-  - You need to make some changes to OpenDSA-LTI repository related to your spesific production server. To do that you need to clone OpenDSA-LTI to your github account and then add your cloned repository as a remote to OpenDSA-LTI in OpenDSA-DevStack. This way you can make your own changes to OpenDSA-LTI and keep up to date with the latest changes done in the originial reposiroty.
-  - In your OpenDSA-DevStack terminal, add your cloned repository
+  - You need to make some changes to OpenDSA-LTI repository related to your spesific production server. To do that you need to fork [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA-LTI) to your github account and then add your own repository as a remote to OpenDSA-LTI in OpenDSA-DevStack. This way you can make your own changes to OpenDSA-LTI and keep up to date with the latest changes done in the originial reposiroty.
+  - In your OpenDSA-DevStack terminal, add your forked repository
   ```
   cd /vagrant/OpenDSA-LTI
-  git remote add cloned https://github.com/your_username/OpenDSA-LTI.git
+  git remote add forked https://github.com/your_username/OpenDSA-LTI.git
   ```
 
-  - First in `/vagrant/OpenDSA-LTI/config/deploy.rb` file, change `repo_url` to match you cloned repository url
+  - First, in `/vagrant/OpenDSA-LTI/config/deploy.rb` file, change `repo_url` to match you cloned repository url
   ```
   # config valid only for Capistrano 3.1
   lock '3.2.1'
@@ -254,15 +258,17 @@ The following server requirements will be fine for supporting hundreds of users.
   ...  
   ```
 
-  - Commit your changes and push it to `cloned` remote 
+  - Commit your changes and push it to `forked` remote 
   ```
+  cd /vagrant/OpenDSA-LTI
   git add .
   git commit -m "Add production server details"
-  git push cloned master
+  git push forked master
   ```
 
   - Deploy OpenDSA-LTI for the first time **(this step will fail!)**. But it will create OpenDSA-LTI folder structure in the production server.
   ```
+  cd /vagrant/OpenDSA-LTI
   bundle exec cap production deploy
   ```
 
@@ -281,7 +287,7 @@ The following server requirements will be fine for supporting hundreds of users.
   sudo nano database.yml
   ```
 
-  - And then copy the following lines and replace `db_password` with your password
+  - Copy the following lines and replace `db_password` with your password
   ```
   production:
      adapter: mysql2
@@ -310,14 +316,15 @@ The following server requirements will be fine for supporting hundreds of users.
     secret_key_base: secret_string
   ```
 
-  - Now production server is ready deployment, switch back to OpenDSA-DevStack termainal and execute the following
+  - Now production server is ready for deployment, switch back to OpenDSA-DevStack termainal and execute the following
   ```
   bundle exec cap production deploy
   ```
 
 ### Final Steps
 
-  - Adding The Nginx Host. In order to get Nginx to respond with the Rails application, we need to modify it's sites-enabled. Open up `/etc/nginx/sites-enabled/default` in your text editor and we will replace the file's contents with the below conficuration. Replace `prod_server_name` with your domain name.
+  - Adding The Nginx Host. In order to get Nginx to respond with the Rails application, we need to modify it's sites-enabled. Open up `/etc/nginx/sites-enabled/default` in your text editor and we will replace the file's contents with the below configuration. Replace `prod_server_name` with your domain name.
+
   ```
   server {
           listen 80 default_server;
@@ -341,13 +348,19 @@ The following server requirements will be fine for supporting hundreds of users.
   }
 
   ```
-  - Replace /etc/nginx/ssl/nginx.crt and /etc/nginx/ssl/nginx.key with you valid certificate and key.
+
+  - Replace /etc/nginx/ssl/nginx.crt and /etc/nginx/ssl/nginx.key with you valid certificate and key. 
+
   - Restart Nginix web server
+
   ```
   sudo service nginx restart
   ```
+
   - **TO BE REMOVED:** To populate your database with initial starter data execute the following
+
   ```
   bundle exec cap production invoke:rake TASK=db:reset_populate
   ```
-  - Go to https://prod_server_name you should see OpenDSA Rails application landing page. Congradulations!!!
+
+  - Go to [https://prod_server_name](https://prod_server_name) you should see OpenDSA Rails application landing page. Congratulations!!!
