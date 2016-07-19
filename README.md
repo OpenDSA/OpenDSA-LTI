@@ -364,3 +364,7 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
 
   - Go to [https://prod_server_name](https://prod_server_name) you should see OpenDSA Rails application landing page. Congratulations!!!
+
+### Production deployment workflow
+
+  - Production deployment is initiated from the development enviroment. It starts with changes you make to OpenDSA-LTI in OpenDSA-DevStack, or changes made to the originial OpenDSA-LTI reposiroty and you decided to deploy them on your production server. First, test these changes locally using OpenDSA-DevStack development servers, Then commit and push these changes to your OpenDSA-LTI reposiroty. Finally initiate the production deployment command from within OpenDSA-DevStack as shown earlier. It is very important to push your changes to your OpenDSA-LTI reposiroty before production deployment. Everytime you deploy your code Capistrano will go and clone the latest version of your OpenDSA-LTI and perform the deployment tasks.
