@@ -161,13 +161,14 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
   - Now that we've restarted Nginx, the OpenDSA-LTI will be served up using the `deploy` user just how we want.
 
-### Setting Up MySQL
-
+### Setting Up MySQL server
   - You can install MySQL server and client from the packages in the Ubuntu repository. As part of the installation process, you'll set the password for the root user. This information will go into your OpenDSA-LTI database.yml file in the future.
   ```
   sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
   ```
+
   - Installing the libmysqlclient-dev gives you the necessary files to compile the mysql2 gem which is what Rails will use to connect to MySQL when you setup OpenDSA-LTI application.
+
   - Now we will create a new database and user `opendsa` for Open-LTI application. First login to mysql
   ```
   mysql -uroot -p
@@ -191,6 +192,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
 ### Clone OpenDSA repository in your production server
   - OpenDSA contains all the book contents that will be served by OpenDSA-LTI Rails application. You only need to clone OpenDSA under `deploy` home directory, Then all the linking between OpenDSA and OpenDSA-LTI will happen automatically through the automated deployment tasks.
+
   ```
   cd
   git clone https://github.com/OpenDSA/OpenDSA.git
