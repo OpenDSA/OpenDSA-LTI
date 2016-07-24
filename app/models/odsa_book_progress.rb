@@ -10,9 +10,9 @@ class OdsaBookProgress < ActiveRecord::Base
   def update_started(inst_exercise)
     unless self.started?(inst_exercise)
       if self.started_exercises.to_s.strip.length == 0
-        self.started_exercises = inst_exercise.id
+        self.started_exercises = inst_exercise.short_name
       else
-        self.started_exercises += ',' + inst_exercise.id.to_s
+        self.started_exercises += ',' + inst_exercise.short_name
       end
     end
     self.save
@@ -29,9 +29,9 @@ class OdsaBookProgress < ActiveRecord::Base
       proficient = true
       unless self.proficient?(inst_exercise)
         if self.proficient_exercises.to_s.strip.length == 0
-          self.proficient_exercises = inst_exercise.id
+          self.proficient_exercises = inst_exercise.short_name
         else
-          self.proficient_exercises += ',' + inst_exercise.id.to_s
+          self.proficient_exercises += ',' + inst_exercise.short_name
         end
       end
     end
@@ -41,19 +41,17 @@ class OdsaBookProgress < ActiveRecord::Base
 
   def started?(inst_exercise)
     started_exercises = self.started_exercises.split(',')
-    return started_exercises.include? inst_exercise.id.to_s
+    return started_exercises.include? inst_exercise.short_name
   end
 
   def proficient?(inst_exercise)
     proficient_exercises = self.get_proficient_exercises
-    return proficient_exercises.include? inst_exercise.id.to_s
+    return proficient_exercises.include? inst_exercise.short_name
   end
 
+  # Return array of exercises names
   def get_proficient_exercises
-    proficient_exercises = []
-    proficient_exercises.concat self.proficient_exercises.split(',').map(&:to_i)
-    puts proficient_exercises.inspect
-    return proficient_exercises
+    return self.proficient_exercises.split(',')
   end
 
   #~ Private instance methods .................................................

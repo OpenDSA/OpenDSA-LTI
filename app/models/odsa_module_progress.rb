@@ -16,12 +16,13 @@ class OdsaModuleProgress < ActiveRecord::Base
 
     self.first_done ||= DateTime.now
     self.last_done = DateTime.now
+    self.save!
 
     last_exercise = false
     if self.proficient_date.nil?
       if module_exercises and proficient_exercises
         if (module_exercises - proficient_exercises).length == 1
-          if module_exercises[0] == inst_exercise.id
+          if module_exercises[0] == inst_exercise.short_name
             last_exercise = true
           end
         end

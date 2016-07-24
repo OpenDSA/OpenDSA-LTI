@@ -30,9 +30,10 @@ class InstChapterModule < ActiveRecord::Base
   def get_exercises_list
     exercises_list = []
     inst_sections.each do |inst_section|
-      exercises_list.concat inst_section.inst_book_section_exercises.collect(&:inst_exercise_id)
+      exercises_ids = inst_section.inst_book_section_exercises.collect(&:inst_exercise_id).compact
+      exercises_objs = InstExercise.where(id: exercises_ids)
+      exercises_list.concat exercises_objs.collect(&:short_name)
     end
-    puts exercises_list.inspect
     return exercises_list
   end
 
