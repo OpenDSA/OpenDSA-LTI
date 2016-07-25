@@ -32,63 +32,88 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   #~ Class methods ............................................................
   #~ Instance methods .........................................................
   def update_exercise_progress
-      @inst_chapter_module = inst_book_section_exercise.get_chapter_module
-      inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
-      book_progress = self.get_book_progress
-      module_progress = self.get_module_progress
-      exercise_progress = self.get_exercise_progress
+    if self.request_type === 'PE'
+      update_pe_exercise_progress
+    else
+      update_ka_exercise_progress
+    end
+  end
 
-      exercise_progress.first_done ||= DateTime.now
-      exercise_progress.last_done = DateTime.now
-
-      first_response = (self.count_attempts == 1 and self.count_hints == 0) ||
-                       (self.count_attempts == 0 and self.count_hints == 1)
-
-      book_progress.update_started(inst_exercise)
-
-      if self.correct
-        exercise_progress['total_correct'] += 1
-        if self.worth_credit
-          exercise_progress['total_worth_credit'] += 1
-          exercise_progress['current_score'] += 1
-          exercise_progress['highest_score'] = [exercise_progress['highest_score'], exercise_progress['current_score']].max
-
-          proficient = book_progress.update_proficiency(exercise_progress)
-          if proficient
-            self.earned_proficiency = true
-            self.save!
-            exercise_progress.proficient_date ||= DateTime.now
-            module_progress.update_proficiency(inst_exercise)
-          end
-
-          if exercise_progress['correct_exercises'].to_s.strip.length == 0
-            exercise_progress['correct_exercises'] = self['question_name']
-          else
-            exercise_progress['correct_exercises'] += ',' + self['question_name']
-          end
+  def update_ka_exercise_progress
+    @inst_chapter_module = inst_book_section_exercise.get_chapter_module
+    inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
+    book_progress = self.get_book_progress
+    module_progress = self.get_module_progress
+    exercise_progress = self.get_exercise_progress
+    exercise_progress.first_done ||= DateTime.now
+    exercise_progress.last_done = DateTime.now
+    first_response = (self.count_attempts == 1 and self.count_hints == 0) ||
+                     (self.count_attempts == 0 and self.count_hints == 1)
+    book_progress.update_started(inst_exercise)
+    if self.correct
+      exercise_progress['total_correct'] += 1
+      if self.worth_credit
+        exercise_progress['total_worth_credit'] += 1
+        exercise_progress['current_score'] += 1
+        exercise_progress['highest_score'] = [exercise_progress['highest_score'], exercise_progress['current_score']].max
+        proficient = book_progress.update_proficiency(exercise_progress)
+        if proficient
+          self.earned_proficiency = true
+          self.save!
+          exercise_progress.proficient_date ||= DateTime.now
+          module_progress.update_proficiency(inst_exercise)
         end
-
-        # when student answer an exercise correctly from first time then clear the hint
-        if self.request_type != 'hint'
-          exercise_progress['hinted_exercise'] = ""
-        end
-      else
-        if self.count_hints == 0 and self.request_type != 'hint' and self.count_attempts == 1
-          # Only count wrong answer at most once per problem
-          if exercise_progress['current_score'] - 1 > 0
-            exercise_progress['current_score'] -= 1
-          else
-            exercise_progress['current_score'] = 0
-          end
+        if exercise_progress['correct_exercises'].to_s.strip.length == 0
+          exercise_progress['correct_exercises'] = self['question_name']
+        else
+          exercise_progress['correct_exercises'] += ',' + self['question_name']
         end
       end
-
-      # save exercise_name to hinted_exercise so that student won't get credit if he saw the hint then refreshes the page
-      if self.request_type == 'hint' and inst_exercise.short_name.include? "Summ"
-        exercise_progress['hinted_exercise'] = self['question_name']
+      # when student answer an exercise correctly from first time then clear the hint
+      if self.request_type != 'hint'
+        exercise_progress['hinted_exercise'] = ""
       end
+    else
+      if self.count_hints == 0 and self.request_type != 'hint' and self.count_attempts == 1
+        # Only count wrong answer at most once per problem
+        if exercise_progress['current_score'] - 1 > 0
+          exercise_progress['current_score'] -= 1
+        else
+          exercise_progress['current_score'] = 0
+        end
+      end
+    end
+    # save exercise_name to hinted_exercise so that student won't get credit if he saw the hint then refreshes the page
+    if self.request_type == 'hint' and inst_exercise.short_name.include? "Summ"
+      exercise_progress['hinted_exercise'] = self['question_name']
+    end
+    exercise_progress.save
+  end
 
-      exercise_progress.save
+  def update_pe_exercise_progress
+    @inst_chapter_module = inst_book_section_exercise.get_chapter_module
+    inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
+    book_progress = self.get_book_progress
+    module_progress = self.get_module_progress
+    exercise_progress = self.get_exercise_progress
+    exercise_progress.first_done ||= DateTime.now
+    exercise_progress.last_done = DateTime.now
+
+    book_progress.update_started(inst_exercise)
+    if self.correct
+      exercise_progress['total_correct'] += 1
+      exercise_progress['total_worth_credit'] += 1
+      exercise_progress['current_score'] = self.points_earned
+      exercise_progress['highest_score'] = self.points_earned
+      proficient = book_progress.update_proficiency(exercise_progress)
+      if proficient
+        self.earned_proficiency = true
+        self.save!
+        exercise_progress.proficient_date ||= DateTime.now
+        module_progress.update_proficiency(inst_exercise)
+      end
+    end
+    exercise_progress.save
   end
 
   def get_exercise_progress

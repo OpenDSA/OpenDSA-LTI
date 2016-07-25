@@ -38,6 +38,7 @@ CodeWorkout::Application.routes.draw do
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id' => 'odsa_exercise_progresses#show_section'
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
+  post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_pe'
 
   # namespace path_helper hackery!
   # get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book

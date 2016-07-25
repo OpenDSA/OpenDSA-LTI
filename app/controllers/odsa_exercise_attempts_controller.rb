@@ -74,5 +74,64 @@ class OdsaExerciseAttemptsController < ApplicationController
     end
   end
 
+  # -------------------------------------------------------------
+  # POST /odsa_exercise_attempts/pe
+  def create_pe
+    inst_book = InstBook.find_by(id: params[:inst_book_id])
+    inst_section = InstSection.find_by(id: params[:inst_section_id])
+    inst_exercise = InstExercise.find_by(short_name: params[:exercise])
+    inst_book_section_exercise = InstBookSectionExercise.where(
+                                  "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+                                  params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+
+    unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
+                                                 inst_book_section_exercise_id=?",
+                                                 current_user.id,
+                                                 inst_book_section_exercise.id).first
+
+      exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                                                    inst_book_section_exercise: inst_book_section_exercise)
+      exercise_progress.save
+    end
+
+    correct = params[:score].to_f >= params[:threshold].to_f
+    points_earned = 0
+    if correct
+      points_earned = params[:score]
+    end
+
+    exercise_attempt = OdsaExerciseAttempt.new(
+                                              inst_book: inst_book,
+                                              user: current_user,
+                                              inst_section: inst_section,
+                                              inst_book_section_exercise: inst_book_section_exercise,
+                                              worth_credit: correct,
+                                              correct: correct,
+                                              time_done: Time.now,
+                                              time_taken: (params[:total_time].to_f/1000).round,
+                                              count_hints: 0,
+                                              count_attempts: params[:uiid],
+                                              hint_used: 0,
+                                              question_name: params[:exercise],
+                                              request_type: "PE" ,
+                                              points_earned: points_earned, # TODO: relace with the correct value
+                                              ip_address: request.ip)
+
+    respond_to do |format|
+      if exercise_attempt.save
+        exercise_progress = OdsaExerciseProgress.where(
+                                                  "user_id=? and inst_book_section_exercise_id=?",
+                                                  current_user.id,
+                                                  inst_book_section_exercise.id).first
+        format.json  { render :json => {
+                                        :exercise_progress => exercise_progress,
+                                        :threshold => inst_book_section_exercise.threshold}}
+      else
+        msg = { :status => "fail", :message => "Fail!" }
+        format.json  { render :json => msg }
+      end
+    end
+  end
+
   #~ Private instance methods .................................................
 end
