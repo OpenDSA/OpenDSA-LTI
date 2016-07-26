@@ -300,6 +300,14 @@ The following server requirements will be fine for supporting hundreds of users.
      password: db_password
      host: localhost
      strict: false
+
+  staging:
+     adapter: mysql2
+     database: opendsa
+     username: opendsa
+     password: db_password
+     host: localhost
+     strict: false     
   ```
 
   - Second update secrets.yml. To generate a new secret go to OpenDSA-DevStack terminal
