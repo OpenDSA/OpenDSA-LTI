@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160713134709) do
+ActiveRecord::Schema.define(version: 20160726103305) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -356,16 +356,15 @@ ActiveRecord::Schema.define(version: 20160713134709) do
   add_index "odsa_exercise_attempts", ["user_id"], name: "odsa_exercise_attempts_user_id_fk", using: :btree
 
   create_table "odsa_exercise_progresses", force: true do |t|
-    t.integer  "user_id",                                               null: false
-    t.integer  "inst_book_section_exercise_id",                         null: false
-    t.integer  "current_score",                                         null: false
-    t.integer  "highest_score",                                         null: false
-    t.datetime "first_done",                                            null: false
-    t.datetime "last_done",                                             null: false
-    t.integer  "total_correct",                                         null: false
-    t.integer  "total_worth_credit",                                    null: false
-    t.datetime "proficient_date",                                       null: false
-    t.decimal  "progress",                      precision: 5, scale: 2, null: false
+    t.integer  "user_id",                       null: false
+    t.integer  "inst_book_section_exercise_id", null: false
+    t.integer  "current_score",                 null: false
+    t.integer  "highest_score",                 null: false
+    t.datetime "first_done",                    null: false
+    t.datetime "last_done",                     null: false
+    t.integer  "total_correct",                 null: false
+    t.integer  "total_worth_credit",            null: false
+    t.datetime "proficient_date",               null: false
     t.string   "current_exercise"
     t.string   "correct_exercises"
     t.string   "hinted_exercise"

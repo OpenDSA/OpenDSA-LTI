@@ -52,7 +52,6 @@ class OdsaExerciseAttemptsController < ApplicationController
                                               hint_used: params[:count_hints].to_i > 0,
                                               question_name: question_name,
                                               request_type: request_type ,
-                                              points_earned: 1, # TODO: relace with the correct value
                                               ip_address: request.ip)
 
     respond_to do |format|
@@ -95,10 +94,6 @@ class OdsaExerciseAttemptsController < ApplicationController
     end
 
     correct = params[:score].to_f >= params[:threshold].to_f
-    points_earned = 0
-    if correct
-      points_earned = params[:score]
-    end
 
     exercise_attempt = OdsaExerciseAttempt.new(
                                               inst_book: inst_book,
@@ -114,7 +109,6 @@ class OdsaExerciseAttemptsController < ApplicationController
                                               hint_used: 0,
                                               question_name: params[:exercise],
                                               request_type: "PE" ,
-                                              points_earned: points_earned, # TODO: relace with the correct value
                                               ip_address: request.ip)
 
     respond_to do |format|

@@ -96,18 +96,25 @@ class CompileBookJob < ProgressJob::Base
 
       update_stage('Generating: ' + opts[:module__name__])
 
-      if chapter.lms_chapter_id
-        opts[:module__published__] = true
-        res = client.update_module(lms_course_id, chapter.lms_chapter_id, opts)
-      else
+      if !chapter.lms_chapter_id
         res = client.create_module(lms_course_id, chapter.name, opts)
         chapter.lms_chapter_id = res['id']
         chapter.save
-        opts[:module__published__] = true
-        res = client.update_module(lms_course_id, chapter.lms_chapter_id, opts)
+      end
+
+     assignment_group_opts = {:name => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name}
+
+      if !chapter.lms_assignment_group_id
+        res = client.create_assignment_group(lms_course_id, assignment_group_opts)
+        chapter.lms_assignment_group_id = res['id']
+        chapter.save
       end
 
       save_lms_chapter(client, lms_course_id, chapter)
+      # Publish the module and its all sections
+      opts[:module__published__] = true
+      res = client.update_module(lms_course_id, chapter.lms_chapter_id, opts)
+
       update_progress
     end
   end
@@ -251,6 +258,8 @@ class CompileBookJob < ProgressJob::Base
       :assignment__name__ => title,
       :assignment__submission_types__ => "external_tool",
       :assignment__external_tool_tag_attributes__ => {:url => opts[:module_item__external_url__] },
+      :assignment__assignment_group_id__ => chapter.lms_assignment_group_id,
+      :assignment__description__ => title
     }
 
     if section.gradable
@@ -300,6 +309,8 @@ class CompileBookJob < ProgressJob::Base
       :assignment__name__ => title,
       :assignment__submission_types__ => "external_tool",
       :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query },
+      :assignment__assignment_group_id__ => chapter.lms_assignment_group_id,
+      :assignment__description__ => title
     }
 
     opts[:module_item__title__] = title

@@ -47,8 +47,9 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     exercise_progress = self.get_exercise_progress
     exercise_progress.first_done ||= DateTime.now
     exercise_progress.last_done = DateTime.now
-    first_response = (self.count_attempts == 1 and self.count_hints == 0) ||
-                     (self.count_attempts == 0 and self.count_hints == 1)
+    # first_response = (self.count_attempts == 1 and self.count_hints == 0) ||
+    #                  (self.count_attempts == 0 and self.count_hints == 1)
+
     book_progress.update_started(inst_exercise)
     if self.correct
       exercise_progress['total_correct'] += 1
@@ -59,6 +60,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
         proficient = book_progress.update_proficiency(exercise_progress)
         if proficient
           self.earned_proficiency = true
+          self.points_earned = inst_book_section_exercise.points
           self.save!
           exercise_progress.proficient_date ||= DateTime.now
           module_progress.update_proficiency(inst_exercise)
@@ -108,6 +110,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       proficient = book_progress.update_proficiency(exercise_progress)
       if proficient
         self.earned_proficiency = true
+        self.points_earned = inst_book_section_exercise.points
         self.save!
         exercise_progress.proficient_date ||= DateTime.now
         module_progress.update_proficiency(inst_exercise)

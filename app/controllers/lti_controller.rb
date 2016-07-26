@@ -19,7 +19,7 @@ layout 'lti', only: [:launch]
     last_name = params[:lis_person_name_family]
     @user = User.where(email: email).first
     if @user.blank?
-      # TODO: should mark this as LMS user then prevent this user from login to codeworkout domain
+      # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
       @user = User.new(:email => email, :password => email, :password_confirmation => email, :first_name => first_name, :last_name => last_name)
       @user.save
     end
