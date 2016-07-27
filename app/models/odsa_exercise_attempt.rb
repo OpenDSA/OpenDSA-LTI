@@ -89,7 +89,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     if self.request_type == 'hint' and inst_exercise.short_name.include? "Summ"
       exercise_progress['hinted_exercise'] = self['question_name']
     end
-    exercise_progress.save
+    exercise_progress.save!
   end
 
   def update_pe_exercise_progress
@@ -103,20 +103,18 @@ class OdsaExerciseAttempt < ActiveRecord::Base
 
     book_progress.update_started(inst_exercise)
     if self.correct
+      self.earned_proficiency = true
+      self.points_earned = inst_book_section_exercise.points
+      self.save!
       exercise_progress['total_correct'] += 1
       exercise_progress['total_worth_credit'] += 1
       exercise_progress['current_score'] = self.points_earned
       exercise_progress['highest_score'] = self.points_earned
-      proficient = book_progress.update_proficiency(exercise_progress)
-      if proficient
-        self.earned_proficiency = true
-        self.points_earned = inst_book_section_exercise.points
-        self.save!
-        exercise_progress.proficient_date ||= DateTime.now
-        module_progress.update_proficiency(inst_exercise)
-      end
+      exercise_progress.proficient_date ||= DateTime.now
+      module_progress.update_proficiency(inst_exercise)
+      book_progress.update_proficiency(exercise_progress)
     end
-    exercise_progress.save
+    exercise_progress.save!
   end
 
   def get_exercise_progress
@@ -129,6 +127,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     unless book_progress = OdsaBookProgress.where("user_id=? and inst_book_id=?",
                                                   user.id, inst_book.id).first
       book_progress = OdsaBookProgress.create(user: user,inst_book: inst_book)
+      book_progress.save!
     end
     book_progress
   end
@@ -136,6 +135,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   def get_module_progress
     unless module_progress = OdsaModuleProgress.where(user: user,inst_book: inst_book,inst_chapter_module: @inst_chapter_module).first
       module_progress = OdsaModuleProgress.create(user: user,inst_book: inst_book,inst_chapter_module: @inst_chapter_module)
+      module_progress.save!
     end
     module_progress
   end

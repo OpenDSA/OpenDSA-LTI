@@ -326,6 +326,9 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
   production:
     secret_key_base: secret_string
+
+  staging:
+    secret_key_base: secret_string
   ```
 
   - Now production server is ready for deployment, switch back to OpenDSA-DevStack termainal and execute the following

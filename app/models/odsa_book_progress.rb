@@ -23,9 +23,10 @@ class OdsaBookProgress < ActiveRecord::Base
     inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
 
     threshold = inst_book_section_exercise.threshold
+    exercise_points = inst_book_section_exercise.points
     highest_score = exercise_progress.highest_score
     proficient = false
-    if highest_score >= threshold
+    if (exercise_points == 0) || (exercise_points != 0 && highest_score >= threshold)
       proficient = true
       unless self.proficient?(inst_exercise)
         if self.proficient_exercises.to_s.strip.length == 0
