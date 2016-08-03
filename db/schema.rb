@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160726103305) do
+ActiveRecord::Schema.define(version: 20160801110137) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -307,7 +307,7 @@ ActiveRecord::Schema.define(version: 20160726103305) do
   add_index "lms_types", ["name"], name: "index_lms_types_on_name", unique: true, using: :btree
 
   create_table "odsa_book_progresses", force: true do |t|
-    t.integer  "user_id",                                 null: false
+    t.integer  "user_id"
     t.integer  "inst_book_id",                            null: false
     t.text     "started_exercises",    limit: 2147483647, null: false
     t.text     "proficient_exercises", limit: 2147483647, null: false
@@ -348,6 +348,8 @@ ActiveRecord::Schema.define(version: 20160726103305) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "correct"
+    t.decimal  "pe_score",                                 precision: 5, scale: 2
+    t.integer  "pe_steps_fixed"
   end
 
   add_index "odsa_exercise_attempts", ["inst_book_id"], name: "odsa_exercise_attempts_inst_book_id_fk", using: :btree

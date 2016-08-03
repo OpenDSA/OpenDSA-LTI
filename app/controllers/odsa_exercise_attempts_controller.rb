@@ -109,7 +109,9 @@ class OdsaExerciseAttemptsController < ApplicationController
                                               hint_used: 0,
                                               question_name: params[:exercise],
                                               request_type: "PE" ,
-                                              ip_address: request.ip)
+                                              ip_address: request.ip,
+                                              pe_score: params[:score],
+                                              pe_steps_fixed: params[:steps_fixed])
 
     respond_to do |format|
       if exercise_attempt.save
