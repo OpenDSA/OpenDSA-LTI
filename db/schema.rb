@@ -307,7 +307,7 @@ ActiveRecord::Schema.define(version: 20160801110137) do
   add_index "lms_types", ["name"], name: "index_lms_types_on_name", unique: true, using: :btree
 
   create_table "odsa_book_progresses", force: true do |t|
-    t.integer  "user_id"
+    t.integer  "user_id",                                 null: false
     t.integer  "inst_book_id",                            null: false
     t.text     "started_exercises",    limit: 2147483647, null: false
     t.text     "proficient_exercises", limit: 2147483647, null: false

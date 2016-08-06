@@ -195,7 +195,6 @@ class CompileBookJob < ProgressJob::Base
 
       learning_tool = section.learning_tool
       if learning_tool
-        title = section.name
         learning_tool_obj = LearningTool.where(:name => learning_tool).first
         launch_url = learning_tool_obj.launch_url
         tool_data ={
