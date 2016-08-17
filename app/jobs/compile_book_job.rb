@@ -3,6 +3,10 @@ class CompileBookJob < ProgressJob::Base
     @user_id = user_id
     @inst_book = InstBook.find_by(id: inst_book_id)
     @odsa_launch_url = launch_url
+    @course_offering = CourseOffering.where(:id => @inst_book.course_offering_id).first
+    @term = Term.where(:id => @course_offering.term_id).first
+    @course = Course.where(:id => @course_offering.course_id).first
+    @organization = Organization.where(:id => @course.organization_id).first
   end
 
   def perform
@@ -73,7 +77,8 @@ class CompileBookJob < ProgressJob::Base
       end
     end
 
-    opts = {:custom_fields => {"label"=>"opendsa"},
+    custom_fields = @course_offering.label+"\r\n"+"term="+@term.slug+"\r\n"+"course_number="+@course.slug+"\r\n"+"course_name="+@course.name
+    opts = {:custom_fields => {"label"=>custom_fields},
             :url => launch_url}
 
     if !tool_exists and !@created_LTI_tools.include? tool_name
@@ -92,7 +97,7 @@ class CompileBookJob < ProgressJob::Base
 
     chapters.each do |chapter|
       opts = {:module__name__ => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name,
-                   :module__position__ => chapter.position}
+              :module__position__ => chapter.position}
 
       update_stage('Generating: ' + opts[:module__name__])
 
