@@ -77,9 +77,7 @@ class CompileBookJob < ProgressJob::Base
       end
     end
 
-    custom_fields = @course_offering.label+"\r\n"+"term="+@term.slug+"\r\n"+"course_number="+@course.slug+"\r\n"+"course_name="+@course.name
-    opts = {:custom_fields => {"label"=>custom_fields},
-            :url => launch_url}
+    opts = {:url => launch_url}
 
     if !tool_exists and !@created_LTI_tools.include? tool_name
       res = client.create_external_tool_courses(lms_course_id, tool_name,
@@ -210,6 +208,19 @@ class CompileBookJob < ProgressJob::Base
           "launch_url" => launch_url
         }
         save_lti_app(client, lms_course_id, tool_data)
+
+        learning_tool_url_opts = {
+          :custom_term => @term.slug,
+          :custom_label => @course_offering.label,
+          :custom_course_number => @course.number,
+          :custom_course_name => @course.name
+        }
+
+        require "addressable/uri"
+        uri = Addressable::URI.new
+        uri.query_values = learning_tool_url_opts
+        launch_url = launch_url + '?' + uri.query
+
       end
     else
       section_file_name = module_name
