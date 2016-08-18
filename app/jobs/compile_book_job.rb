@@ -229,11 +229,11 @@ class CompileBookJob < ProgressJob::Base
 
     if !learning_tool
       odsa_url_opts = {
-        :inst_book_id => @inst_book.id,
-        :inst_section_id => (section.id if section),
-        :book_path => book_path(@inst_book),
-        :section_file_name => section_file_name,
-        :section_title => title
+        :custom_inst_book_id => @inst_book.id,
+        :custom_inst_section_id => (section.id if section),
+        :custom_book_path => book_path(@inst_book),
+        :custom_section_file_name => section_file_name,
+        :custom_section_title => title
       }
 
       require "addressable/uri"
@@ -312,9 +312,9 @@ class CompileBookJob < ProgressJob::Base
 
     if section.gradable
       gradable_ex = section.get_gradable_ex
-      url_opts[:ex_name] = gradable_ex['ex_name']
-      url_opts[:inst_bk_sec_ex] = gradable_ex['inst_bk_sec_ex']
-      url_opts[:section_title] = title
+      url_opts[:custom_ex_name] = gradable_ex['ex_name']
+      url_opts[:custom_inst_bk_sec_ex] = gradable_ex['inst_bk_sec_ex']
+      url_opts[:custom_section_title] = title
     end
 
     uri = Addressable::URI.new

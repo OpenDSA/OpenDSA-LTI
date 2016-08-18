@@ -7,7 +7,7 @@ layout 'lti', only: [:launch]
   def launch
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
-    @inst_book = InstBook.find_by(id: params[:inst_book_id])
+    @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
     $oauth_creds = @inst_book.lms_creds
 
     render('error') and return unless lti_authorize!
@@ -27,8 +27,8 @@ layout 'lti', only: [:launch]
     lti_enroll
 
     @section_html = File.read(File.join('public/OpenDSA/Books',
-                                                            params["book_path"],
-                                                            '/lti_html/', "#{params['section_file_name'].to_s}.html")) and return
+                                                            params[:custom_book_path],
+                                                            '/lti_html/', "#{params[:custom_section_file_name].to_s}.html")) and return
 
   end
 
@@ -68,7 +68,7 @@ layout 'lti', only: [:launch]
 
   private
     def lti_enroll
-      inst_book = InstBook.find_by(id: params[:inst_book_id])
+      inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
       course_offering = CourseOffering.find_by(id: inst_book.course_offering_id)
 
       if course_offering &&
