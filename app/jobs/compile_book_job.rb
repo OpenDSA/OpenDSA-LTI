@@ -107,7 +107,7 @@ class CompileBookJob < ProgressJob::Base
 
      assignment_group_opts = {:name => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name}
 
-      if !chapter.lms_assignment_group_id
+      if !chapter.lms_assignment_group_id and chapter.has_gradable_sections?
         res = client.create_assignment_group(lms_course_id, assignment_group_opts)
         chapter.lms_assignment_group_id = res['id']
         chapter.save

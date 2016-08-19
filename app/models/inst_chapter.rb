@@ -36,5 +36,15 @@ class InstChapter < ActiveRecord::Base
     end
   end
 
+  def has_gradable_sections?
+    gradable_section = false
+    inst_chapter_modules.each do |chapter_module|
+      chapter_module.inst_sections.each do |inst_section|
+        gradable_section = inst_section.gradable
+      end
+    end
+    return gradable_section
+  end
+
   #~ Private instance methods .................................................
 end
