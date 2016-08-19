@@ -35,7 +35,9 @@ class OdsaExerciseAttemptsController < ApplicationController
     worth_credit = (params[:complete].to_i == 1 and params[:count_hints].to_i == 0 and params[:attempt_number].to_i == 1)
 
     if inst_exercise.short_name.include? "Summ"
-      worth_credit = worth_credit and (exercise_progress['hinted_exercise'] != question_name)
+      if (exercise_progress['hinted_exercise'].to_s == question_name.to_s)
+        worth_credit = false
+      end
     end
 
     exercise_attempt = OdsaExerciseAttempt.new(
