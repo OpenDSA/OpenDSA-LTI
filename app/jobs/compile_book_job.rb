@@ -91,7 +91,7 @@ class CompileBookJob < ProgressJob::Base
   # Create canvas modules that maps to OpenDSA chapters
   def save_lms_course(client, lms_course_id)
 
-    chapters = InstChapter.where(inst_book_id: @inst_book.id)
+    chapters = InstChapter.where(inst_book_id: @inst_book.id).order('position')
 
     chapters.each do |chapter|
       opts = {:module__name__ => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name,
@@ -126,7 +126,7 @@ class CompileBookJob < ProgressJob::Base
   # For each canvas module, create text items (just a label) that maps to OpenDSA modules
   def save_lms_chapter(client, lms_course_id, chapter)
 
-    modules = InstChapterModule.where(inst_chapter_id: chapter.id)
+    modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
 
     module_item_position = 1
     modules.each do |inst_ch_module|

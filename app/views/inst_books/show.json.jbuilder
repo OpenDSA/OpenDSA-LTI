@@ -1,7 +1,7 @@
 # chapters
 json.chapters do
 
-  for inst_chapter in @inst_book.inst_chapters
+  for inst_chapter in @inst_book.inst_chapters.order('position')
 
     chapter_name = inst_chapter.name
     # chapter object
@@ -9,7 +9,7 @@ json.chapters do
       json.set! :lms_chapter_id, inst_chapter.lms_chapter_id
       json.set! :lms_assignment_group_id, inst_chapter.lms_assignment_group_id
 
-      for inst_chapter_module in inst_chapter.inst_chapter_modules
+      for inst_chapter_module in inst_chapter.inst_chapter_modules.order('module_position')
         module_path = InstModule.where(:id => inst_chapter_module.inst_module_id).first.path
 
         # module Object
