@@ -5,11 +5,11 @@ class InstBookSectionExercise < ActiveRecord::Base
   has_many :odsa_user_interactions
   has_many :odsa_exercise_attempts
   has_many :odsa_exercise_progresses
-  has_many :users_by_odsa_exercise_attempts, :source => :user, :through => :odsa_exercise_attempts
-  has_many :users_by_odsa_exercise_progress, :source => :user, :through => :odsa_exercise_progresses
-  has_many :inst_books, :through => :odsa_user_interactions
-  has_many :inst_sections, :through => :odsa_user_interactions
-  has_many :users_by_odsa_user_interactions, :source => :user, :through => :odsa_user_interactions
+  # has_many :users_by_odsa_exercise_attempts, :source => :user, :through => :odsa_exercise_attempts
+  # has_many :users_by_odsa_exercise_progress, :source => :user, :through => :odsa_exercise_progresses
+  # has_many :inst_books, :through => :odsa_user_interactions
+  # has_many :inst_sections, :through => :odsa_user_interactions
+  # has_many :users_by_odsa_user_interactions, :source => :user, :through => :odsa_user_interactions
 
   #~ Validation ...............................................................
   #~ Constants ................................................................

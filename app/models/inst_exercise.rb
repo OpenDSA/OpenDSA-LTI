@@ -6,7 +6,7 @@ class InstExercise < ActiveRecord::Base
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
-  def self.save_data_from_json(book, inst_section, exercise_name, exercise_obj)
+  def self.save_data_from_json(book, inst_section, exercise_name, exercise_obj, update_mode=false)
     ex = InstExercise.find_by short_name: exercise_name
     if !ex and !exercise_obj['learning_tool']
       ex = InstExercise.new
@@ -15,9 +15,17 @@ class InstExercise < ActiveRecord::Base
       ex.save
     end
 
-    book_sec_ex = InstBookSectionExercise.new
-    book_sec_ex.inst_book_id = book.id
-    book_sec_ex.inst_section_id = inst_section.id
+    if exercise_obj['learning_tool']
+      book_sec_ex = InstBookSectionExercise.where("inst_book_id = ? AND inst_section_id = ?", book.id, inst_section.id).first
+    else
+      book_sec_ex = InstBookSectionExercise.where("inst_book_id = ? AND inst_section_id = ? AND inst_exercise_id = ?", book.id, inst_section.id, ex.id).first
+    end
+
+    if !update_mode or (update_mode and !book_sec_ex)
+      book_sec_ex = InstBookSectionExercise.new
+      book_sec_ex.inst_book_id = book.id
+      book_sec_ex.inst_section_id = inst_section.id
+    end
 
     if exercise_obj['learning_tool']
       book_sec_ex.points = exercise_obj['points'] || 0

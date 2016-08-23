@@ -25,18 +25,26 @@ class InstBook < ActiveRecord::Base
   #~ Class methods ............................................................
   def self.save_data_from_json(json, current_user)
     book_data = json
-    b = InstBook.new
+    update_mode = false
+    inst_book_id = book_data['inst_book_id']
+
+    if inst_book_id == nil
+      b = InstBook.new
+      b.user_id = current_user.id
+      b.template = true
+    else
+      b = InstBook.find_by(id: inst_book_id)
+      update_mode = true
+    end
     b.title = book_data['title']
     b.desc = book_data['desc']
-    b.user_id = current_user.id
-    b.template = true
     b.save
 
     chapters = book_data['chapters']
 
     ch_position = 0
     chapters.each do |k,v|
-      inst_chapter = InstChapter.save_data_from_json(b, k, v, ch_position)
+      inst_chapter = InstChapter.save_data_from_json(b, k, v, ch_position, update_mode)
       ch_position += 1
     end
   end

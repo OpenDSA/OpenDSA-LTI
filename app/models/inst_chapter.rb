@@ -7,16 +7,20 @@ class InstChapter < ActiveRecord::Base
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
-  def self.save_data_from_json(book, chapter_name, chapter_obj, chapter_position)
-    ch = InstChapter.new
-    ch.inst_book_id = book.id
-    ch.name = chapter_name
+  def self.save_data_from_json(book, chapter_name, chapter_obj, chapter_position, update_mode=false)
+    ch = InstChapter.where("inst_book_id = ? AND name = ?", book.id, chapter_name).first
+
+    if !update_mode or (update_mode and !ch)
+      ch = InstChapter.new
+      ch.inst_book_id = book.id
+      ch.name = chapter_name
+    end
     ch.position = chapter_position
     ch.save
 
     mod_position = 1
     chapter_obj.each do |k, v|
-      inst_module = InstModule.save_data_from_json(book, ch, k, v, mod_position)
+      inst_module = InstModule.save_data_from_json(book, ch, k, v, mod_position, update_mode)
       mod_position += 1
     end
   end

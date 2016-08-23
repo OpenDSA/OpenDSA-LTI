@@ -2,8 +2,8 @@ class LatePolicy < ActiveRecord::Base
 
   #~ Relationships ............................................................
   has_many :course_offerings, inverse_of: :late_policy
-  has_many :courses, :through => :course_offerings
-  has_many :terms, :through => :course_offerings
+  # has_many :courses, :through => :course_offerings
+  # has_many :terms, :through => :course_offerings
 
 
   #~ Validation ...............................................................

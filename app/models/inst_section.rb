@@ -4,36 +4,40 @@ class InstSection < ActiveRecord::Base
   has_many :inst_book_section_exercises, dependent: :destroy
   has_many :odsa_student_extensions
   has_many :odsa_user_interactions
-  has_many :odsa_exercise_atempts
-  has_many :inst_books_by_inst_book_section_exercises, :source => :inst_book, :through => :inst_book_section_exercises
-  has_many :users_by_odsa_student_extensions, :source => :user, :through => :odsa_student_extensions
-  has_many :inst_book_section_exercises_by_odsa_user_interactions, :source => :inst_book_section_exercise, :through => :odsa_user_interactions
-  has_many :inst_books_by_odsa_user_interactions, :source => :inst_book, :through => :odsa_user_interactions
-  has_many :users_by_odsa_user_interactions, :source => :user, :through => :odsa_user_interactions
+  has_many :odsa_exercise_attempts
+  # has_many :inst_books_by_inst_book_section_exercises, :source => :inst_book, :through => :inst_book_section_exercises
+  # has_many :users_by_odsa_student_extensions, :source => :user, :through => :odsa_student_extensions
+  # has_many :inst_book_section_exercises_by_odsa_user_interactions, :source => :inst_book_section_exercise, :through => :odsa_user_interactions
+  # has_many :inst_books_by_odsa_user_interactions, :source => :inst_book, :through => :odsa_user_interactions
+  # has_many :users_by_odsa_user_interactions, :source => :user, :through => :odsa_user_interactions
 
   #~ Validation ...............................................................
 
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
-  def self.save_data_from_json(book, module_rec, inst_chapter_module_rec, section_name, section_obj, section_position)
-    inst_sec = InstSection.new
-    inst_sec.inst_module_id = module_rec.id
-    inst_sec.inst_chapter_module_id = inst_chapter_module_rec.id
-    inst_sec.name = section_name
+  def self.save_data_from_json(book, module_rec, inst_chapter_module_rec, section_name, section_obj, section_position, update_mode=false)
+
+    inst_sec = InstSection.where("inst_chapter_module_id = ? AND inst_module_id = ? AND name = ?", inst_chapter_module_rec.id, module_rec.id, section_name).first
+
+    if !update_mode or (update_mode and !inst_sec)
+      inst_sec = InstSection.new
+      inst_sec.inst_module_id = module_rec.id
+      inst_sec.inst_chapter_module_id = inst_chapter_module_rec.id
+      inst_sec.name = section_name
+    end
     inst_sec.learning_tool = section_obj['learning_tool']
     inst_sec.resource_type = section_obj['resource_type']
     inst_sec.resource_name = section_obj['resource_name']
-    inst_sec.name = section_name
     inst_sec.show = section_obj['showsection'] || true
     inst_sec.save
 
     # learning tool section
     if section_obj['learning_tool'] and section_obj['resource_type'] == 'external_assignment'
-     InstExercise.save_data_from_json(book, inst_sec, section_name, section_obj)
+     InstExercise.save_data_from_json(book, inst_sec, section_name, section_obj, update_mode)
     else # OpenDSA section
       section_obj.each do |k, v|
-       InstExercise.save_data_from_json(book, inst_sec, k, v) if v.is_a?(Hash) && !v.empty?
+       InstExercise.save_data_from_json(book, inst_sec, k, v, update_mode) if v.is_a?(Hash) && !v.empty?
       end
     end
 
