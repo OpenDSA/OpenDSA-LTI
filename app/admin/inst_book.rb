@@ -103,7 +103,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     f.semantic_errors *f.object.errors.keys
     f.inputs do
       if !f.object.template
-        if f.object.last_compiled == nil
+        if f.object.last_compiled == nil or (f.object.last_compiled != nil and current_user.global_role.is_admin?)
           f.input :course_offering
         end
       end
