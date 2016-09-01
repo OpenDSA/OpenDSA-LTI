@@ -1,5 +1,5 @@
 class LtiController < ApplicationController
-layout 'lti', only: [:launch]
+  layout 'lti', only: [:launch]
 
   after_action :allow_iframe, only: :launch
   # the consumer keys/secrets
@@ -29,12 +29,14 @@ layout 'lti', only: [:launch]
     @section_html = File.read(File.join('public/OpenDSA/Books',
                                                             params[:custom_book_path],
                                                             '/lti_html/', "#{params[:custom_section_file_name].to_s}.html")) and return
-
   end
 
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
-    launch_params = request_params['launch_params']
+    inst_book_id = request_params['instBookId']
+    @inst_book = InstBook.find_by(id: inst_book_id)
+    $oauth_creds = @inst_book.lms_creds
+    launch_params = request_params['toParams']['launch_params']
     if launch_params
       key = launch_params['oauth_consumer_key']
     else
@@ -50,7 +52,7 @@ layout 'lti', only: [:launch]
     end
 
     # post the given score to the TC
-    score = (request_params['score'] != '' ? request_params['score'] : nil)
+    score = (request_params['toParams']['score'] != '' ? request_params['toParams']['score'] : nil)
     res = @tp.post_replace_result!(score)
 
     if res.success?
