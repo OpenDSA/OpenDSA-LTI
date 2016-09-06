@@ -37,7 +37,7 @@ class InstSection < ActiveRecord::Base
      InstExercise.save_data_from_json(book, inst_sec, section_name, section_obj, update_mode)
     else # OpenDSA section
       section_obj.each do |k, v|
-       InstExercise.save_data_from_json(book, inst_sec, k, v, update_mode) if v.is_a?(Hash) && !v.empty?
+       InstExercise.save_data_from_json(book, inst_sec, k, v, update_mode) if v.is_a?(Hash)
       end
     end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160801110137) do
+ActiveRecord::Schema.define(version: 20160905171520) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -158,6 +158,7 @@ ActiveRecord::Schema.define(version: 20160801110137) do
     t.decimal  "threshold",        precision: 5, scale: 2,                 null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "type"
   end
 
   add_index "inst_book_section_exercises", ["inst_book_id"], name: "inst_book_section_exercises_inst_book_id_fk", using: :btree
