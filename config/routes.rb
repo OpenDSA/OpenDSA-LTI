@@ -74,6 +74,7 @@ CodeWorkout::Application.routes.draw do
   post 'inst_books/upload_create' => 'inst_books#upload_create', as: :books_upload_create
   get  'inst_books/upload' => 'inst_books#upload', as: :books_upload
   post 'inst_books/:id/:operation' => 'inst_books#perform_operation', defaults: { format: 'js', data: {type: "script"} }, as: :perform_operation
+  # post 'inst_books/:id/compile' => 'inst_books#compile', defaults: { format: 'js', data: {type: "script"} }, as: :book_compile
   resources :inst_books
 
   get 'sse/feedback_wait'
