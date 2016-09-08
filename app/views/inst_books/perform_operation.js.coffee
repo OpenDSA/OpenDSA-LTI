@@ -11,8 +11,12 @@ interval = setInterval((->
           $('.progress').removeClass 'active'
           $('.progress-bar').css('width', '100%').text '100%'
           $('.progress-status').text 'Book generated successfully.'
-          $('[name="compile_commit"]')[0].disabled = false;
-          $('[name="compile_commit"]')[0].value = "Recompile Book";
+          if Window.ODSA.action_type == 'generate_course'
+            $('[name="generate_course_' + Window.ODSA.inst_book_id + '"]')[0].disabled = false;
+            $('[name="generate_course_' + Window.ODSA.inst_book_id + '"]')[0].value = "Re-generate LMS Course";
+          else
+            $('[name="compile_book_' + Window.ODSA.inst_book_id + '"]')[0].disabled = false;
+            $('[name="compile_book_' + Window.ODSA.inst_book_id + '"]')[0].value = "Recompile Book";
           clearInterval interval
           return
       # If there are errors
@@ -33,8 +37,12 @@ interval = setInterval((->
       $('.progress').removeClass 'active'
       $('.progress-bar').css('width', '100%').text '100%'
       $('.progress-status').text 'Book generated successfully.'
-      $('[name="compile_commit"]')[0].disabled = false;
-      $('[name="compile_commit"]')[0].value = "Recompile Book";
+      if Window.ODSA.action_type == 'generate_course'
+        $('[name="generate_course_' + Window.ODSA.inst_book_id + '"]')[0].disabled = false;
+        $('[name="generate_course_' + Window.ODSA.inst_book_id + '"]')[0].value = "Re-generate LMS Course";
+      else
+        $('[name="compile_book_' + Window.ODSA.inst_book_id + '"]')[0].disabled = false;
+        $('[name="compile_book_' + Window.ODSA.inst_book_id + '"]')[0].value = "Recompile Book";
       clearInterval interval
       return
   return

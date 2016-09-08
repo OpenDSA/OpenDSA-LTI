@@ -76,19 +76,6 @@
 
     - if !@is_student
       .tab-pane.fade{ id: 'odsa' }
-        - @course_offerings.each do |offering|
-          - if @course_offerings.size > 1
-            %h2= offering.display_name
-            = link_to
-          %table.table.table-striped
-            %thead
-              %tr
-                %th Title
-                %th
-                %th
-            %tbody#odsa
-              - @odsa = offering.inst_books
-              = render @odsa
         .well
           .row
             .col-xs-12
@@ -100,6 +87,21 @@
                 .progress-bar
                   .text-primary
                     0%
+        - @course_offerings.each do |offering|
+          - if @course_offerings.size > 1
+            %h2= offering.display_name
+            = link_to
+          %table.table.table-striped
+            %thead
+              %tr
+                %th Book Title
+                %th LMS Course
+                %th
+                %th
+                %th
+            %tbody#odsa
+              - @inst_book = offering.inst_books
+              = render @inst_book
 
 
 -else
