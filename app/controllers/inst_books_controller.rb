@@ -4,8 +4,8 @@ class InstBooksController < ApplicationController
   #~ Action methods ...........................................................
 
   # -------------------------------------------------------------
-  # POST /inst_books/:id/:operation
-  def perform_operation
+  # POST /inst_books/:id
+  def compile
     if params[:operation] == 'generate_course'
       launch_url = request.protocol + request.host_with_port + "/lti/launch"
       @job = Delayed::Job.enqueue GenerateCourseJob.new(params[:id], launch_url, current_user.id)
