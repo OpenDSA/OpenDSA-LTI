@@ -12,7 +12,9 @@
   %td
     = form_tag '/configurations/book/create_redirect' do
       = submit_tag "Configure Book"
-  %td
-    - form_name = 'compile_book_' + inst_book.id.to_s
-    = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=compile_book', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
-      = submit_tag "Compile Book", name: form_name
+
+  - if inst_book.last_compiled != nil
+    %td
+      - form_name = 'compile_book_' + inst_book.id.to_s
+      = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=compile_book', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
+        = submit_tag "Compile Book", name: form_name

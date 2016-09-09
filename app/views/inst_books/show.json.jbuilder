@@ -1,3 +1,14 @@
+json.set! :title, @inst_book.title
+json.set! :desc, @inst_book.desc
+
+options = @inst_book.options
+if options != nil && options != "null"
+  options = eval(options)
+  options.each do |key, value|
+    json.set! key, value
+  end
+end
+
 # chapters
 json.chapters do
 
@@ -50,6 +61,10 @@ json.chapters do
                           json.set! :required, inst_book_section_exercise.required
                           json.set! :points, inst_book_section_exercise.points.to_f
                           json.set! :threshold, inst_book_section_exercise.threshold.to_f
+                          options = inst_book_section_exercise.options
+                          if options != nil && options != "null"
+                            json.set! :exer_options, eval(options)
+                          end
                         end
                       end
                     end

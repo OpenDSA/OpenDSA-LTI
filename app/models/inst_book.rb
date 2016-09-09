@@ -27,6 +27,16 @@ class InstBook < ActiveRecord::Base
     book_data = json
     update_mode = false
     inst_book_id = book_data['inst_book_id']
+    options = {}
+    options['build_dir'] = book_data['build_dir'] || "Books"
+    options['code_dir'] = book_data['code_dir'] || "SourceCode/"
+    options['lang'] = book_data['lang'] || "en"
+    options['build_JSAV'] = book_data['build_JSAV'] || false
+    options['build_cmap'] = book_data['build_cmap'] || false
+    options['suppress_todo'] = book_data['suppress_todo'] || true
+    options['assumes'] = book_data['assumes'] || "recursion"
+    options['dispModComp'] = book_data['dispModComp'] || true
+    options['glob_exer_options'] = book_data['glob_exer_options'] || {}
 
     if inst_book_id == nil
       b = InstBook.new
@@ -38,6 +48,9 @@ class InstBook < ActiveRecord::Base
     end
     b.title = book_data['title']
     b.desc = book_data['desc']
+
+    require 'json'
+    b.options = options.to_json
     b.save
 
     chapters = book_data['chapters']
