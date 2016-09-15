@@ -33,6 +33,7 @@ class InstBookSectionExercise < ActiveRecord::Base
     book_section_exercise.points = self.points
     book_section_exercise.required = self.required
     book_section_exercise.threshold = self.threshold
+    book_section_exercise.options = self.options
     book_section_exercise.save
   end
 

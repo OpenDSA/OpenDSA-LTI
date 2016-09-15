@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160909162650) do
+ActiveRecord::Schema.define(version: 20160915171747) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -150,16 +150,16 @@ ActiveRecord::Schema.define(version: 20160909162650) do
   add_index "identities", ["user_id"], name: "index_identities_on_user_id", using: :btree
 
   create_table "inst_book_section_exercises", force: true do |t|
-    t.integer  "inst_book_id",                                             null: false
-    t.integer  "inst_section_id",                                          null: false
+    t.integer  "inst_book_id",                                                                null: false
+    t.integer  "inst_section_id",                                                             null: false
     t.integer  "inst_exercise_id"
-    t.decimal  "points",           precision: 5, scale: 2,                 null: false
-    t.boolean  "required",                                 default: false
-    t.decimal  "threshold",        precision: 5, scale: 2,                 null: false
+    t.decimal  "points",                              precision: 5, scale: 2,                 null: false
+    t.boolean  "required",                                                    default: false
+    t.decimal  "threshold",                           precision: 5, scale: 2,                 null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "type"
-    t.string   "options"
+    t.text     "options",          limit: 2147483647
   end
 
   add_index "inst_book_section_exercises", ["inst_book_id"], name: "inst_book_section_exercises_inst_book_id_fk", using: :btree
@@ -168,14 +168,14 @@ ActiveRecord::Schema.define(version: 20160909162650) do
 
   create_table "inst_books", force: true do |t|
     t.integer  "course_offering_id"
-    t.integer  "user_id",                                       null: false
-    t.string   "title",              limit: 50,                 null: false
+    t.integer  "user_id",                                               null: false
+    t.string   "title",              limit: 50,                         null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "template",                      default: false
+    t.boolean  "template",                              default: false
     t.string   "desc"
     t.datetime "last_compiled"
-    t.string   "options"
+    t.text     "options",            limit: 2147483647
   end
 
   add_index "inst_books", ["course_offering_id"], name: "inst_books_course_offering_id_fk", using: :btree

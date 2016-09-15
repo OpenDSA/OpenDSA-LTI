@@ -84,6 +84,10 @@ json.chapters do
   end
 
 end
-json.course_id CourseOffering.where(:id => @inst_book.course_offering_id).first.lms_course_num
-lms_instance_id = CourseOffering.where(:id => @inst_book.course_offering_id).first.lms_instance_id
-json.LMS_url LmsInstance.where(:id => lms_instance_id).first.url
+course_offering = CourseOffering.where(:id => @inst_book.course_offering_id).first
+
+if course_offering != nil
+  json.course_id course_offering.lms_course_num
+  lms_instance_id = course_offering.lms_instance_id
+  json.LMS_url LmsInstance.where(:id => lms_instance_id).first.url
+end

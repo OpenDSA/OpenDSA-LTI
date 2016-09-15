@@ -31,7 +31,9 @@ class InstBook < ActiveRecord::Base
     options['build_dir'] = book_data['build_dir'] || "Books"
     options['code_dir'] = book_data['code_dir'] || "SourceCode/"
     options['lang'] = book_data['lang'] || "en"
+    options['code_lang'] = book_data['code_lang'] || {}
     options['build_JSAV'] = book_data['build_JSAV'] || false
+    options['tabbed_codeinc'] = book_data['tabbed_codeinc'] || false
     options['build_cmap'] = book_data['build_cmap'] || false
     options['suppress_todo'] = book_data['suppress_todo'] || true
     options['assumes'] = book_data['assumes'] || "recursion"
@@ -77,6 +79,7 @@ class InstBook < ActiveRecord::Base
       b = InstBook.new
       b.title = self.title
       b.desc = self.desc
+      b.options = self.options
       b.user_id = current_user.id
       b.save
 
