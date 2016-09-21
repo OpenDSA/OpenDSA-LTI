@@ -95,38 +95,43 @@ class OdsaExerciseAttemptsController < ApplicationController
                                                       inst_book_section_exercise: inst_book_section_exercise)
         exercise_progress.save
       end
-    end
 
-    correct = params[:score].to_f >= params[:threshold].to_f
+      correct = params[:score].to_f >= params[:threshold].to_f
 
-    exercise_attempt = OdsaExerciseAttempt.new(
-                                              inst_book: inst_book,
-                                              user: current_user,
-                                              inst_section: inst_section,
-                                              inst_book_section_exercise: inst_book_section_exercise,
-                                              worth_credit: correct,
-                                              correct: correct,
-                                              time_done: Time.now,
-                                              time_taken: (params[:total_time].to_f/1000).round,
-                                              count_hints: 0,
-                                              count_attempts: params[:uiid],
-                                              hint_used: 0,
-                                              question_name: params[:exercise],
-                                              request_type: "PE" ,
-                                              ip_address: request.ip,
-                                              pe_score: params[:score],
-                                              pe_steps_fixed: params[:steps_fixed])
+      exercise_attempt = OdsaExerciseAttempt.new(
+                                                inst_book: inst_book,
+                                                user: current_user,
+                                                inst_section: inst_section,
+                                                inst_book_section_exercise: inst_book_section_exercise,
+                                                worth_credit: correct,
+                                                correct: correct,
+                                                time_done: Time.now,
+                                                time_taken: (params[:total_time].to_f/1000).round,
+                                                count_hints: 0,
+                                                count_attempts: params[:uiid],
+                                                hint_used: 0,
+                                                question_name: params[:exercise],
+                                                request_type: "PE" ,
+                                                ip_address: request.ip,
+                                                pe_score: params[:score],
+                                                pe_steps_fixed: params[:steps_fixed])
 
-    respond_to do |format|
-      if exercise_attempt.save
-        exercise_progress = OdsaExerciseProgress.where(
-                                                  "user_id=? and inst_book_section_exercise_id=?",
-                                                  current_user.id,
-                                                  inst_book_section_exercise.id).first
-        format.json  { render :json => {
-                                        :exercise_progress => exercise_progress,
-                                        :threshold => inst_book_section_exercise.threshold}}
-      else
+      respond_to do |format|
+        if exercise_attempt.save
+          exercise_progress = OdsaExerciseProgress.where(
+                                                    "user_id=? and inst_book_section_exercise_id=?",
+                                                    current_user.id,
+                                                    inst_book_section_exercise.id).first
+          format.json  { render :json => {
+                                          :exercise_progress => exercise_progress,
+                                          :threshold => inst_book_section_exercise.threshold}}
+        else
+          msg = { :status => "fail", :message => "Fail!" }
+          format.json  { render :json => msg }
+        end
+      end
+    else
+      respond_to do |format|
         msg = { :status => "fail", :message => "Fail!" }
         format.json  { render :json => msg }
       end
