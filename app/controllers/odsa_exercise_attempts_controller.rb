@@ -85,14 +85,16 @@ class OdsaExerciseAttemptsController < ApplicationController
                                   "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
                                   params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
 
-    unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
-                                                 inst_book_section_exercise_id=?",
-                                                 current_user.id,
-                                                 inst_book_section_exercise.id).first
+    if inst_book_section_exercise != nil
+      unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
+                                                   inst_book_section_exercise_id=?",
+                                                   current_user.id,
+                                                   inst_book_section_exercise.id).first
 
-      exercise_progress = OdsaExerciseProgress.new(user: current_user,
-                                                    inst_book_section_exercise: inst_book_section_exercise)
-      exercise_progress.save
+        exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                                                      inst_book_section_exercise: inst_book_section_exercise)
+        exercise_progress.save
+      end
     end
 
     correct = params[:score].to_f >= params[:threshold].to_f
