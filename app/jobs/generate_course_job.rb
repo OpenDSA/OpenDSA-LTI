@@ -160,17 +160,24 @@ class GenerateCourseJob < ProgressJob::Base
 
     sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
 
+
     section_item_position = 1
+    section_file_name_seq = 1
 
     if !sections.empty?
       sections.each do |section|
         save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                      section, module_item_position, section_item_position)
+                                      section, module_item_position, section_item_position, section_file_name_seq)
         section_item_position += 1
+        learning_tool = nil
+        learning_tool = section.learning_tool
+        if !learning_tool
+          section_file_name_seq += 1
+        end
       end
     else
       save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                    nil, module_item_position, section_item_position)
+                                    nil, module_item_position, section_item_position, section_file_name_seq)
     end
 
     module_item_position + section_item_position
@@ -180,7 +187,7 @@ class GenerateCourseJob < ProgressJob::Base
   # -------------------------------------------------------------
   # in canvas, module item that has external link will map OpenDSA non-gradable section
   def save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                    section, module_item_position, section_item_position)
+                                    section, module_item_position, section_item_position, section_file_name_seq)
 
     module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
     if module_name.include? '/'
@@ -193,7 +200,7 @@ class GenerateCourseJob < ProgressJob::Base
 
     learning_tool = nil
     if section
-      section_file_name = module_name + "-" + section_item_position.to_s.rjust(2, "0")
+      section_file_name = module_name + "-" + section_file_name_seq.to_s.rjust(2, "0")
       title = title + section.name
 
       learning_tool = section.learning_tool
