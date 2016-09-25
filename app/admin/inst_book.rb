@@ -1,4 +1,5 @@
 ActiveAdmin.register InstBook, sort_order: :created_at_asc do
+  filter :template
   includes :course_offering, :user
   config.clear_action_items!
   actions :all, except: [:new]
