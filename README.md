@@ -403,6 +403,8 @@ The following server requirements will be fine for supporting hundreds of users.
 - Relax the following constraints
     + alter table users drop index email;
     + alter table users drop index slug;
+- Change the following configuration on workbench
+    + Edit > Preferences > Sql Editor > uncheck the "Safe Updates" 
 - Execute the following update statements to anonymize the exported data
     + UPDATE `opendsa`.`users` SET `email` = "example@opendsa.org";
     + UPDATE `opendsa`.`users` SET `slug` = "example@opendsa.org";
