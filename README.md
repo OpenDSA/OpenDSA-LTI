@@ -391,14 +391,14 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Production deployment is initiated from the development enviroment. It starts with changes you make to OpenDSA-LTI in OpenDSA-DevStack, or changes made to the originial OpenDSA-LTI repository and you decided to deploy them on your production server. First, test these changes locally using OpenDSA-DevStack development servers, Then commit and push these changes to your OpenDSA-LTI repository. Finally initiate the production deployment command from within OpenDSA-DevStack as shown earlier. It is very important to push your changes to your OpenDSA-LTI repository before production deployment. Everytime you deploy your code Capistrano will go and clone the latest version of your OpenDSA-LTI and perform the deployment tasks.
 
-### Export/Import anonymize OpenDSA-LTI data
-- Export databse schema from opendsa.cs.vt.edu server using MySQl workbench data export tool
+### Export anonymize OpenDSA-LTI data
+- Export databse schema from opendsa.cs.vt.edu server using MySQL workbench data export tool
 - Provision the OpenDSA-DevStack VM
 - `vagrant ssh` into the VM
 - `cd /vagrant/OpenDSA-LTI`
 - `bundle exec rake db:drop`
 - `bundle exec rake db:create`
-- Connect to your local OpenDSA-DevStack using workbench and import the data using MySQl workbench data import tool
+- Connect to your local OpenDSA-DevStack using MySQL workbench and import the data using data import tool
 - On OpenDSA-DevStack database do the follwoing:
 - Relax the following constraints
     + alter table users drop index email;
@@ -413,3 +413,10 @@ The following server requirements will be fine for supporting hundreds of users.
     + UPDATE `opendsa`.`users` SET `encrypted_password` = "encrypted_password";
 - Re-export the anynomized schema from OpenDSA-DevStack.
 
+### Import anonymized OpenDSA-LTI data
+- Provision the OpenDSA-DevStack VM
+- `vagrant ssh` into the VM
+- `cd /vagrant/OpenDSA-LTI`
+- `bundle exec rake db:drop`
+- `bundle exec rake db:create`
+- Connect to your local OpenDSA-DevStack using Mysql workbench and import the anonymized data using data import tool
