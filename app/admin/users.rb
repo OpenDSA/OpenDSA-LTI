@@ -1,5 +1,4 @@
 ActiveAdmin.register User do
-  # filter :global_role
   remove_filter :odsa_exercise_attempts, :odsa_exercise_progresses,
                         :odsa_module_progresses, :odsa_book_progresses, :odsa_user_interactions,
                         :course_enrollments, :identities, :lms_accesses, :inst_books, :encrypted_password,
@@ -8,8 +7,7 @@ ActiveAdmin.register User do
                         :confirmation_sent_at
 
   includes :global_role
-  active_admin_import
-
+  actions :all, except: [:new]
   permit_params :first_name, :last_name, :email,
     :confirmed_at, :global_role_id, :avatar
 
