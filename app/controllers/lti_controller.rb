@@ -58,10 +58,10 @@ class LtiController < ApplicationController
     if res.success?
       # @score = request_params['score']
       # @tp.lti_msg = "Message shown when arriving back at Tool Consumer."
-      render :json => { :message => 'success' }.to_json
+      render :json => { :message => 'success', :res => res.to_json }.to_json
       # erb :assessment_finished
     else
-      render :json => { :message => 'failure' }.to_json
+      render :json => { :message => 'failure', :res => res.to_json }.to_json
       # @tp.lti_errormsg = "The Tool Consumer failed to add the score."
       # show_error "Your score was not recorded: #{res.description}"
       # return erb :error
