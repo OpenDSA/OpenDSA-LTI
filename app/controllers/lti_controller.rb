@@ -44,7 +44,12 @@ class LtiController < ApplicationController
       render(:error)
     end
 
-    @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
+    # @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
+    @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], {
+      "lis_outcome_service_url" => "#{launch_params['lis_outcome_service_url']}",
+      "lis_result_sourcedid" => "#{launch_params['lis_result_sourcedid']}"
+    })
+
 
     if !@tp.outcome_service?
       @message = "This tool wasn't lunched as an outcome service"
