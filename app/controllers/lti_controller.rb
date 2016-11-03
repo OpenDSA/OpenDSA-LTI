@@ -44,11 +44,12 @@ class LtiController < ApplicationController
       render(:error)
     end
 
-    # @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
-    @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], {
+    lti_param = {
       "lis_outcome_service_url" => "#{launch_params['lis_outcome_service_url']}",
       "lis_result_sourcedid" => "#{launch_params['lis_result_sourcedid']}"
-    })
+    }
+    # @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
+    @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], lti_param)
 
 
     if !@tp.outcome_service?
@@ -67,6 +68,8 @@ class LtiController < ApplicationController
       # erb :assessment_finished
     else
       render :json => { :message => 'failure', :res => res.to_json }.to_json
+      error = Error.new(:class_name => 'lti_post_replace_result', :message => res.inspect, :params => lti_param.to_s)
+      error.save!
       # @tp.lti_errormsg = "The Tool Consumer failed to add the score."
       # show_error "Your score was not recorded: #{res.description}"
       # return erb :error
