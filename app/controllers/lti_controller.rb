@@ -65,8 +65,8 @@ class LtiController < ApplicationController
       # @score = request_params['score']
       # @tp.lti_msg = "Message shown when arriving back at Tool Consumer."
       render :json => { :message => 'success', :res => res.to_json }.to_json
-      error = Error.new(:class_name => 'post_replace_result_success', :message => res.inspect, :params => lti_param.to_s)
-      error.save!
+      # error = Error.new(:class_name => 'post_replace_result_success', :message => res.inspect, :params => lti_param.to_s)
+      # error.save!
       # erb :assessment_finished
     else
       render :json => { :message => 'failure', :res => res.to_json }.to_json
