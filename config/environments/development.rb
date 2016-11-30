@@ -18,9 +18,21 @@ CodeWorkout::Application.configure do
   config.preload_frameworks = true
   config.allow_concurrency = true
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
-  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
+  # Do care if the mailer can't send.
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.default_url_options = { :host => 'https://192.168.33.10:9292' }
+
+  config.action_mailer.delivery_method = :smtp
+
+  config.action_mailer.smtp_settings = {
+  address: 'smtp.gmail.com',
+  port: 587,
+  domain: 'gmail.com',
+  authentication: 'plain',
+  enable_starttls_auto: true,
+  user_name: 'opendsa.noreply@gmail.com',
+  password: ''
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

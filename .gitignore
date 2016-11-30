@@ -27,6 +27,8 @@ usr/resources/*/tests
 working.txt
 timezones.txt
 
+.env
+
 .vagrant
 /homeworks
 #server.crt
