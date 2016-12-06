@@ -10,7 +10,7 @@
     = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=generate_course', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'generate_course'; return true;" do
       = submit_tag "Generate LMS Course", name: form_name
   %td
-    = form_tag '/configurations/book/create_redirect' do
+    = form_tag '/inst_books/configure/'+ inst_book.id.to_s  do
       = submit_tag "Configure Book"
 
   - if inst_book.last_compiled != nil

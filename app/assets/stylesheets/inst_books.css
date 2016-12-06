@@ -1,0 +1,51 @@
+/*h1 {
+	width: 30%;
+}
+
+a {
+	color: blue !important;
+}
+
+ul {
+	list-style: none;
+}
+
+ul li ul {
+	display: none;
+}
+
+li {
+	border: none !important;
+	padding: 15px;
+	margin: 10px;
+	width: 90%;
+}
+
+li button {
+	float: right;
+}
+
+input {
+	width: 25%;
+}*/
+
+#content {
+	padding-left: 10px;
+}
+
+#toggle {
+	margin-left: 20%;
+}
+
+#add {
+	margin-left: 20%;
+}
+
+#options {
+	display: none;
+}
+
+#downloadLink {
+	display: none;
+	padding: 20px;
+}
