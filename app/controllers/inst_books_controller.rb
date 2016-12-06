@@ -18,12 +18,11 @@ class InstBooksController < ApplicationController
   # POST /inst_books/configure/:id
   def configure
 
-    # inst_book_json = ApplicationController.new.render_to_string(
-    #     template: 'inst_books/show.json.jbuilder',
-    #     locals: {:@inst_book => @inst_book})
+    @inst_book_json = ApplicationController.new.render_to_string(
+        template: 'inst_books/show.json.jbuilder',
+        locals: {:@inst_book => @inst_book})
 
     # render json: inst_book_json
-
 
     # inst_book
     # if params[:operation] == 'generate_course'

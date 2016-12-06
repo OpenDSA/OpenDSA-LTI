@@ -1,5 +1,8 @@
 = render 'layouts/breadcrumb'
 
+:javascript
+  window.jsonFile = #{@inst_book_json.html_safe}
+
 #odsa_content
   #instructions
     %p Press the "Save Book" button to generate a link that will allow you to download your book configuration.
@@ -14,9 +17,6 @@
     #heading
   #options
   #chapters
-
-
-
 
 / %h1
 /   = @course.number_and_name

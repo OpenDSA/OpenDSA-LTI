@@ -1,7 +1,6 @@
 // make.js
 
 // Default variable for loading a json file. Should be set to whatever is passed in by the user.
-let jsonFile = "https://taylorr7.github.io/interfaceApplication/json/CS3.json";
 //let jsonFile = "https://taylorr7.github.io/interfaceApplication/json/Everything.json";
 //let jsonFile = "";
 
@@ -15,11 +14,11 @@ let nextId = 0; // Global variable used for tracking input ids.
  * Checks if a json file has been defined and, if not, prompts the user to select one.
  */
 $(document).ready(() => {
-  if (jsonFile != "") {
-    loadJSON(jsonFile);
-  } else {
-    $('#title').html("<h1> Please load a book to edit or start a new book. </h1>");
-  }
+  loadJSON(jsonFile);
+  // if (jsonFile != "") {
+  // } else {
+  //   $('#title').html("<h1> Please load a book to edit or start a new book. </h1>");
+  // }
 })
 
 /*
@@ -37,6 +36,7 @@ $(function() {
 $(document).on('focus', '.datepicker', function() {
   $(this).datepicker();
 });
+
 
 /*
  * The click event for the 'Show Options' button.
@@ -64,7 +64,8 @@ $(document).on('click', '#new', function() {
  * just loads the hardcoded json file for now.
  */
 $(document).on('click', '#load', function() {
-  loadJSON(jsonFile);
+  // loadJSON(jsonFile);
+  // let jsonFile = window.jsonFile
   /*listJSON(jsonDirectory);*/
 });
 
@@ -86,7 +87,7 @@ $(document).on('click', '#save', function() {
  */
 $(document).on('click', '#bookButton', function() {
   let jsonBook = $('#Book option:selected').val() + $('#Book option:selected').text();
-  loadJSON(jsonBook);
+  // loadJSON(jsonBook);
 });
 
 /*
