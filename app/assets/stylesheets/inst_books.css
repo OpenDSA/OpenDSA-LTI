@@ -1,33 +1,33 @@
-/*h1 {
+h1 {
 	width: 30%;
 }
 
-a {
+/*a {
 	color: blue !important;
 }
-
-ul {
+*/
+ul.odsa_ul {
 	list-style: none;
 }
 
-ul li ul {
+ul.odsa_ul li ul {
 	display: none;
 }
 
-li {
+li.odsa_li {
 	border: none !important;
 	padding: 15px;
 	margin: 10px;
 	width: 90%;
 }
 
-li button {
+li.odsa_li button {
 	float: right;
 }
 
-input {
+input.odsa_in {
 	width: 25%;
-}*/
+}
 
 #content {
 	padding-left: 10px;

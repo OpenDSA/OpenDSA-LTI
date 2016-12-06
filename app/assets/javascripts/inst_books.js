@@ -1,11 +1,3 @@
-// make.js
-
-// Default variable for loading a json file. Should be set to whatever is passed in by the user.
-//let jsonFile = "https://taylorr7.github.io/interfaceApplication/json/Everything.json";
-//let jsonFile = "";
-
-let jsonDirectory = "https://taylorr7.github.io/interfaceApplication/json/";
-
 let textFile = null; // Temporary global variable used for download link.
 
 let nextId = 0; // Global variable used for tracking input ids.
@@ -15,10 +7,6 @@ let nextId = 0; // Global variable used for tracking input ids.
  */
 $(document).ready(() => {
   loadJSON(jsonFile);
-  // if (jsonFile != "") {
-  // } else {
-  //   $('#title').html("<h1> Please load a book to edit or start a new book. </h1>");
-  // }
 })
 
 /*
@@ -58,18 +46,6 @@ $(document).on('click', '#new', function() {
 });
 
 /*
- * The click event for the 'Load Book' button.
- * The url for the json directory is passed into here.
- * Since Ajax doesn't seem to work on github, this
- * just loads the hardcoded json file for now.
- */
-$(document).on('click', '#load', function() {
-  // loadJSON(jsonFile);
-  // let jsonFile = window.jsonFile
-  /*listJSON(jsonDirectory);*/
-});
-
-/*
  * The click event for the 'Save Book' button.
  * Currently, this saves the book as an html download object.
  */
@@ -87,7 +63,6 @@ $(document).on('click', '#save', function() {
  */
 $(document).on('click', '#bookButton', function() {
   let jsonBook = $('#Book option:selected').val() + $('#Book option:selected').text();
-  // loadJSON(jsonBook);
 });
 
 /*
@@ -259,7 +234,6 @@ const decode = (fileArray, chapter = true) => {
           }
         } else {
           line = "\"" + value + "\",";
-          // line = value + ",";
         }
       } else {
         if ((!chapter) || (i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
@@ -298,9 +272,7 @@ const decode = (fileArray, chapter = true) => {
           line = spacing + "},";
         }
       }
-    } else if (fileArray[i].startsWith("a")) {} else if (fileArray[i].startsWith("/a")) {} else {
-      //alert(fileArray[i]);
-    }
+    } else if (fileArray[i].startsWith("a")) {} else if (fileArray[i].startsWith("/a")) {} else {}
     jsonString += line;
   }
   return jsonString;
@@ -354,18 +326,18 @@ const addClasses = function() {
  * Function to build a new json book.
  */
 const newJSON = function() {
-  let titleString = "<h1> Header: <button id=\"toggle\"> Show Options </button> </h1> <ul>";
+  let titleString = "<h1> Header: <button id=\"toggle\"> Show Options </button> </h1> <ul class='odsa_ul'>";
   titleString += encode("file name", "");
   titleString += "</ul>";
   $('#title').html(titleString);
 
-  let headerString = "<ul>";
+  let headerString = "<ul class='odsa_ul'>";
   headerString += encode("title", "");
   headerString += encode("desc", "");
   headerString += "</ul>";
   $('#heading').html(headerString);
 
-  let optionString = "<ul>";
+  let optionString = "<ul class='odsa_ul'>";
   optionString += encode("build_dir", "Books");
   optionString += encode("code_dir", "SourceCode/");
   optionString += encode("lang", "en");
@@ -377,7 +349,7 @@ const newJSON = function() {
   optionString += "</ul>";
   $('#options').html(optionString);
 
-  let chapterString = "<h1> Chapters: </h1> <ul class=\"odsa_collapse\">";
+  let chapterString = "<h1> Chapters: </h1> <ul class=\"odsaul odsa_collapse\">";
   chapterString += "</ul>";
   $('#chapters').html(chapterString);
 
@@ -388,39 +360,33 @@ const newJSON = function() {
  * Function to load an existing json book.
  */
 const loadJSON = function(jsonFile) {
-  $.getJSON(jsonFile, function(data) {
-    let nameStart = jsonFile.lastIndexOf("/");
-    let nameEnd = jsonFile.search("$");
-    let fileName = jsonFile.slice(nameStart + 1, nameEnd);
 
-    let titleString = "<h1> Header: <button id=\"toggle\"> Show Options </button> </h1> <ul>";
-    titleString += encode("file name", fileName);
-    titleString += "</ul>"
-    $('#title').html(titleString);
+  let titleString = "<h1> Header: <button id=\"toggle\"> Show Options </button> </h1> <ul class='odsa_ul'>";
+  titleString += "</ul>"
+  $('#title').html(titleString);
 
-    let headerString = "<ul>";
-    headerString += encode("title", data['title']);
-    headerString += encode("desc", data['desc']);
-    headerString += "</ul>";
-    $('#heading').html(headerString);
+  let headerString = "<ul class='odsa_ul'>";
+  headerString += encode("title", jsonFile['title']);
+  headerString += encode("desc", jsonFile['desc']);
+  headerString += "</ul>";
+  $('#heading').html(headerString);
 
-    let optionString = "<ul>";
-    $.each(data, function(key, val) {
-      if (!(key === "title" || key === "desc" || key === "chapters")) {
-        optionString += encode(key, val);
-      }
-    });
-    optionString += "</ul>";
-    $('#options').html(optionString);
-
-    let chapterString = "<h1> Chapters: </h1> <ul class=\"odsa_collapse odsa_sortable\">";
-    /* <button id=\"add\"> Add Chapter </button> */
-    $.each(data['chapters'], function(key, val) {
-      chapterString += encode(key, val, 1);
-    });
-    chapterString += "</ul>";
-    $('#chapters').html(chapterString);
-
-    addClasses();
+  let optionString = "<ul class='odsa_ul'>";
+  $.each(jsonFile, function(key, val) {
+    if (!(key === "title" || key === "desc" || key === "chapters")) {
+      optionString += encode(key, val);
+    }
   });
+  optionString += "</ul>";
+  $('#options').html(optionString);
+
+  let chapterString = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\">";
+  $.each(jsonFile['chapters'], function(key, val) {
+    chapterString += encode(key, val, 1);
+  });
+  chapterString += "</ul>";
+  $('#chapters').html(chapterString);
+
+  addClasses();
+
 }
