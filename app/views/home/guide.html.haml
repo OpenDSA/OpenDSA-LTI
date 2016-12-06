@@ -41,7 +41,9 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
     Click the "University-oriented" menu again and select "Course
     Offerings".
     Now you will create a new course offering for your course.
-    Note: all fields marked with asterisk "*" are required.
+    Note: all fields marked with asterisk
+    %code *
+    are required.
 
     %ul
 
@@ -57,10 +59,20 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
         course name and course ID that you created in step (3).
 
   %li
-    Under the "ODSA Books" menu, select "Inst Book". Choose the book you want to use in
-    your course offering and click "clone". A new instance of the book will be created, click "edit" then
+    Under the "ODSA Books" menu, select "Book Instances". Click "Upload Books" then choose the book configuration file form your file system. After the book is uploaded successfully click "clone"
+    to use it with your course offering. A new instance of the book will be created, click "edit" then
     select the proper course offering (the one that you created in the previous
     step). Click "Update Inst Book".
+
+  %br
+  %p
+    %strong Note:
+    A web interface for book configuration modification is still under development. But you can
+    still update your book by updating the configuration file and upload it again. To do that add a new attribute
+    %code {"inst_book_id": book_id}
+    to your book configration file where
+    %code book_id
+    is the id of the book you want to update, you can find this id in "Book Instances" page.
 
   %li
     Under the "LMS config" menu, click "Lms Access".
@@ -70,14 +82,14 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
     to make one.)
     Choose the LMS instance and put in your access token.
     If you are doing this for the first time, then you probably do not
-    have an entry in the table, so click on "Create one".
+    have an entry in the table, so click on "New Lms Access".
     Then click "Update Lms access".
 
   %li
     Now click "Back to OpenDSA" in the top menu to go back to the book
     compilation application.
     Click the "Course" button and then navigate to the course offering
-    that you have previously created.
+    that you have just created.
     (You might need to click "Browse all" and navigate to the proper
     organization and term.)
     Once you find your course offering, click on it.
