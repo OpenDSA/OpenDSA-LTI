@@ -77,12 +77,12 @@ $(document).on('click', '.remove', function() {
  */
 $(document).on('click', '.odsa_collapse li a', function() {
   $(this).parent().children('ul').toggle();
-  if ($(this).children('span').hasClass('ui-icon-triangle-1-s')) {
-    $(this).children('span').removeClass('ui-icon-triangle-1-s');
-    $(this).children('span').addClass('ui-icon-triangle-1-se');
-  } else if ($(this).children('span').hasClass('ui-icon-triangle-1-se')) {
-    $(this).children('span').removeClass('ui-icon-triangle-1-se');
-    $(this).children('span').addClass('ui-icon-triangle-1-s');
+  if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-down')) {
+    $(this).children('span').removeClass('glyphicon glyphicon-chevron-down');
+    $(this).children('span').addClass('glyphicon glyphicon-chevron-right');
+  } else if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-right')) {
+    $(this).children('span').removeClass('glyphicon glyphicon-chevron-right');
+    $(this).children('span').addClass('glyphicon glyphicon-chevron-down');
   }
 });
 
@@ -178,17 +178,17 @@ const encode = (key, val, index = -100) => {
   if (typeof val === 'object' && val !== null) {
     let output = "";
     if (index === 1) {
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='ui-icon ui-icon-grip-dotted-vertical'></span><a><span class='ui-icon ui-icon-triangle-1-s'></span>" + key + "</a><button class=\"remove\">Delete</button><ul class=\"contain odsa_sortable\">";
+      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><button class=\"odsa_button remove\">Delete</button><ul class=\"contain odsa_sortable\">";
       output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bbotstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
       output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bbotstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
     } else if (index === 2) {
-      output += "<li class='odsa_li' id='" + htmlKey + "'><span class='ui-icon ui-icon-grip-dotted-vertical'></span><a><span class='ui-icon ui-icon-triangle-1-s'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id='" + htmlKey + "'><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
     } else if (index === 3) {
       output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bbotstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
       output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bbotstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='ui-icon ui-icon-triangle-1-s'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
     } else {
-      output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='ui-icon ui-icon-triangle-1-s'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
     }
     for (var entry in val) {
       output = output + encode(entry, val[entry], index + 1);
@@ -326,7 +326,7 @@ const addClasses = function() {
  * Function to build a new json book.
  */
 const newJSON = function() {
-  let titleString = "<h1> Header: <button id=\"toggle\"> Show Options </button> </h1> <ul class='odsa_ul'>";
+  let titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
   titleString += encode("file name", "");
   titleString += "</ul>";
   $('#title').html(titleString);
@@ -361,7 +361,7 @@ const newJSON = function() {
  */
 const loadJSON = function(jsonFile) {
 
-  let titleString = "<h1> Header: <button id=\"toggle\"> Show Options </button> </h1> <ul class='odsa_ul'>";
+  let titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
   titleString += "</ul>"
   $('#title').html(titleString);
 
