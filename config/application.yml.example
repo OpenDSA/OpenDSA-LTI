@@ -1,0 +1,23 @@
+development:
+  email_address: 'smtp.gmail.com'
+  email_port: 587
+  email_domain: 'gmail.com'
+  email_user_name: 'username@gmail.com'
+  email_password: 'email_password'
+  host_url: 'https://192.168.33.10:9292'
+
+staging:
+  email_address: 'smtp.gmail.com'
+  email_port: 587
+  email_domain: 'gmail.com'
+  email_user_name: 'username@gmail.com'
+  email_password: 'email_password'
+  host_url: 'host_url'
+
+production:
+  email_address: 'smtp.gmail.com'
+  email_port: 587
+  email_domain: 'gmail.com'
+  email_user_name: 'username@gmail.com'
+  email_password: 'email_password'
+  host_url: 'host_url'
