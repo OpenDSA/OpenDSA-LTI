@@ -1,4 +1,5 @@
-= semantic_form_for User.new, url: session_path(User.new),
+= semantic_form_for User.new,
+  url: session_path(User.new),
   html: { class: "form-horizontal" } do |f|
 
   = f.inputs do
@@ -14,4 +15,4 @@
   = f.actions do
     = f.submit 'Sign in', class: 'btn btn-primary'
 
-= link_to "Change your password", edit_user_registration_path
+  = link_to "Forgot user password?", new_password_path

@@ -170,11 +170,12 @@ CodeWorkout::Application.routes.draw do
     controllers: {omniauth_callbacks: 'users/omniauth_callbacks', registrations: "registrations" },
     skip: [:registrations, :sessions]
   as :user do
-    get '/users/password/new' => 'devise/registrations#edit', as: :edit_user_registration
-    # get '/users/password/edit' => 'devise/passwords#edit', as: :edit_user_password1
-    # put '/users' => 'devise/registrations#update', as: :user_registration
-    get '/signup' => 'registrations#new', as: :new_user_registration
-    post '/signup' => 'registrations#create', as: :user_registration
+    get '/new_password' => 'devise/passwords#new', as: :new_password
+    get '/edit_password' => 'devise/passwords#edit', as: :edit_password
+    put '/update_password' => 'devise/passwords#update', as: :update_password
+    post '/create_password' => 'devise/passwords#create', as: :create_password
+    get '/signup' => 'devise/registrations#new', as: :new_user_registration
+    post '/signup' => 'devise/registrations#create', as: :user_registration
     get '/login' => 'devise/sessions#new', as: :new_user_session
     post '/login' => 'devise/sessions#create', as: :user_session
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session
