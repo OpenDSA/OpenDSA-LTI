@@ -1,4 +1,6 @@
 ActiveAdmin.register User do
+  menu :if => proc{ current_user.global_role.is_admin? }
+
   remove_filter :odsa_exercise_attempts, :odsa_exercise_progresses,
                 :odsa_module_progresses, :odsa_book_progresses, :odsa_user_interactions,
                 :course_enrollments, :identities, :lms_accesses, :inst_books, :encrypted_password,

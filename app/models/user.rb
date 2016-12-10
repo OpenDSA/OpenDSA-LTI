@@ -51,7 +51,7 @@ class User < ActiveRecord::Base
 
   scope :alphabetical, -> { order('last_name asc, first_name asc, email asc') }
   scope :visible_to_user, -> (u) { joins{course_enrollments.outer}.
-    where{ (id == u.id) |
+    where{ (id == u.id) &
     (course_enrollments.course_role_id != CourseRole::STUDENT_ID) } }
 
 
