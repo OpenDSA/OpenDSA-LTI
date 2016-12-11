@@ -69,10 +69,12 @@ $(document).on('click', '#odsa_save', function() {
       withCredentials: true
     },
     success: function(data) {
-      console.log('success');
+      console.dir(data);
+      $('#save_message').text(data['message']);
     },
     error: function(data) {
-      console.log('error');
+      console.dir(data);
+      $('#save_message').text("Error occurred!");
     }
   });
 });

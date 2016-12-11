@@ -23,16 +23,16 @@ class InstBooksController < ApplicationController
         locals: {:@inst_book => @inst_book})
   end
 
-  # POST /inst_books/update/:id
+  # POST /inst_books/update
   def update
-    # @inst_book_json = ApplicationController.new.render_to_string(
-    #     template: 'inst_books/show.json.jbuilder',
-    #     locals: {:@inst_book => @inst_book})
     inst_book = params['inst_book']
 
-    # InstBook.save_data_from_json(inst_book, current_user)
+    InstBook.save_data_from_json(inst_book, current_user)
 
-    redirect_to book_configure_path(:id => inst_book['id']), notice: 'Book configuration uploaded successfully!'
+    respond_to do |format|
+      msg = { :status => "success", :message => "Book configuration uploaded successfully!" }
+      format.json  { render :json => msg }
+    end
 
   end
 

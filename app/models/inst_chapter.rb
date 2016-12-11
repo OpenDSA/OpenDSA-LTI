@@ -20,8 +20,10 @@ class InstChapter < ActiveRecord::Base
 
     mod_position = 1
     chapter_obj.each do |k, v|
-      inst_module = InstModule.save_data_from_json(book, ch, k, v, mod_position, update_mode)
-      mod_position += 1
+      if v.is_a?(Hash)
+        inst_module = InstModule.save_data_from_json(book, ch, k, v, mod_position, update_mode)
+        mod_position += 1
+      end
     end
   end
   #~ Instance methods .........................................................

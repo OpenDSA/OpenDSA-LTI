@@ -27,12 +27,14 @@ class InstModule < ActiveRecord::Base
     ch_mod.module_position = module_position
     ch_mod.save
 
-    sections = module_obj['sections']
+    sections = module_obj['sections'] || {}
 
     sec_position = 0
     sections.each do |k, v|
-      inst_sec = InstSection.save_data_from_json(book, mod, ch_mod, k, v, sec_position, update_mode)
-      sec_position += 1
+      if v.is_a?(Hash)
+        inst_sec = InstSection.save_data_from_json(book, mod, ch_mod, k, v, sec_position, update_mode)
+        sec_position += 1
+      end
     end
   end
   #~ Instance methods .........................................................
