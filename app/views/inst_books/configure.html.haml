@@ -1,4 +1,4 @@
-= render 'layouts/breadcrumb'
+/ = render 'layouts/breadcrumb'
 
 :javascript
   window.jsonFile = #{@inst_book_json.html_safe}
@@ -11,6 +11,7 @@
     / %button#odsa_new.odsa_button.ui-button.ui-corner-all New Book
     / %button#odsa_load.odsa_button.ui-button.ui-corner-all Load Book
     %button#odsa_save.odsa_button.ui-button.ui-corner-all Save Book
+    %span#save_message
     %a#downloadLink{:download => "Test.json"} Download
   #header
     #title

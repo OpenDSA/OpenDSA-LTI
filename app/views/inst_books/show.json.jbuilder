@@ -1,3 +1,4 @@
+json.set! :inst_book_id, @inst_book.id
 json.set! :title, @inst_book.title
 json.set! :desc, @inst_book.desc
 
@@ -39,11 +40,12 @@ json.chapters do
 
                # section object
                 json.set! section_name do
-                  if !inst_section.show
-                    json.set! :show, inst_section.show
-                  end
+                  json.set! :soft_deadline, inst_section.soft_deadline
+                  json.set! :hard_deadline, inst_section.hard_deadline
+                  json.set! :showsection, inst_section.show
                   json.set! :lms_item_id, inst_section.lms_item_id
                   json.set! :lms_assignment_id, inst_section.lms_assignment_id
+
                   learning_tool = inst_section.learning_tool
                   if learning_tool
                     json.set! :learning_tool, learning_tool
@@ -61,6 +63,7 @@ json.chapters do
                           json.set! :required, inst_book_section_exercise.required
                           json.set! :points, inst_book_section_exercise.points.to_f
                           json.set! :threshold, inst_book_section_exercise.threshold.to_f
+                          json.set! :options, inst_book_section_exercise.options
                           options = inst_book_section_exercise.options
                           if options != nil && options != "null"
                             json.set! :exer_options, eval(options)

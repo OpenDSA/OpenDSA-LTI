@@ -30,6 +30,8 @@ class InstSection < ActiveRecord::Base
     inst_sec.resource_type = section_obj['resource_type']
     inst_sec.resource_name = section_obj['resource_name']
     inst_sec.show = section_obj['showsection'] || true
+    inst_sec.soft_deadline = section_obj['soft_deadline']
+    inst_sec.hard_deadline = section_obj['hard_deadline']
     inst_sec.save
 
     # learning tool section
