@@ -5,7 +5,7 @@ var nextId = 0; // Global variable used for tracking input ids.
 /*
  * Checks if a json file has been defined and, if not, prompts the user to select one.
  */
-$(document).ready(() => {
+$(document).ready(function() {
   loadJSON(jsonFile);
 })
 
@@ -112,7 +112,7 @@ $(document).on('click', '.odsa_collapse li a', function() {
  * Ajax call to the given directory to pull the names of all .json files.
  * The user is then prompted to select one and given the option to load it.
  */
-const listJSON = (url) => {
+const listJSON = function(url) {
   $.ajax({
     url: url,
     success: function(data) {
@@ -134,7 +134,7 @@ const listJSON = (url) => {
  * Function to remove class declarations and ampersands from a given html string before
  * turning it into an array, splitting on the '<' character.
  */
-const prepArray = (inputHTML) => {
+const prepArray = function(inputHTML) {
   inputHTML = inputHTML.replace(/&amp;/g, "&");
   inputHTML = inputHTML.replace(/ style="[^"]+"/g, "");
   inputHTML = inputHTML.replace(/ style=""/g, "");
@@ -147,7 +147,7 @@ const prepArray = (inputHTML) => {
 /*
  * Function to return the 'value' element of the given html string.
  */
-const pullValue = (inputString) => {
+const pullValue = function(inputString) {
   var value = "";
   if (inputString.includes("value")) {
     var stringStart = inputString.search("value=\"");
@@ -162,7 +162,7 @@ const pullValue = (inputString) => {
 /*
  * Function to take a key and a value and return it as a json object pair.
  */
-const makePair = (key, value) => {
+const makePair = function(key, value) {
   if (value === "{}") {
     return "\"" + key + "\": " + value + ",\n";
   } else if (value === "true" || value === "false") {
@@ -175,7 +175,7 @@ const makePair = (key, value) => {
 /*
  * Function to take a text array and turn it into an html download object.
  */
-const makeFile = (textArray) => {
+const makeFile = function(textArray) {
   if (textFile != null) {
     window.URL.revokeObjectURL(textFile);
   }
@@ -190,7 +190,7 @@ const makeFile = (textArray) => {
  * Function to read in a json key and value pair and convert it into the
  * proper html to be dispayed to the user.
  */
-const encode = (key, val, index = -100) => {
+const encode = function(key, val, index = -100) {
   var htmlKey = "";
   if (key.includes("'")) {
     htmlKey = key.replace("'", "&#39;");
@@ -226,7 +226,7 @@ const encode = (key, val, index = -100) => {
  * Function to read in an array of html strings and convert it into a json
  * object.
  */
-const decode = (fileArray, chapter = true) => {
+const decode = function(fileArray, chapter = true) {
   var jsonString = "";
   var spacing = "  ";
   for (i = 0; i < fileArray.length; i++) {
@@ -306,7 +306,7 @@ const decode = (fileArray, chapter = true) => {
 /*
  * Function to build a json file from the html on the page.
  */
-const buildJSON = () => {
+const buildJSON = function() {
   var fileName = "Download.json";
   if ($('#1').val() != "") {
     fileName = $('#1').val();
