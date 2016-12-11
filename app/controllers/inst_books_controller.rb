@@ -21,16 +21,19 @@ class InstBooksController < ApplicationController
     @inst_book_json = ApplicationController.new.render_to_string(
         template: 'inst_books/show.json.jbuilder',
         locals: {:@inst_book => @inst_book})
+  end
 
-    # render json: inst_book_json
+  # POST /inst_books/update/:id
+  def update
+    # @inst_book_json = ApplicationController.new.render_to_string(
+    #     template: 'inst_books/show.json.jbuilder',
+    #     locals: {:@inst_book => @inst_book})
+    inst_book = params['inst_book']
 
-    # inst_book
-    # if params[:operation] == 'generate_course'
-    #   launch_url = request.protocol + request.host_with_port + "/lti/launch"
-    #   @job = Delayed::Job.enqueue GenerateCourseJob.new(params[:id], launch_url, current_user.id)
-    # else
-    #   @job = Delayed::Job.enqueue CompileBookJob.new(params[:id], current_user.id)
-    # end
+    # InstBook.save_data_from_json(inst_book, current_user)
+
+    redirect_to book_configure_path(:id => inst_book['id']), notice: 'Book configuration uploaded successfully!'
+
   end
 
   #~ Private instance methods .................................................

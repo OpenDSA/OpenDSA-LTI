@@ -25,7 +25,6 @@ $(document).on('focus', '.datepicker', function() {
   $(this).datepicker();
 });
 
-
 /*
  * The click event for the 'Show Options' button.
  */
@@ -49,12 +48,33 @@ $(document).on('click', '#new', function() {
  * The click event for the 'Save Book' button.
  * Currently, this saves the book as an html download object.
  */
-$(document).on('click', '#save', function() {
-  let json = buildJSON();
-  let download = document.getElementById('downloadLink');
-  download.href = makeFile(json);
-  alert("Ready for Download!");
-  $('#downloadLink').toggle();
+// $(document).on('click', '#odsa_save', function() {
+//   let json = buildJSON();
+//   let download = document.getElementById('downloadLink');
+//   download.href = makeFile(json);
+//   alert("Ready for Download!");
+//   $('#downloadLink').toggle();
+// });
+
+$(document).on('click', '#odsa_save', function() {
+  jQuery.ajax({
+    url: "/inst_books/update",
+    type: "POST",
+    data: JSON.stringify({
+      'inst_book': jsonFile
+    }),
+    contentType: "application/json; charset=utf-8",
+    datatype: "json",
+    xhrFields: {
+      withCredentials: true
+    },
+    success: function(data) {
+      console.log('success');
+    },
+    error: function(data) {
+      console.log('error');
+    }
+  });
 });
 
 /*
@@ -179,13 +199,13 @@ const encode = (key, val, index = -100) => {
     let output = "";
     if (index === 1) {
       output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><button class=\"odsa_button remove\">Delete</button><ul class=\"contain odsa_sortable\">";
-      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bbotstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bbotstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
     } else if (index === 2) {
       output += "<li class='odsa_li' id='" + htmlKey + "'><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
     } else if (index === 3) {
-      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bbotstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bbotstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
       output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
     } else {
       output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
@@ -217,6 +237,9 @@ const decode = (fileArray, chapter = true) => {
     } else if (fileArray[i].startsWith("input")) {
       let stringStart = fileArray[i].search("id=\"");
       let stringEnd = fileArray[i].search("\" type=");
+      console.log(fileArray[i]);
+      console.log(stringStart);
+      console.log(stringEnd);
       let id = "#" + fileArray[i].slice(stringStart + 4, stringEnd);
       let value = $(id).val();
       if (value === "true" || value === "false") {
@@ -303,6 +326,7 @@ const buildJSON = () => {
   let chapters = $('#chapters').html();
   chapters = chapters.replace(/readonly=/g, "");
   let chapterArray = prepArray(chapters);
+
   json += spacing + "\"chapters\": ";
   json += decode(chapterArray);
 
