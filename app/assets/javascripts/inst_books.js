@@ -190,7 +190,8 @@ const makeFile = function(textArray) {
  * Function to read in a json key and value pair and convert it into the
  * proper html to be dispayed to the user.
  */
-const encode = function(key, val, index = -100) {
+const encode = function(key, val, index) {
+  index = index || -100
   var htmlKey = "";
   if (key.includes("'")) {
     htmlKey = key.replace("'", "&#39;");
@@ -226,7 +227,8 @@ const encode = function(key, val, index = -100) {
  * Function to read in an array of html strings and convert it into a json
  * object.
  */
-const decode = function(fileArray, chapter = true) {
+const decode = function(fileArray, chapter ) {
+  chapter = chapter || true
   var jsonString = "";
   var spacing = "  ";
   for (i = 0; i < fileArray.length; i++) {
