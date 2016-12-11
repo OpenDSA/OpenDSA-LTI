@@ -488,6 +488,7 @@ DEPENDENCIES
   ims-lti (~> 1.1.8)
   jbuilder (~> 2.4, >= 2.4.1)
   jquery-rails
+  jquery-ui-rails
   js-routes
   json
   kaminari

@@ -1,0 +1,19 @@
+= render 'layouts/breadcrumb'
+
+:javascript
+  window.jsonFile = #{@inst_book_json.html_safe}
+
+#odsa_content
+  #instructions
+    %p Press the "Save Book" button to generate a link that will allow you to download your book configuration.
+  #dialog{:title => "Load Book"}
+  #navigation
+    / %button#odsa_new.odsa_button.ui-button.ui-corner-all New Book
+    / %button#odsa_load.odsa_button.ui-button.ui-corner-all Load Book
+    %button#odsa_save.odsa_button.ui-button.ui-corner-all Save Book
+    %a#downloadLink{:download => "Test.json"} Download
+  #header
+    #title
+    #heading
+    #options
+    #chapters

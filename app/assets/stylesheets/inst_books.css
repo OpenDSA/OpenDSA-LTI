@@ -1,0 +1,70 @@
+h1 {
+	width: 30%;
+}
+
+ul.odsa_ul {
+	list-style: none;
+	
+}
+
+ul.odsa_ul li ul {
+	display: none;
+}
+
+li.odsa_li a {
+	padding: 10px;
+}
+
+li.odsa_li a span {
+	padding: 5px;
+}
+
+li.odsa_li {
+	border: none !important;
+	padding: 15px;
+	margin: 10px;
+	width: 90%;
+}
+
+li.odsa_li button {
+	float: right;
+	width: 5%;
+}
+
+input.odsa_in {
+	width: 25%;
+}
+
+#odsa_content {
+	/*background-color: #fff7ea;*/
+	background-color: #f8eedf;
+	padding-top: 10px;
+	padding-left: 15px;
+	border: 2px solid #f8eedf;
+	border-radius: 5px;
+}
+
+#header {
+	margin-top: 15px;
+}
+
+#content {
+	padding-left: 10px;
+}
+
+#toggle {
+	margin-left: 20%;
+}
+
+#add {
+	margin-left: 20%;
+}
+
+#options {
+	display: none;
+}
+
+#downloadLink {
+	display: none;
+	padding: 20px;
+}
