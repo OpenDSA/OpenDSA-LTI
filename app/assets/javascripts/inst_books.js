@@ -1,6 +1,6 @@
-let textFile = null; // Temporary global variable used for download link.
+var textFile = null; // Temporary global variable used for download link.
 
-let nextId = 0; // Global variable used for tracking input ids.
+var nextId = 0; // Global variable used for tracking input ids.
 
 /*
  * Checks if a json file has been defined and, if not, prompts the user to select one.
@@ -49,8 +49,8 @@ $(document).on('click', '#new', function() {
  * Currently, this saves the book as an html download object.
  */
 // $(document).on('click', '#odsa_save', function() {
-//   let json = buildJSON();
-//   let download = document.getElementById('downloadLink');
+//   var json = buildJSON();
+//   var download = document.getElementById('downloadLink');
 //   download.href = makeFile(json);
 //   alert("Ready for Download!");
 //   $('#downloadLink').toggle();
@@ -84,11 +84,11 @@ $(document).on('click', '#odsa_save', function() {
  * This button loads the selected json book.
  */
 $(document).on('click', '#bookButton', function() {
-  let jsonBook = $('#Book option:selected').val() + $('#Book option:selected').text();
+  var jsonBook = $('#Book option:selected').val() + $('#Book option:selected').text();
 });
 
 /*
- * The click event for the 'Delete' buttons.
+ * The click event for the 'Devare' buttons.
  */
 $(document).on('click', '.remove', function() {
   $(this).parent().remove();
@@ -116,7 +116,7 @@ const listJSON = (url) => {
   $.ajax({
     url: url,
     success: function(data) {
-      let output = "<select id=\"Book\">";
+      var output = "<select id=\"Book\">";
       $(data).find("a:contains(.json)").each(function() {
         output += "<option value=\"" + url + "\">" + $(this).attr("href") + "</option>";
       });
@@ -140,7 +140,7 @@ const prepArray = (inputHTML) => {
   inputHTML = inputHTML.replace(/ style=""/g, "");
   inputHTML = inputHTML.replace(/ class="[^"]+"/g, "");
   inputHTML = inputHTML.replace(/ class=""/g, "");
-  let HTMLArray = inputHTML.split("<");
+  var HTMLArray = inputHTML.split("<");
   return HTMLArray;
 }
 
@@ -148,10 +148,10 @@ const prepArray = (inputHTML) => {
  * Function to return the 'value' element of the given html string.
  */
 const pullValue = (inputString) => {
-  let value = "";
+  var value = "";
   if (inputString.includes("value")) {
-    let stringStart = inputString.search("value=\"");
-    let stringEnd = inputString.search("\" type=");
+    var stringStart = inputString.search("value=\"");
+    var stringEnd = inputString.search("\" type=");
     value = inputString.slice(stringStart + 7, stringEnd);
   } else {
     value = "";
@@ -191,16 +191,16 @@ const makeFile = (textArray) => {
  * proper html to be dispayed to the user.
  */
 const encode = (key, val, index = -100) => {
-  let htmlKey = "";
+  var htmlKey = "";
   if (key.includes("'")) {
     htmlKey = key.replace("'", "&#39;");
   } else {
     htmlKey = key;
   }
   if (typeof val === 'object' && val !== null) {
-    let output = "";
+    var output = "";
     if (index === 1) {
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><button class=\"odsa_button remove\">Delete</button><ul class=\"contain odsa_sortable\">";
+      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><button class=\"odsa_button remove\">Devare</button><ul class=\"contain odsa_sortable\">";
       output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
       output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
     } else if (index === 2) {
@@ -227,23 +227,23 @@ const encode = (key, val, index = -100) => {
  * object.
  */
 const decode = (fileArray, chapter = true) => {
-  let jsonString = "";
-  let spacing = "  ";
+  var jsonString = "";
+  var spacing = "  ";
   for (i = 0; i < fileArray.length; i++) {
-    let line = "";
+    var line = "";
     if (fileArray[i].startsWith("li")) {
-      let stringStart = fileArray[i].search("id=\"");
-      let stringEnd = fileArray[i].search("\">");
-      let value = fileArray[i].slice(stringStart + 4, stringEnd);
+      var stringStart = fileArray[i].search("id=\"");
+      var stringEnd = fileArray[i].search("\">");
+      var value = fileArray[i].slice(stringStart + 4, stringEnd);
       line = spacing + "\"" + value + "\": ";
     } else if (fileArray[i].startsWith("input")) {
-      let stringStart = fileArray[i].search("id=\"");
-      let stringEnd = fileArray[i].search("\" type=");
+      var stringStart = fileArray[i].search("id=\"");
+      var stringEnd = fileArray[i].search("\" type=");
       console.log(fileArray[i]);
       console.log(stringStart);
       console.log(stringEnd);
-      let id = "#" + fileArray[i].slice(stringStart + 4, stringEnd);
-      let value = $(id).val();
+      var id = "#" + fileArray[i].slice(stringStart + 4, stringEnd);
+      var value = $(id).val();
       if (value === "true" || value === "false") {
         if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
           line = value + ",";
@@ -307,27 +307,27 @@ const decode = (fileArray, chapter = true) => {
  * Function to build a json file from the html on the page.
  */
 const buildJSON = () => {
-  let fileName = "Download.json";
+  var fileName = "Download.json";
   if ($('#1').val() != "") {
     fileName = $('#1').val();
   }
 
   $('#downloadLink').attr('download', fileName);
 
-  let json = "{\n";
-  let spacing = "  ";
+  var json = "{\n";
+  var spacing = "  ";
 
-  let header = $('#heading').html();
-  let headerArray = prepArray(header);
+  var header = $('#heading').html();
+  var headerArray = prepArray(header);
   json += decode(headerArray, false);
 
-  let options = $('#options').html();
-  let optionArray = prepArray(options);
+  var options = $('#options').html();
+  var optionArray = prepArray(options);
   json += decode(optionArray, false);
 
-  let chapters = $('#chapters').html();
+  var chapters = $('#chapters').html();
   chapters = chapters.replace(/readonly=/g, "");
-  let chapterArray = prepArray(chapters);
+  var chapterArray = prepArray(chapters);
 
   json += spacing + "\"chapters\": ";
   json += decode(chapterArray);
@@ -352,18 +352,18 @@ const addClasses = function() {
  * Function to build a new json book.
  */
 const newJSON = function() {
-  let titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
+  var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
   titleString += encode("file name", "");
   titleString += "</ul>";
   $('#title').html(titleString);
 
-  let headerString = "<ul class='odsa_ul'>";
+  var headerString = "<ul class='odsa_ul'>";
   headerString += encode("title", "");
   headerString += encode("desc", "");
   headerString += "</ul>";
   $('#heading').html(headerString);
 
-  let optionString = "<ul class='odsa_ul'>";
+  var optionString = "<ul class='odsa_ul'>";
   optionString += encode("build_dir", "Books");
   optionString += encode("code_dir", "SourceCode/");
   optionString += encode("lang", "en");
@@ -375,7 +375,7 @@ const newJSON = function() {
   optionString += "</ul>";
   $('#options').html(optionString);
 
-  let chapterString = "<h1> Chapters: </h1> <ul class=\"odsaul odsa_collapse\">";
+  var chapterString = "<h1> Chapters: </h1> <ul class=\"odsaul odsa_collapse\">";
   chapterString += "</ul>";
   $('#chapters').html(chapterString);
 
@@ -387,17 +387,17 @@ const newJSON = function() {
  */
 const loadJSON = function(jsonFile) {
 
-  let titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
+  var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
   titleString += "</ul>"
   $('#title').html(titleString);
 
-  let headerString = "<ul class='odsa_ul'>";
+  var headerString = "<ul class='odsa_ul'>";
   headerString += encode("title", jsonFile['title']);
   headerString += encode("desc", jsonFile['desc']);
   headerString += "</ul>";
   $('#heading').html(headerString);
 
-  let optionString = "<ul class='odsa_ul'>";
+  var optionString = "<ul class='odsa_ul'>";
   $.each(jsonFile, function(key, val) {
     if (!(key === "title" || key === "desc" || key === "chapters")) {
       optionString += encode(key, val);
@@ -406,7 +406,7 @@ const loadJSON = function(jsonFile) {
   optionString += "</ul>";
   $('#options').html(optionString);
 
-  let chapterString = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\">";
+  var chapterString = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\">";
   $.each(jsonFile['chapters'], function(key, val) {
     chapterString += encode(key, val, 1);
   });
