@@ -1,21 +1,22 @@
 .row
   .col-xs-9.alert-msg#alerts{style: 'display: none;'}
 .form-horizontal
-  %h4.text-danger '*' indicates a required field.
+  .form-group
+    .col-xs-offset-2.col-xs-3
+      %h4.text-danger '*' indicates a required field.
+
   .form-group
     = label_tag :lms_instance_select, 'LMS Instance:', class: 'control-label col-xs-1'
-    .col-xs-2
+    .col-xs-3
       = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
       { id: 'lms-instance-select', class: 'form-control' }
-    .col-xs-2
-      = link_to admin_lms_instances_path, title: "this text appears when you hover", class: 'btn btn-default' do
-        %i.glyphicon.glyphicon-new-window
     .col-xs-1
-      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#lms-instance-help-modal' } }
+      = link_to admin_lms_instances_path, title: "Create new LMS Instance", class: 'btn btn-default' do
+        %i.glyphicon.glyphicon-new-window
 
   .form-group
     = label_tag :name, 'LMS Course Id *', class: 'control-label col-xs-2'
-    .col-lg-7.col-md-6.col-xs-7
+    .col-lg-5.col-md-5.col-xs-5
       = text_field_tag :lms_course_id, nil, id: 'lms-course-id', class: 'form-control', maxlength: 25
       %small.col-xs-11.text.text-warning
         Copy the course Id from the end of Canvas course URL (e.g. Course Id of https://canvas.instructure.com/courses/1076903 is 1076903).
@@ -23,44 +24,45 @@
 
   .form-group
     = label_tag :name, 'LMS Course Name *', class: 'control-label col-xs-2'
-    .col-lg-7.col-md-6.col-xs-7
+    .col-lg-5.col-md-5.col-xs-5
       = text_field_tag :lms_course_name, nil, id: 'lms-course-name', class: 'form-control', maxlength: 25
       %small.col-xs-11.text.text-warning
         Canvas course name.
 
   .form-group
     = label_tag :organization_select, 'Organization:', class: 'control-label col-xs-1'
-    .col-xs-2
+    .col-xs-3
       = collection_select nil, nil, Organization.all, :id, :name, { prompt: 'Select', selected: nil },
       { id: 'organization-select', class: 'form-control' }
-    .col-xs-2
-      = button_link 'New Organization', admin_organizations_path
     .col-xs-1
-      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#org-help-modal' } }
+      = link_to admin_organizations_path, title: "Create new organization", class: 'btn btn-default' do
+        %i.glyphicon.glyphicon-new-window
 
   .form-group
     = label_tag :course_select, 'Course:', class: 'control-label col-xs-1'
-    .col-xs-2
+    .col-xs-3
       = collection_select nil, nil, Course.all, :id, :display_name, { prompt: 'Select', selected: nil },
       { id: 'course-select', class: 'form-control' }
-    .col-xs-2
-      = button_link 'New course', admin_courses_path
+    .col-xs-1
+      = link_to admin_courses_path, title: "Create new course", class: 'btn btn-default' do
+        %i.glyphicon.glyphicon-new-window
     .col-xs-1
       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#course-help-modal' } }
 
   .form-group
     = label_tag :term_select, 'Term:', class: 'control-label col-xs-1'
-    .col-xs-2
+    .col-xs-3
       = collection_select nil, nil, Term.all, :id, :display_name, { prompt: 'Select', selected: nil },
       { id: 'term-select', class: 'form-control' }
-    .col-xs-2
-      = button_link 'New Term', admin_terms_path
+    .col-xs-1
+      = link_to admin_courses_path, title: "Create new term", class: 'btn btn-default' do
+        %i.glyphicon.glyphicon-new-window
     .col-xs-1
       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#term-help-modal' } }
 
   .form-group
     = label_tag :name, 'Label *', class: 'control-label col-xs-2'
-    .col-lg-7.col-md-6.col-xs-7
+    .col-lg-5.col-md-5.col-xs-5
       = text_field_tag :name, nil, id: 'label', class: 'form-control', maxlength: 25,
         placeholder: 'e.g. TR 10:00am'
       %small.col-xs-11.text.text-warning
@@ -68,21 +70,23 @@
 
   .form-group
     = label_tag :late_policy_select, 'Late Policy:', class: 'control-label col-xs-1'
-    .col-xs-2
+    .col-xs-3
       = collection_select nil, nil, LatePolicy.all, :id, :name, { prompt: 'Select', selected: nil },
       { id: 'late-policy-select', class: 'form-control' }
-    .col-xs-2
-      = button_link 'New Late Policy', admin_late_policies_path
+    .col-xs-1
+      = link_to admin_late_policies_path, title: "Create new late policy", class: 'btn btn-default' do
+        %i.glyphicon.glyphicon-new-window
     .col-xs-1
       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#late-policy-help-modal' } }
 
   .form-group
     = label_tag :inst_book_select, 'Book Instance:', class: 'control-label col-xs-1'
-    .col-xs-2
+    .col-xs-3
       = collection_select nil, nil, InstBook.all, :id, :title, { prompt: 'Select', selected: nil },
       { id: 'inst-book-select', class: 'form-control' }
-    .col-xs-2
-      = button_link 'New Book', admin_inst_books_path
+    .col-xs-1
+      = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default' do
+        %i.glyphicon.glyphicon-new-window
     .col-xs-1
       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#inst-book-help-modal' } }
 
@@ -158,6 +162,8 @@
           %thead
             %th Id
             %th Name
+            %th Starts on
+            %th Ends on
           %tbody
             - Term.all.each do |term|
               %tr
@@ -165,6 +171,10 @@
                   = term.id
                 %td
                   = term.display_name
+                %td
+                  = term.starts_on
+                %td
+                  = term.ends_on
 
 #late-policy-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
   .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
@@ -176,6 +186,8 @@
           %thead
             %th Id
             %th Name
+            %th Late days
+            %th Penalty percent
           %tbody
             - LatePolicy.all.each do |late_policy|
               %tr
@@ -183,6 +195,10 @@
                   = late_policy.id
                 %td
                   = late_policy.name
+                %td
+                  = late_policy.late_days
+                %td
+                  = late_policy.late_percent
 
 #inst-book-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
   .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
@@ -196,7 +212,7 @@
             %th Title
             %th Description
           %tbody
-            - InstBook.all.each do |inst_book|
+            - InstBook.template.each do |inst_book|
               %tr
                 %td
                   = inst_book.id
