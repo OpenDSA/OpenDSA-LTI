@@ -1,4 +1,3 @@
-
 .row
   .col-xs-9.alert-msg#alerts{style: 'display: none;'}
 .form-horizontal
@@ -11,7 +10,7 @@
     .col-xs-3
       = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
       { id: 'lms-instance-select', class: 'form-control' }
-    #lms-access-update-btn.col-xs-1.hidden
+    #lms-access-update-btn.col-xs-1
       = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas", class: 'btn btn-default' do
         %i.glyphicon.glyphicon-new-window
 
@@ -80,16 +79,16 @@
       %small.col-xs-11.text.text-warning
         Write a label for each course section.
 
-  .form-group
-    = label_tag :late_policy_select, 'Late Policy:', class: 'control-label col-xs-1'
-    .col-xs-3
-      = collection_select nil, nil, LatePolicy.all, :id, :name, { prompt: 'Select', selected: nil },
-      { id: 'late-policy-select', class: 'form-control' }
-    .col-xs-1
-      = link_to admin_late_policies_path, title: "Create new late policy", class: 'btn btn-default' do
-        %i.glyphicon.glyphicon-new-window
-    .col-xs-1
-      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#late-policy-help-modal' } }
+  / .form-group
+  /   = label_tag :late_policy_select, 'Late Policy:', class: 'control-label col-xs-1'
+  /   .col-xs-3
+  /     = collection_select nil, nil, LatePolicy.all, :id, :name, { prompt: 'Select', selected: nil },
+  /     { id: 'late-policy-select', class: 'form-control' }
+  /   .col-xs-1
+  /     = link_to admin_late_policies_path, title: "Create new late policy", class: 'btn btn-default' do
+  /       %i.glyphicon.glyphicon-new-window
+  /   .col-xs-1
+  /     %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#late-policy-help-modal' } }
 
   .form-group
     = label_tag :inst_book_select, 'Book Instance:', class: 'control-label col-xs-1'

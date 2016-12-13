@@ -34,14 +34,14 @@ class CourseOfferingsController < ApplicationController
     lms_instance = LmsInstance.find_by(id: params[:lms_instance_id])
     course = Course.find_by(id: params[:course_id])
     term = Term.find_by(id: params[:term_id])
-    late_policy = LatePolicy.find_by(id: params[:late_policy_id])
+    # late_policy = LatePolicy.find_by(id: params[:late_policy_id])
     inst_book = InstBook.find_by(id: params[:inst_book_id])
 
     course_offering = CourseOffering.new(
                                          course: course,
                                          term: term,
                                          label: params[:label],
-                                         late_policy: late_policy || nil,
+                                         # late_policy: late_policy || nil,
                                          lms_instance: lms_instance,
                                          lms_course_code: params[:lms_course_id],
                                          lms_course_num: params[:lms_course_name])
