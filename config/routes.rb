@@ -80,6 +80,8 @@ CodeWorkout::Application.routes.draw do
   # get 'sse/feedback_update'
   get 'sse/feedback_poll'
   post '/course_offerings/:id/upload_roster' => 'course_offerings#upload_roster'
+  get '/course_offerings/new' => 'course_offerings#new', as: :new_course_offerings
+  post '/course_offerings' => 'course_offerings#create', as: :create_course_offerings
 
   get '/request_extension' => 'workout_offerings#request_extension'
   post '/add_extension' => 'workout_offerings#add_extension'

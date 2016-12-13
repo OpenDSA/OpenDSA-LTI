@@ -1,6 +1,6 @@
 class CourseOfferingsController < ApplicationController
   before_filter :rename_course_offering_id_param
-  load_and_authorize_resource
+  # load_and_authorize_resource
 
 
   # -------------------------------------------------------------
@@ -31,16 +31,46 @@ class CourseOfferingsController < ApplicationController
   # -------------------------------------------------------------
   # POST /course_offerings
   def create
-    @course_offering = CourseOffering.new(course_offering_params)
+    lms_instance = LmsInstance.find_by(id: params[:lms_instance_id])
+    course = Course.find_by(id: params[:course_id])
+    term = Term.find_by(id: params[:term_id])
+    late_policy = LatePolicy.find_by(id: params[:late_policy_id])
+    inst_book = InstBook.find_by(id: params[:inst_book_id])
 
-    if @course_offering.save
-      redirect_to organization_course_path(
-        @course_offering.course.organization,
-        @course_offering.course,
-        @course_offering.term),
-        notice: "#{@course_offering.display_name} was successfully created."
+    course_offering = CourseOffering.new(
+                                         course: course,
+                                         term: term,
+                                         label: params[:label],
+                                         late_policy: late_policy || nil,
+                                         lms_instance: lms_instance,
+                                         lms_course_code: params[:lms_course_id],
+                                         lms_course_num: params[:lms_course_name],
+                                         lms_instance: lms_instance)
+
+    cloned_book = inst_book.clone(current_user)
+
+    if course_offering.save!
+      # Add course_offering to the new book
+      cloned_book.course_offering_id = course_offering.id
+      cloned_book.save!
+
+      # Enroll user as course_offering instructor
+      enrollment = CourseEnrollment.new
+      enrollment.course_offering_id = course_offering.id
+      enrollment.user_id = current_user.id
+      enrollment.course_role_id = CourseRole.instructor.id
+      enrollment.save!
+
+      url = url_for(organization_course_path(
+          course_offering.course.organization,
+          course_offering.course,
+          course_offering.term))
     else
-      render action: 'new'
+      err_string = 'There was a problem while creating the workout.'
+      url = url_for new_course_offerings_path(notice: err_string)
+    end
+    respond_to do |format|
+      format.json { render json: { url: url } }
     end
   end
 

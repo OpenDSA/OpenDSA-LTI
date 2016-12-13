@@ -1,10 +1,206 @@
-= semantic_form_for @course_offering, html: { class: "form-horizontal" } do |f|
-  = f.semantic_errors
-  = f.inputs
-  = link_to "<i class=\"icon-upload\"> Upload Roster</i>".html_safe,
-    upload_roster_path(@course_offering),
-    class: "btn btn-inverse",
-    remote: true
-  %a.btn{"data-toggle" => "modal", href: "#upload_roster_modal", role: "button"} Modal
-  = f.actions do
-    = f.action :submit, as: :button, button_html: { class: 'btn btn-primary' }
+.row
+  .col-xs-9.alert-msg#alerts{style: 'display: none;'}
+.form-horizontal
+  %h4.text-danger '*' indicates a required field.
+  .form-group
+    = label_tag :lms_instance_select, 'LMS Instance:', class: 'control-label col-xs-1'
+    .col-xs-2
+      = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
+      { id: 'lms-instance-select', class: 'form-control' }
+    .col-xs-2
+      = link_to admin_lms_instances_path, title: "this text appears when you hover", class: 'btn btn-default' do
+        %i.glyphicon.glyphicon-new-window
+    .col-xs-1
+      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#lms-instance-help-modal' } }
+
+  .form-group
+    = label_tag :name, 'LMS Course Id *', class: 'control-label col-xs-2'
+    .col-lg-7.col-md-6.col-xs-7
+      = text_field_tag :lms_course_id, nil, id: 'lms-course-id', class: 'form-control', maxlength: 25
+      %small.col-xs-11.text.text-warning
+        Copy the course Id from the end of Canvas course URL (e.g. Course Id of https://canvas.instructure.com/courses/1076903 is 1076903).
+
+
+  .form-group
+    = label_tag :name, 'LMS Course Name *', class: 'control-label col-xs-2'
+    .col-lg-7.col-md-6.col-xs-7
+      = text_field_tag :lms_course_name, nil, id: 'lms-course-name', class: 'form-control', maxlength: 25
+      %small.col-xs-11.text.text-warning
+        Canvas course name.
+
+  .form-group
+    = label_tag :organization_select, 'Organization:', class: 'control-label col-xs-1'
+    .col-xs-2
+      = collection_select nil, nil, Organization.all, :id, :name, { prompt: 'Select', selected: nil },
+      { id: 'organization-select', class: 'form-control' }
+    .col-xs-2
+      = button_link 'New Organization', admin_organizations_path
+    .col-xs-1
+      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#org-help-modal' } }
+
+  .form-group
+    = label_tag :course_select, 'Course:', class: 'control-label col-xs-1'
+    .col-xs-2
+      = collection_select nil, nil, Course.all, :id, :display_name, { prompt: 'Select', selected: nil },
+      { id: 'course-select', class: 'form-control' }
+    .col-xs-2
+      = button_link 'New course', admin_courses_path
+    .col-xs-1
+      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#course-help-modal' } }
+
+  .form-group
+    = label_tag :term_select, 'Term:', class: 'control-label col-xs-1'
+    .col-xs-2
+      = collection_select nil, nil, Term.all, :id, :display_name, { prompt: 'Select', selected: nil },
+      { id: 'term-select', class: 'form-control' }
+    .col-xs-2
+      = button_link 'New Term', admin_terms_path
+    .col-xs-1
+      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#term-help-modal' } }
+
+  .form-group
+    = label_tag :name, 'Label *', class: 'control-label col-xs-2'
+    .col-lg-7.col-md-6.col-xs-7
+      = text_field_tag :name, nil, id: 'label', class: 'form-control', maxlength: 25,
+        placeholder: 'e.g. TR 10:00am'
+      %small.col-xs-11.text.text-warning
+        Diffrenciate multiple course sections with the label.
+
+  .form-group
+    = label_tag :late_policy_select, 'Late Policy:', class: 'control-label col-xs-1'
+    .col-xs-2
+      = collection_select nil, nil, LatePolicy.all, :id, :name, { prompt: 'Select', selected: nil },
+      { id: 'late-policy-select', class: 'form-control' }
+    .col-xs-2
+      = button_link 'New Late Policy', admin_late_policies_path
+    .col-xs-1
+      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#late-policy-help-modal' } }
+
+  .form-group
+    = label_tag :inst_book_select, 'Book Instance:', class: 'control-label col-xs-1'
+    .col-xs-2
+      = collection_select nil, nil, InstBook.all, :id, :title, { prompt: 'Select', selected: nil },
+      { id: 'inst-book-select', class: 'form-control' }
+    .col-xs-2
+      = button_link 'New Book', admin_inst_books_path
+    .col-xs-1
+      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#inst-book-help-modal' } }
+
+  .form-group
+    .col-xs-offset-2.col-xs-2
+      %button#btn-submit-wo.btn.btn-primary Submit
+
+
+#lms-instance-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead LMS Instances Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th URL
+          %tbody
+            - LmsInstance.all.each do |lms_instance|
+              %tr
+                %td
+                  = lms_instance.id
+                %td
+                  = lms_instance.url
+
+#org-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Organization Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Name
+            %th Abbreviation
+          %tbody
+            - Organization.all.each do |org|
+              %tr
+                %td
+                  = org.id
+                %td
+                  = org.name
+                %td
+                  = org.abbreviation
+
+#course-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Course Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Name
+          %tbody
+            - Course.all.each do |course|
+              %tr
+                %td
+                  = course.id
+                %td
+                  = course.display_name
+
+#term-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Term Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Name
+          %tbody
+            - Term.all.each do |term|
+              %tr
+                %td
+                  = term.id
+                %td
+                  = term.display_name
+
+#late-policy-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Late Policy Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Name
+          %tbody
+            - LatePolicy.all.each do |late_policy|
+              %tr
+                %td
+                  = late_policy.id
+                %td
+                  = late_policy.name
+
+#inst-book-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Book Instances Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Title
+            %th Description
+          %tbody
+            - InstBook.all.each do |inst_book|
+              %tr
+                %td
+                  = inst_book.id
+                %td
+                  = inst_book.title
+                %td
+                  = inst_book.desc
