@@ -48,15 +48,22 @@ $(document).on('click', '#new', function() {
  * The click event for the 'Save Book' button.
  * Currently, this saves the book as an html download object.
  */
-// $(document).on('click', '#odsa_save', function() {
-//   let json = buildJSON();
-//   let download = document.getElementById('downloadLink');
-//   download.href = makeFile(json);
-//   alert("Ready for Download!");
-//   $('#downloadLink').toggle();
-// });
+/*
+ $(document).on('click', '#odsa_save', function() {
+   let json = buildJSON();
+   let download = document.getElementById('downloadLink');
+   let jsonOb = JSON.parse(json);
+   json = JSON.stringify(jsonOb);
+   download.href = makeFile(json);
+   alert("Ready for Download!");
+   $('#downloadLink').toggle();
+ });
+*/
+
 
 $(document).on('click', '#odsa_save', function() {
+  //bookConfig = buildJSON();
+  //alert(JSON.parse(bookConfig));
   jQuery.ajax({
     url: "/inst_books/update",
     type: "POST",
@@ -79,6 +86,7 @@ $(document).on('click', '#odsa_save', function() {
   });
 });
 
+
 /*
  * The click event for the 'Book Button' button.
  * This button loads the selected json book.
@@ -91,7 +99,7 @@ $(document).on('click', '#bookButton', function() {
  * The click event for the 'Delete' buttons.
  */
 $(document).on('click', '.remove', function() {
-  $(this).parent().remove();
+  $(this).parent().parent().parent().remove();
 });
 
 /*
@@ -99,12 +107,12 @@ $(document).on('click', '.remove', function() {
  */
 $(document).on('click', '.odsa_collapse li a', function() {
   $(this).parent().children('ul').toggle();
-  if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-down')) {
-    $(this).children('span').removeClass('glyphicon glyphicon-chevron-down');
-    $(this).children('span').addClass('glyphicon glyphicon-chevron-right');
-  } else if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-right')) {
+  if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-right')) {
     $(this).children('span').removeClass('glyphicon glyphicon-chevron-right');
-    $(this).children('span').addClass('glyphicon glyphicon-chevron-down');
+    $(this).children('span').addClass('glyphicon glyphicon-chevron-down'); 
+  } else if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-down')) { 
+    $(this).children('span').removeClass('glyphicon glyphicon-chevron-down'); 
+    $(this).children('span').addClass('glyphicon glyphicon-chevron-right');
   }
 });
 
@@ -186,6 +194,18 @@ const makeFile = (textArray) => {
   return textFile;
 }
 
+const dropdown = () => {
+  let html = "<div class=\"dropdown\">";
+  html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
+  html += "<ul class=\"dropdown-menu\">";
+  html += "<li class=\"due-date\"><a>Set Due Dates</a></li>";
+  html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
+  html += "</ul></div>";
+  return html;
+}
+
+//odsa_save.odsa_button.ui-button.ui-corner-all
+
 /*
  * Function to read in a json key and value pair and convert it into the
  * proper html to be dispayed to the user.
@@ -200,17 +220,18 @@ const encode = (key, val, index = -100) => {
   if (typeof val === 'object' && val !== null) {
     let output = "";
     if (index === 1) {
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><button class=\"odsa_button remove\">Delete</button><ul class=\"contain odsa_sortable\">";
-      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      //output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><button class=\"odsa_button remove\">Delete</button><ul class=\"contain odsa_sortable\">";
+      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a>" + dropdown() + "<ul class=\"contain odsa_sortable\">";
+      //output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      //output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
     } else if (index === 2) {
-      output += "<li class='odsa_li' id='" + htmlKey + "'><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id='" + htmlKey + "'><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
     } else if (index === 3) {
       output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
       output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
     } else {
-      output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
     }
     for (var entry in val) {
       output = output + encode(entry, val[entry], index + 1);
@@ -261,7 +282,8 @@ const decode = (fileArray, chapter = true) => {
           line = "\"" + value + "\",";
         }
       } else {
-        if ((!chapter) || (i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
+        //alert(fileArray[i + 2]);
+        if ((!chapter) || (i + 2 < fileArray.length) && ((fileArray[i + 2].startsWith("li")) || (fileArray[i + 2].startsWith("/li")))) {
           line = "\"" + value + "\",";
         } else {
           line = "\"" + value + "\"";
@@ -307,12 +329,12 @@ const decode = (fileArray, chapter = true) => {
  * Function to build a json file from the html on the page.
  */
 const buildJSON = () => {
-  let fileName = "Download.json";
-  if ($('#1').val() != "") {
-    fileName = $('#1').val();
-  }
+  //let fileName = "Download.json";
+  //if ($('#1').val() != "") {
+  //  fileName = $('#1').val();
+  //}
 
-  $('#downloadLink').attr('download', fileName);
+  //$('#downloadLink').attr('download', fileName);
 
   let json = "{\n";
   let spacing = "  ";
