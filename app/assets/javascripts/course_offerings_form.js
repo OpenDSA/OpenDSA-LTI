@@ -7,11 +7,14 @@
       return load_courses();
     });
 
+    $('#lms-instance-select').change(function() { //change majors when user changes school
+      return handle_lms_access();
+    });
+
     return $('#btn-submit-co').click(function() {
       return handle_submit();
     });
   });
-
 
   load_courses = function() {
     var request = "/courses/" + $('#organization-select').val() + "/search";
@@ -27,6 +30,28 @@
     });
   };
 
+  handle_lms_access = function() {
+    if ($('#lms-instance-select').val()) {
+      var request = "/lms_accesses/" + $('#lms-instance-select').val() + "/search";
+
+      var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize()
+      }).done(function(data) {
+        if (data) {
+          $("#lms-access-update-btn").show();
+          $("#lms-access-token").hide();
+        } else {
+          $("#lms-access-update-btn").hide();
+          $("#lms-access-token").show();
+        }
+      }).fail(function(data) {
+        console.log('AJAX request has FAILED');
+      });
+    }
+  };
+
   //modify the course dropdown
   change_courses = function(data) {
     $("#course-select").empty();
@@ -38,12 +63,7 @@
   };
 
   init = function() {
-    var description;
-    description = $('textarea#description').data('value');
-    $('textarea#description').val(description);
-    init_templates();
-    init_datepickers();
-    return validate_workout_name();
+    $("#lms-access-update-btn").hide();
   };
 
   remove_extensions_if_any = function(course_offering_id) {

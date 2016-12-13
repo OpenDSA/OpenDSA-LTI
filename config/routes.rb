@@ -83,6 +83,8 @@ CodeWorkout::Application.routes.draw do
   get '/course_offerings/new' => 'course_offerings#new', as: :new_course_offerings
   post '/course_offerings' => 'course_offerings#create', as: :create_course_offerings
 
+  get '/lms_accesses/:lms_instance_id/search' => 'lms_accesses#search', as: :lms_access_search
+
   get '/request_extension' => 'workout_offerings#request_extension'
   post '/add_extension' => 'workout_offerings#add_extension'
 

@@ -11,11 +11,11 @@
     .col-xs-3
       = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
       { id: 'lms-instance-select', class: 'form-control' }
-    .col-xs-1
+    #lms-access-update-btn.col-xs-1.hidden
       = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas", class: 'btn btn-default' do
         %i.glyphicon.glyphicon-new-window
 
-  .form-group
+  #lms-access-token.form-group
     = label_tag :name, 'Canvas access token', class: 'control-label col-xs-2'
     .col-lg-5.col-md-5.col-xs-5
       = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 25,
