@@ -19,7 +19,7 @@ class InstBook < ActiveRecord::Base
 
   paginates_per 100
 
-  scope :template, -> {where template: 1}
+  scope :template, -> {where "template = ?", 1}
 
   #~ Validation ...............................................................
   #~ Constants ................................................................

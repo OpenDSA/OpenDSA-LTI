@@ -1,7 +1,7 @@
 ActiveAdmin.register Term, sort_order: :created_at_asc do
   menu parent: 'University-oriented', priority: 10
   permit_params :year, :starts_on, :ends_on, :season
-  actions :all, except: [:destroy]
+  actions :all, except: [:destroy, :edit]
 
   index do
     id_column

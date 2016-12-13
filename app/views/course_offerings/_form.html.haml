@@ -1,29 +1,41 @@
+
 .row
   .col-xs-9.alert-msg#alerts{style: 'display: none;'}
 .form-horizontal
   .form-group
     .col-xs-offset-2.col-xs-3
-      %h4.text-danger '*' indicates a required field.
+      %h4.text-danger All fileds are required.
 
   .form-group
-    = label_tag :lms_instance_select, 'LMS Instance:', class: 'control-label col-xs-1'
+    = label_tag :lms_instance_select, 'Canvas Instance:', class: 'control-label col-xs-1'
     .col-xs-3
       = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
       { id: 'lms-instance-select', class: 'form-control' }
     .col-xs-1
-      = link_to admin_lms_instances_path, title: "Create new LMS Instance", class: 'btn btn-default' do
+      = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas", class: 'btn btn-default' do
         %i.glyphicon.glyphicon-new-window
 
   .form-group
-    = label_tag :name, 'LMS Course Id *', class: 'control-label col-xs-2'
+    = label_tag :name, 'Canvas access token', class: 'control-label col-xs-2'
+    .col-lg-5.col-md-5.col-xs-5
+      = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 25,
+        placeholder: 'e.g. 7~iYir4J6xo9iMXigxIM9BEqP5zWhJiUyuO845P83aEit2doF9Ed0nrO70qceI3Cr2'
+      %small.col-xs-11.text.text-warning
+        Put your Canvas access token for the selected Canvas
+        instance. If you have not already created a Canvas access token,
+        then follow the instructions <a href="https://guides.instructure.com/m/4214/l/40399-how-do-i-obtain-an-api-access-token-for-an-account" target="_blank">here</a>
+        to make one.
+
+  .form-group
+    = label_tag :name, 'Canvas course Id', class: 'control-label col-xs-2'
     .col-lg-5.col-md-5.col-xs-5
       = text_field_tag :lms_course_id, nil, id: 'lms-course-id', class: 'form-control', maxlength: 25
       %small.col-xs-11.text.text-warning
-        Copy the course Id from the end of Canvas course URL (e.g. Course Id of https://canvas.instructure.com/courses/1076903 is 1076903).
+        Create a new course at the selected canvas instance and copy the course Id here (e.g. Course Id of https://canvas.instructure.com/courses/1076903 is 1076903).
 
 
   .form-group
-    = label_tag :name, 'LMS Course Name *', class: 'control-label col-xs-2'
+    = label_tag :name, 'Canvas course Name', class: 'control-label col-xs-2'
     .col-lg-5.col-md-5.col-xs-5
       = text_field_tag :lms_course_name, nil, id: 'lms-course-name', class: 'form-control', maxlength: 25
       %small.col-xs-11.text.text-warning
@@ -52,21 +64,21 @@
   .form-group
     = label_tag :term_select, 'Term:', class: 'control-label col-xs-1'
     .col-xs-3
-      = collection_select nil, nil, Term.all, :id, :display_name, { prompt: 'Select', selected: nil },
+      = collection_select nil, nil, Term.on_or_future, :id, :display_name, { prompt: 'Select', selected: nil },
       { id: 'term-select', class: 'form-control' }
     .col-xs-1
-      = link_to admin_courses_path, title: "Create new term", class: 'btn btn-default' do
+      = link_to admin_terms_path, title: "Create new term", class: 'btn btn-default' do
         %i.glyphicon.glyphicon-new-window
     .col-xs-1
       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#term-help-modal' } }
 
   .form-group
-    = label_tag :name, 'Label *', class: 'control-label col-xs-2'
+    = label_tag :name, 'Label', class: 'control-label col-xs-2'
     .col-lg-5.col-md-5.col-xs-5
       = text_field_tag :name, nil, id: 'label', class: 'form-control', maxlength: 25,
         placeholder: 'e.g. TR 10:00am'
       %small.col-xs-11.text.text-warning
-        Diffrenciate multiple course sections with the label.
+        Write a label for each course section.
 
   .form-group
     = label_tag :late_policy_select, 'Late Policy:', class: 'control-label col-xs-1'
@@ -82,7 +94,7 @@
   .form-group
     = label_tag :inst_book_select, 'Book Instance:', class: 'control-label col-xs-1'
     .col-xs-3
-      = collection_select nil, nil, InstBook.all, :id, :title, { prompt: 'Select', selected: nil },
+      = collection_select nil, nil, InstBook.template, :id, :title, { prompt: 'Select', selected: nil },
       { id: 'inst-book-select', class: 'form-control' }
     .col-xs-1
       = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default' do
@@ -92,7 +104,7 @@
 
   .form-group
     .col-xs-offset-2.col-xs-2
-      %button#btn-submit-wo.btn.btn-primary Submit
+      %button#btn-submit-co.btn.btn-primary Submit
 
 
 #lms-instance-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
@@ -144,6 +156,7 @@
           %thead
             %th Id
             %th Name
+            %th Organization
           %tbody
             - Course.all.each do |course|
               %tr
@@ -151,6 +164,8 @@
                   = course.id
                 %td
                   = course.display_name
+                %td
+                  = course.organization.name
 
 #term-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
   .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
@@ -165,7 +180,7 @@
             %th Starts on
             %th Ends on
           %tbody
-            - Term.all.each do |term|
+            - Term.on_or_future.each do |term|
               %tr
                 %td
                   = term.id
@@ -181,6 +196,8 @@
     .modal-content
       .modal-header
         %p.lead Late Policy Information
+        Late days are the number of days (after deadline) during which the penalty percent will be applied.
+        After late days, student submissions will be recorded but they will not be graded.
       .modal-body
         %table.table
           %thead

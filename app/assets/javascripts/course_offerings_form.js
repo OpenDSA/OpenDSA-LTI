@@ -1,142 +1,41 @@
 (function() {
   var check_completeness, clear_student_search, disable_dates, form_alert, get_exercises, get_offerings, get_offerings_with_extensions, handle_submit, init, init_datepickers, init_exercises, init_row_datepickers, init_student_extensions, init_templates, remove_extensions_if_any, reset_alert_area, search_students, validate_workout_name;
 
-  $('.workouts.new, .workouts.edit, .workouts.clone').ready(function() {
-    var sortable;
-    if (window.codeworkout == null) {
-      window.codeworkout = {};
-    }
-    window.codeworkout.removed_exercises = [];
-    window.codeworkout.removed_offerings = [];
-    window.codeworkout.removed_extensions = [];
-    init();
-    sortable = $('#ex-list').sortable({
-      handle: '.handle'
+  $(document).ready(function() {
+
+    $('#organization-select').change(function() { //change majors when user changes school
+      return load_courses();
     });
-    $('#wo-name').change(function() {
-      return validate_workout_name();
-    });
-    $('.search-results').on('click', '.add-ex', function() {
-      var data, ex_id, ex_name, template;
-      $('.empty-msg').css('display', 'none');
-      $('#ex-list').css('display', 'block');
-      ex_name = $(this).data('ex-name');
-      ex_id = $(this).data('ex-id');
-      data = {
-        name: ex_name,
-        id: ex_id,
-        points: 0
-      };
-      template = Mustache.render($(window.codeworkout.exercise_template).filter('#exercise-template').html(), data);
-      return $('#ex-list').append(template);
-    });
-    $('#course-offerings').on('click', 'a', function() {
-      var course_offering_display, course_offering_id, row, row_fields;
-      course_offering_id = $(this).data('course-offering-id');
-      course_offering_display = $(this).text().trim();
-      row = $($('#add-offering-form tbody').html());
-      row_fields = row.find('td');
-      $(row_fields[0]).data('course-offering-id', course_offering_id);
-      $(row_fields[0]).find('.display').html(course_offering_display);
-      init_row_datepickers(row);
-      $(this).remove();
-      $('#offerings-modal').modal('hide');
-      return $('#workout-offering-fields tbody').append(row);
-    });
-    $('#workout-offering-fields').on('click', '.delete-offering', function() {
-      var course_offering_display, course_offering_id, delete_confirmed, removable, row, unused_row, workout_offering_id;
-      row = $(this).closest('tr');
-      workout_offering_id = row.data('id');
-      course_offering_id = row.find('.course-offering').data('course-offering-id');
-      course_offering_display = row.find('.course-offering .display').text();
-      removable = $(this).data('removable');
-      if (removable) {
-        delete_confirmed = false;
-        if (course_offering_id !== '') {
-          delete_confirmed = remove_extensions_if_any(parseInt(course_offering_id));
-        }
-        if (delete_confirmed) {
-          if ((workout_offering_id != null) && workout_offering_id !== '') {
-            window.codeworkout.removed_offerings.push(workout_offering_id);
-          }
-          row.remove();
-          $('#offerings-modal .msg').empty();
-          unused_row = "<a class='list-group-item action' data-course-offering-id='" + course_offering_id + "'>" + course_offering_display + "</a>";
-          return $('#offerings-modal #course-offerings').append(unused_row);
-        }
-      } else {
-        return alert('Cannot delete this workout. Some students have already attempted it.');
-      }
-    });
-    $('#workout-offering-fields').on('click', '.add-extension', function() {
-      var course_offering, course_offering_id;
-      course_offering = $(this).closest('tr').find('.course-offering small').text();
-      course_offering_id = $(this).closest('tr').find('.course-offering').data('course-offering-id');
-      clear_student_search();
-      $('#extension-modal').data('course-offering', {
-        id: course_offering_id,
-        display: course_offering
-      });
-      $('#extension-modal #modal-header').append('Searching for students from <u>' + course_offering + '</u>');
-      $('#btn-student-search').click(function() {
-        return search_students(course_offering_id);
-      });
-      return $('#terms').keydown(function(e) {
-        if (e.keyCode === 13) {
-          return search_students(course_offering_id);
-        }
-      });
-    });
-    $('#students').on('click', 'a', function() {
-      var course_offering, data, student, template;
-      course_offering = $('#extension-modal').data('course-offering');
-      student = {
-        id: $(this).data('student-id'),
-        display: $(this).text()
-      };
-      data = {
-        course_offering_id: course_offering.id,
-        course_offering_display: course_offering.display,
-        student_display: student.display,
-        student_id: student.id
-      };
-      template = $(Mustache.render($(window.codeworkout.student_extension_template).filter('#extension-template').html(), data));
-      $('#student-extension-fields tbody').append(template);
-      $('#extension-modal').modal('hide');
-      $('#extensions').css('display', 'block');
-      return init_row_datepickers(template);
-    });
-    $(document).on('click', '.delete-extension', function() {
-      var extension_id, extensions, row;
-      row = $(this).closest('tr');
-      extension_id = row.data('id');
-      if ((extension_id != null) && extension_id !== '') {
-        window.codeworkout.removed_extensions.push(extension_id);
-      }
-      row.remove();
-      extensions = $('#student-extension-fields tbody').find('tr');
-      if (extensions.length === 0) {
-        return $('#extensions').css('display', 'none');
-      }
-    });
-    $('#ex-list').on('click', '.delete-ex', function() {
-      var ex_row, ex_workout_id, exs;
-      ex_row = $(this).closest('li');
-      ex_workout_id = ex_row.data('exercise-workout-id');
-      if ((ex_workout_id != null) && ex_workout_id !== '') {
-        window.codeworkout.removed_exercises.push(ex_workout_id);
-      }
-      ex_row.remove();
-      exs = $('#ex-list li').length;
-      if (exs === 0) {
-        $('.empty-msg').css('display', 'block');
-        return $('#ex-list').css('display', 'none');
-      }
-    });
-    return $('#btn-submit-wo').click(function() {
+
+    return $('#btn-submit-co').click(function() {
       return handle_submit();
     });
   });
+
+
+  load_courses = function() {
+    var request = "/courses/" + $('#organization-select').val() + "/search";
+
+    var aj = $.ajax({
+      url: request,
+      type: 'get',
+      data: $(this).serialize()
+    }).done(function(data) {
+      change_courses(data);
+    }).fail(function(data) {
+      console.log('AJAX request has FAILED');
+    });
+  };
+
+  //modify the course dropdown
+  change_courses = function(data) {
+    $("#course-select").empty();
+    for (i = 0; i < data.length; i++) {
+      $("#course-select").append(
+        $("<option></option>").attr("value", data[i].id).text(data[i].number + ': ' + data[i].name)
+      );
+    }
+  };
 
   init = function() {
     var description;

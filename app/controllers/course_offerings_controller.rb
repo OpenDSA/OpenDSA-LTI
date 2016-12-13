@@ -44,8 +44,7 @@ class CourseOfferingsController < ApplicationController
                                          late_policy: late_policy || nil,
                                          lms_instance: lms_instance,
                                          lms_course_code: params[:lms_course_id],
-                                         lms_course_num: params[:lms_course_name],
-                                         lms_instance: lms_instance)
+                                         lms_course_num: params[:lms_course_name])
 
     cloned_book = inst_book.clone(current_user)
 

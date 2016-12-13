@@ -33,6 +33,7 @@ class Term < ActiveRecord::Base
   # default_scope { order('ends_on desc') }
   default_scope { order('year desc, season desc') }
 
+  scope :on_or_future, -> {where "ends_on >= ?", DateTime.now}
 
   #~ Constants ................................................................
 
