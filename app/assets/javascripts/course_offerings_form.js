@@ -12,6 +12,7 @@
     });
 
     $('#btn-submit-co').click(function() {
+      $(this).prop('disabled', true);
       return handle_submit();
     });
 
@@ -131,6 +132,7 @@
     messages = check_completeness();
     if (messages.length !== 0) {
       form_alert(messages);
+      $('#btn-submit-co').prop('disabled', false);
       return;
     }
     lms_instance_id = $('#lms-instance-select').val();
@@ -161,7 +163,6 @@
       processData: false,
       contentType: false,
       success: function(data) {
-        console.log(data);
         return window.location.href = data['url'];
       }
     });
