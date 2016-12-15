@@ -1,13 +1,14 @@
-var textFile = null; // Temporary global variable used for download link.
+let textFile = null; // Temporary global variable used for download link.
 
-var nextId = 0; // Global variable used for tracking input ids.
+let nextId = 0; // Global variable used for tracking input ids.
 
 /*
  * Checks if a json file has been defined and, if not, prompts the user to select one.
  */
-$(document).ready(function() {
+$(document).ready(() => {
   loadJSON(jsonFile);
 })
+
 
 /*
  * Defines the div tag 'dialog' as a jquery ui dialog widget.
@@ -21,8 +22,8 @@ $(function() {
 /*
  * Defines the class 'datepicker' as a jquery ui datepicker widget.
  */
-$(document).on('focus', '.datepicker', function() {
-  $(this).datepicker();
+$(document).on('focus', '.datetimepicker', function() {
+  $(this).datetimepicker();
 });
 
 /*
@@ -44,19 +45,30 @@ $(document).on('click', '#new', function() {
   newJSON();
 });
 
+
 /*
  * The click event for the 'Save Book' button.
  * Currently, this saves the book as an html download object.
  */
-// $(document).on('click', '#odsa_save', function() {
-//   var json = buildJSON();
-//   var download = document.getElementById('downloadLink');
-//   download.href = makeFile(json);
-//   alert("Ready for Download!");
-//   $('#downloadLink').toggle();
-// });
+/*
+ $(document).on('click', '#odsa_save', function() {
+   let download = document.getElementById('downloadLink');
+   
+   //let json = JSON.stringify(jsonFile);
+   
+   let json = buildJSON();
+
+   download.href = makeFile(json);
+   alert("Ready for Download!");
+   $('#downloadLink').toggle();
+ });
+*/
+
 
 $(document).on('click', '#odsa_save', function() {
+  var bookConfig = JSON.parse(buildJSON());
+
+  /*
   jQuery.ajax({
     url: "/inst_books/update",
     type: "POST",
@@ -76,22 +88,47 @@ $(document).on('click', '#odsa_save', function() {
       console.dir(data);
       $('#save_message').text("Error occurred!");
     }
+  }); 
+  */
+  
+  jQuery.ajax({
+    url: "/inst_books/update",
+    type: "POST",
+    data: JSON.stringify({ 
+      'inst_book': bookConfig 
+    }),
+    contentType: "application/json; charset=utf-8",
+    datatype: "json",
+    xhrFields: {
+      withCredentials: true
+    },
+    success: function(data) {
+      console.dir(data);
+      $('#save_message').text(data['message']);
+    },
+    error: function(data) {
+      console.dir(data);
+      //$('#save_message').text("Error occurred!");
+      $('#save_message').html(data['responseText']);
+    }
   });
+  
 });
+
 
 /*
  * The click event for the 'Book Button' button.
  * This button loads the selected json book.
  */
 $(document).on('click', '#bookButton', function() {
-  var jsonBook = $('#Book option:selected').val() + $('#Book option:selected').text();
+  let jsonBook = $('#Book option:selected').val() + $('#Book option:selected').text();
 });
 
 /*
- * The click event for the 'Devare' buttons.
+ * The click event for the 'Delete' buttons.
  */
 $(document).on('click', '.remove', function() {
-  $(this).parent().remove();
+  $(this).parent().parent().parent().remove();
 });
 
 /*
@@ -99,12 +136,12 @@ $(document).on('click', '.remove', function() {
  */
 $(document).on('click', '.odsa_collapse li a', function() {
   $(this).parent().children('ul').toggle();
-  if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-down')) {
-    $(this).children('span').removeClass('glyphicon glyphicon-chevron-down');
-    $(this).children('span').addClass('glyphicon glyphicon-chevron-right');
-  } else if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-right')) {
+  if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-right')) {
     $(this).children('span').removeClass('glyphicon glyphicon-chevron-right');
-    $(this).children('span').addClass('glyphicon glyphicon-chevron-down');
+    $(this).children('span').addClass('glyphicon glyphicon-chevron-down'); 
+  } else if ($(this).children('span').hasClass('glyphicon glyphicon-chevron-down')) { 
+    $(this).children('span').removeClass('glyphicon glyphicon-chevron-down'); 
+    $(this).children('span').addClass('glyphicon glyphicon-chevron-right');
   }
 });
 
@@ -112,11 +149,11 @@ $(document).on('click', '.odsa_collapse li a', function() {
  * Ajax call to the given directory to pull the names of all .json files.
  * The user is then prompted to select one and given the option to load it.
  */
-const listJSON = function(url) {
+const listJSON = (url) => {
   $.ajax({
     url: url,
     success: function(data) {
-      var output = "<select id=\"Book\">";
+      let output = "<select id=\"Book\">";
       $(data).find("a:contains(.json)").each(function() {
         output += "<option value=\"" + url + "\">" + $(this).attr("href") + "</option>";
       });
@@ -134,24 +171,24 @@ const listJSON = function(url) {
  * Function to remove class declarations and ampersands from a given html string before
  * turning it into an array, splitting on the '<' character.
  */
-const prepArray = function(inputHTML) {
+const prepArray = (inputHTML) => {
   inputHTML = inputHTML.replace(/&amp;/g, "&");
   inputHTML = inputHTML.replace(/ style="[^"]+"/g, "");
   inputHTML = inputHTML.replace(/ style=""/g, "");
   inputHTML = inputHTML.replace(/ class="[^"]+"/g, "");
   inputHTML = inputHTML.replace(/ class=""/g, "");
-  var HTMLArray = inputHTML.split("<");
+  let HTMLArray = inputHTML.split("<");
   return HTMLArray;
 }
 
 /*
  * Function to return the 'value' element of the given html string.
  */
-const pullValue = function(inputString) {
-  var value = "";
+const pullValue = (inputString) => {
+  let value = "";
   if (inputString.includes("value")) {
-    var stringStart = inputString.search("value=\"");
-    var stringEnd = inputString.search("\" type=");
+    let stringStart = inputString.search("value=\"");
+    let stringEnd = inputString.search("\" type=");
     value = inputString.slice(stringStart + 7, stringEnd);
   } else {
     value = "";
@@ -162,7 +199,7 @@ const pullValue = function(inputString) {
 /*
  * Function to take a key and a value and return it as a json object pair.
  */
-const makePair = function(key, value) {
+const makePair = (key, value) => {
   if (value === "{}") {
     return "\"" + key + "\": " + value + ",\n";
   } else if (value === "true" || value === "false") {
@@ -175,7 +212,7 @@ const makePair = function(key, value) {
 /*
  * Function to take a text array and turn it into an html download object.
  */
-const makeFile = function(textArray) {
+const makeFile = (textArray) => {
   if (textFile != null) {
     window.URL.revokeObjectURL(textFile);
   }
@@ -186,32 +223,61 @@ const makeFile = function(textArray) {
   return textFile;
 }
 
+const datepick = () => {
+  let html = "<div class=\"col-sm-6\"><div class=\"form-group\"><div class=\"datetimepicker\" input-group date\">";
+  html += "<input class=\"form-control\" type=\"text\" /><span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
+  html += "</span></span></div></div></div>";
+  return html;
+}
+
+const dropdown = () => {
+  let html = "<div class=\"dropdown instDropdown\">";
+  html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
+  html += "<ul class=\"dropdown-menu pull-right\">";
+  //html += "<li class=\"due-date\"><a>Set Due Dates</a></li>";
+  html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
+  html += "</ul></div>";
+  return html;
+}
+
+const dropdownAdd = () => {
+   let html = "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
+   html += "<ul class=\"dropdown-menu pull-right\">";
+   //html += "<li class=\"due-date\"><a>Set Due Dates</a></li>";
+   html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
+   html += "</ul></div>";
+   return html;
+}
+
+
+//odsa_save.odsa_button.ui-button.ui-corner-all
+
 /*
  * Function to read in a json key and value pair and convert it into the
  * proper html to be dispayed to the user.
  */
-const encode = function(key, val, index) {
-  index = index || -100
-  var htmlKey = "";
+const encode = (key, val, index = -100) => {
+  let htmlKey = "";
   if (key.includes("'")) {
     htmlKey = key.replace("'", "&#39;");
   } else {
     htmlKey = key;
   }
   if (typeof val === 'object' && val !== null) {
-    var output = "";
+    let output = "";
     if (index === 1) {
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><button class=\"odsa_button remove\">Devare</button><ul class=\"contain odsa_sortable\">";
-      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      //output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><button class=\"odsa_button remove\">Delete</button><ul class=\"contain odsa_sortable\">";
+      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a>" + dropdown() + "<ul class=\"contain odsa_sortable\">";
+      //output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      //output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
     } else if (index === 2) {
-      output += "<li class='odsa_li' id='" + htmlKey + "'><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id='" + htmlKey + "'><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
     } else if (index === 3) {
-      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
     } else {
-      output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='glyphicon glyphicon-chevron-down'></span>" + key + "</a><ul class=\"contain\">";
+      output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
     }
     for (var entry in val) {
       output = output + encode(entry, val[entry], index + 1);
@@ -227,25 +293,24 @@ const encode = function(key, val, index) {
  * Function to read in an array of html strings and convert it into a json
  * object.
  */
-const decode = function(fileArray, chapter ) {
-  chapter = chapter || true
-  var jsonString = "";
-  var spacing = "  ";
+const decode = (fileArray, chapter = true) => {
+  let jsonString = "";
+  let spacing = "  ";
   for (i = 0; i < fileArray.length; i++) {
-    var line = "";
+    let line = "";
     if (fileArray[i].startsWith("li")) {
-      var stringStart = fileArray[i].search("id=\"");
-      var stringEnd = fileArray[i].search("\">");
-      var value = fileArray[i].slice(stringStart + 4, stringEnd);
+      let stringStart = fileArray[i].search("id=\"");
+      let stringEnd = fileArray[i].search("\">");
+      let value = fileArray[i].slice(stringStart + 4, stringEnd);
       line = spacing + "\"" + value + "\": ";
     } else if (fileArray[i].startsWith("input")) {
-      var stringStart = fileArray[i].search("id=\"");
-      var stringEnd = fileArray[i].search("\" type=");
-      console.log(fileArray[i]);
-      console.log(stringStart);
-      console.log(stringEnd);
-      var id = "#" + fileArray[i].slice(stringStart + 4, stringEnd);
-      var value = $(id).val();
+      let stringStart = fileArray[i].search("id=\"");
+      let stringEnd = fileArray[i].search("\" type=");
+      //console.log(fileArray[i]);
+      //console.log(stringStart);
+      //console.log(stringEnd);
+      let id = "#" + fileArray[i].slice(stringStart + 4, stringEnd);
+      let value = $(id).val();
       if (value === "true" || value === "false") {
         if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
           line = value + ",";
@@ -263,7 +328,8 @@ const decode = function(fileArray, chapter ) {
           line = "\"" + value + "\",";
         }
       } else {
-        if ((!chapter) || (i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
+        //alert(fileArray[i + 2]);
+        if ((!chapter) || (i + 2 < fileArray.length) && ((fileArray[i + 2].startsWith("li")) || (fileArray[i + 2].startsWith("/li")))) {
           line = "\"" + value + "\",";
         } else {
           line = "\"" + value + "\"";
@@ -308,33 +374,39 @@ const decode = function(fileArray, chapter ) {
 /*
  * Function to build a json file from the html on the page.
  */
-const buildJSON = function() {
-  var fileName = "Download.json";
-  if ($('#1').val() != "") {
-    fileName = $('#1').val();
-  }
+const buildJSON = () => {
+  //let fileName = "Download.json";
+  //if ($('#1').val() != "") {
+  //  fileName = $('#1').val();
+  //}
 
-  $('#downloadLink').attr('download', fileName);
+  //$('#downloadLink').attr('download', fileName);
+  $('.instDropdown').html("");
 
-  var json = "{\n";
-  var spacing = "  ";
+  let json = "{\n";
+  let spacing = "  ";
 
-  var header = $('#heading').html();
-  var headerArray = prepArray(header);
+  let header = $('#heading').html();
+  let headerArray = prepArray(header);
   json += decode(headerArray, false);
 
-  var options = $('#options').html();
-  var optionArray = prepArray(options);
+  let options = $('#options').html();
+  let optionArray = prepArray(options);
   json += decode(optionArray, false);
 
-  var chapters = $('#chapters').html();
+  let chapters = $('#chapters').html();
   chapters = chapters.replace(/readonly=/g, "");
-  var chapterArray = prepArray(chapters);
+  let chapterArray = prepArray(chapters);
 
   json += spacing + "\"chapters\": ";
   json += decode(chapterArray);
 
   json += "\n}";
+  
+  json = json.replace(/"sections": "null"/g, "\"sections\": {}");
+  
+  $('.instDropdown').html(dropdownAdd());
+  
   return json;
 }
 
@@ -354,18 +426,18 @@ const addClasses = function() {
  * Function to build a new json book.
  */
 const newJSON = function() {
-  var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
+  let titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
   titleString += encode("file name", "");
   titleString += "</ul>";
   $('#title').html(titleString);
 
-  var headerString = "<ul class='odsa_ul'>";
+  let headerString = "<ul class='odsa_ul'>";
   headerString += encode("title", "");
   headerString += encode("desc", "");
   headerString += "</ul>";
   $('#heading').html(headerString);
 
-  var optionString = "<ul class='odsa_ul'>";
+  let optionString = "<ul class='odsa_ul'>";
   optionString += encode("build_dir", "Books");
   optionString += encode("code_dir", "SourceCode/");
   optionString += encode("lang", "en");
@@ -377,7 +449,7 @@ const newJSON = function() {
   optionString += "</ul>";
   $('#options').html(optionString);
 
-  var chapterString = "<h1> Chapters: </h1> <ul class=\"odsaul odsa_collapse\">";
+  let chapterString = "<h1> Chapters: </h1> <ul class=\"odsaul odsa_collapse\">";
   chapterString += "</ul>";
   $('#chapters').html(chapterString);
 
@@ -389,17 +461,17 @@ const newJSON = function() {
  */
 const loadJSON = function(jsonFile) {
 
-  var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
+  let titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
   titleString += "</ul>"
   $('#title').html(titleString);
 
-  var headerString = "<ul class='odsa_ul'>";
+  let headerString = "<ul class='odsa_ul'>";
   headerString += encode("title", jsonFile['title']);
   headerString += encode("desc", jsonFile['desc']);
   headerString += "</ul>";
   $('#heading').html(headerString);
 
-  var optionString = "<ul class='odsa_ul'>";
+  let optionString = "<ul class='odsa_ul'>";
   $.each(jsonFile, function(key, val) {
     if (!(key === "title" || key === "desc" || key === "chapters")) {
       optionString += encode(key, val);
@@ -408,7 +480,7 @@ const loadJSON = function(jsonFile) {
   optionString += "</ul>";
   $('#options').html(optionString);
 
-  var chapterString = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\">";
+  let chapterString = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\">";
   $.each(jsonFile['chapters'], function(key, val) {
     chapterString += encode(key, val, 1);
   });
@@ -416,5 +488,4 @@ const loadJSON = function(jsonFile) {
   $('#chapters').html(chapterString);
 
   addClasses();
-
 }

@@ -26,7 +26,8 @@
 //= require book
 //= require course_offerings_form.js
 //= require data-confirm-modal
-
+//= require moment
+//= require bootstrap-datetimepicker
 // Add the route helpers directly into the window object for easy access.
 $.extend(window, Routes);
 

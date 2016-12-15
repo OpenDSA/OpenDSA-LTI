@@ -3,12 +3,18 @@ h1 {
 }
 
 ul.odsa_ul {
+	background-color: #f8eedf;
 	list-style: none;
-	
+	padding-left: 0;
 }
 
 ul.odsa_ul li ul {
 	display: none;
+	padding-left: 0;
+	border: 2px solid #f8eedf;
+	border-radius: 5px;
+	list-style-type: none;
+	background-color: #f8eedf;
 }
 
 li.odsa_li a {
@@ -27,19 +33,25 @@ li.odsa_li {
 }
 
 li.odsa_li button {
-	float: right;
-	width: 5%;
+	width: 20%;
 }
 
 input.odsa_in {
 	width: 25%;
 }
 
+button.odsa_button {
+	font-size: 90%;
+	border: 1px solid black;
+	border-radius: 10px;
+	padding: 2px 10px 2px 10px;
+}
+
 #odsa_content {
 	/*background-color: #fff7ea;*/
 	background-color: #f8eedf;
 	padding-top: 10px;
-	padding-left: 15px;
+	padding-left: 0px;
 	border: 2px solid #f8eedf;
 	border-radius: 5px;
 }
@@ -67,4 +79,14 @@ input.odsa_in {
 #downloadLink {
 	display: none;
 	padding: 20px;
+}
+
+.dropdown {
+	float: right;
+	width: 160px;
+	display: inline-block;
+}
+
+.dropdown button {
+	width: 100% !important;
 }
