@@ -9,6 +9,7 @@ $(document).ready(() => {
   loadJSON(jsonFile);
 })
 
+
 /*
  * Defines the div tag 'dialog' as a jquery ui dialog widget.
  */
@@ -21,8 +22,8 @@ $(function() {
 /*
  * Defines the class 'datepicker' as a jquery ui datepicker widget.
  */
-$(document).on('focus', '.datepicker', function() {
-  $(this).datepicker();
+$(document).on('focus', '.datetimepicker', function() {
+  $(this).datetimepicker();
 });
 
 /*
@@ -44,16 +45,19 @@ $(document).on('click', '#new', function() {
   newJSON();
 });
 
+
 /*
  * The click event for the 'Save Book' button.
  * Currently, this saves the book as an html download object.
  */
 /*
  $(document).on('click', '#odsa_save', function() {
-   let json = buildJSON();
    let download = document.getElementById('downloadLink');
-   let jsonOb = JSON.parse(json);
-   json = JSON.stringify(jsonOb);
+   
+   //let json = JSON.stringify(jsonFile);
+   
+   let json = buildJSON();
+
    download.href = makeFile(json);
    alert("Ready for Download!");
    $('#downloadLink').toggle();
@@ -62,8 +66,9 @@ $(document).on('click', '#new', function() {
 
 
 $(document).on('click', '#odsa_save', function() {
-  //bookConfig = buildJSON();
-  //alert(JSON.parse(bookConfig));
+  var bookConfig = JSON.parse(buildJSON());
+
+  /*
   jQuery.ajax({
     url: "/inst_books/update",
     type: "POST",
@@ -83,7 +88,31 @@ $(document).on('click', '#odsa_save', function() {
       console.dir(data);
       $('#save_message').text("Error occurred!");
     }
+  }); 
+  */
+  
+  jQuery.ajax({
+    url: "/inst_books/update",
+    type: "POST",
+    data: JSON.stringify({ 
+      'inst_book': bookConfig 
+    }),
+    contentType: "application/json; charset=utf-8",
+    datatype: "json",
+    xhrFields: {
+      withCredentials: true
+    },
+    success: function(data) {
+      console.dir(data);
+      $('#save_message').text(data['message']);
+    },
+    error: function(data) {
+      console.dir(data);
+      //$('#save_message').text("Error occurred!");
+      $('#save_message').html(data['responseText']);
+    }
   });
+  
 });
 
 
@@ -194,15 +223,32 @@ const makeFile = (textArray) => {
   return textFile;
 }
 
+const datepick = () => {
+  let html = "<div class=\"col-sm-6\"><div class=\"form-group\"><div class=\"datetimepicker\" input-group date\">";
+  html += "<input class=\"form-control\" type=\"text\" /><span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
+  html += "</span></span></div></div></div>";
+  return html;
+}
+
 const dropdown = () => {
-  let html = "<div class=\"dropdown\">";
+  let html = "<div class=\"dropdown instDropdown\">";
   html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
-  html += "<ul class=\"dropdown-menu\">";
-  html += "<li class=\"due-date\"><a>Set Due Dates</a></li>";
+  html += "<ul class=\"dropdown-menu pull-right\">";
+  //html += "<li class=\"due-date\"><a>Set Due Dates</a></li>";
   html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
   html += "</ul></div>";
   return html;
 }
+
+const dropdownAdd = () => {
+   let html = "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
+   html += "<ul class=\"dropdown-menu pull-right\">";
+   //html += "<li class=\"due-date\"><a>Set Due Dates</a></li>";
+   html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
+   html += "</ul></div>";
+   return html;
+}
+
 
 //odsa_save.odsa_button.ui-button.ui-corner-all
 
@@ -227,8 +273,8 @@ const encode = (key, val, index = -100) => {
     } else if (index === 2) {
       output += "<li class='odsa_li' id='" + htmlKey + "'><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
     } else if (index === 3) {
-      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
+      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
       output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
     } else {
       output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
@@ -260,9 +306,9 @@ const decode = (fileArray, chapter = true) => {
     } else if (fileArray[i].startsWith("input")) {
       let stringStart = fileArray[i].search("id=\"");
       let stringEnd = fileArray[i].search("\" type=");
-      console.log(fileArray[i]);
-      console.log(stringStart);
-      console.log(stringEnd);
+      //console.log(fileArray[i]);
+      //console.log(stringStart);
+      //console.log(stringEnd);
       let id = "#" + fileArray[i].slice(stringStart + 4, stringEnd);
       let value = $(id).val();
       if (value === "true" || value === "false") {
@@ -335,6 +381,7 @@ const buildJSON = () => {
   //}
 
   //$('#downloadLink').attr('download', fileName);
+  $('.instDropdown').html("");
 
   let json = "{\n";
   let spacing = "  ";
@@ -355,6 +402,11 @@ const buildJSON = () => {
   json += decode(chapterArray);
 
   json += "\n}";
+  
+  json = json.replace(/"sections": "null"/g, "\"sections\": {}");
+  
+  $('.instDropdown').html(dropdownAdd());
+  
   return json;
 }
 
@@ -436,5 +488,4 @@ const loadJSON = function(jsonFile) {
   $('#chapters').html(chapterString);
 
   addClasses();
-
 }

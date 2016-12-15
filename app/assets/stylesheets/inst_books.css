@@ -82,5 +82,11 @@ button.odsa_button {
 }
 
 .dropdown {
-	margin-left: 80%;
+	float: right;
+	width: 160px;
+	display: inline-block;
+}
+
+.dropdown button {
+	width: 100% !important;
 }

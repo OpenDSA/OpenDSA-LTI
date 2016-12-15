@@ -24,6 +24,8 @@
 //= require cocoon
 //= require cm
 //= require book
+//= require moment
+//= require bootstrap-datetimepicker
 
 
 // Add the route helpers directly into the window object for easy access.
