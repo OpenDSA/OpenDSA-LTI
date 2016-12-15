@@ -11,12 +11,12 @@
       = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
       { id: 'lms-instance-select', class: 'form-control' }
     #lms-access-update-btn.col-xs-1
-      = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas instance", class: 'btn btn-default' do
+      = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas instance", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
 
   #lms-access-token-group.form-group
     = label_tag :name, 'Canvas access token', class: 'control-label col-xs-2'
-    .col-lg-5.col-md-5.col-xs-5
+    .col-lg-4.col-md-4.col-xs-4
       = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 100,
         placeholder: 'e.g. 7~iYir4J6xo9iMXigxIM9BEqP5zWhJiUyuO845P83aEit2doF9Ed0nrO70qceI3Cr2'
       %small.col-xs-11.text.text-warning
@@ -27,18 +27,18 @@
 
   .form-group
     = label_tag :name, 'Canvas course Id', class: 'control-label col-xs-2'
-    .col-lg-5.col-md-5.col-xs-5
+    .col-lg-4.col-md-4.col-xs-4
       = text_field_tag :lms_course_id, nil, id: 'lms-course-num', class: 'form-control', maxlength: 25
       %small.col-xs-11.text.text-warning
         Create a new course at the selected canvas instance and copy the course Id here (e.g. Course Id of https://canvas.instructure.com/courses/1076903 is 1076903).
 
 
-  .form-group
-    = label_tag :name, 'Canvas course Name', class: 'control-label col-xs-2'
-    .col-lg-5.col-md-5.col-xs-5
-      = text_field_tag :lms_course_name, nil, id: 'lms-course-code', class: 'form-control', maxlength: 25
-      %small.col-xs-11.text.text-warning
-        Canvas course name.
+  / .form-group
+  /   = label_tag :name, 'Canvas course Name', class: 'control-label col-xs-2'
+  /   .col-lg-5.col-md-5.col-xs-5
+  /     = text_field_tag :lms_course_name, nil, id: 'lms-course-code', class: 'form-control', maxlength: 25
+  /     %small.col-xs-11.text.text-warning
+  /       Canvas course name.
 
   .form-group
     = label_tag :organization_select, 'Organization:', class: 'control-label col-xs-1'
@@ -46,7 +46,7 @@
       = collection_select nil, nil, Organization.all, :id, :name, { prompt: 'Select', selected: nil },
       { id: 'organization-select', class: 'form-control' }
     .col-xs-1
-      = link_to admin_organizations_path, title: "Create new organization", class: 'btn btn-default' do
+      = link_to admin_organizations_path, title: "Create new organization", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
 
   .form-group
@@ -55,7 +55,7 @@
       = collection_select nil, nil, Course.all, :id, :display_name, { prompt: 'Select', selected: nil },
       { id: 'course-select', class: 'form-control' }
     .col-xs-1
-      = link_to admin_courses_path, title: "Create new course", class: 'btn btn-default' do
+      = link_to admin_courses_path, title: "Create new course", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
     .col-xs-1
       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#course-help-modal' } }
@@ -66,14 +66,14 @@
       = collection_select nil, nil, Term.on_or_future, :id, :display_name, { prompt: 'Select', selected: nil },
       { id: 'term-select', class: 'form-control' }
     .col-xs-1
-      = link_to admin_terms_path, title: "Create new term", class: 'btn btn-default' do
+      = link_to admin_terms_path, title: "Create new term", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
     .col-xs-1
       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#term-help-modal' } }
 
   .form-group
     = label_tag :name, 'Label', class: 'control-label col-xs-2'
-    .col-lg-5.col-md-5.col-xs-5
+    .col-lg-4.col-md-4.col-xs-4
       = text_field_tag :name, nil, id: 'label', class: 'form-control', maxlength: 25,
         placeholder: 'e.g. TR 10:00am'
       %small.col-xs-11.text.text-warning
@@ -85,7 +85,7 @@
   /     = collection_select nil, nil, LatePolicy.all, :id, :name, { prompt: 'Select', selected: nil },
   /     { id: 'late-policy-select', class: 'form-control' }
   /   .col-xs-1
-  /     = link_to admin_late_policies_path, title: "Create new late policy", class: 'btn btn-default' do
+  /     = link_to admin_late_policies_path, title: "Create new late policy", class: 'btn btn-default', :target => "_blank" do
   /       %i.glyphicon.glyphicon-new-window
   /   .col-xs-1
   /     %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#late-policy-help-modal' } }
@@ -96,7 +96,7 @@
       = collection_select nil, nil, InstBook.template, :id, :title, { prompt: 'Select', selected: nil },
       { id: 'inst-book-select', class: 'form-control' }
     .col-xs-1
-      = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default' do
+      = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
     .col-xs-1
       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#inst-book-help-modal' } }

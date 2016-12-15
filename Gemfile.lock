@@ -167,6 +167,8 @@ GEM
     csv_shaper (1.1.1)
       activesupport (>= 3.0.0)
     daemons (1.2.3)
+    data-confirm-modal (1.2.0)
+      railties (>= 3.0)
     delayed_job (4.1.2)
       activesupport (>= 3.0, < 5.1)
     delayed_job_active_record (4.1.1)
@@ -470,6 +472,7 @@ DEPENDENCIES
   css3-progress-bar-rails
   csv_shaper
   daemons
+  data-confirm-modal
   delayed_job_active_record
   devise
   exception_handler

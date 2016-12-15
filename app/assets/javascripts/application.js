@@ -25,6 +25,7 @@
 //= require cm
 //= require book
 //= require course_offerings_form.js
+//= require data-confirm-modal
 
 // Add the route helpers directly into the window object for easy access.
 $.extend(window, Routes);

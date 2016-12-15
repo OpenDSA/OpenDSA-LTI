@@ -137,3 +137,4 @@ gem 'ims-lti', '~> 1.1.8'
 gem 'json'
 gem "browser"
 gem "figaro"
+gem 'data-confirm-modal'

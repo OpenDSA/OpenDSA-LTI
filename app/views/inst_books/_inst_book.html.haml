@@ -6,15 +6,20 @@
   %td= inst_book.title
   %td= link_to lms_course_code, course_offering_url, :target => "_blank"
   %td
+    - if inst_book.last_compiled == nil
+      - btn_label = "Generate Canvas Course"
+    - else
+      - btn_label = "Re-generate Canvas Course"
+
     - form_name = 'generate_course_' + inst_book.id.to_s
     = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=generate_course', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'generate_course'; return true;" do
-      = submit_tag "Generate LMS Course", name: form_name
+      = submit_tag btn_label, name: form_name, class: "btn btn-primary", title: btn_label + ' confirmation.', data: {confirm: 'Re-generating canvas course will override assignments due dates and number of points. Do you want to continue?'}
   %td
-    = form_tag '/inst_books/configure/'+ inst_book.id.to_s, :method => :get  do
-      = submit_tag "Configure Book"
+    = form_tag '/inst_books/configure/'+ inst_book.id.to_s, :method => :get, :target => "_blank"  do
+      = submit_tag "Configure Book", class: "btn btn-primary", :target => "_blank"
 
   - if inst_book.last_compiled != nil
     %td
       - form_name = 'compile_book_' + inst_book.id.to_s
       = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=compile_book', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
-        = submit_tag "Compile Book", name: form_name
+        = submit_tag "Compile Book", name: form_name, class: "btn btn-primary", title: 'Compile book confirmation.', data: {confirm: "Book compilaiton process will recreate the book pages on OpenDSA server. Canvas course won't be affected by this action. Do you want to continue?"}

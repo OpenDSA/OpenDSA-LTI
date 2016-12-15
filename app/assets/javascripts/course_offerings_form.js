@@ -105,9 +105,9 @@
     if ($('#lms-course-num').val() === '') {
       messages.push('You have to write LMS course Id.');
     }
-    if ($('#lms-course-code').val() === '') {
-      messages.push('You have to write LMS course name.');
-    }
+    // if ($('#lms-course-code').val() === '') {
+    //   messages.push('You have to write LMS course name.');
+    // }
     if ($('#organization-select').val() === '') {
       messages.push('One of the organizations has to be selected.');
     }
@@ -137,7 +137,7 @@
     lms_instance_id = $('#lms-instance-select').val();
     lms_access_token = $('#lms-access-token').val();
     lms_course_num = $('#lms-course-num').val();
-    lms_course_code = $('#lms-course-code').val();
+    // lms_course_code = $('#lms-course-code').val();
     organization_id = $('#organization-select').val();
     course_id = $('#course-select').val();
     term_id = $('#term-select').val();
@@ -148,7 +148,7 @@
     fd.append('lms_instance_id', lms_instance_id);
     fd.append('lms_access_token', lms_access_token);
     fd.append('lms_course_num', lms_course_num);
-    fd.append('lms_course_code', lms_course_code);
+    // fd.append('lms_course_code', lms_course_code);
     fd.append('organization_id', organization_id);
     fd.append('course_id', course_id);
     fd.append('term_id', term_id);

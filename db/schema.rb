@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161215000155) do
+ActiveRecord::Schema.define(version: 20161215194756) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(version: 20161215000155) do
     t.date     "cutoff_date"
     t.integer  "late_policy_id"
     t.integer  "lms_instance_id",                        null: false
-    t.string   "lms_course_code",                        null: false
+    t.string   "lms_course_code"
     t.integer  "lms_course_num",                         null: false
   end
 
