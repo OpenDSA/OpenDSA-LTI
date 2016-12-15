@@ -132,9 +132,7 @@ class CoursesController < ApplicationController
 
   # -------------------------------------------------------------
   def search
-     puts  params['organization_id']
      courses = Course.where("organization_id = ?", params['organization_id']).as_json
-     puts courses
 
      respond_to do |format|
           format.json {

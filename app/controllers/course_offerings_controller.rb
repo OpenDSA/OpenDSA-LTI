@@ -38,8 +38,8 @@ class CourseOfferingsController < ApplicationController
     inst_book = InstBook.find_by(id: params[:inst_book_id])
 
     course_offering = CourseOffering.where(
-                                  "course_id=? and term_id=? and label=?",
-                                  params[:course_id], params[:term_id], params[:label]).first
+                                  "course_id=? and term_id=? and label=? and lms_instance_id=?",
+                                  params[:course_id], params[:term_id], params[:label], params[:lms_instance_id]).first
 
     if course_offering.blank?
       course_offering = CourseOffering.new(
@@ -48,8 +48,8 @@ class CourseOfferingsController < ApplicationController
                                    label: params[:label],
                                    # late_policy: late_policy || nil,
                                    lms_instance: lms_instance,
-                                   lms_course_code: params[:lms_course_id],
-                                   lms_course_num: params[:lms_course_name])
+                                   lms_course_code: params[:lms_course_code],
+                                   lms_course_num: params[:lms_course_num])
 
       cloned_book = inst_book.clone(current_user)
 
@@ -57,6 +57,13 @@ class CourseOfferingsController < ApplicationController
         # Add course_offering to the new book
         cloned_book.course_offering_id = course_offering.id
         cloned_book.save!
+        if !params['lms_access_token'].blank?
+          lms_access = LmsAccess.new(
+                                 lms_instance: lms_instance,
+                                 user: current_user,
+                                 access_token: params[:lms_access_token])
+          lms_access.save!
+        end
 
         # Enroll user as course_offering instructor
         enrollment = CourseEnrollment.new
@@ -64,7 +71,6 @@ class CourseOfferingsController < ApplicationController
         enrollment.user_id = current_user.id
         enrollment.course_role_id = CourseRole.instructor.id
         enrollment.save!
-
       else
         err_string = 'There was a problem while creating the workout.'
         url = url_for new_course_offerings_path(notice: err_string)

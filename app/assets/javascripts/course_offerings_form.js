@@ -44,10 +44,10 @@
       }).done(function(data) {
         if (data) {
           $("#lms-access-update-btn").show("slow");
-          $("#lms-access-token").hide("slow");
+          $("#lms-access-token-group").hide("slow");
         } else {
           $("#lms-access-update-btn").hide("slow");
-          $("#lms-access-token").show("slow");
+          $("#lms-access-token-group").show("slow");
         }
       }).fail(function(data) {
         console.log('AJAX request has FAILED');
@@ -67,9 +67,8 @@
 
   init = function() {
     $("#lms-access-update-btn").hide();
-    $("#lms-access-token").hide();
+    $("#lms-access-token-group").hide();
   };
-
 
   form_alert = function(messages) {
     var alert_list, message, _fn, _i, _len;
@@ -98,15 +97,15 @@
     if ($('#lms-instance-select').val() === '') {
       messages.push('One of the LMS instances has to be selected.');
     }
-    if ($('#lms-access-token').is(":visible")) {
+    if ($('#lms-access-token-group').is(":visible")) {
       if ($('#lms-access-token').val() === '') {
         messages.push('You have to provide an access token for the selected Canvas instance.');
       }
     };
-    if ($('#lms-course-id').val() === '') {
+    if ($('#lms-course-num').val() === '') {
       messages.push('You have to write LMS course Id.');
     }
-    if ($('#lms-course-name').val() === '') {
+    if ($('#lms-course-code').val() === '') {
       messages.push('You have to write LMS course name.');
     }
     if ($('#organization-select').val() === '') {
@@ -128,7 +127,7 @@
   };
 
   handle_submit = function() {
-    var lms_instance_id, lms_course_id, lms_course_name, organization_id, course_id, term_id, label, late_policy_id, inst_book_id, fd, messages, url;
+    var lms_instance_id, lms_course_num, lms_course_code, organization_id, course_id, term_id, label, late_policy_id, inst_book_id, fd, messages, url;
     messages = check_completeness();
     if (messages.length !== 0) {
       form_alert(messages);
@@ -137,8 +136,8 @@
     }
     lms_instance_id = $('#lms-instance-select').val();
     lms_access_token = $('#lms-access-token').val();
-    lms_course_id = $('#lms-course-id').val();
-    lms_course_name = $('#lms-course-name').val();
+    lms_course_num = $('#lms-course-num').val();
+    lms_course_code = $('#lms-course-code').val();
     organization_id = $('#organization-select').val();
     course_id = $('#course-select').val();
     term_id = $('#term-select').val();
@@ -147,8 +146,9 @@
     inst_book_id = $('#inst-book-select').val();
     fd = new FormData;
     fd.append('lms_instance_id', lms_instance_id);
-    fd.append('lms_course_id', lms_course_id);
-    fd.append('lms_course_name', lms_course_name);
+    fd.append('lms_access_token', lms_access_token);
+    fd.append('lms_course_num', lms_course_num);
+    fd.append('lms_course_code', lms_course_code);
     fd.append('organization_id', organization_id);
     fd.append('course_id', course_id);
     fd.append('term_id', term_id);

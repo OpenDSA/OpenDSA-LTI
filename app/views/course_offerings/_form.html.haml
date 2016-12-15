@@ -11,13 +11,13 @@
       = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
       { id: 'lms-instance-select', class: 'form-control' }
     #lms-access-update-btn.col-xs-1
-      = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas", class: 'btn btn-default' do
+      = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas instance", class: 'btn btn-default' do
         %i.glyphicon.glyphicon-new-window
 
-  #lms-access-token.form-group
+  #lms-access-token-group.form-group
     = label_tag :name, 'Canvas access token', class: 'control-label col-xs-2'
     .col-lg-5.col-md-5.col-xs-5
-      = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 25,
+      = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 100,
         placeholder: 'e.g. 7~iYir4J6xo9iMXigxIM9BEqP5zWhJiUyuO845P83aEit2doF9Ed0nrO70qceI3Cr2'
       %small.col-xs-11.text.text-warning
         Put your Canvas access token for the selected Canvas
@@ -28,7 +28,7 @@
   .form-group
     = label_tag :name, 'Canvas course Id', class: 'control-label col-xs-2'
     .col-lg-5.col-md-5.col-xs-5
-      = text_field_tag :lms_course_id, nil, id: 'lms-course-id', class: 'form-control', maxlength: 25
+      = text_field_tag :lms_course_id, nil, id: 'lms-course-num', class: 'form-control', maxlength: 25
       %small.col-xs-11.text.text-warning
         Create a new course at the selected canvas instance and copy the course Id here (e.g. Course Id of https://canvas.instructure.com/courses/1076903 is 1076903).
 
@@ -36,7 +36,7 @@
   .form-group
     = label_tag :name, 'Canvas course Name', class: 'control-label col-xs-2'
     .col-lg-5.col-md-5.col-xs-5
-      = text_field_tag :lms_course_name, nil, id: 'lms-course-name', class: 'form-control', maxlength: 25
+      = text_field_tag :lms_course_name, nil, id: 'lms-course-code', class: 'form-control', maxlength: 25
       %small.col-xs-11.text.text-warning
         Canvas course name.
 
