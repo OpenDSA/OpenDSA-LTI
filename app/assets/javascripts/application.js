@@ -26,7 +26,8 @@
 //= require book
 //= require moment
 //= require bootstrap-datetimepicker
-
+//= require mustache.min
+//= require handlebars.min
 
 // Add the route helpers directly into the window object for easy access.
 $.extend(window, Routes);
