@@ -221,10 +221,6 @@ GEM
       activesupport (>= 4.0.1)
       haml (>= 3.1, < 5.0)
       railties (>= 4.0.1)
-    handlebars (0.7.0)
-      handlebars-source (~> 3.0.0)
-      therubyracer (~> 0.12.1)
-    handlebars-source (3.0.3)
     has_scope (0.6.0)
       actionpack (>= 3.2, < 5)
       activesupport (>= 3.2, < 5)
@@ -260,7 +256,6 @@ GEM
     kaminari (0.16.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    libv8 (3.16.14.17)
     link_header (0.0.8)
     log_file (0.0.3)
     loofah (1.2.1)
@@ -276,7 +271,6 @@ GEM
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
-    mustache (1.0.3)
     mysql2 (0.3.15)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -357,7 +351,6 @@ GEM
     rdoc (4.1.2)
       json (~> 1.4)
     redcarpet (3.1.1)
-    ref (2.0.0)
     remotipart (1.2.1)
     representable (2.1.6)
       multi_json
@@ -416,9 +409,6 @@ GEM
       celluloid (~> 0.16.0)
     test-unit (3.0.9)
       power_assert
-    therubyracer (0.12.2)
-      libv8 (~> 3.16.14.0)
-      ref
     thin (1.6.4)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -496,7 +486,6 @@ DEPENDENCIES
   gravtastic
   haml (>= 3.1.4)
   haml-rails
-  handlebars (~> 0.7.0)
   immigrant
   ims-lti (~> 1.1.8)
   jbuilder (~> 2.4, >= 2.4.1)
@@ -508,7 +497,6 @@ DEPENDENCIES
   log_file
   loofah
   momentjs-rails (>= 2.9.0)
-  mustache (~> 1.0, >= 1.0.3)
   mysql2
   nokogiri
   oj

@@ -2,6 +2,14 @@ h1 {
 	width: 30%;
 }
 
+input {
+  width: 300px;
+}
+
+option {
+	width: 300px;
+}
+
 ul.odsa_ul {
 	background-color: #f8eedf;
 	list-style: none;
@@ -89,4 +97,8 @@ button.odsa_button {
 
 .dropdown button {
 	width: 100% !important;
+}
+
+.modal-body input {
+  margin: 10px;
 }

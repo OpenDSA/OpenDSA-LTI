@@ -1,7 +1,5 @@
 let textFile = null; // Temporary global variable used for download link.
 
-let nextId = 0; // Global variable used for tracking input ids.
-
 /*
  * Checks if a json file has been defined and, if not, prompts the user to select one.
  */
@@ -22,6 +20,7 @@ $(function() {
  * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
  */
 $(document).on('focus', '.datetimepicker', function() {
+  $(this).parent().css("position", "relative");
   $(this).datetimepicker();
 });
 
@@ -41,7 +40,8 @@ $(document).on('blur', 'select', function() {
 });
 
 /*
- *
+ * Sends the chapter name to the chapter due date modal when the appropriate
+ * button is clicked.
  */
 $(document).on('click', '.chapterLoad', function() {
 	$('#chapterSoft').attr('data-chapter', $(this).attr('data-chapter'));
@@ -49,7 +49,8 @@ $(document).on('click', '.chapterLoad', function() {
 });
 
 /*
- *
+ * Sets all of the section due dates to the values set in the chapter due date
+ * modal.
  */
 $(document).on('click', '#chapterSubmit', function() {
 	var chapterTitle = $('#chapterSoft').attr('data-chapter');
@@ -79,9 +80,9 @@ $(document).on('click', '#new', function() {
 
 /*
  * The click event for the 'Save Book' button.
- * Currently, this saves the book as an html download object.
  */
-/*
+
+/* The old version that saves the book as a downloadable file. Used for testing.
  $(document).on('click', '#odsa_save', function() {
    let download = document.getElementById('downloadLink');
    
@@ -95,29 +96,6 @@ $(document).on('click', '#new', function() {
 
 $(document).on('click', '#odsa_save', function() {
   var bookConfig = JSON.parse(buildJSON());
-  
-  /*
-  jQuery.ajax({
-    url: "/inst_books/update",
-    type: "POST",
-    data: JSON.stringify({
-      'inst_book': jsonFile
-    }),
-    contentType: "application/json; charset=utf-8",
-    datatype: "json",
-    xhrFields: {
-      withCredentials: true
-    },
-    success: function(data) {
-      console.dir(data);
-      $('#save_message').text(data['message']);
-    },
-    error: function(data) {
-      console.dir(data);
-      $('#save_message').text("Error occurred!");
-    }
-  }); 
-  */
 
   jQuery.ajax({
     url: "/inst_books/update",
@@ -136,8 +114,8 @@ $(document).on('click', '#odsa_save', function() {
     },
     error: function(data) {
       console.dir(data);
-      //$('#save_message').text("Error occurred!");
-      $('#save_message').html(data['responseText']);
+      $('#save_message').text("Error occurred!");
+      //$('#save_message').html(data['responseText']);
     }
   });
   
@@ -208,6 +186,7 @@ const prepArray = (inputHTML) => {
   inputHTML = inputHTML.replace(/ type="[^"]+"/g, "");
   inputHTML = inputHTML.replace(/ type=""/g, "");
   inputHTML = inputHTML.replace(/ readonly=/g, "");
+  inputHTML = inputHTML.replace(/ disabled=""/g, "");
   let HTMLArray = inputHTML.split("<");
   return HTMLArray;
 }
@@ -239,19 +218,6 @@ const pullValue = ( dataString ) => {
 }
 
 /*
- * Function to take a key and a value and return it as a json object pair.
- */
-const makePair = (key, value) => {
-  if (value === "{}") {
-    return "\"" + key + "\": " + value + ",\n";
-  } else if (value === "true" || value === "false") {
-    return "\"" + key + "\": " + value + ",\n";
-  } else {
-    return "\"" + key + "\": \"" + value + "\",\n";
-  }
-}
-
-/*
  * Function to take a text array and turn it into an html download object.
  */
 const makeFile = (textArray) => {
@@ -265,13 +231,20 @@ const makeFile = (textArray) => {
   return textFile;
 }
 
-const datepick = () => {
-  let html = "<div class=\"col-sm-6\"><div class=\"form-group\"><div class=\"datetimepicker\" input-group date\">";
-  html += "<input class=\"form-control\" type=\"text\" /><span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
-  html += "</span></span></div></div></div>";
+/*
+ * Function to return the html to make a datetimepicker object.
+ */
+const datepick = (chapter) => {
+  let html = "<div class=\"form-group\"><div class=\"datetimepicker input-group date\">";
+  html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\"/>";
+  html += "<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
+  html += "</span></span></div></div>";
   return html;
 }
 
+/*
+ * Function to return the html to make a dropdown menu object.
+ */
 const dropdown = () => {
   let html = "<div class=\"dropdown instDropdown\">";
   html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
@@ -302,7 +275,13 @@ const encode = ( data ) => {
 				return "exercise options";
 			} else if(key == "learning_tool") {
 				return "learning tool";
-			} else if(key == "soft_deadline") {
+			} else if(key == "showsection") {
+        return "show section";
+      } else if(key == "lms_item_id") {
+        return "lms item id";
+      } else if(key == "lms_assignment_id") {
+        return "lms assignment id";
+      } else if(key == "soft_deadline") {
         return "soft deadline";
       } else if(key == "hard_deadline") {
         return "hard deadline";
@@ -312,19 +291,23 @@ const encode = ( data ) => {
 		});
 		
 		Handlebars.registerHelper('valCheck', function(key, value, chapter) {
-			if(key == "required") {
+			if(key == "required" || key == "showsection") {
 				if(value == "true") {
 					return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
 				} else {
 					return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
 				}
-			} else if(key == "soft_deadline") {
+			} else if(key == "lms_item_id" || key == "lms_assignment_id") {
+        return new Handlebars.SafeString("<input value=\"null\" disabled>");
+      } else if(key == "soft_deadline") {
         return new Handlebars.SafeString("<input data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\" class=\"datetimepicker\">");
       } else if(key == "hard_deadline") {
         return new Handlebars.SafeString("<input data-chapter=\"" + chapter + "\" data-type=\"hard\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\" class=\"datetimepicker\">");
       } else if(typeof(value) === 'object') {
 				return new Handlebars.SafeString("<input value=\"{}\">");
-			} else {
+			} else if(key == "long_name") {
+        return new Handlebars.SafeString("<input value=\"" + value + "\" disabled>");
+      } else {
 				return new Handlebars.SafeString("<input value=\"" + value + "\">");
 			}
 		});
@@ -393,7 +376,7 @@ const decode = ( fileArray ) => {
 			let value = pullValue(fileArray[i]);
       value = value.replace(/"="/g, '');
       value = value.replace(/"/g, '\\"');
-			if (value === "true" || value === "false" || (!isNaN(parseFloat(value)) && !(value.includes("-")) && !(value.includes("/")))) {
+			if (value === "true" || value === "false" || value === "null" || (!isNaN(parseFloat(value)) && !(value.includes("-")) && !(value.includes("/")))) {
 				line = value;
 			} else {
 				line = "\"" + value + "\"";
@@ -440,8 +423,6 @@ const decode = ( fileArray ) => {
  * Function to build a json file from the html on the page.
  */
 const buildJSON = () => {
-  //$('.instDropdown').html("");
-
   let json = "{\n";
   let spacing = "  ";
 
@@ -466,7 +447,6 @@ const buildJSON = () => {
   
   json = json.replace(/"sections": "null"/g, "\"sections\": {}");
   
-  //$('.instDropdown').html(dropdownAdd());
   return json;
 }
 
