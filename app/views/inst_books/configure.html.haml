@@ -5,7 +5,7 @@
 
 #odsa_content
   #instructions
-    %p Press the "Save Book" button to generate a link that will allow you to download your book configuration.
+    %p Press the "Save Book" button to upload your new book configuration.
   #dialog{:title => "Load Book"}
   #navigation
     / %button#odsa_new.odsa_button.ui-button.ui-corner-all New Book
@@ -13,6 +13,20 @@
     %button#odsa_save.odsa_button.ui-button.ui-corner-all Save Book
     %span#save_message
     %a#downloadLink{:download => "Test.json"} Download
+  #chapterDue.modal.fade
+    .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{"data-dismiss" => "modal"} &times;
+        %h2.modal-title Chapter Due Date
+      .modal-body
+        Soft Deadline:
+        %input#chapterSoft.datetimepicker
+        %br
+        Hard Deadline:
+        %input#chapterHard.datetimepicker
+      .modal-footer
+        %button#chapterSubmit.btn.btn-default{"data-dismiss" => "modal"} Submit
   #header
     #title
     #heading

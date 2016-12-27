@@ -1,14 +1,11 @@
 let textFile = null; // Temporary global variable used for download link.
 
-let nextId = 0; // Global variable used for tracking input ids.
-
 /*
  * Checks if a json file has been defined and, if not, prompts the user to select one.
  */
 $(document).ready(() => {
   loadJSON(jsonFile);
 })
-
 
 /*
  * Defines the div tag 'dialog' as a jquery ui dialog widget.
@@ -20,10 +17,46 @@ $(function() {
 });
 
 /*
- * Defines the class 'datepicker' as a jquery ui datepicker widget.
+ * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
  */
 $(document).on('focus', '.datetimepicker', function() {
+  $(this).parent().css("position", "relative");
   $(this).datetimepicker();
+});
+
+/*
+ * Sets the value attribute of an input tag when the user changes it.
+ */
+$(document).on('blur', ':input', function() {
+	$(this).attr('value', $(this).val());
+});
+
+
+/*
+ * Sets the data-key attribute of a select tag when the user changes it.
+ */
+$(document).on('blur', 'select', function() {
+	$(this).attr('data-key', $(this).val());
+});
+
+/*
+ * Sends the chapter name to the chapter due date modal when the appropriate
+ * button is clicked.
+ */
+$(document).on('click', '.chapterLoad', function() {
+	$('#chapterSoft').attr('data-chapter', $(this).attr('data-chapter'));
+	$('#chapterHard').attr('data-chapter', $(this).attr('data-chapter'));
+});
+
+/*
+ * Sets all of the section due dates to the values set in the chapter due date
+ * modal.
+ */
+$(document).on('click', '#chapterSubmit', function() {
+	var chapterTitle = $('#chapterSoft').attr('data-chapter');
+	var checkChapter = '[data-chapter=\"' + chapterTitle + '\"]';
+	$(checkChapter + '[data-type="soft"]').val($('#chapterSoft').val());
+	$(checkChapter + '[data-type="hard"]').val($('#chapterHard').val());
 });
 
 /*
@@ -45,16 +78,13 @@ $(document).on('click', '#new', function() {
   newJSON();
 });
 
-
 /*
  * The click event for the 'Save Book' button.
- * Currently, this saves the book as an html download object.
  */
-/*
+
+/* The old version that saves the book as a downloadable file. Used for testing.
  $(document).on('click', '#odsa_save', function() {
    let download = document.getElementById('downloadLink');
-   
-   //let json = JSON.stringify(jsonFile);
    
    let json = buildJSON();
 
@@ -64,33 +94,9 @@ $(document).on('click', '#new', function() {
  });
 */
 
-
 $(document).on('click', '#odsa_save', function() {
   var bookConfig = JSON.parse(buildJSON());
 
-  /*
-  jQuery.ajax({
-    url: "/inst_books/update",
-    type: "POST",
-    data: JSON.stringify({
-      'inst_book': jsonFile
-    }),
-    contentType: "application/json; charset=utf-8",
-    datatype: "json",
-    xhrFields: {
-      withCredentials: true
-    },
-    success: function(data) {
-      console.dir(data);
-      $('#save_message').text(data['message']);
-    },
-    error: function(data) {
-      console.dir(data);
-      $('#save_message').text("Error occurred!");
-    }
-  }); 
-  */
-  
   jQuery.ajax({
     url: "/inst_books/update",
     type: "POST",
@@ -108,8 +114,8 @@ $(document).on('click', '#odsa_save', function() {
     },
     error: function(data) {
       console.dir(data);
-      //$('#save_message').text("Error occurred!");
-      $('#save_message').html(data['responseText']);
+      $('#save_message').text("Error occurred!");
+      //$('#save_message').html(data['responseText']);
     }
   });
   
@@ -177,36 +183,38 @@ const prepArray = (inputHTML) => {
   inputHTML = inputHTML.replace(/ style=""/g, "");
   inputHTML = inputHTML.replace(/ class="[^"]+"/g, "");
   inputHTML = inputHTML.replace(/ class=""/g, "");
+  inputHTML = inputHTML.replace(/ type="[^"]+"/g, "");
+  inputHTML = inputHTML.replace(/ type=""/g, "");
+  inputHTML = inputHTML.replace(/ readonly=/g, "");
+  inputHTML = inputHTML.replace(/ disabled=""/g, "");
   let HTMLArray = inputHTML.split("<");
   return HTMLArray;
 }
 
 /*
- * Function to return the 'value' element of the given html string.
+ * Function to return the 'data-key' element of the given html string.
  */
-const pullValue = (inputString) => {
+const pullData = ( dataString ) => {
   let value = "";
-  if (inputString.includes("value")) {
-    let stringStart = inputString.search("value=\"");
-    let stringEnd = inputString.search("\" type=");
-    value = inputString.slice(stringStart + 7, stringEnd);
-  } else {
-    value = "";
+  if (dataString.includes("data-key")) {
+    let stringStart = dataString.search("data-key=\"");
+    let stringEnd = dataString.search("\">");
+    value = dataString.slice(stringStart + 10, stringEnd);
   }
   return value;
 }
 
 /*
- * Function to take a key and a value and return it as a json object pair.
+ * Function to return the 'value' element of the given html string.
  */
-const makePair = (key, value) => {
-  if (value === "{}") {
-    return "\"" + key + "\": " + value + ",\n";
-  } else if (value === "true" || value === "false") {
-    return "\"" + key + "\": " + value + ",\n";
-  } else {
-    return "\"" + key + "\": \"" + value + "\",\n";
+const pullValue = ( dataString ) => {
+  let value = "";
+  if (dataString.includes("value")) {
+    let stringStart = dataString.search("value=\"");
+    let stringEnd = dataString.search("\">");
+    value = dataString.slice(stringStart + 7, stringEnd);
   }
+  return value;
 }
 
 /*
@@ -223,189 +231,221 @@ const makeFile = (textArray) => {
   return textFile;
 }
 
-const datepick = () => {
-  let html = "<div class=\"col-sm-6\"><div class=\"form-group\"><div class=\"datetimepicker\" input-group date\">";
-  html += "<input class=\"form-control\" type=\"text\" /><span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
-  html += "</span></span></div></div></div>";
+/*
+ * Function to return the html to make a datetimepicker object.
+ */
+const datepick = (chapter) => {
+  let html = "<div class=\"form-group\"><div class=\"datetimepicker input-group date\">";
+  html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\"/>";
+  html += "<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
+  html += "</span></span></div></div>";
   return html;
 }
 
+/*
+ * Function to return the html to make a dropdown menu object.
+ */
 const dropdown = () => {
   let html = "<div class=\"dropdown instDropdown\">";
   html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
   html += "<ul class=\"dropdown-menu pull-right\">";
-  //html += "<li class=\"due-date\"><a>Set Due Dates</a></li>";
+  html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"{{@key}}\" class=\"chapterLoad\">Set Due Dates</a></li>";
   html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
   html += "</ul></div>";
   return html;
 }
 
-const dropdownAdd = () => {
-   let html = "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
-   html += "<ul class=\"dropdown-menu pull-right\">";
-   //html += "<li class=\"due-date\"><a>Set Due Dates</a></li>";
-   html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
-   html += "</ul></div>";
-   return html;
-}
-
-
-//odsa_save.odsa_button.ui-button.ui-corner-all
-
 /*
  * Function to read in a json key and value pair and convert it into the
  * proper html to be dispayed to the user.
  */
-const encode = (key, val, index = -100) => {
-  let htmlKey = "";
-  if (key.includes("'")) {
-    htmlKey = key.replace("'", "&#39;");
-  } else {
-    htmlKey = key;
-  }
-  if (typeof val === 'object' && val !== null) {
-    let output = "";
-    if (index === 1) {
-      //output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><button class=\"odsa_button remove\">Delete</button><ul class=\"contain odsa_sortable\">";
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a>" + dropdown() + "<ul class=\"contain odsa_sortable\">";
-      //output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      //output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + "use_bootstrap_datepicker_instead" + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-    } else if (index === 2) {
-      output += "<li class='odsa_li' id='" + htmlKey + "'><span class='glyphicon glyphicon-th-list'></span><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
-    } else if (index === 3) {
-      output += "<li class='odsa_li' id=\"hard_deadline\">hard_deadline: <input type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"soft_deadline\">soft_deadline: <input type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + "\" class=\"datepicker odsa_in\" id=\"" + ++nextId + "\"> <br>";
-      output += "<li class='odsa_li' id=\"" + htmlKey + "\"><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
-    } else {
-      output += "<li class='odsa_li' id='" + htmlKey + "'><a><span class='glyphicon glyphicon-chevron-right'></span>" + key + "</a><ul class=\"contain\">";
-    }
-    for (var entry in val) {
-      output = output + encode(entry, val[entry], index + 1);
-    }
-    output += "</ul></li>";
-    return output;
-  } else {
-    return "<li class='odsa_li' id=\"" + htmlKey + "\">" + key + ": <input type=\"text\" name=\"" + htmlKey + "\" value=\"" + val + "\" id=\"" + ++nextId + "\"></li>";
-  }
+const encode = ( data ) => {
+		Handlebars.registerHelper('pullModule', function(path) {
+			return path.substr(path.indexOf("/") + 1);
+		});
+		
+		Handlebars.registerHelper('keyCheck', function(key) {
+			if(key == "long_name") {
+				return "long name";
+			} else if(key == "resource_type") {
+				return "resource type";
+			} else if(key == "resource_name") {
+				return "resource name";
+			} else if(key == "exer_options") {
+				return "exercise options";
+			} else if(key == "learning_tool") {
+				return "learning tool";
+			} else if(key == "showsection") {
+        return "show section";
+      } else if(key == "lms_item_id") {
+        return "lms item id";
+      } else if(key == "lms_assignment_id") {
+        return "lms assignment id";
+      } else if(key == "soft_deadline") {
+        return "soft deadline";
+      } else if(key == "hard_deadline") {
+        return "hard deadline";
+      } else {
+				return key;
+			}
+		});
+		
+		Handlebars.registerHelper('valCheck', function(key, value, chapter) {
+			if(key == "required" || key == "showsection") {
+				if(value == "true") {
+					return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
+				} else {
+					return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
+				}
+			} else if(key == "lms_item_id" || key == "lms_assignment_id") {
+        return new Handlebars.SafeString("<input value=\"null\" disabled>");
+      } else if(key == "soft_deadline") {
+        return new Handlebars.SafeString("<input data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\" class=\"datetimepicker\">");
+      } else if(key == "hard_deadline") {
+        return new Handlebars.SafeString("<input data-chapter=\"" + chapter + "\" data-type=\"hard\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\" class=\"datetimepicker\">");
+      } else if(typeof(value) === 'object') {
+				return new Handlebars.SafeString("<input value=\"{}\">");
+			} else if(key == "long_name") {
+        return new Handlebars.SafeString("<input value=\"" + value + "\" disabled>");
+      } else {
+				return new Handlebars.SafeString("<input value=\"" + value + "\">");
+			}
+		});
+  
+    var hSource = "<ul class='odsa_ul'>" +
+                  "<li class='odsa_li'><a data-key=\"inst_book_id\">instance book id: </a><input value=\"{{inst_book_id}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"title\">title: </a><input value=\"{{title}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"desc\">description: </a><input value=\"{{desc}}\"></li>" +
+                  "</ul>";
+    var hTemplate = Handlebars.compile(hSource);
+    var hhtml = hTemplate(data);
+    $('#heading').html(hhtml);
+ 
+    var oSource = "<ul class='odsa_ul'>" +
+                  "<li class='odsa_li'><a data-key=\"course_id\">course id: </a><input value=\"{{course_id}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"LMS_url\">LMS url: </a><input value=\"{{LMS_url}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"build_dir\">build directory: </a><input value=\"{{build_dir}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"code_dir\">code directory: </a><input value=\"{{code_dir}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"lang\">language: </a><input value=\"{{lang}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"code_lang\">code language: </a><input value=\"{}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"build_JSAV\">build JSAV: </a><input value=\"{{build_JSAV}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"tabbed_codeinc\">tabbed code inc: </a><input value=\"{{tabbed_codeinc}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"build_cmap\">build cmap: </a><input value=\"{{build_cmap}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"suppress_todo\">suppress todo: </a><input value=\"{{suppress_todo}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"assumes\">assumes: </a><input value=\"{{assumes}}\"></li>" +
+                  "<li class='odsa_li'><a data-key=\"dispModComp\">display Mod Comp: </a><input value=\"{{dispModComp}}\"></li>" +
+                  "</ul>";
+    var oTemplate = Handlebars.compile(oSource);
+    var ohtml = oTemplate(data);
+    $('#options').html(ohtml);
+  
+		var cSource = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{#each chapters}}" + // List
+				   "<li class='odsa_li'><span class='glyphicon glyphicon-th-list'></span><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a>" + dropdown() + // Chapters
+				   "<ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{#each .}}" + // Chapters
+				   "{{#if long_name}} <li class='odsa_li'><span class='glyphicon glyphicon-th-list'></span><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Module: </strong> {{long_name}} </a><ul class=\"odsa_ul\"> {{#each sections}}" + // Modules
+				   "<li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Section: </strong> {{@key}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Sections
+				   "{{#if long_name}} <li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Exercise: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Exercises
+				   "<li class='odsa_li'><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li>" + // Exercise Data
+				   "{{/each}} </ul></li>" + // Close Exercise Data
+				   "{{else}} <li><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
+				   "{{/each}}" + // Close Exercises
+				   "</ul></li>" + // Close Sections
+				   "{{/each}} </ul> {{/if}} </li>" + // Close Modules
+				   "{{/each}} </ul></li>" + // Close Chapters
+				   "{{/each}} </ul>"; // Close List
+				   
+		var cTemplate = Handlebars.compile(cSource);
+		var chtml = cTemplate(data);
+    $('#chapters').html(chtml);
 }
 
 /*
  * Function to read in an array of html strings and convert it into a json
  * object.
  */
-const decode = (fileArray, chapter = true) => {
-  let jsonString = "";
-  let spacing = "  ";
-  for (i = 0; i < fileArray.length; i++) {
-    let line = "";
-    if (fileArray[i].startsWith("li")) {
-      let stringStart = fileArray[i].search("id=\"");
-      let stringEnd = fileArray[i].search("\">");
-      let value = fileArray[i].slice(stringStart + 4, stringEnd);
-      line = spacing + "\"" + value + "\": ";
-    } else if (fileArray[i].startsWith("input")) {
-      let stringStart = fileArray[i].search("id=\"");
-      let stringEnd = fileArray[i].search("\" type=");
-      //console.log(fileArray[i]);
-      //console.log(stringStart);
-      //console.log(stringEnd);
-      let id = "#" + fileArray[i].slice(stringStart + 4, stringEnd);
-      let value = $(id).val();
-      if (value === "true" || value === "false") {
-        if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
-          line = value + ",";
-        } else {
-          line = value;
-        }
-      } else if (!isNaN(parseFloat(value))) {
-        if (!value.includes("/")) {
-          if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
-            line = parseFloat(value) + ","
-          } else {
-            line = parseFloat(value);
-          }
-        } else {
-          line = "\"" + value + "\",";
-        }
-      } else {
-        //alert(fileArray[i + 2]);
-        if ((!chapter) || (i + 2 < fileArray.length) && ((fileArray[i + 2].startsWith("li")) || (fileArray[i + 2].startsWith("/li")))) {
-          line = "\"" + value + "\",";
-        } else {
-          line = "\"" + value + "\"";
-        }
-      }
+const decode = ( fileArray ) => {
+	let jsonString = "";
+	let spacing = "  ";
+	for(i = 0; i < fileArray.length; i++)
+	{
+		let line = "";
+		if(fileArray[i].startsWith("a")) {
+			let value = pullData(fileArray[i]);
+			line = spacing + "\"" + value + "\": ";
+		} else if (fileArray[i].startsWith("input")) {
+			let value = pullValue(fileArray[i]);
+      value = value.replace(/"="/g, '');
+      value = value.replace(/"/g, '\\"');
+			if (value === "true" || value === "false" || value === "null" || (!isNaN(parseFloat(value)) && !(value.includes("-")) && !(value.includes("/")))) {
+				line = value;
+			} else {
+				line = "\"" + value + "\"";
+			}
+			if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
+				line = line + ",";
+			}
+		} else if(fileArray[i].startsWith("select")) {
+			let value = pullData(fileArray[i]);
+			line = "\"" + value + "\",";
+		} else if(fileArray[i].startsWith("button")) {
+      i = i + 13;
     } else if (fileArray[i].startsWith("ul")) {
       if (fileArray[i + 1].startsWith("/ul")) {
-        if ((!chapter) || (i + 3 < fileArray.length) && (fileArray[i + 3].startsWith("li"))) {
-          line = "{},";
-          i++;
-        } else {
-          line = "{}";
-          i++;
+        line = "{}";
+        if((i + 3 < fileArray.length) && (fileArray[i + 3].startsWith("li"))) {
+          line += ",";
         }
+        i++;
       } else {
-        if (chapter || (i != 1 && i != (fileArray.length - 1))) {
+        if(i != 1 && i != (fileArray.length - 1)) {
           line = "{ \n";
           spacing = spacing + "  ";
         }
       }
-    } else if (fileArray[i].startsWith("/li")) {
-      line = "\n";
-    } else if (fileArray[i].startsWith("/ul")) {
-      if (chapter || (i != 1 && i != (fileArray.length - 1))) {
-        spacing = spacing.slice(0, spacing.length - 2);
-        if (chapter) {
-          if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
-            line = spacing + "},";
-          } else {
-            line = spacing + "}";
-          }
-        } else {
-          line = spacing + "},";
-        }
-      }
-    } else if (fileArray[i].startsWith("a")) {} else if (fileArray[i].startsWith("/a")) {} else {}
-    jsonString += line;
-  }
-  return jsonString;
+		} else if (fileArray[i].startsWith("/li")) {
+      		line = "\n";
+    	} else if (fileArray[i].startsWith("/ul")) {
+		  if (i != 1 && i != (fileArray.length - 1)) {
+			spacing = spacing.slice(0, spacing.length - 2);
+			if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
+				line = spacing + "},";
+			} else {
+				line = spacing + "}";
+			}
+		  }
+		}
+		jsonString += line;
+	}
+	return jsonString;
 }
 
 /*
  * Function to build a json file from the html on the page.
  */
 const buildJSON = () => {
-  //let fileName = "Download.json";
-  //if ($('#1').val() != "") {
-  //  fileName = $('#1').val();
-  //}
-
-  //$('#downloadLink').attr('download', fileName);
-  $('.instDropdown').html("");
-
   let json = "{\n";
   let spacing = "  ";
 
   let header = $('#heading').html();
   let headerArray = prepArray(header);
   json += decode(headerArray, false);
+  json += ",";
 
   let options = $('#options').html();
   let optionArray = prepArray(options);
   json += decode(optionArray, false);
+  json += ",";
 
   let chapters = $('#chapters').html();
-  chapters = chapters.replace(/readonly=/g, "");
   let chapterArray = prepArray(chapters);
 
   json += spacing + "\"chapters\": ";
   json += decode(chapterArray);
+  json += "\n" + spacing + "}";
 
   json += "\n}";
   
   json = json.replace(/"sections": "null"/g, "\"sections\": {}");
-  
-  $('.instDropdown').html(dropdownAdd());
   
   return json;
 }
@@ -461,31 +501,10 @@ const newJSON = function() {
  */
 const loadJSON = function(jsonFile) {
 
-  let titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
-  titleString += "</ul>"
+  let titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1>";
   $('#title').html(titleString);
 
-  let headerString = "<ul class='odsa_ul'>";
-  headerString += encode("title", jsonFile['title']);
-  headerString += encode("desc", jsonFile['desc']);
-  headerString += "</ul>";
-  $('#heading').html(headerString);
-
-  let optionString = "<ul class='odsa_ul'>";
-  $.each(jsonFile, function(key, val) {
-    if (!(key === "title" || key === "desc" || key === "chapters")) {
-      optionString += encode(key, val);
-    }
-  });
-  optionString += "</ul>";
-  $('#options').html(optionString);
-
-  let chapterString = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\">";
-  $.each(jsonFile['chapters'], function(key, val) {
-    chapterString += encode(key, val, 1);
-  });
-  chapterString += "</ul>";
-  $('#chapters').html(chapterString);
+  encode(jsonFile);
 
   addClasses();
 }
