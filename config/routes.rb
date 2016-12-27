@@ -6,22 +6,6 @@ CodeWorkout::Application.routes.draw do
 
   post 'lti/assessment'
 
-  post 'configurations/book/create_redirect' # to be deleted later
-
-  get 'configurations/book/create', as: :book_config_cerate
-
-  post 'configurations/book/create'
-
-  get 'configurations/book/edit'
-
-  post 'configurations/book/edit'
-
-  get 'configurations/book/modules'
-
-  get 'configurations/book/load'
-
-  get 'configurations/book/configs' # Gets the configuration file names that already exist
-
   post 'lti/exercise_attempts'
 
   post 'lti/user_interaction'
