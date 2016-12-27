@@ -95,46 +95,46 @@ class CourseOfferingsController < ApplicationController
   # Public: Creates a new course enrollment based on enroll link.
   # FIXME:  Not really sure this is the best place to do it.
 
-  def enroll
-    if @course_offering &&
-      @course_offering.can_enroll? &&
-      CourseEnrollment.create(
-      course_offering: @course_offering,
-      user: current_user,
-      course_role: CourseRole.student)
+  # def enroll
+  #   if @course_offering &&
+  #     @course_offering.can_enroll? &&
+  #     CourseEnrollment.create(
+  #     course_offering: @course_offering,
+  #     user: current_user,
+  #     course_role: CourseRole.student)
 
-      redirect_to organization_course_path(
-        @course_offering.course.organization,
-        @course_offering.course,
-        @course_offering.term),
-        notice: 'You are now enrolled in ' +
-          "#{@course_offering.display_name}."
-    else
-      flash[:warning] = 'Unable to enroll in that course.'
-      redirect_to root_path
-    end
-  end
+  #     redirect_to organization_course_path(
+  #       @course_offering.course.organization,
+  #       @course_offering.course,
+  #       @course_offering.term),
+  #       notice: 'You are now enrolled in ' +
+  #         "#{@course_offering.display_name}."
+  #   else
+  #     flash[:warning] = 'Unable to enroll in that course.'
+  #     redirect_to root_path
+  #   end
+  # end
 
 
   # -------------------------------------------------------------
   # DELETE /unenroll
   # Public: Deletes an enrollment, if it exists.
-  def unenroll
-    if @course_offering
-      path = organization_course_path(
-        @course_offering.course.organization,
-         @course_offering.course,
-        @course_offering.term)
-      description = @course_offering.display_name
+  # def unenroll
+  #   if @course_offering
+  #     path = organization_course_path(
+  #       @course_offering.course.organization,
+  #        @course_offering.course,
+  #       @course_offering.term)
+  #     description = @course_offering.display_name
 
-      @course_offering.course_enrollments.where(user: current_user).destroy_all
-      redirect_to path, notice: "You have unenrolled from #{description}."
-    else
-      flash[:error] =
-        'No course offering was specified in your unenroll request.'
-      redirect_to root_path
-    end
-  end
+  #     @course_offering.course_enrollments.where(user: current_user).destroy_all
+  #     redirect_to path, notice: "You have unenrolled from #{description}."
+  #   else
+  #     flash[:error] =
+  #       'No course offering was specified in your unenroll request.'
+  #     redirect_to root_path
+  #   end
+  # end
 
   # -------------------------------------------------------------
   # GET /course_offerings/:id/upload_roster

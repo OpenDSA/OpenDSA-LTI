@@ -135,8 +135,8 @@ CodeWorkout::Application.routes.draw do
 
 
   resources :course_offerings, only: [ :edit, :update ] do
-    post 'enroll' => :enroll, as: :enroll
-    delete 'unenroll' => :unenroll, as: :unenroll
+    # post 'enroll' => :enroll, as: :enroll
+    # delete 'unenroll' => :unenroll, as: :unenroll
     match 'upload_roster/:action', controller: 'upload_roster',
       as: :upload_roster, via: [:get, :post]
     post 'generate_gradebook' => :generate_gradebook, as: :gradebook

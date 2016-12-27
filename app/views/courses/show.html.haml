@@ -9,12 +9,12 @@
       - if i > 0
         %br/
       %strong= offering.display_name
-      = surround '(', (offering.instructors.any? ? '),' : ')') do
-        - if offering.is_manager? current_user
+      - if offering.is_manager? current_user
+        = surround '(', (offering.instructors.any? ? '),' : ')') do
           = link_to 'edit', edit_admin_course_offering_path(offering)
-        - else
-          = link_to 'unenroll', course_offering_unenroll_path(offering),
-            method: :delete
+        / - else
+        /   = link_to 'unenroll', course_offering_unenroll_path(offering),
+        /     method: :delete
       - if offering.instructors.any?
         = succeed ':' do
           = 'instructor'.pluralize(offering.instructors.size)
