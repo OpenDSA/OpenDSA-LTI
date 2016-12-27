@@ -153,7 +153,7 @@ $(document).on('click', '.odsa_collapse li a', function() {
  * Ajax call to the given directory to pull the names of all .json files.
  * The user is then prompted to select one and given the option to load it.
  */
-const listJSON = (url) => {
+const listJSON = function(url) {
   $.ajax({
     url: url,
     success: function(data) {
@@ -175,7 +175,7 @@ const listJSON = (url) => {
  * Function to remove class declarations and ampersands from a given html string before
  * turning it into an array, splitting on the '<' character.
  */
-const prepArray = (inputHTML) => {
+const prepArray = function(inputHTML) {
   inputHTML = inputHTML.replace(/&amp;/g, "&");
   inputHTML = inputHTML.replace(/ style="[^"]+"/g, "");
   inputHTML = inputHTML.replace(/ style=""/g, "");
@@ -192,7 +192,7 @@ const prepArray = (inputHTML) => {
 /*
  * Function to return the 'data-key' element of the given html string.
  */
-const pullData = (dataString) => {
+const pullData = function(dataString) {
   var value = "";
   if (dataString.includes("data-key")) {
     var stringStart = dataString.search("data-key=\"");
@@ -205,7 +205,7 @@ const pullData = (dataString) => {
 /*
  * Function to return the 'value' element of the given html string.
  */
-const pullValue = (dataString) => {
+const pullValue = function(dataString) {
   var value = "";
   if (dataString.includes("value")) {
     var stringStart = dataString.search("value=\"");
@@ -218,7 +218,7 @@ const pullValue = (dataString) => {
 /*
  * Function to take a text array and turn it into an html download object.
  */
-const makeFile = (textArray) => {
+const makeFile = function(textArray) {
   if (textFile != null) {
     window.URL.revokeObjectURL(textFile);
   }
@@ -232,7 +232,7 @@ const makeFile = (textArray) => {
 /*
  * Function to return the html to make a datetimepicker object.
  */
-const datepick = (chapter) => {
+const datepick = function(chapter) {
   var html = "<div class=\"form-group\"><div class=\"datetimepicker input-group date\">";
   html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\"/>";
   html += "<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
@@ -257,7 +257,7 @@ const dropdown = function() {
  * Function to read in a json key and value pair and convert it into the
  * proper html to be dispayed to the user.
  */
-const encode = (data) => {
+const encode = function(data) {
   Handlebars.registerHelper('pullModule', function(path) {
     return path.substr(path.indexOf("/") + 1);
   });
@@ -361,7 +361,7 @@ const encode = (data) => {
  * Function to read in an array of html strings and convert it into a json
  * object.
  */
-const decode = (fileArray) => {
+const decode = function(fileArray) {
   var jsonString = "";
   var spacing = "  ";
   for (i = 0; i < fileArray.length; i++) {
