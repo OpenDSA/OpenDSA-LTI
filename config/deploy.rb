@@ -146,14 +146,14 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; make pull; git checkout master"
+      execute "cd ~/OpenDSA; make pull; git checkout master;"
     end
   end
 
   # manually checkout master for khan-exercises repository
   after :finishing, 'deploy:checkout_ka' do
     on roles :all do
-      execute "cd ~/OpenDSA/khan-exercises; git pull; git checkout master"
+      execute "cd ~/OpenDSA/khan-exercises; git pull; git checkout master;"
     end
   end
 
