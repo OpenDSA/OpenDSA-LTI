@@ -35,7 +35,7 @@ class InstBook < ActiveRecord::Base
     options['lang'] = book_data['lang'] || "en"
     options['code_lang'] = book_data['code_lang'] || {}
     options['build_JSAV'] = book_data['build_JSAV'] || false
-    options['tabbed_codeinc'] = book_data['tabbed_codeinc'] || false
+    options['tabbed_codeinc'] = book_data['tabbed_codeinc'] || true
     options['build_cmap'] = book_data['build_cmap'] || false
     options['suppress_todo'] = book_data['suppress_todo'] || true
     options['assumes'] = book_data['assumes'] || "recursion"
