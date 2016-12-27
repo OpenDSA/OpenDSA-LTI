@@ -25,9 +25,9 @@ The following server requirements will be fine for supporting hundreds of users.
   - You will see something similar to the following
   ```
   Generating public/private rsa key pair.
-  Enter file in which to save the key (/home/vagrant/.ssh/id_rsa): 
-  Enter passphrase (empty for no passphrase): 
-  Enter same passphrase again: 
+  Enter file in which to save the key (/home/vagrant/.ssh/id_rsa):
+  Enter passphrase (empty for no passphrase):
+  Enter same passphrase again:
   Your identification has been saved in /home/vagrant/.ssh/id_rsa.
   Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub.
   The key fingerprint is:
@@ -124,13 +124,13 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
   sudo service nginx start
   ```
- 
+
   - Open up the server's IP address in your browser to make sure that nginx is up and running. The service command also provides some other methods such as `restart` and `stop` that allow you to easily restart and stop your webserver.
   - Next, we need to update the Nginx configuration file and update couple of things. You'll want to open up `/etc/nginx/nginx.conf` in your favorite editor or simply use nano:
   ```
   sudo nano /etc/nginx/nginx.conf
   ```
-  - First, change user from `www-data` to `deploy` 
+  - First, change user from `www-data` to `deploy`
   ```
   user `deploy`;
   worker_processes auto;
@@ -142,7 +142,7 @@ The following server requirements will be fine for supporting hundreds of users.
   }
   ...
   ```
-  - Second, point Passenger to the version of Ruby that we're using. Find the following lines in the configuration file 
+  - Second, point Passenger to the version of Ruby that we're using. Find the following lines in the configuration file
   ```
   ##
   # Phusion Passenger
@@ -203,13 +203,7 @@ The following server requirements will be fine for supporting hundreds of users.
   git clone https://github.com/OpenDSA/OpenDSA.git
   cd OpenDSA
   make pull
-  git checkout LTI_ruby
-  cd khan-exercises
-  git checkout LTI_ruby
   ```
-
-  - **Note:** As of this writing `OpenDSA/LTI_ruby` branch is used, however in the near future this branch will be merged into `OpenDSA/master` branch. So make sure you monitor OpenDSA repository to know when these two branches got merged to update your production server accordingly.
-
 
   - For the next steps, **Switch back to OpenDSA-DevStack termainal**
 
@@ -235,7 +229,7 @@ The following server requirements will be fine for supporting hundreds of users.
   # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
   ...
   ```
-  
+
   - Second, you need to open up `/vagrant/OpenDSA-LTI/config/deploy/production.rb` file to set the server IP address of you production server. Replace `128.173.236.80` with your server IP address.
   ```
   set :stage, :production
@@ -257,12 +251,12 @@ The following server requirements will be fine for supporting hundreds of users.
   # server list. The second argument is a, or duck-types, Hash and is
   # used to set extended properties on the server.
   server '128.173.236.80', user: 'deploy', roles: %w{web app db}, my_property: :my_value
-  ...  
+  ...
   ```
 
   - Finally, if you have staging server you need to open up `/vagrant/OpenDSA-LTI/config/deploy/staging.rb` file to set the server IP address of you staging server. Replace `128.173.236.221` with your staging server IP address.
 
-  - Commit your changes and push it to `forked` remote 
+  - Commit your changes and push it to `forked` remote
   ```
   cd /vagrant/OpenDSA-LTI
   git add .
@@ -307,7 +301,7 @@ The following server requirements will be fine for supporting hundreds of users.
      username: opendsa
      password: db_password
      host: localhost
-     strict: false     
+     strict: false
   ```
 
   - Second update secrets.yml. To generate a new secret go to OpenDSA-DevStack terminal
@@ -371,7 +365,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
   ```
 
-  - Replace /etc/nginx/ssl/nginx.crt and /etc/nginx/ssl/nginx.key with your valid certificate and key. 
+  - Replace /etc/nginx/ssl/nginx.crt and /etc/nginx/ssl/nginx.key with your valid certificate and key.
 
   - Restart Nginix web server
 
@@ -404,7 +398,7 @@ The following server requirements will be fine for supporting hundreds of users.
     + alter table users drop index email;
     + alter table users drop index slug;
 - Change the following configuration on workbench
-    + Edit > Preferences > Sql Editor > uncheck the "Safe Updates" 
+    + Edit > Preferences > Sql Editor > uncheck the "Safe Updates"
 - Execute the following update statements to anonymize the exported data
     + UPDATE `opendsa`.`users` SET `email` = "example@opendsa.org";
     + UPDATE `opendsa`.`users` SET `slug` = "example@opendsa.org";
