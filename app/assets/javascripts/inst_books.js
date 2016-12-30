@@ -39,6 +39,13 @@ $(document).on('blur', 'select', function() {
 });
 
 /*
+ * Sets the data-key attribute of a form tag when the user changes it.
+ */
+$(document).on('blur', 'form', function() {
+	$(this).attr('data-key', $(this + "input[type='radio']:checked").val());
+});
+
+/*
  * Sends the chapter name to the chapter due date modal when the appropriate
  * button is clicked.
  */
@@ -121,6 +128,13 @@ $(document).on('click', '#odsa_save', function() {
 });
 
 /*
+ * The click even for the 'Undo Changes' button.
+ */
+$(document).on('click', '#odsa_reset', function() {
+	loadJSON(jsonFile);
+});
+
+/*
  * The click event for the 'Book Button' button.
  * This button loads the selected json book.
  */
@@ -185,6 +199,7 @@ const prepArray = (inputHTML) => {
   inputHTML = inputHTML.replace(/ type=""/g, "");
   inputHTML = inputHTML.replace(/ readonly=/g, "");
   inputHTML = inputHTML.replace(/ disabled=""/g, "");
+  inputHTML = inputHTML.replace(/ hidden=""/g, "");
   var HTMLArray = inputHTML.split("<");
   return HTMLArray;
 }
@@ -232,11 +247,16 @@ const makeFile = (textArray) => {
 /*
  * Function to return the html to make a datetimepicker object.
  */
-const datepick = (chapter) => {
+const datepick = (value, chapter) => {
+  /*
   var html = "<div class=\"form-group\"><div class=\"datetimepicker input-group date\">";
-  html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\"/>";
+  html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"null\"/>";
   html += "<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
   html += "</span></span></div></div>";
+  return html;
+  */
+
+  var html = "<input class=\"datetimepicker\" data-chapter\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
   return html;
 }
 
@@ -254,12 +274,35 @@ const dropdown = function() {
 }
 
 /*
+ * Function to check if a given input is not a radio button.
+ */
+const checkRadio = function(input) {
+	if(input.includes("radio")) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+/*
  * Function to read in a json key and value pair and convert it into the
  * proper html to be dispayed to the user.
  */
 const encode = (data) => {
   Handlebars.registerHelper('pullModule', function(path) {
     return path.substr(path.indexOf("/") + 1);
+  });
+  
+  Handlebars.registerHelper('hideExer', function(key) {
+	if(key != "long_name" && key != "points" && key != "threshold") {
+		return "hidden";
+	}
+  });
+  
+  Handlebars.registerHelper('hideSec', function(key) {
+	if(key == "lms_assignment_id" || key == "lms_item_id") {
+		return "hidden";
+	}
   });
 
   Handlebars.registerHelper('keyCheck', function(key) {
@@ -291,16 +334,20 @@ const encode = (data) => {
   Handlebars.registerHelper('valCheck', function(key, value, chapter) {
     if (key == "required" || key == "showsection") {
       if (value == "true") {
-        return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
+        //return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
+		return new Handlebars.SafeString("<form data-key=\"" + value + "\"><label><input type=\"radio\" name=\"radio\" value=\"true\" checked>True</label><label><input type=\"radio\" name=\"radio\" value=\"false\">False</label></form>");
       } else {
-        return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
+        //return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
+		return new Handlebars.SafeString("<form data-key=\"" + value + "\"><label><input type=\"radio\" name=\"radio\" value=\"true\">True</label><label><input type=\"radio\" name=\"radio\" value=\"false\" checked>False</label></form>");
       }
     } else if (key == "lms_item_id" || key == "lms_assignment_id") {
       return new Handlebars.SafeString("<input value=\"null\" disabled>");
     } else if (key == "soft_deadline") {
-      return new Handlebars.SafeString("<input data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\" class=\"datetimepicker\">");
+	  if(typeof(value) === "object") { value = null; }
+	  return new Handlebars.SafeString(datepick(value, chapter));
     } else if (key == "hard_deadline") {
-      return new Handlebars.SafeString("<input data-chapter=\"" + chapter + "\" data-type=\"hard\" type=\"text\" value=\"" + $.datepicker.formatDate('mm/dd/yy', new Date()) + " 12:00 AM\" class=\"datetimepicker\">");
+	  if(typeof(value) === "object") { value = null; }
+	  return new Handlebars.SafeString(datepick(value, chapter));
     } else if (typeof(value) === 'object') {
       return new Handlebars.SafeString("<input value=\"{}\">");
     } else if (key == "long_name") {
@@ -311,7 +358,7 @@ const encode = (data) => {
   });
 
   var hSource = "<ul class='odsa_ul'>" +
-    "<li class='odsa_li'><a data-key=\"inst_book_id\">instance book id: </a><input value=\"{{inst_book_id}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"inst_book_id\">instance book id: </a><input value=\"{{inst_book_id}}\"></li>" +
     "<li class='odsa_li'><a data-key=\"title\">title: </a><input value=\"{{title}}\"></li>" +
     "<li class='odsa_li'><a data-key=\"desc\">description: </a><input value=\"{{desc}}\"></li>" +
     "</ul>";
@@ -320,18 +367,18 @@ const encode = (data) => {
   $('#heading').html(hhtml);
 
   var oSource = "<ul class='odsa_ul'>" +
-    "<li class='odsa_li'><a data-key=\"course_id\">course id: </a><input value=\"{{course_id}}\"></li>" +
-    "<li class='odsa_li'><a data-key=\"LMS_url\">LMS url: </a><input value=\"{{LMS_url}}\"></li>" +
-    "<li class='odsa_li'><a data-key=\"build_dir\">build directory: </a><input value=\"{{build_dir}}\"></li>" +
-    "<li class='odsa_li'><a data-key=\"code_dir\">code directory: </a><input value=\"{{code_dir}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"course_id\">course id: </a><input value=\"{{course_id}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"LMS_url\">LMS url: </a><input value=\"{{LMS_url}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"build_dir\">build directory: </a><input value=\"{{build_dir}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"code_dir\">code directory: </a><input value=\"{{code_dir}}\"></li>" +
     "<li class='odsa_li'><a data-key=\"lang\">language: </a><input value=\"{{lang}}\"></li>" +
     "<li class='odsa_li'><a data-key=\"code_lang\">code language: </a><input value=\"{}\"></li>" +
-    "<li class='odsa_li'><a data-key=\"build_JSAV\">build JSAV: </a><input value=\"{{build_JSAV}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"build_JSAV\">build JSAV: </a><input value=\"{{build_JSAV}}\"></li>" +
     "<li class='odsa_li'><a data-key=\"tabbed_codeinc\">tabbed code inc: </a><input value=\"{{tabbed_codeinc}}\"></li>" +
-    "<li class='odsa_li'><a data-key=\"build_cmap\">build cmap: </a><input value=\"{{build_cmap}}\"></li>" +
-    "<li class='odsa_li'><a data-key=\"suppress_todo\">suppress todo: </a><input value=\"{{suppress_todo}}\"></li>" +
-    "<li class='odsa_li'><a data-key=\"assumes\">assumes: </a><input value=\"{{assumes}}\"></li>" +
-    "<li class='odsa_li'><a data-key=\"dispModComp\">display Mod Comp: </a><input value=\"{{dispModComp}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"build_cmap\">build cmap: </a><input value=\"{{build_cmap}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"suppress_todo\">suppress todo: </a><input value=\"{{suppress_todo}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"assumes\">assumes: </a><input value=\"{{assumes}}\"></li>" +
+    "<li class='odsa_li' hidden><a data-key=\"dispModComp\">display Mod Comp: </a><input value=\"{{dispModComp}}\"></li>" +
     "</ul>";
   var oTemplate = Handlebars.compile(oSource);
   var ohtml = oTemplate(data);
@@ -340,12 +387,12 @@ const encode = (data) => {
   var cSource = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{#each chapters}}" + // List
     "<li class='odsa_li'><span class='glyphicon glyphicon-th-list'></span><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a>" + dropdown() + // Chapters
     "<ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{#each .}}" + // Chapters
-    "{{#if long_name}} <li class='odsa_li'><span class='glyphicon glyphicon-th-list'></span><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Module: </strong> {{long_name}} </a><ul class=\"odsa_ul\"> {{#each sections}}" + // Modules
+    "{{#if long_name}} <li class='odsa_li'><span class='glyphicon glyphicon-th-list'></span><a data-key=\"{{@key}}\">{{#if sections}}<span class='glyphicon glyphicon-chevron-right'></span>{{/if}}<strong> Module: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each sections}}" + // Modules
     "<li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Section: </strong> {{@key}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Sections
     "{{#if long_name}} <li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Exercise: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Exercises
-    "<li class='odsa_li'><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li>" + // Exercise Data
+    "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li>" + // Exercise Data
     "{{/each}} </ul></li>" + // Close Exercise Data
-    "{{else}} <li><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
+    "{{else}} <li {{hideSec @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
     "{{/each}}" + // Close Exercises
     "</ul></li>" + // Close Sections
     "{{/each}} </ul> {{/if}} </li>" + // Close Modules
@@ -369,7 +416,7 @@ const decode = (fileArray) => {
     if (fileArray[i].startsWith("a")) {
       var value = pullData(fileArray[i]);
       line = spacing + "\"" + value + "\": ";
-    } else if (fileArray[i].startsWith("input")) {
+    } else if (fileArray[i].startsWith("input") && checkRadio(fileArray[i])) {
       var value = pullValue(fileArray[i]);
       value = value.replace(/"="/g, '');
       value = value.replace(/"/g, '\\"');
@@ -381,9 +428,10 @@ const decode = (fileArray) => {
       if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
         line = line + ",";
       }
-    } else if (fileArray[i].startsWith("select")) {
+    } else if (fileArray[i].startsWith("select") || fileArray[i].startsWith("form")) {
       var value = pullData(fileArray[i]);
-      line = "\"" + value + "\",";
+      //line = "\"" + value + "\",";
+	  line = value + ",";
     } else if (fileArray[i].startsWith("button")) {
       i = i + 13;
     } else if (fileArray[i].startsWith("ul")) {
@@ -497,7 +545,6 @@ const newJSON = function() {
  * Function to load an existing json book.
  */
 const loadJSON = function(jsonFile) {
-
   var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1>";
   $('#title').html(titleString);
 
