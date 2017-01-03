@@ -6,6 +6,10 @@ input {
   width: 300px;
 }
 
+form input {
+  width: 50px;
+}
+
 option {
 	width: 300px;
 }
@@ -100,5 +104,6 @@ button.odsa_button {
 }
 
 .modal-body input {
+  width: 13%;
   margin: 10px;
 }

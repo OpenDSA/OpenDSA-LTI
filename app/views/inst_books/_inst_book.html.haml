@@ -14,9 +14,9 @@
     - form_name = 'generate_course_' + inst_book.id.to_s
     = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=generate_course', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'generate_course'; return true;" do
       = submit_tag btn_label, name: form_name, class: "btn btn-primary", title: btn_label + ' confirmation.', data: {confirm: 'Re-generating canvas course will override due dates and number of points of all the assignments. Do you want to continue?'}
-  / %td
-  /   = form_tag '/inst_books/configure/'+ inst_book.id.to_s, :method => :get, :target => "_blank"  do
-  /     = submit_tag "Configure Book", class: "btn btn-primary", :target => "_blank"
+  %td
+    = form_tag '/inst_books/configure/'+ inst_book.id.to_s, :method => :get, :target => "_blank"  do
+      = submit_tag "Configure Book", class: "btn btn-primary", :target => "_blank"
 
   - if inst_book.last_compiled != nil
     %td

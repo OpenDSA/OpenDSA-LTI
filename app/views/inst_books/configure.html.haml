@@ -1,4 +1,6 @@
-/ = render 'layouts/breadcrumb'
+%ol.breadcrumb
+  %li= link_to 'Home', root_path
+  %li.active= 'Book Configuration'
 
 :javascript
   window.jsonFile = #{@inst_book_json.html_safe}
@@ -11,6 +13,7 @@
     / %button#odsa_new.odsa_button.ui-button.ui-corner-all New Book
     / %button#odsa_load.odsa_button.ui-button.ui-corner-all Load Book
     %button#odsa_save.odsa_button.ui-button.ui-corner-all Save Book
+    %button#odsa_reset.odsa_button.ui-button.ui-corner-all Undo Changes
     %span#save_message
     %a#downloadLink{:download => "Test.json"} Download
   #chapterDue.modal.fade
@@ -32,4 +35,3 @@
     #heading
     #options
     #chapters
-  

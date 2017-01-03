@@ -56,6 +56,15 @@ class CourseOffering < ActiveRecord::Base
   validates :term, presence: true
 
   #~ Hooks ....................................................................
+  after_save :update_inst_book
+
+  def update_inst_book
+    inst_books.each do |inst_book|
+      inst_book.last_compiled = nil
+      inst_book.save
+    end
+  end
+
   #~ Public instance methods ..................................................
 
   # -------------------------------------------------------------
