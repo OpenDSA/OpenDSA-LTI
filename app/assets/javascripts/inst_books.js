@@ -88,18 +88,19 @@ $(document).on('click', '#new', function() {
  * The click event for the 'Save Book' button.
  */
 
-/* The old version that saves the book as a downloadable file. Used for testing.
+/* The old version that saves the book as a downloadable file. Used for testing. */
  $(document).on('click', '#odsa_save', function() {
    var download = document.getElementById('downloadLink');
 
    var json = buildJSON();
 
-   download.href = makeFile(json);
+   //download.href = makeFile(json);
+   download.href = makeFile(JSON.stringify(jsonFile));
    alert("Ready for Download!");
    $('#downloadLink').toggle();
  });
-*/
 
+/*
 $(document).on('click', '#odsa_save', function() {
   var bookConfig = JSON.parse(buildJSON());
 
@@ -126,6 +127,7 @@ $(document).on('click', '#odsa_save', function() {
   });
 
 });
+*/
 
 /*
  * The click even for the 'Undo Changes' button.
@@ -384,10 +386,10 @@ const encode = (data) => {
   var ohtml = oTemplate(data);
   $('#options').html(ohtml);
 
-  var cSource = "<h1> Chapters: </h1> <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{#each chapters}}" + // List
-    "<li class='odsa_li'><span class='glyphicon glyphicon-th-list'></span><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a>" + dropdown() + // Chapters
-    "<ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{#each .}}" + // Chapters
-    "{{#if long_name}} <li class='odsa_li'><span class='glyphicon glyphicon-th-list'></span><a data-key=\"{{@key}}\">{{#if sections}}<span class='glyphicon glyphicon-chevron-right'></span>{{/if}}<strong> Module: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each sections}}" + // Modules
+  var cSource = "<h1> Chapters: </h1> {{#if last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}} {{#each chapters}}" + // List
+    "<li class='odsa_li'> {{#unless ../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a>" + dropdown() + // Chapters
+    "{{#if ../last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}} {{#each .}}" + // Chapters
+    "{{#if long_name}} <li class='odsa_li'> {{#unless ../../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\">{{#if sections}}<span class='glyphicon glyphicon-chevron-right'></span>{{/if}}<strong> Module: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each sections}}" + // Modules
     "<li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Section: </strong> {{@key}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Sections
     "{{#if long_name}} <li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Exercise: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Exercises
     "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li>" + // Exercise Data
