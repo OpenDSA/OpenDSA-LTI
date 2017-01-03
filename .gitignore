@@ -12,10 +12,13 @@
 /db/*.sqlite3-journal
 
 # Ignore all logfiles and tempfiles.
+*~
+*.bak
 /log/*.log
 /tmp
 .secret
 test-*.txt
+
 # lib/assets/
 public/assets/
 public/OpenDSA
