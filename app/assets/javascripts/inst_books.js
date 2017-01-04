@@ -91,7 +91,7 @@ $(document).on('click', '#new', function() {
  * The click event for the 'Save Book' button.
  */
 
-/* The old version that saves the book as a downloadable file. Used for testing. */
+/* The old version that saves the book as a downloadable file. Used for testing.
  $(document).on('click', '#odsa_save', function() {
    var download = document.getElementById('downloadLink');
 
@@ -102,8 +102,8 @@ $(document).on('click', '#new', function() {
    alert("Ready for Download!");
    $('#downloadLink').toggle();
  });
+*/
 
-/*
 $(document).on('click', '#odsa_save', function() {
   var bookConfig = JSON.parse(buildJSON());
 
@@ -130,7 +130,7 @@ $(document).on('click', '#odsa_save', function() {
   });
 
 });
-*/
+
 
 /*
  * The click even for the 'Undo Changes' button.
