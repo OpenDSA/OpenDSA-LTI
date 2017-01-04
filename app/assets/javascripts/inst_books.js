@@ -22,6 +22,7 @@ $(function() {
 $(document).on('focus', '.datetimepicker', function() {
   $(this).parent().css("position", "relative");
   $(this).datetimepicker({
+    showClose: true,
     sideBySide: true,
     format: "YYYY-MM-DD HH:MM"
   });
@@ -253,11 +254,11 @@ const makeFile = (textArray) => {
  * Function to return the html to make a datetimepicker object.
  */
 const datepick = (value, chapter) => {
-  //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
+  var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
   
-  var html = "<div class='col-sm-3 input-group date datetimepicker'>";
-  html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" /> <span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
-  html += "</div>";
+  //var html = "<div class='col-sm-3 input-group date datetimepicker'>";
+  //html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" /> <span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
+  //html += "</div>";
   return html;
 }
 
