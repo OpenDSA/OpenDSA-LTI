@@ -6,22 +6,6 @@ CodeWorkout::Application.routes.draw do
 
   post 'lti/assessment'
 
-  post 'configurations/book/create_redirect' # to be deleted later
-
-  get 'configurations/book/create', as: :book_config_cerate
-
-  post 'configurations/book/create'
-
-  get 'configurations/book/edit'
-
-  post 'configurations/book/edit'
-
-  get 'configurations/book/modules'
-
-  get 'configurations/book/load'
-
-  get 'configurations/book/configs' # Gets the configuration file names that already exist
-
   post 'lti/exercise_attempts'
 
   post 'lti/user_interaction'
@@ -80,6 +64,10 @@ CodeWorkout::Application.routes.draw do
   # get 'sse/feedback_update'
   get 'sse/feedback_poll'
   post '/course_offerings/:id/upload_roster' => 'course_offerings#upload_roster'
+  get '/course_offerings/new' => 'course_offerings#new', as: :new_course_offerings
+  post '/course_offerings' => 'course_offerings#create', as: :create_course_offerings
+
+  get '/lms_accesses/:lms_instance_id/search' => 'lms_accesses#search', as: :lms_access_search
 
   get '/request_extension' => 'workout_offerings#request_extension'
   post '/add_extension' => 'workout_offerings#add_extension'
@@ -147,8 +135,8 @@ CodeWorkout::Application.routes.draw do
 
 
   resources :course_offerings, only: [ :edit, :update ] do
-    post 'enroll' => :enroll, as: :enroll
-    delete 'unenroll' => :unenroll, as: :unenroll
+    # post 'enroll' => :enroll, as: :enroll
+    # delete 'unenroll' => :unenroll, as: :unenroll
     match 'upload_roster/:action', controller: 'upload_roster',
       as: :upload_roster, via: [:get, :post]
     post 'generate_gradebook' => :generate_gradebook, as: :gradebook
@@ -167,12 +155,15 @@ CodeWorkout::Application.routes.draw do
 
   #OmniAuth for Facebook
   devise_for :users,
-    controllers: {omniauth_callbacks: 'users/omniauth_callbacks',
-                  registrations: "registrations" },
+    controllers: {omniauth_callbacks: 'users/omniauth_callbacks', registrations: "registrations" },
     skip: [:registrations, :sessions]
   as :user do
-    get '/signup' => 'registrations#new', as: :new_user_registration
-    post '/signup' => 'registrations#create', as: :user_registration
+    get '/new_password' => 'devise/passwords#new', as: :new_password
+    get '/edit_password' => 'devise/passwords#edit', as: :edit_password
+    put '/update_password' => 'devise/passwords#update', as: :update_password
+    post '/create_password' => 'devise/passwords#create', as: :create_password
+    get '/signup' => 'devise/registrations#new', as: :new_user_registration
+    post '/signup' => 'devise/registrations#create', as: :user_registration
     get '/login' => 'devise/sessions#new', as: :new_user_session
     post '/login' => 'devise/sessions#create', as: :user_session
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session

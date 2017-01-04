@@ -30,7 +30,7 @@ class CourseOffering < ActiveRecord::Base
   belongs_to :term, inverse_of: :course_offerings
   belongs_to :late_policy, inverse_of: :course_offerings
 
-  has_many :inst_books, inverse_of: :course_offering
+  has_many :inst_books, inverse_of: :course_offering, dependent: :destroy
   accepts_nested_attributes_for :inst_books, allow_destroy: true
 
   has_many :course_enrollments,
@@ -56,6 +56,15 @@ class CourseOffering < ActiveRecord::Base
   validates :term, presence: true
 
   #~ Hooks ....................................................................
+  after_save :update_inst_book
+
+  def update_inst_book
+    inst_books.each do |inst_book|
+      inst_book.last_compiled = nil
+      inst_book.save
+    end
+  end
+
   #~ Public instance methods ..................................................
 
   # -------------------------------------------------------------

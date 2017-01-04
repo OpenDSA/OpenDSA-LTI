@@ -27,19 +27,27 @@
             %thead
               %th Term
               %th Section
+              - if user_signed_in? && current_user.global_role.is_admin?
+                %th Canvas course
               %th Instructor(s)
-              %th Enroll
+              / %th Enroll
             %tbody
               - course.course_offerings.each do |o|
+                - lms_course_code = o.lms_course_code
+                - lms_url = o.lms_instance.url
+                - lms_course_num = o.lms_course_num
+                - course_offering_url = lms_url.to_s + "/courses/" + lms_course_num.to_s
                 %tr
                   %td= o.term.display_name
                   %td= link_to o.display_name,
                     organization_course_path(o.course.organization,
                     o.course, o.term)
+                  - if user_signed_in? && current_user.global_role.is_admin?
+                    %td= link_to lms_course_code, course_offering_url, :target => "_blank"
                   %td!= o.instructors.map{ |i| link_to i.display_name,
                     user_path(i) }.to_sentence
-                  %td= render partial: "course_offerings/self_enrollment",
-                    locals: { off: o }
+                  / %td= render partial: "course_offerings/self_enrollment",
+                  /   locals: { off: o }
 - else
   %p
     No organizations have courses offered in

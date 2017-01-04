@@ -2,7 +2,7 @@ ActiveAdmin.register Organization, sort_order: :created_at_asc do
 
   menu parent: 'University-oriented', priority: 20
   permit_params :name, :abbreviation
-  actions :all, except: [:destroy]
+  actions :all, except: [:destroy, :edit]
 
   index do
     id_column

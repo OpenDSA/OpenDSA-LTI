@@ -19,11 +19,14 @@ class InstBook < ActiveRecord::Base
 
   paginates_per 100
 
+  scope :template, -> {where "template = ?", 1}
+
   #~ Validation ...............................................................
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
   def self.save_data_from_json(json, current_user)
+    puts "inst_books"
     book_data = json
     update_mode = false
     inst_book_id = book_data['inst_book_id']
@@ -33,7 +36,7 @@ class InstBook < ActiveRecord::Base
     options['lang'] = book_data['lang'] || "en"
     options['code_lang'] = book_data['code_lang'] || {}
     options['build_JSAV'] = book_data['build_JSAV'] || false
-    options['tabbed_codeinc'] = book_data['tabbed_codeinc'] || false
+    options['tabbed_codeinc'] = book_data['tabbed_codeinc'] || true
     options['build_cmap'] = book_data['build_cmap'] || false
     options['suppress_todo'] = book_data['suppress_todo'] || true
     options['assumes'] = book_data['assumes'] || "recursion"

@@ -9,6 +9,7 @@ class InstModule < ActiveRecord::Base
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
   def self.save_data_from_json(book, chapter, module_path, module_obj, module_position, update_mode=false)
+    puts "inst_modules"
     mod = InstModule.find_by path: module_path
     if !mod
       mod = InstModule.new

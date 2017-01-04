@@ -1,6 +1,6 @@
 class CourseOfferingsController < ApplicationController
   before_filter :rename_course_offering_id_param
-  load_and_authorize_resource
+  # load_and_authorize_resource
 
 
   # -------------------------------------------------------------
@@ -31,16 +31,61 @@ class CourseOfferingsController < ApplicationController
   # -------------------------------------------------------------
   # POST /course_offerings
   def create
-    @course_offering = CourseOffering.new(course_offering_params)
+    lms_instance = LmsInstance.find_by(id: params[:lms_instance_id])
+    course = Course.find_by(id: params[:course_id])
+    term = Term.find_by(id: params[:term_id])
+    # late_policy = LatePolicy.find_by(id: params[:late_policy_id])
+    inst_book = InstBook.find_by(id: params[:inst_book_id])
 
-    if @course_offering.save
-      redirect_to organization_course_path(
-        @course_offering.course.organization,
-        @course_offering.course,
-        @course_offering.term),
-        notice: "#{@course_offering.display_name} was successfully created."
-    else
-      render action: 'new'
+    course_offering = CourseOffering.where(
+                                  "course_id=? and term_id=? and label=? and lms_instance_id=?",
+                                  params[:course_id], params[:term_id], params[:label], params[:lms_instance_id]).first
+
+    if course_offering.blank?
+      course_offering = CourseOffering.new(
+                                   course: course,
+                                   term: term,
+                                   label: params[:label],
+                                   # late_policy: late_policy || nil,
+                                   lms_instance: lms_instance,
+                                   lms_course_code: params[:lms_course_code],
+                                   lms_course_num: params[:lms_course_num])
+
+      cloned_book = inst_book.clone(current_user)
+
+      if course_offering.save!
+        # Add course_offering to the new book
+        cloned_book.course_offering_id = course_offering.id
+        cloned_book.save!
+        if !params['lms_access_token'].blank?
+          lms_access = LmsAccess.new(
+                                 lms_instance: lms_instance,
+                                 user: current_user,
+                                 access_token: params[:lms_access_token])
+          lms_access.save!
+        end
+
+        # Enroll user as course_offering instructor
+        enrollment = CourseEnrollment.new
+        enrollment.course_offering_id = course_offering.id
+        enrollment.user_id = current_user.id
+        enrollment.course_role_id = CourseRole.instructor.id
+        enrollment.save!
+      else
+        err_string = 'There was a problem while creating the workout.'
+        url = url_for new_course_offerings_path(notice: err_string)
+      end
+    end
+
+    if !url
+      url = url_for(organization_course_path(
+          course_offering.course.organization,
+          course_offering.course,
+          course_offering.term))
+    end
+
+    respond_to do |format|
+      format.json { render json: { url: url } }
     end
   end
 
@@ -50,46 +95,46 @@ class CourseOfferingsController < ApplicationController
   # Public: Creates a new course enrollment based on enroll link.
   # FIXME:  Not really sure this is the best place to do it.
 
-  def enroll
-    if @course_offering &&
-      @course_offering.can_enroll? &&
-      CourseEnrollment.create(
-      course_offering: @course_offering,
-      user: current_user,
-      course_role: CourseRole.student)
+  # def enroll
+  #   if @course_offering &&
+  #     @course_offering.can_enroll? &&
+  #     CourseEnrollment.create(
+  #     course_offering: @course_offering,
+  #     user: current_user,
+  #     course_role: CourseRole.student)
 
-      redirect_to organization_course_path(
-        @course_offering.course.organization,
-        @course_offering.course,
-        @course_offering.term),
-        notice: 'You are now enrolled in ' +
-          "#{@course_offering.display_name}."
-    else
-      flash[:warning] = 'Unable to enroll in that course.'
-      redirect_to root_path
-    end
-  end
+  #     redirect_to organization_course_path(
+  #       @course_offering.course.organization,
+  #       @course_offering.course,
+  #       @course_offering.term),
+  #       notice: 'You are now enrolled in ' +
+  #         "#{@course_offering.display_name}."
+  #   else
+  #     flash[:warning] = 'Unable to enroll in that course.'
+  #     redirect_to root_path
+  #   end
+  # end
 
 
   # -------------------------------------------------------------
   # DELETE /unenroll
   # Public: Deletes an enrollment, if it exists.
-  def unenroll
-    if @course_offering
-      path = organization_course_path(
-        @course_offering.course.organization,
-         @course_offering.course,
-        @course_offering.term)
-      description = @course_offering.display_name
+  # def unenroll
+  #   if @course_offering
+  #     path = organization_course_path(
+  #       @course_offering.course.organization,
+  #        @course_offering.course,
+  #       @course_offering.term)
+  #     description = @course_offering.display_name
 
-      @course_offering.course_enrollments.where(user: current_user).destroy_all
-      redirect_to path, notice: "You have unenrolled from #{description}."
-    else
-      flash[:error] =
-        'No course offering was specified in your unenroll request.'
-      redirect_to root_path
-    end
-  end
+  #     @course_offering.course_enrollments.where(user: current_user).destroy_all
+  #     redirect_to path, notice: "You have unenrolled from #{description}."
+  #   else
+  #     flash[:error] =
+  #       'No course offering was specified in your unenroll request.'
+  #     redirect_to root_path
+  #   end
+  # end
 
   # -------------------------------------------------------------
   # GET /course_offerings/:id/upload_roster

@@ -24,6 +24,8 @@
 //= require cocoon
 //= require cm
 //= require book
+//= require course_offerings_form.js
+//= require data-confirm-modal
 //= require moment
 //= require bootstrap-datetimepicker
 //= require mustache.min

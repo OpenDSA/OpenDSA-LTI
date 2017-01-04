@@ -31,8 +31,10 @@ class Term < ActiveRecord::Base
 
   # Orders terms in descending order (latest time first).
   # default_scope { order('ends_on desc') }
-  default_scope { order('year desc, season desc') }
+  # default_scope { order('year desc, season desc') }
+  default_scope { order('starts_on') }
 
+  scope :on_or_future, -> {where "ends_on >= ?", DateTime.now}
 
   #~ Constants ................................................................
 

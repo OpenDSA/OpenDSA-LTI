@@ -1,6 +1,7 @@
 json.set! :inst_book_id, @inst_book.id
 json.set! :title, @inst_book.title
 json.set! :desc, @inst_book.desc
+json.set! :last_compiled, @inst_book.last_compiled.try(:strftime, "%Y-%m-%d %H:%m:%S")
 
 options = @inst_book.options
 if options != nil && options != "null"
@@ -40,8 +41,8 @@ json.chapters do
 
                # section object
                 json.set! section_name do
-                  json.set! :soft_deadline, inst_section.soft_deadline
-                  json.set! :hard_deadline, inst_section.hard_deadline
+                  json.set! :soft_deadline, inst_section.soft_deadline.try(:strftime, "%Y-%m-%d %H:%m:%S")
+                  json.set! :hard_deadline, inst_section.soft_deadline.try(:strftime, "%Y-%m-%d %H:%m:%S")
                   json.set! :showsection, inst_section.show
                   json.set! :lms_item_id, inst_section.lms_item_id
                   json.set! :lms_assignment_id, inst_section.lms_assignment_id

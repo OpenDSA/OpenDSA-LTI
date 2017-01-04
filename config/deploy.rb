@@ -34,7 +34,7 @@ set :deploy_to, '/home/deploy/OpenDSA-LTI'
 # Default value for keep_releases is 5
 set :keep_releases, 5
 
-set :linked_files, %w{config/database.yml config/secrets.yml}
+set :linked_files, %w{config/database.yml config/secrets.yml config/application.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
 
 set :bower_flags, '--quiet --config.interactive=false'
@@ -146,14 +146,14 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; make pull;"
+      execute "cd ~/OpenDSA; git checkout master; make pull;"
     end
   end
 
   # manually checkout master for khan-exercises repository
   after :finishing, 'deploy:checkout_ka' do
     on roles :all do
-      execute "cd ~/OpenDSA/khan-exercises; git pull; git checkout LTI_ruby;"
+      execute "cd ~/OpenDSA/khan-exercises; git checkout master; git pull;"
     end
   end
 

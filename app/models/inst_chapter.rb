@@ -8,6 +8,7 @@ class InstChapter < ActiveRecord::Base
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
   def self.save_data_from_json(book, chapter_name, chapter_obj, chapter_position, update_mode=false)
+    puts "inst_chapters"
     ch = InstChapter.where("inst_book_id = ? AND name = ?", book.id, chapter_name).first
 
     if !update_mode or (update_mode and !ch)

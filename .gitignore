@@ -12,10 +12,13 @@
 /db/*.sqlite3-journal
 
 # Ignore all logfiles and tempfiles.
+*~
+*.bak
 /log/*.log
 /tmp
 .secret
 test-*.txt
+
 # lib/assets/
 public/assets/
 public/OpenDSA
@@ -26,6 +29,8 @@ usr/resources/*/tests
 *.csv
 working.txt
 timezones.txt
+
+.env
 
 .vagrant
 /homeworks
@@ -49,7 +54,6 @@ tasks.todo
 
 # if using bower-rails ignore default bower_components path bower.json files
 /vendor/assets/bower_components
-
 
 /config/application.yml
 /config/database.yml

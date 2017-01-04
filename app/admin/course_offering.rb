@@ -1,11 +1,16 @@
 ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
-  includes :course, :term, :late_policy, :lms_instance
+  includes :course, :term, :lms_instance
 
   menu parent: 'University-oriented', priority: 40
   permit_params :course_id, :term_id, :label, :url,
-    :self_enrollment_allowed, :late_policy_id,
+    :self_enrollment_allowed,
     :lms_instance_id, :lms_course_code, :lms_course_num,
     inst_books_attributes: [ :id, :course_offering_id, :user_id, :title, :desc, :template, :_destroy ]
+
+  action_item only: [:edit]  do
+    link_to "Delete", { action: :destroy }, method: :delete
+  end
+
 
   controller do
     def auto_enroll_instructor(course_offering)
@@ -30,10 +35,10 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
     column :label do |c|
       link_to c.label, admin_course_offering_path(c)
     end
-    column 'Self-enroll?', :self_enrollment_allowed
+    # column 'Self-enroll?', :self_enrollment_allowed
     # column(:url) { |c| link_to c.url, c.url }
     column :created_at
-    column :late_policy, sortable: 'late_policy.name'
+    # column :late_policy, sortable: 'late_policy.name'
     column :lms_instance, sortable: 'lms_instance.url'
     actions
   end
@@ -49,8 +54,8 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
       f.input :course
       f.input :term
       f.input :label
-      f.input :late_policy
-      f.input :self_enrollment_allowed
+      # f.input :late_policy
+      # f.input :self_enrollment_allowed
     end
     # f.inputs 'OpenDSA Books:' do
     #   f.has_many :inst_books, heading: false, allow_destroy: true do |a|

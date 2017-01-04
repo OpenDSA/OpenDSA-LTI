@@ -24,7 +24,7 @@ class CoursesController < ApplicationController
       render 'show_terms'
     else
       @term = Term.find(params[:term_id])
-        
+
       @course_offerings =
         current_user.andand.course_offerings_for_term(@term, @course)
       @is_student = !user_signed_in? ||
@@ -132,6 +132,13 @@ class CoursesController < ApplicationController
 
   # -------------------------------------------------------------
   def search
+     courses = Course.where("organization_id = ?", params['organization_id']).as_json
+
+     respond_to do |format|
+          format.json {
+              render json: courses
+          }
+    end
   end
 
 
