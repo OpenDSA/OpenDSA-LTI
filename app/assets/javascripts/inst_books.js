@@ -110,7 +110,7 @@
   /*
    * The click even for the 'Undo Changes' button.
    */
-  $(document).on('click', '#odsa-reset-co', function() {
+  $(document).on('click', '#odsa-reset-co', function(e) {
     loadJSON(jsonFile);
     e.preventDefault();
   });
@@ -541,39 +541,36 @@
   var handleSubmit = function() {
     var messages,
       bookConfig = JSON.parse(buildJSON()),
-      url = "/inst_books/update",
-      fd;
+      url = "/inst_books/update";
 
     messages = check_completeness();
     if (messages.length !== 0) {
-      form_alert(messages);
+      form_alert(messages, 'danger');
       $('#odsa-submit-co').prop('disabled', false);
       return;
     }
 
-    fd = new FormData;
-    fd.append('inst_book', JSON.stringify(bookConfig));
-
     jQuery.ajax({
       url: url,
       type: "POST",
-      data: fd,
+      data: JSON.stringify({
+        'inst_book': bookConfig
+      }),
       contentType: "application/json; charset=utf-8",
       datatype: "json",
       xhrFields: {
         withCredentials: true
       },
       success: function(data) {
-        $('#save_message').text(data['message']);
+        form_alert([data['message']], 'success');
       },
       error: function(data) {
-        console.dir(data);
-        $('#save_message').text("Error occurred!");
+        form_alert(['Error occurred!'], 'danger');
       }
     });
   };
 
-  var form_alert = function(messages) {
+  var form_alert = function(messages, alertClass) {
     var alert_list, message, _fn, _i, _len;
     reset_alert_area();
     alert_list = $('#alerts').find('.alert ul');
@@ -584,21 +581,22 @@
       message = messages[_i];
       _fn(message);
     }
+    var alertClass = alertClass == 'danger' ? "alert-danger" : "alert-success";
+    $('#alerts .alert').addClass(alertClass).css('display', 'block');
     return $('#alerts').css('display', 'block');
   };
 
   var reset_alert_area = function() {
-    var alert_box;
+    var $alert_box;
     $('#alerts').find('.alert').alert('close');
-    alert_box = "<div class='alert alert-danger alert-dismissable' role='alert'>" + "<button class='close' data-dismiss='alert' aria-label='Close'><i class='fa fa-times'></i></button>" + "<ul></ul>" + "</div>";
-    return $('#alerts').append(alert_box);
+    $alert_box = "<div class='alert alert-dismissable' role='alert'>" + "<button class='close' data-dismiss='alert' aria-label='Close'><i class='fa fa-times'></i></button>" + "<ul></ul>" + "</div>";
+    return $('#alerts').append($alert_box);
   };
 
   // Book Configuration validation rules implemented here
   var check_completeness = function() {
     var messages;
     messages = [];
-    // messages.push('One of the LMS instances has to be selected.');
     // if ($('#lms-instance-select').val() === '') {
     //   messages.push('One of the LMS instances has to be selected.');
     // }
