@@ -5,22 +5,18 @@
   %li= link_to 'Home', root_path
   %li.active= 'Book Configuration'
 
-
 .row
   .col-xs-9.alert-msg#alerts{style: 'display: none;'}
 
-
-#odsa_content
-  / #instructions
-  /   %p Press the "Save Book" button to upload your new book configuration.
-  #dialog{:title => "Load Book"}
-  .form-horizontal
+.form-horizontal
+  = form_tag "/inst_books/update" do
     .form-group
       .col-xs-2
-        = form_tag "/inst_books/update" do
-          = submit_tag 'Save Book', name: 'Save Book', class: "btn btn-primary", title: 'Save Book Confirmation.', data: {confirm: 'Do you want to continue?'}
-      .col-xs-2
-        %button#odsa-reset-co.btn.btn-primary Undo Changes
+        = submit_tag 'Save Book', name: 'Save Book', id: "odsa-submit-co", class: "btn btn-primary", title: 'Save Book Confirmation.', data: {confirm: 'Do you want to continue?'}
+        = submit_tag 'Undo Changes', name: 'Undo Changes', id: "odsa-reset-co", class: "btn btn-primary", title: 'Undo Book Confirmation.', data: {confirm: 'Do you want to continue?'}
+
+#odsa_content
+  #dialog{:title => "Load Book"}
 
   %span#save_message
   %a#downloadLink{:download => "Test.json"} Download

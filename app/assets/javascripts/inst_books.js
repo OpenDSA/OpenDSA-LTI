@@ -43,7 +43,7 @@
   /*
    * Sets the data-key attribute of a form tag when the user changes it.
    */
-  $(document).on('blur', 'form', function() {
+  $(document).on('blur', '#odsa_content form', function() {
     $(this).attr('data-key', $(this + "input[type='radio']:checked").val());
   });
 
@@ -102,8 +102,9 @@
   //   $('#downloadLink').toggle();
   // });
 
-  $(document).on('click', '#odsa-submit-co', function() {
-    handle_submit();
+  $(document).on('click', '#odsa-submit-co', function(e) {
+    handleSubmit();
+    e.preventDefault();
   });
 
   /*
@@ -111,6 +112,7 @@
    */
   $(document).on('click', '#odsa-reset-co', function() {
     loadJSON(jsonFile);
+    e.preventDefault();
   });
 
   /*
@@ -527,7 +529,7 @@
   /*
    * Function to load an existing json book.
    */
-  const loadJSON = function(jsonFile) {
+  var loadJSON = function(jsonFile) {
     var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1>";
     $('#title').html(titleString);
 
@@ -536,10 +538,11 @@
     addClasses();
   }
 
-  const handle_submit = function() {
+  var handleSubmit = function() {
     var messages,
       bookConfig = JSON.parse(buildJSON()),
-      url = "/inst_books/update";
+      url = "/inst_books/update",
+      fd;
 
     messages = check_completeness();
     if (messages.length !== 0) {
@@ -548,12 +551,13 @@
       return;
     }
 
+    fd = new FormData;
+    fd.append('inst_book', JSON.stringify(bookConfig));
+
     jQuery.ajax({
       url: url,
       type: "POST",
-      data: JSON.stringify({
-        'inst_book': bookConfig
-      }),
+      data: fd,
       contentType: "application/json; charset=utf-8",
       datatype: "json",
       xhrFields: {
@@ -569,7 +573,7 @@
     });
   };
 
-  const form_alert = function(messages) {
+  var form_alert = function(messages) {
     var alert_list, message, _fn, _i, _len;
     reset_alert_area();
     alert_list = $('#alerts').find('.alert ul');
@@ -583,7 +587,7 @@
     return $('#alerts').css('display', 'block');
   };
 
-  const reset_alert_area = function() {
+  var reset_alert_area = function() {
     var alert_box;
     $('#alerts').find('.alert').alert('close');
     alert_box = "<div class='alert alert-danger alert-dismissable' role='alert'>" + "<button class='close' data-dismiss='alert' aria-label='Close'><i class='fa fa-times'></i></button>" + "<ul></ul>" + "</div>";
@@ -591,9 +595,10 @@
   };
 
   // Book Configuration validation rules implemented here
-  const check_completeness = function() {
+  var check_completeness = function() {
     var messages;
     messages = [];
+    // messages.push('One of the LMS instances has to be selected.');
     // if ($('#lms-instance-select').val() === '') {
     //   messages.push('One of the LMS instances has to be selected.');
     // }
