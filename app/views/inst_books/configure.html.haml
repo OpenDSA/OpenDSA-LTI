@@ -1,21 +1,25 @@
+:javascript
+  window.jsonFile = #{@inst_book_json.html_safe}
+
 %ol.breadcrumb
   %li= link_to 'Home', root_path
   %li.active= 'Book Configuration'
 
-:javascript
-  window.jsonFile = #{@inst_book_json.html_safe}
+.row
+  .col-xs-9.alert-msg#alerts{style: 'display: none;'}
+
+.form-horizontal
+  = form_tag "/inst_books/update" do
+    .form-group
+      .col-xs-4
+        = submit_tag 'Save Book', name: 'Save Book', id: "odsa-submit-co", class: "btn btn-primary", title: 'Save Book Confirmation.', data: {confirm: 'Do you want to continue?'}
+        = submit_tag 'Undo Changes', name: 'Undo Changes', id: "odsa-reset-co", class: "btn btn-primary", title: 'Undo Book Confirmation.', data: {confirm: 'Do you want to continue?'}
 
 #odsa_content
-  #instructions
-    %p Press the "Save Book" button to upload your new book configuration.
   #dialog{:title => "Load Book"}
-  #navigation
-    / %button#odsa_new.odsa_button.ui-button.ui-corner-all New Book
-    / %button#odsa_load.odsa_button.ui-button.ui-corner-all Load Book
-    %button#odsa_save.odsa_button.ui-button.ui-corner-all Save Book
-    %button#odsa_reset.odsa_button.ui-button.ui-corner-all Undo Changes
-    %span#save_message
-    %a#downloadLink{:download => "Test.json"} Download
+
+  %span#save_message
+  %a#downloadLink{:download => "Test.json"} Download
   #chapterDue.modal.fade
     .modal-dialog
     .modal-content
@@ -23,11 +27,12 @@
         %button.close{"data-dismiss" => "modal"} &times;
         %h2.modal-title Chapter Due Date
       .modal-body
-        Soft Deadline:
+        / Soft Deadline:
+        Due Date:
         %input#chapterSoft.datetimepicker
-        %br
-        Hard Deadline:
-        %input#chapterHard.datetimepicker
+        / %br
+        / Hard Deadline:
+        / %input#chapterHard.datetimepicker
       .modal-footer
         %button#chapterSubmit.btn.btn-default{"data-dismiss" => "modal"} Submit
   #header
