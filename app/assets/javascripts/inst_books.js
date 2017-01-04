@@ -21,7 +21,10 @@ $(function() {
  */
 $(document).on('focus', '.datetimepicker', function() {
   $(this).parent().css("position", "relative");
-  $(this).datetimepicker();
+  $(this).datetimepicker({
+    sideBySide: true,
+    format: "YYYY-MM-DD HH:MM"
+  });
 });
 
 /*
@@ -88,7 +91,7 @@ $(document).on('click', '#new', function() {
  * The click event for the 'Save Book' button.
  */
 
-/* The old version that saves the book as a downloadable file. Used for testing. 
+/* The old version that saves the book as a downloadable file. Used for testing. */
  $(document).on('click', '#odsa_save', function() {
    var download = document.getElementById('downloadLink');
 
@@ -99,8 +102,8 @@ $(document).on('click', '#new', function() {
    alert("Ready for Download!");
    $('#downloadLink').toggle();
  });
-*/
 
+/*
 $(document).on('click', '#odsa_save', function() {
   var bookConfig = JSON.parse(buildJSON());
 
@@ -127,7 +130,7 @@ $(document).on('click', '#odsa_save', function() {
   });
 
 });
-
+*/
 
 /*
  * The click even for the 'Undo Changes' button.
@@ -250,15 +253,11 @@ const makeFile = (textArray) => {
  * Function to return the html to make a datetimepicker object.
  */
 const datepick = (value, chapter) => {
-  /*
-  var html = "<div class=\"form-group\"><div class=\"datetimepicker input-group date\">";
-  html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"null\"/>";
-  html += "<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-calendar>";
-  html += "</span></span></div></div>";
-  return html;
-  */
-
-  var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
+  //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
+  
+  var html = "<div class='col-sm-3 input-group date datetimepicker'>";
+  html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" /> <span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
+  html += "</div>";
   return html;
 }
 
@@ -435,6 +434,8 @@ const decode = (fileArray) => {
       }
       if ((i + 2 < fileArray.length) && (fileArray[i + 2].startsWith("li"))) {
         line = line + ",";
+      } else if((i + 2 < fileArray.length) && fileArray[i + 2].startsWith("span")) {
+        line = line + ",";
       }
     } else if (fileArray[i].startsWith("select") || fileArray[i].startsWith("form")) {
       var value = pullData(fileArray[i]);
@@ -481,12 +482,12 @@ const buildJSON = function() {
 
   var header = $('#heading').html();
   var headerArray = prepArray(header);
-  json += decode(headerArray, false);
+  json += decode(headerArray);
   json += ",";
 
   var options = $('#options').html();
   var optionArray = prepArray(options);
-  json += decode(optionArray, false);
+  json += decode(optionArray);
   json += ",";
 
   var chapters = $('#chapters').html();
