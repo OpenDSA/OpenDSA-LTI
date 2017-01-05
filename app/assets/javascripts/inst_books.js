@@ -94,7 +94,7 @@
    */
 
   /* The old version that saves the book as a downloadable file. Used for testing.
-   $(document).on('click', '#odsa_save', function() {
+   $(document).on('click', '#odsa-save', function() {
      var download = document.getElementById('downloadLink');
 
      var json = buildJSON();
@@ -104,7 +104,8 @@
      alert("Ready for Download!");
      $('#downloadLink').toggle();
    });
-  */
+*/
+
   $(document).on('click', '#odsa-submit-co', function(e) {
     handleSubmit();
     e.preventDefault();
@@ -151,7 +152,7 @@
    * Ajax call to the given directory to pull the names of all .json files.
    * The user is then prompted to select one and given the option to load it.
    */
-  const listJSON = (url) => {
+  var listJSON = function(url) {
     $.ajax({
       url: url,
       success: function(data) {
@@ -173,7 +174,7 @@
    * Function to remove class declarations and ampersands from a given html string before
    * turning it into an array, splitting on the '<' character.
    */
-  const prepArray = (inputHTML) => {
+  var prepArray = function(inputHTML) {
     inputHTML = inputHTML.replace(/&amp;/g, "&");
     inputHTML = inputHTML.replace(/ style="[^"]+"/g, "");
     inputHTML = inputHTML.replace(/ style=""/g, "");
@@ -191,7 +192,7 @@
   /*
    * Function to return the 'data-key' element of the given html string.
    */
-  const pullData = (dataString) => {
+  var pullData = function(dataString) {
     var value = "";
     if (dataString.includes("data-key")) {
       var stringStart = dataString.search("data-key=\"");
@@ -204,7 +205,7 @@
   /*
    * Function to return the 'value' element of the given html string.
    */
-  const pullValue = (dataString) => {
+  var pullValue = function(dataString) {
     var value = "";
     if (dataString.includes("value")) {
       var stringStart = dataString.search("value=\"");
@@ -217,7 +218,7 @@
   /*
    * Function to take a text array and turn it into an html download object.
    */
-  const makeFile = (textArray) => {
+  var makeFile = function(textArray) {
     if (textFile != null) {
       window.URL.revokeObjectURL(textFile);
     }
@@ -231,19 +232,20 @@
   /*
    * Function to return the html to make a datetimepicker object.
    */
-  const datepick = (value, chapter) => {
-    var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
+  var datepick = function(value, parent, chapter) {
+    //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
-    //var html = "<div class='col-sm-3 input-group date datetimepicker'>";
-    //html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" /> <span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
-    //html += "</div>";
+    var html = "<div class='col-sm-3 input-group date datetimepicker'>";
+    html += "<input class=\"form-control\" data-source=\"" + chapter + "/" + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
+    html += "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
+    html += "</div>";
     return html;
   }
 
   /*
    * Function to return the html to make a dropdown menu object.
    */
-  const dropdown = function() {
+  var dropdown = function() {
     var html = "<div class=\"dropdown instDropdown\">";
     html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
     html += "<ul class=\"dropdown-menu pull-right\">";
@@ -256,7 +258,7 @@
   /*
    * Function to check if a given input is not a radio button.
    */
-  const checkRadio = function(input) {
+  var checkRadio = function(input) {
     if (input.includes("radio")) {
       return false;
     } else {
@@ -268,7 +270,7 @@
    * Function to read in a json key and value pair and convert it into the
    * proper html to be dispayed to the user.
    */
-  const encode = (data) => {
+  var encode = function(data) {
     Handlebars.registerHelper('pullModule', function(path) {
       return path.substr(path.indexOf("/") + 1);
     });
@@ -314,7 +316,7 @@
       }
     });
 
-    Handlebars.registerHelper('valCheck', function(key, value, chapter) {
+    Handlebars.registerHelper('valCheck', function(key, value, parent, chapter) {
       if (key == "required" || key == "showsection") {
         if (value == "true") {
           //return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
@@ -329,17 +331,27 @@
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, chapter));
       } else if (key == "hard_deadline") {
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, chapter));
       } else if (typeof(value) === 'object') {
         //return new Handlebars.SafeString("<input value=\"{}\">");
         return new Handlebars.SafeString("<input value=\"" + value + "\" hidden>");
       } else if (key == "long_name") {
         return new Handlebars.SafeString("<input value=\"" + value + "\" disabled>");
+      } else if (key == "points") {
+        return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+      } else if (key == "threshold") {
+        if(parent.includes("PRO") || parent.includes("PE")) {
+          return new Handlebars.SafeString("<input class=\"threshold-pro\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+        } else if(parent.includes("CON")) {
+          return new Handlebars.SafeString("<input value=\"" + value + "\">");
+        } else {
+          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+        }
       } else {
         return new Handlebars.SafeString("<input value=\"" + value + "\">");
       }
@@ -347,8 +359,8 @@
 
     var hSource = "<ul class='odsa_ul'>" +
       "<li class='odsa_li' hidden><a data-key=\"inst_book_id\">instance book id: </a><input value=\"{{inst_book_id}}\"></li>" +
-      "<li class='odsa_li'><a data-key=\"title\">title: </a><input value=\"{{title}}\"></li>" +
-      "<li class='odsa_li'><a data-key=\"desc\">description: </a><input value=\"{{desc}}\"></li>" +
+      "<li class='odsa_li'><a data-key=\"title\">title: </a><input id=\"book-title\" value=\"{{title}}\"></li>" +
+      "<li class='odsa_li'><a data-key=\"desc\">description: </a><input id=\"book-desc\" value=\"{{desc}}\"></li>" +
       "</ul>";
     var hTemplate = Handlebars.compile(hSource);
     var hhtml = hTemplate(data);
@@ -380,9 +392,9 @@
       "<li class='odsa_li'> {{#if sections}} <a data-key=\"sections\"> <span class='glyphicon glyphicon-chevron-right'></span> Sections</a> {{else}} <a data-key=\"sections\" hidden> </a> {{/if}} <ul class=\"odsa_ul\"> {{#each sections}}" + // Module Sections
       "<li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> {{@key}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Sections
       "{{#if long_name}} <li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Exercise: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Exercises
-      "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li>" + // Exercise Data
+      "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../../key}} </li>" + // Exercise Data
       "{{/each}} </ul></li>" + // Close Exercise Data
-      "{{else}} <li {{hideSec @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
+      "{{else}} <li {{hideSec @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
       "{{/each}}" + // Close Exercises
       "</ul></li>" + // Close Sections
       "{{/each}} </ul> </ul> {{/if}} </li>" + // Close Modules
@@ -398,7 +410,7 @@
    * Function to read in an array of html strings and convert it into a json
    * object.
    */
-  const decode = (fileArray) => {
+  var decode = function(fileArray) {
     var jsonString = "";
     var spacing = "  ";
     for (i = 0; i < fileArray.length; i++) {
@@ -459,7 +471,7 @@
   /*
    * Function to build a json file from the html on the page.
    */
-  const buildJSON = function() {
+  var buildJSON = function() {
     var json = "{\n";
     var spacing = "  ";
 
@@ -491,7 +503,7 @@
    * Function to add the proper jquery ui classes to
    * the appropriate dynamic elements.
    */
-  const addClasses = function() {
+  var addClasses = function() {
     $('#odsa_content').addClass("ui-widget-content");
     $('.odsa_button').addClass("ui-button ui-corner-all");
     $('input.odsa_in').addClass("ui-widget-content ui-corner-all");
@@ -502,7 +514,7 @@
   /*
    * Function to build a new json book.
    */
-  const newJSON = function() {
+  var newJSON = function() {
     var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
     titleString += encode("file name", "");
     titleString += "</ul>";
@@ -536,7 +548,7 @@
   /*
    * Function to load an existing json book.
    */
-  const loadJSON = function(jsonFile) {
+  var loadJSON = function(jsonFile) {
     //var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1>";
     var titleString = "<h1> Header: </h1>";
     $('#title').html(titleString);
@@ -546,6 +558,9 @@
     addClasses();
   }
 
+  /*
+   * Function to send configuration to server.
+   */
   var handleSubmit = function() {
     var messages,
       bookConfig = JSON.parse(buildJSON()),
@@ -578,6 +593,9 @@
     });
   };
 
+  /*
+   * Function to build alerts for sending book to server.
+   */
   var form_alert = function(messages, alertClass) {
     var alert_list, message, _fn, _i, _len;
     reset_alert_area();
@@ -594,6 +612,9 @@
     return $('#alerts').css('display', 'block');
   };
 
+  /*
+   * Function to remove alerts for sending book to server.
+   */
   var reset_alert_area = function() {
     var $alert_box;
     $('#alerts').find('.alert').alert('close');
@@ -601,13 +622,52 @@
     return $('#alerts').append($alert_box);
   };
 
-  // Book Configuration validation rules implemented here
+  /*
+   * Function to validate user configuration before
+   * sending book to server.
+   */
   var check_completeness = function() {
     var messages;
     messages = [];
-    // if ($('#lms-instance-select').val() === '') {
-    //   messages.push('One of the LMS instances has to be selected.');
-    // }
+    if($('#book-title').val() === '') {
+      messages.push('The book configuration needs a title.');
+    }
+    if($('#book-desc').val() === '') {
+      messages.push('The book configuration needs a description.');
+    }
+    $('.points').each(function(index, element) {
+      if($(element).val() != parseFloat($(element).val())) {
+        messages.push('Points must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+    })
+    $('.form-control').each(function(index, element) {
+      if(!(/^\d\d\d\d-\d\d-\d\d \d\d:\d\d$/.test($(element).val())) && $(element).val() != 'null') {
+        messages.push('Dates must be in the format YYYY-MM-DD HH:MM SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+    })
+    $('.threshold').each(function(index, element) {
+      if($(element).val() != parseFloat($(element).val())) {
+        messages.push('Thresholds must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+      if($(element).val() > 10 || $(element).val() < 1) {
+        messages.push('Thresholds must be between 1 and 10 SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+    })
+    $('.threshold-pro').each(function(index, element) {
+      if($(element).val() != parseFloat($(element).val())) {
+        messages.push('Thresholds must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+      if($(element).val() > 1 || $(element).val() < 0) {
+        messages.push('Thresholds for proficiency exercises must be between 0 and 1.0 SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+    })
     return messages;
   };
+
 }).call(this);
