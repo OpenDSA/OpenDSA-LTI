@@ -98,11 +98,11 @@ class Ability
         enrollment.course_offering.is_manager? user
       end
 
-      can  [:create, :read], InstBook
-      can  [:create, :read], Term
-      can  [:create, :read], LatePolicy
-      can  [:update, :destroy], InstBook, user_id: user.id
-      can :manage, Organization
+      can [:create, :read], InstBook
+      can [:create, :read], Term
+      can [:create, :read], LatePolicy
+      can [:update, :destroy], InstBook, user_id: user.id
+      can [:create, :read], Organization
       can :manage, Course, user_id: user.id
       can :manage, CourseEnrollment, user_id: user.id
       # Everyone can upload and compile his book

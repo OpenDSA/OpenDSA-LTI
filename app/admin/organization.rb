@@ -1,8 +1,9 @@
 ActiveAdmin.register Organization, sort_order: :created_at_asc do
 
+  remove_filter :slugs, :courses, :abbreviation, :slug
+
   menu parent: 'University-oriented', priority: 20
   permit_params :name, :abbreviation
-  actions :all, except: [:destroy, :edit]
 
   index do
     id_column
