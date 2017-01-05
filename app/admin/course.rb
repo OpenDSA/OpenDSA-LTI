@@ -1,6 +1,8 @@
 ActiveAdmin.register Course, sort_order: :created_at_asc do
   includes :organization, :user
 
+  remove_filter :slugs, :user, :course_offerings
+
   before_build do |record|
     record.user = current_user
   end
@@ -11,8 +13,11 @@ ActiveAdmin.register Course, sort_order: :created_at_asc do
   index do
     id_column
     column :number
-    column(:name) { |c| link_to c.name, admin_course_path(c) }
+    column (:name) { |c| link_to c.name, admin_course_path(c) }
     column :organization, sortable: 'organizations.name'
+    if current_user.global_role.is_admin?
+      column "Owner", :user
+    end
     column :created_at
     actions
   end
@@ -30,13 +35,13 @@ ActiveAdmin.register Course, sort_order: :created_at_asc do
     f.actions
   end
 
-  sidebar 'Offerings', only: :show do
-    table_for course.course_offerings do
-      column(:term) { |c| c.term.display_name }
-      column(:name) do |c|
-        link_to c.display_name, admin_course_offering_path(c)
-      end
-    end
-  end
+  # sidebar 'Offerings', only: :show do
+  #   table_for course.course_offerings do
+  #     column(:term) { |c| c.term.display_name }
+  #     column(:name) do |c|
+  #       link_to c.display_name, admin_course_offering_path(c)
+  #     end
+  #   end
+  # end
 
 end
