@@ -151,7 +151,7 @@
    * Ajax call to the given directory to pull the names of all .json files.
    * The user is then prompted to select one and given the option to load it.
    */
-  const listJSON = (url) => {
+  var listJSON = (url) => {
     $.ajax({
       url: url,
       success: function(data) {
@@ -173,7 +173,7 @@
    * Function to remove class declarations and ampersands from a given html string before
    * turning it into an array, splitting on the '<' character.
    */
-  const prepArray = (inputHTML) => {
+  var prepArray = (inputHTML) => {
     inputHTML = inputHTML.replace(/&amp;/g, "&");
     inputHTML = inputHTML.replace(/ style="[^"]+"/g, "");
     inputHTML = inputHTML.replace(/ style=""/g, "");
@@ -191,7 +191,7 @@
   /*
    * Function to return the 'data-key' element of the given html string.
    */
-  const pullData = (dataString) => {
+  var pullData = (dataString) => {
     var value = "";
     if (dataString.includes("data-key")) {
       var stringStart = dataString.search("data-key=\"");
@@ -204,7 +204,7 @@
   /*
    * Function to return the 'value' element of the given html string.
    */
-  const pullValue = (dataString) => {
+  var pullValue = (dataString) => {
     var value = "";
     if (dataString.includes("value")) {
       var stringStart = dataString.search("value=\"");
@@ -217,11 +217,11 @@
   /*
    * Function to take a text array and turn it into an html download object.
    */
-  const makeFile = (textArray) => {
+  var makeFile = (textArray) => {
     if (textFile != null) {
       window.URL.revokeObjectURL(textFile);
     }
-    const data = new Blob([textArray], {
+    var data = new Blob([textArray], {
       type: 'text/plain'
     });
     textFile = window.URL.createObjectURL(data);
@@ -231,7 +231,7 @@
   /*
    * Function to return the html to make a datetimepicker object.
    */
-  const datepick = (value, chapter) => {
+  var datepick = (value, chapter) => {
     var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
     //var html = "<div class='col-sm-3 input-group date datetimepicker'>";
@@ -243,7 +243,7 @@
   /*
    * Function to return the html to make a dropdown menu object.
    */
-  const dropdown = function() {
+  var dropdown = function() {
     var html = "<div class=\"dropdown instDropdown\">";
     html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
     html += "<ul class=\"dropdown-menu pull-right\">";
@@ -256,7 +256,7 @@
   /*
    * Function to check if a given input is not a radio button.
    */
-  const checkRadio = function(input) {
+  var checkRadio = function(input) {
     if (input.includes("radio")) {
       return false;
     } else {
@@ -268,7 +268,7 @@
    * Function to read in a json key and value pair and convert it into the
    * proper html to be dispayed to the user.
    */
-  const encode = (data) => {
+  var encode = (data) => {
     Handlebars.registerHelper('pullModule', function(path) {
       return path.substr(path.indexOf("/") + 1);
     });
@@ -398,7 +398,7 @@
    * Function to read in an array of html strings and convert it into a json
    * object.
    */
-  const decode = (fileArray) => {
+  var decode = (fileArray) => {
     var jsonString = "";
     var spacing = "  ";
     for (i = 0; i < fileArray.length; i++) {
@@ -459,7 +459,7 @@
   /*
    * Function to build a json file from the html on the page.
    */
-  const buildJSON = function() {
+  var buildJSON = function() {
     var json = "{\n";
     var spacing = "  ";
 
@@ -491,7 +491,7 @@
    * Function to add the proper jquery ui classes to
    * the appropriate dynamic elements.
    */
-  const addClasses = function() {
+  var addClasses = function() {
     $('#odsa_content').addClass("ui-widget-content");
     $('.odsa_button').addClass("ui-button ui-corner-all");
     $('input.odsa_in').addClass("ui-widget-content ui-corner-all");
@@ -502,7 +502,7 @@
   /*
    * Function to build a new json book.
    */
-  const newJSON = function() {
+  var newJSON = function() {
     var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1> <ul class='odsa_ul'>";
     titleString += encode("file name", "");
     titleString += "</ul>";
@@ -536,7 +536,7 @@
   /*
    * Function to load an existing json book.
    */
-  const loadJSON = function(jsonFile) {
+  var loadJSON = function(jsonFile) {
     //var titleString = "<h1> Header: <button id=\"toggle\" class=\"odsa_button\"> Show Options </button> </h1>";
     var titleString = "<h1> Header: </h1>";
     $('#title').html(titleString);
