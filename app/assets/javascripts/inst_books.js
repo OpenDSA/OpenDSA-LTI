@@ -151,7 +151,7 @@
    * Ajax call to the given directory to pull the names of all .json files.
    * The user is then prompted to select one and given the option to load it.
    */
-  var listJSON = (url) => {
+  var listJSON = function(url) {
     $.ajax({
       url: url,
       success: function(data) {
@@ -173,7 +173,7 @@
    * Function to remove class declarations and ampersands from a given html string before
    * turning it into an array, splitting on the '<' character.
    */
-  var prepArray = (inputHTML) => {
+  var prepArray = function(inputHTML) {
     inputHTML = inputHTML.replace(/&amp;/g, "&");
     inputHTML = inputHTML.replace(/ style="[^"]+"/g, "");
     inputHTML = inputHTML.replace(/ style=""/g, "");
@@ -191,7 +191,7 @@
   /*
    * Function to return the 'data-key' element of the given html string.
    */
-  var pullData = (dataString) => {
+  var pullData = function(dataString) {
     var value = "";
     if (dataString.includes("data-key")) {
       var stringStart = dataString.search("data-key=\"");
@@ -204,7 +204,7 @@
   /*
    * Function to return the 'value' element of the given html string.
    */
-  var pullValue = (dataString) => {
+  var pullValue = function(dataString) {
     var value = "";
     if (dataString.includes("value")) {
       var stringStart = dataString.search("value=\"");
@@ -217,7 +217,7 @@
   /*
    * Function to take a text array and turn it into an html download object.
    */
-  var makeFile = (textArray) => {
+  var makeFile = function(textArray) {
     if (textFile != null) {
       window.URL.revokeObjectURL(textFile);
     }
@@ -231,7 +231,7 @@
   /*
    * Function to return the html to make a datetimepicker object.
    */
-  var datepick = (value, chapter) => {
+  var datepick = function(value, chapter) {
     var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
     //var html = "<div class='col-sm-3 input-group date datetimepicker'>";
@@ -268,7 +268,7 @@
    * Function to read in a json key and value pair and convert it into the
    * proper html to be dispayed to the user.
    */
-  var encode = (data) => {
+  var encode = function(data) {
     Handlebars.registerHelper('pullModule', function(path) {
       return path.substr(path.indexOf("/") + 1);
     });
@@ -398,7 +398,7 @@
    * Function to read in an array of html strings and convert it into a json
    * object.
    */
-  var decode = (fileArray) => {
+  var decode = function(fileArray) {
     var jsonString = "";
     var spacing = "  ";
     for (i = 0; i < fileArray.length; i++) {
