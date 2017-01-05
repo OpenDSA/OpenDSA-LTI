@@ -1,16 +1,20 @@
 ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
   includes :course, :term, :lms_instance
 
+  remove_filter :users, :late_policy, :course_enrollments, :inst_books, :self_enrollment_allowed, :cutoff_date, :lms_course_code
+  # filter :course_organization_name, :as => :string
+
   menu parent: 'University-oriented', priority: 40
   permit_params :course_id, :term_id, :label, :url,
-    :self_enrollment_allowed,
-    :lms_instance_id, :lms_course_code, :lms_course_num,
-    inst_books_attributes: [ :id, :course_offering_id, :user_id, :title, :desc, :template, :_destroy ]
+                :self_enrollment_allowed,
+                :lms_instance_id, :lms_course_code, :lms_course_num,
+                inst_books_attributes: [ :id, :course_offering_id, :user_id, :title, :desc, :template, :_destroy ]
 
-  action_item only: [:edit]  do
-    link_to "Delete", { action: :destroy }, method: :delete
+  action_item only: [:edit] do
+    if current_user.global_role.is_admin?
+      link_to "Delete", { action: :destroy }, method: :delete
+    end
   end
-
 
   controller do
     def auto_enroll_instructor(course_offering)
@@ -26,7 +30,7 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
 
   index do
     id_column
-    column :course, sortable: 'courses.number' do |c|
+    column :course, sortable: 'courses.display_name' do |c|
       link_to c.course.number_and_org, admin_course_path(c.course)
     end
     column :term, sortable: 'term.ends_on' do |c|
