@@ -26,7 +26,6 @@ class InstBook < ActiveRecord::Base
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
   def self.save_data_from_json(json, current_user)
-    puts "inst_books"
     book_data = json
     update_mode = false
     inst_book_id = book_data['inst_book_id']

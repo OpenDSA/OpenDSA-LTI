@@ -27,7 +27,6 @@ class InstBooksController < ApplicationController
   def update
     inst_book = params['inst_book']
 
-    puts "in update"
     InstBook.save_data_from_json(inst_book, current_user)
 
     respond_to do |format|
