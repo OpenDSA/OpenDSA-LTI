@@ -86,6 +86,17 @@ class InstSection < ActiveRecord::Base
     end
   end
 
+  def total_points
+    total_points = 0
+    inst_book_section_exercises.each do |bk_sec_ex|
+      bk_sec_ex_points = bk_sec_ex.points
+      if bk_sec_ex_points == nil
+        bk_sec_ex_points = 0
+      end
+      total_points = total_points + bk_sec_ex_points
+    end
+    return total_points
+  end
 
   #~ Private instance methods .................................................
 end

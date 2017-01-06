@@ -90,5 +90,18 @@ class InstBook < ActiveRecord::Base
       end
       return b
   end
+
+  def total_points
+    total_points = 0
+    inst_chapters.each do |chapter|
+      chapter_points = chapter.total_points
+      if chapter_points == nil
+        chapter_points = 0
+      end
+      total_points = total_points + chapter_points
+    end
+    return total_points
+  end
+
   #~ Private instance methods .................................................
 end

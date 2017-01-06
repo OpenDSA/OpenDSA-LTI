@@ -53,5 +53,17 @@ class InstChapter < ActiveRecord::Base
     return gradable_section
   end
 
+  def total_points
+    total_points = 0
+    inst_chapter_modules.each do |chapter_module|
+      chapter_module_points = chapter_module.total_points
+      if chapter_module_points == nil
+        chapter_module_points = 0
+      end
+      total_points = total_points + chapter_module_points
+    end
+    return total_points
+  end
+
   #~ Private instance methods .................................................
 end

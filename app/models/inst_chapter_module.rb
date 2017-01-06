@@ -37,5 +37,18 @@ class InstChapterModule < ActiveRecord::Base
     return exercises_list
   end
 
+  def total_points
+    total_points = 0
+    inst_sections.each do |inst_section|
+      inst_section_points = inst_section.total_points
+      if inst_section_points == nil
+        inst_section_points = 0
+      end
+      total_points = total_points + inst_section_points
+    end
+    return total_points
+  end
+
+
   #~ Private instance methods .................................................
 end
