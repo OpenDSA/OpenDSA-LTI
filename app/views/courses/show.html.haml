@@ -67,7 +67,7 @@
         %th Section
         %th Instructors
         %th Graders
-        %th Enroll
+        / %th Enroll
     %tbody
       - @course.course_offerings.each do |off|
         %tr
@@ -77,7 +77,7 @@
             user_path(i) }.to_sentence
           %td!= off.graders.map{ |i| link_to i.display_name,
             user_path(i) }.to_sentence
-          %td
-            = render partial: 'course_offerings/self_enrollment',
-              locals: { off: off }
+          / %td
+          /   = render partial: 'course_offerings/self_enrollment',
+          /     locals: { off: off }
 
