@@ -24,10 +24,10 @@
   - @course_offering.instructors.each do |instructor|
     = link_to instructor.display_name, user_path(instructor)
 
-%p
-  %strong Grader(s):
-  - @course_offering.graders.each do |grader|
-    = link_to grader.display_name, user_path(grader)
+/ %p
+/   %strong Grader(s):
+/   - @course_offering.graders.each do |grader|
+/     = link_to grader.display_name, user_path(grader)
 
 %p
   %strong Self enrollment allowed:
