@@ -303,9 +303,9 @@ class GenerateCourseJob < ProgressJob::Base
         update_opts.delete(:module_item__indent__)
         res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, update_opts)
       else
-        assignment_opts[:assignment__name__ => title]
-        assignment_opts[:assignment__assignment_group_id__ => chapter.lms_assignment_group_id]
-        assignment_opts[:assignment__description__ => title]
+        assignment_opts[:assignment__name__] = title
+        assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
+        assignment_opts[:assignment__description__] = title
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
@@ -360,9 +360,9 @@ class GenerateCourseJob < ProgressJob::Base
         update_opts.delete(:module_item__indent__)
         res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, update_opts)
       else
-        assignment_opts[:assignment__name__ => title]
-        assignment_opts[:assignment__assignment_group_id__ => chapter.lms_assignment_group_id]
-        assignment_opts[:assignment__description__ => title]
+        assignment_opts[:assignment__name__] = title
+        assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
+        assignment_opts[:assignment__description__] = title
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
