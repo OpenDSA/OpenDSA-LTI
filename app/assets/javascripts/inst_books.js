@@ -94,7 +94,7 @@
    */
 
   /* The old version that saves the book as a downloadable file. Used for testing.
-   $(document).on('click', '#odsa_save', function() {
+   $(document).on('click', '#odsa-save', function() {
      var download = document.getElementById('downloadLink');
 
      var json = buildJSON();
@@ -104,7 +104,8 @@
      alert("Ready for Download!");
      $('#downloadLink').toggle();
    });
-  */
+*/
+
   $(document).on('click', '#odsa-submit-co', function(e) {
     handleSubmit();
     e.preventDefault();
@@ -221,7 +222,7 @@
     if (textFile != null) {
       window.URL.revokeObjectURL(textFile);
     }
-    var data = new Blob([textArray], {
+    const data = new Blob([textArray], {
       type: 'text/plain'
     });
     textFile = window.URL.createObjectURL(data);
@@ -231,12 +232,13 @@
   /*
    * Function to return the html to make a datetimepicker object.
    */
-  var datepick = function(value, chapter) {
-    var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
+  var datepick = function(value, parent, chapter) {
+    //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
-    //var html = "<div class='col-sm-3 input-group date datetimepicker'>";
-    //html += "<input class=\"form-control\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" /> <span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
-    //html += "</div>";
+    var html = "<div class='col-sm-3 input-group date datetimepicker'>";
+    html += "<input class=\"form-control\" data-source=\"" + chapter + "/" + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
+    html += "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
+    html += "</div>";
     return html;
   }
 
@@ -314,7 +316,7 @@
       }
     });
 
-    Handlebars.registerHelper('valCheck', function(key, value, chapter) {
+    Handlebars.registerHelper('valCheck', function(key, value, parent, chapter) {
       if (key == "required" || key == "showsection") {
         if (value == "true") {
           //return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
@@ -329,17 +331,27 @@
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, chapter));
       } else if (key == "hard_deadline") {
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, chapter));
       } else if (typeof(value) === 'object') {
         //return new Handlebars.SafeString("<input value=\"{}\">");
         return new Handlebars.SafeString("<input value=\"" + value + "\" hidden>");
       } else if (key == "long_name") {
         return new Handlebars.SafeString("<input value=\"" + value + "\" disabled>");
+      } else if (key == "points") {
+        return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+      } else if (key == "threshold") {
+        if(parent.includes("PRO") || parent.includes("PE")) {
+          return new Handlebars.SafeString("<input class=\"threshold-pro\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+        } else if(parent.includes("CON")) {
+          return new Handlebars.SafeString("<input value=\"" + value + "\">");
+        } else {
+          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+        }
       } else {
         return new Handlebars.SafeString("<input value=\"" + value + "\">");
       }
@@ -347,8 +359,8 @@
 
     var hSource = "<ul class='odsa_ul'>" +
       "<li class='odsa_li' hidden><a data-key=\"inst_book_id\">instance book id: </a><input value=\"{{inst_book_id}}\"></li>" +
-      "<li class='odsa_li'><a data-key=\"title\">title: </a><input value=\"{{title}}\"></li>" +
-      "<li class='odsa_li'><a data-key=\"desc\">description: </a><input value=\"{{desc}}\"></li>" +
+      "<li class='odsa_li'><a data-key=\"title\">title: </a><input id=\"book-title\" value=\"{{title}}\"></li>" +
+      "<li class='odsa_li'><a data-key=\"desc\">description: </a><input id=\"book-desc\" value=\"{{desc}}\"></li>" +
       "</ul>";
     var hTemplate = Handlebars.compile(hSource);
     var hhtml = hTemplate(data);
@@ -380,9 +392,9 @@
       "<li class='odsa_li'> {{#if sections}} <a data-key=\"sections\"> <span class='glyphicon glyphicon-chevron-right'></span> Sections</a> {{else}} <a data-key=\"sections\" hidden> </a> {{/if}} <ul class=\"odsa_ul\"> {{#each sections}}" + // Module Sections
       "<li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> {{@key}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Sections
       "{{#if long_name}} <li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Exercise: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Exercises
-      "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li>" + // Exercise Data
+      "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../../key}} </li>" + // Exercise Data
       "{{/each}} </ul></li>" + // Close Exercise Data
-      "{{else}} <li {{hideSec @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
+      "{{else}} <li {{hideSec @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
       "{{/each}}" + // Close Exercises
       "</ul></li>" + // Close Sections
       "{{/each}} </ul> </ul> {{/if}} </li>" + // Close Modules
@@ -546,6 +558,9 @@
     addClasses();
   }
 
+  /*
+   * Function to send configuration to server.
+   */
   var handleSubmit = function() {
     var messages,
       bookConfig = JSON.parse(buildJSON()),
@@ -578,6 +593,9 @@
     });
   };
 
+  /*
+   * Function to build alerts for sending book to server.
+   */
   var form_alert = function(messages, alertClass) {
     var alert_list, message, _fn, _i, _len;
     reset_alert_area();
@@ -594,6 +612,9 @@
     return $('#alerts').css('display', 'block');
   };
 
+  /*
+   * Function to remove alerts for sending book to server.
+   */
   var reset_alert_area = function() {
     var $alert_box;
     $('#alerts').find('.alert').alert('close');
@@ -601,13 +622,52 @@
     return $('#alerts').append($alert_box);
   };
 
-  // Book Configuration validation rules implemented here
+  /*
+   * Function to validate user configuration before
+   * sending book to server.
+   */
   var check_completeness = function() {
     var messages;
     messages = [];
-    // if ($('#lms-instance-select').val() === '') {
-    //   messages.push('One of the LMS instances has to be selected.');
-    // }
+    if($('#book-title').val() === '') {
+      messages.push('The book configuration needs a title.');
+    }
+    if($('#book-desc').val() === '') {
+      messages.push('The book configuration needs a description.');
+    }
+    $('.points').each(function(index, element) {
+      if($(element).val() != parseFloat($(element).val())) {
+        messages.push('Points must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+    })
+    $('.form-control').each(function(index, element) {
+      if(!(/^\d\d\d\d-\d\d-\d\d \d\d:\d\d$/.test($(element).val())) && $(element).val() != 'null') {
+        messages.push('Dates must be in the format YYYY-MM-DD HH:MM SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+    })
+    $('.threshold').each(function(index, element) {
+      if($(element).val() != parseFloat($(element).val())) {
+        messages.push('Thresholds must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+      if($(element).val() > 10 || $(element).val() < 1) {
+        messages.push('Thresholds must be between 1 and 10 SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+    })
+    $('.threshold-pro').each(function(index, element) {
+      if($(element).val() != parseFloat($(element).val())) {
+        messages.push('Thresholds must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+      if($(element).val() > 1 || $(element).val() < 0) {
+        messages.push('Thresholds for proficiency exercises must be between 0 and 1.0 SOURCE: ' + $(element).attr('data-source'));
+        return false;
+      }
+    })
     return messages;
   };
+
 }).call(this);
