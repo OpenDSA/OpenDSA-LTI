@@ -288,8 +288,7 @@ class GenerateCourseJob < ProgressJob::Base
 
     assignment_opts = {
       :assignment__submission_types__ => "external_tool",
-      :assignment__external_tool_tag_attributes__ => {:url => opts[:module_item__external_url__] },
-      :assignment__assignment_group_id__ => chapter.lms_assignment_group_id,
+      :assignment__external_tool_tag_attributes__ => {:url => opts[:module_item__external_url__] }
       }
 
     if section.gradable
@@ -304,6 +303,7 @@ class GenerateCourseJob < ProgressJob::Base
         update_opts.delete(:module_item__indent__)
         res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, update_opts)
       else
+        assignment_opts[:assignment__assignment_group_id__ => chapter.lms_assignment_group_id]
         assignment_opts[:assignment__name__ => title]
         assignment_opts[:assignment__description__ => title]
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
@@ -344,8 +344,7 @@ class GenerateCourseJob < ProgressJob::Base
 
     assignment_opts = {
       :assignment__submission_types__ => "external_tool",
-      :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query },
-      :assignment__assignment_group_id__ => chapter.lms_assignment_group_id,
+      :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query }
     }
 
     opts[:module_item__title__] = title
@@ -361,6 +360,7 @@ class GenerateCourseJob < ProgressJob::Base
         update_opts.delete(:module_item__indent__)
         res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, update_opts)
       else
+        assignment_opts[:assignment__assignment_group_id__ => chapter.lms_assignment_group_id]
         assignment_opts[:assignment__name__ => title]
         assignment_opts[:assignment__description__ => title]
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
