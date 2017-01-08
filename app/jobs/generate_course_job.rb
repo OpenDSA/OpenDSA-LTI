@@ -61,7 +61,7 @@ class GenerateCourseJob < ProgressJob::Base
     # generate canvas course modules, items and assignments out of inst_book configurations
     save_lms_course(client, lms_course_id)
     @inst_book.last_compiled = Time.now
-    @inst_book.save
+    @inst_book.save!
   end
 
   # -------------------------------------------------------------
@@ -99,22 +99,22 @@ class GenerateCourseJob < ProgressJob::Base
 
     chapters.each do |chapter|
       opts = {:module__name__ => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name,
-                   :module__position__ => chapter.position}
+              :module__position__ => chapter.position}
 
       update_stage('Generating: ' + opts[:module__name__])
 
       if !chapter.lms_chapter_id
         res = client.create_module(lms_course_id, chapter.name, opts)
         chapter.lms_chapter_id = res['id']
-        chapter.save
+        chapter.save!
       end
 
-     assignment_group_opts = {:name => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name}
 
       if !chapter.lms_assignment_group_id and chapter.has_gradable_sections?
+        assignment_group_opts = {:name => opts[:module__name__]}
         res = client.create_assignment_group(lms_course_id, assignment_group_opts)
         chapter.lms_assignment_group_id = res['id']
-        chapter.save
+        chapter.save!
       end
 
       save_lms_chapter(client, lms_course_id, chapter)
@@ -138,11 +138,12 @@ class GenerateCourseJob < ProgressJob::Base
     module_item_position = 1
     modules.each do |inst_ch_module|
       title = (chapter.position.to_s||"")+"."+
-                 (inst_ch_module.module_position.to_s||"")+"."+
-                 InstModule.where(:id => inst_ch_module.inst_module_id).first.name
+               (inst_ch_module.module_position.to_s||"")+"."+
+               InstModule.where(:id => inst_ch_module.inst_module_id).first.name
+
       opts = {:module_item__title__ => title,
-                    :module_item__type__ => 'SubHeader',
-                    :module_item__position__ => module_item_position}
+              :module_item__type__ => 'SubHeader',
+              :module_item__position__ => module_item_position}
 
       # if inst_ch_module.lms_module_item_id
       #   res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_module_item_id, opts)
@@ -150,7 +151,7 @@ class GenerateCourseJob < ProgressJob::Base
       if !inst_ch_module.lms_module_item_id
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'SubHeader', '', opts)
         inst_ch_module.lms_module_item_id = res['id']
-        inst_ch_module.save
+        inst_ch_module.save!
       end
 
       module_item_position = save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_item_position)
@@ -229,7 +230,7 @@ class GenerateCourseJob < ProgressJob::Base
           :custom_label => @course_offering.label,
           :custom_course_number => @course.number,
           :custom_course_name => @course.name
-        }
+          }
 
         require "addressable/uri"
         uri = Addressable::URI.new
@@ -258,11 +259,11 @@ class GenerateCourseJob < ProgressJob::Base
     end
 
     opts = {:module_item__title__ => title,
-                 :module_item__type__ => 'ExternalTool',
-                 :module_item__position__ => module_item_position + section_item_position,
-                 :module_item__external_url__ => launch_url,
-                 :module_item__indent__ => 1
-                }
+            :module_item__type__ => 'ExternalTool',
+            :module_item__position__ => module_item_position + section_item_position,
+            :module_item__external_url__ => launch_url,
+            :module_item__indent__ => 1
+            }
 
     if learning_tool
       save_learning_tool(client, lms_course_id, chapter, section, title, opts)
@@ -276,7 +277,7 @@ class GenerateCourseJob < ProgressJob::Base
         if !inst_ch_module.lms_section_item_id
           res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
           inst_ch_module.lms_section_item_id = res['id']
-          inst_ch_module.save
+          inst_ch_module.save!
         end
       end
     end
@@ -286,26 +287,31 @@ class GenerateCourseJob < ProgressJob::Base
   def save_learning_tool(client, lms_course_id, chapter, section, title, opts)
 
     assignment_opts = {
-      :assignment__name__ => title,
       :assignment__submission_types__ => "external_tool",
       :assignment__external_tool_tag_attributes__ => {:url => opts[:module_item__external_url__] },
       :assignment__assignment_group_id__ => chapter.lms_assignment_group_id,
-      :assignment__description__ => title
-    }
+      }
 
     if section.gradable
-      assignment_opts = {}
       assignment_opts[:assignment__points_possible__] = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", section.id).first.points
-
+      # TODO: add the due date
+      opts[:module_item__type__] = 'Assignment'
       if section.lms_item_id && section.lms_assignment_id
+        opts[:module_item__content_id__] = section.lms_assignment_id
         assignment_res = client.edit_assignment(lms_course_id, section.lms_assignment_id, assignment_opts )
+        update_opts = opts
+        update_opts.delete(:module_item__title__)
+        update_opts.delete(:module_item__indent__)
+        res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, update_opts)
       else
+        assignment_opts[:assignment__name__ => title]
+        assignment_opts[:assignment__description__ => title]
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
         section.lms_assignment_id = assignment_res['id']
         section.lms_item_id = res['id']
-        section.save
+        section.save!
       end
     else
       # if section.lms_item_id
@@ -314,7 +320,7 @@ class GenerateCourseJob < ProgressJob::Base
       if !section.lms_item_id
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
         section.lms_item_id = res['id']
-        section.save
+        section.save!
       end
     end
 
@@ -337,26 +343,32 @@ class GenerateCourseJob < ProgressJob::Base
     uri.query_values = url_opts
 
     assignment_opts = {
-      :assignment__name__ => title,
       :assignment__submission_types__ => "external_tool",
       :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query },
       :assignment__assignment_group_id__ => chapter.lms_assignment_group_id,
-      :assignment__description__ => title
     }
 
     opts[:module_item__title__] = title
     if section.gradable
-      assignment_opts = {}
       assignment_opts[:assignment__points_possible__] = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", section.id).first.points
+      # TODO: add the due date
+      opts[:module_item__type__] = 'Assignment'
       if section.lms_item_id && section.lms_assignment_id
+        opts[:module_item__content_id__] = section.lms_assignment_id
         assignment_res = client.edit_assignment(lms_course_id, section.lms_assignment_id, assignment_opts )
+        update_opts = opts
+        update_opts.delete(:module_item__title__)
+        update_opts.delete(:module_item__indent__)
+        res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, update_opts)
       else
+        assignment_opts[:assignment__name__ => title]
+        assignment_opts[:assignment__description__ => title]
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
         section.lms_assignment_id = assignment_res['id']
         section.lms_item_id = res['id']
-        section.save
+        section.save!
       end
     else
       # if section.lms_item_id
@@ -365,7 +377,7 @@ class GenerateCourseJob < ProgressJob::Base
       if !section.lms_item_id
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
         section.lms_item_id = res['id']
-        section.save
+        section.save!
       end
     end
 

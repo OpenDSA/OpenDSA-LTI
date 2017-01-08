@@ -18,9 +18,9 @@
       - if offering.instructors.any?
         = succeed ':' do
           = 'instructor'.pluralize(offering.instructors.size)
-      /   = succeed (offering.graders.any? ? ',' : '') do
-      /     != offering.instructors.map{ |i| link_to i.display_name,
-      /       user_path(i) }.to_sentence
+        = succeed (offering.graders.any? ? ',' : '') do
+          != offering.instructors.map{ |i| link_to i.display_name,
+            user_path(i) }.to_sentence
       / - if offering.graders.any?
       /   = succeed ':' do
       /     = 'grader'.pluralize(offering.graders.size)
