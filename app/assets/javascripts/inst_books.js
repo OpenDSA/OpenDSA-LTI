@@ -20,13 +20,16 @@
   /*
    * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
    */
-  $(document).on('focus', '.datetimepicker', function() {
+  $(document).on('click', '.input-group-addon', function() {
     $(this).parent().css("position", "relative");
-    $(this).datetimepicker({
+    $(this).parent().datetimepicker({
       showClose: true,
       sideBySide: true,
+	  keepInvalid: true,
+	  allowInputToggle: true,
       format: "YYYY-MM-DD HH:MM"
     });
+	$(this).parent().data("DateTimePicker").show();
   });
 
   /*
@@ -345,9 +348,7 @@
       } else if (key == "points") {
         return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
       } else if (key == "threshold") {
-        if(parent.includes("PRO") || parent.includes("PE")) {
-          return new Handlebars.SafeString("<input class=\"threshold-pro\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
-        } else if(parent.includes("CON")) {
+        if(parent.includes("CON")) {
           return new Handlebars.SafeString("<input value=\"" + value + "\">");
         } else {
           return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
@@ -648,24 +649,16 @@
       }
     })
     $('.threshold').each(function(index, element) {
-      if($(element).val() != parseFloat($(element).val())) {
-        messages.push('Thresholds must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
+      if($(element).val() > 10 || $(element).val() < 0) {
+        messages.push('Thresholds must be between 1 and 10 or 0 and 1.0 SOURCE: ' + $(element).attr('data-source'));
         return false;
-      }
-      if($(element).val() > 10 || $(element).val() < 1) {
-        messages.push('Thresholds must be between 1 and 10 SOURCE: ' + $(element).attr('data-source'));
-        return false;
-      }
-    })
-    $('.threshold-pro').each(function(index, element) {
-      if($(element).val() != parseFloat($(element).val())) {
-        messages.push('Thresholds must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
-        return false;
-      }
-      if($(element).val() > 1 || $(element).val() < 0) {
-        messages.push('Thresholds for proficiency exercises must be between 0 and 1.0 SOURCE: ' + $(element).attr('data-source'));
-        return false;
-      }
+      } else if($(element).val() < 1 && $(element).val() != parseFloat($(element).val())) {
+		messages.push('Thresholds between 0 and 1.0 must be a decimal.');
+		return false;
+	  } else if($(element).val() >= 1 && $(element).val() != parseInt($(element).val())) {
+		messages.push('Thresholds between 1 and 10 must be an integer.');
+		return false;
+	  }
     })
     return messages;
   };
