@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161215194756) do
+ActiveRecord::Schema.define(version: 20170108234743) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -40,18 +40,19 @@ ActiveRecord::Schema.define(version: 20161215194756) do
   add_index "course_enrollments", ["user_id"], name: "index_course_enrollments_on_user_id", using: :btree
 
   create_table "course_offerings", force: true do |t|
-    t.integer  "course_id",                              null: false
-    t.integer  "term_id",                                null: false
-    t.string   "label",                                  null: false
+    t.integer  "course_id",                               null: false
+    t.integer  "term_id",                                 null: false
+    t.string   "label",                                   null: false
     t.string   "url"
     t.boolean  "self_enrollment_allowed", default: true
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date     "cutoff_date"
     t.integer  "late_policy_id"
-    t.integer  "lms_instance_id",                        null: false
+    t.integer  "lms_instance_id",                         null: false
     t.string   "lms_course_code"
-    t.integer  "lms_course_num",                         null: false
+    t.integer  "lms_course_num",                          null: false
+    t.boolean  "archived",                default: false
   end
 
   add_index "course_offerings", ["course_id"], name: "index_course_offerings_on_course_id", using: :btree

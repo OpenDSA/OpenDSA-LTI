@@ -78,7 +78,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     id_column
     column :title
     column :desc
-    column :template
+    column 'Template?', :template
     if current_user.global_role.is_admin?
       column "Owner", :user
     end
