@@ -246,19 +246,6 @@
   }
 
   /*
-   * Function to return the html to make a dropdown menu object.
-   */
-  var dropdown = function() {
-    var html = "<div class=\"dropdown instDropdown\">";
-    html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
-    html += "<ul class=\"dropdown-menu pull-right\">";
-    html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"{{@key}}\" class=\"chapterLoad\">Set Due Dates</a></li>";
-    html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
-    html += "</ul></div>";
-    return html;
-  }
-
-  /*
    * Function to check if a given input is not a radio button.
    */
   var checkRadio = function(input) {
@@ -285,12 +272,24 @@
     });
 
     Handlebars.registerHelper('hideSec', function(key) {
-      if (key == "lms_assignment_id" || key == "lms_item_id" || key == "hard_deadline") {
+      if (key == "lms_assignment_id" || key == "lms_item_id" || key == "hard_deadline" || key == "showsection") {
         return "hidden";
       } else if (key.includes("CON")) {
         return "hidden";
       }
     });
+	
+	Handlebars.registerHelper('dropdown', function(canDelete) {
+		var html = "<div class=\"dropdown instDropdown\">";
+		html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
+		html += "<ul class=\"dropdown-menu pull-right\">";
+		html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"{{@key}}\" class=\"chapterLoad\">Set Due Dates</a></li>";
+		if(canDelete) {
+			html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
+		}
+		html += "</ul></div>";
+		return new Handlebars.SafeString(html);
+	});
 
     Handlebars.registerHelper('keyCheck', function(key) {
       if (key == "long_name") {
@@ -319,7 +318,7 @@
       }
     });
 
-    Handlebars.registerHelper('valCheck', function(key, value, parent, chapter) {
+    Handlebars.registerHelper('valCheck', function(key, value, parent, section, dChapter, eChapter) {
       if (key == "required" || key == "showsection") {
         if (value == "true") {
           //return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
@@ -334,24 +333,24 @@
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, parent, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, dChapter));
       } else if (key == "hard_deadline") {
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, parent, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, dChapter));
       } else if (typeof(value) === 'object') {
         //return new Handlebars.SafeString("<input value=\"{}\">");
         return new Handlebars.SafeString("<input value=\"" + value + "\" hidden>");
       } else if (key == "long_name") {
         return new Handlebars.SafeString("<input value=\"" + value + "\" disabled>");
       } else if (key == "points") {
-        return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+        return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + eChapter + "/" + section + "/" + parent + "\" value=\"" + value + "\">");
       } else if (key == "threshold") {
         if(parent.includes("CON")) {
           return new Handlebars.SafeString("<input value=\"" + value + "\">");
         } else {
-          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + eChapter + "/" + section + "/" + parent + "\" value=\"" + value + "\">");
         }
       } else {
         return new Handlebars.SafeString("<input value=\"" + value + "\">");
@@ -386,16 +385,16 @@
     $('#options').html(ohtml);
 
     var cSource = "<h1> Chapters: </h1> {{#if last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}} {{#each chapters}}" + // List
-      "<li class='odsa_li'> {{#unless ../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a>" + dropdown() + // Chapters
+      "<li class='odsa_li'> {{#unless ../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a> {{#if ../last_compiled}} {{dropdown false}} {{else}} {{dropdown true}} {{/if}}" + // Chapters
       "{{#if ../last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}} {{#each .}}" + // Chapters
       "{{#if long_name}} <li class='odsa_li'> {{#unless ../../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\">{{#if sections}}<span class='glyphicon glyphicon-chevron-right'></span>{{/if}}<strong> Module: </strong> {{long_name}} </a>" + // Modules
       "<ul class=\"odsa_ul\"> <li class='odsa_li' hidden><a data-key=\"long_name\"></a><input value=\"{{long_name}}\"></li>" + // Module Name
       "<li class='odsa_li'> {{#if sections}} <a data-key=\"sections\"> <span class='glyphicon glyphicon-chevron-right'></span> Sections</a> {{else}} <a data-key=\"sections\" hidden> </a> {{/if}} <ul class=\"odsa_ul\"> {{#each sections}}" + // Module Sections
       "<li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> {{@key}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Sections
       "{{#if long_name}} <li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Exercise: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Exercises
-      "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../../key}} </li>" + // Exercise Data
+      "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../key @../../../key @../../../../key}} </li>" + // Exercise Data
       "{{/each}} </ul></li>" + // Close Exercise Data
-      "{{else}} <li {{hideSec @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
+      "{{else}} <li {{hideSec @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../key @../../../key @../../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
       "{{/each}}" + // Close Exercises
       "</ul></li>" + // Close Sections
       "{{/each}} </ul> </ul> {{/if}} </li>" + // Close Modules
@@ -511,6 +510,19 @@
     $('li.odsa_li').addClass("ui-widget-content ui-corner-all");
     $(".odsa_sortable").sortable();
   }
+  
+  /*
+   * Function to set the default size of all text inputs.
+   */
+  var sizeInputs = function() {
+	$('input:text').each(function(index, element) {
+		if($(element).val().length > 10) {
+			$(element).attr('size', $(element).val().length);
+		} else {
+			$(element).attr('size', 10);
+		}
+	});
+  }
 
   /*
    * Function to build a new json book.
@@ -544,6 +556,7 @@
     $('#chapters').html(chapterString);
 
     addClasses();
+	sizeInputs();
   }
 
   /*
@@ -557,6 +570,7 @@
     encode(jsonFile);
 
     addClasses();
+	sizeInputs();
   }
 
   /*
@@ -653,10 +667,10 @@
         messages.push('Thresholds must be between 1 and 10 or 0 and 1.0 SOURCE: ' + $(element).attr('data-source'));
         return false;
       } else if($(element).val() < 1 && $(element).val() != parseFloat($(element).val())) {
-		messages.push('Thresholds between 0 and 1.0 must be a decimal.');
+		messages.push('Thresholds between 0 and 1.0 must be a decimal. SOURCE: ' + $(element).attr('data-source'));
 		return false;
 	  } else if($(element).val() >= 1 && $(element).val() != parseInt($(element).val())) {
-		messages.push('Thresholds between 1 and 10 must be an integer.');
+		messages.push('Thresholds between 1 and 10 must be an integer. SOURCE: ' + $(element).attr('data-source'));
 		return false;
 	  }
     })
