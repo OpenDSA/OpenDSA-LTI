@@ -42,7 +42,7 @@ class CourseOffering < ActiveRecord::Base
 
   accepts_nested_attributes_for :term
 
-  # default_scope { where(archived: false) }
+  default_scope { where(archived: false) }
 
   scope :by_date,
     -> { includes(:term).order('terms.starts_on DESC', 'label ASC') }
