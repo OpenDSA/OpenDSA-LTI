@@ -20,6 +20,19 @@
   /*
    * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
    */
+   $(document).on('focus', '.timemodal', function() {
+	$(this).parent().css("position", "relative");
+    $(this).parent().datetimepicker({
+      showClose: true,
+      sideBySide: true,
+	  allowInputToggle: true,
+      format: "YYYY-MM-DD HH:MM"
+    });
+   });
+  
+  /*
+   * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
+   */
   $(document).on('click', '.input-group-addon', function() {
     $(this).parent().css("position", "relative");
     $(this).parent().datetimepicker({
@@ -279,11 +292,11 @@
       }
     });
 	
-	Handlebars.registerHelper('dropdown', function(canDelete) {
+	Handlebars.registerHelper('dropdown', function(key, canDelete) {
 		var html = "<div class=\"dropdown instDropdown\">";
 		html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
 		html += "<ul class=\"dropdown-menu pull-right\">";
-		html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"{{@key}}\" class=\"chapterLoad\">Set Due Dates</a></li>";
+		html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"" + key + "\" class=\"chapterLoad\">Set Due Dates</a></li>";
 		if(canDelete) {
 			html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
 		}
@@ -385,7 +398,7 @@
     $('#options').html(ohtml);
 
     var cSource = "<h1> Chapters: </h1> {{#if last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}} {{#each chapters}}" + // List
-      "<li class='odsa_li'> {{#unless ../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a> {{#if ../last_compiled}} {{dropdown false}} {{else}} {{dropdown true}} {{/if}}" + // Chapters
+      "<li class='odsa_li'> {{#unless ../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a> {{#if ../last_compiled}} {{dropdown @key false}} {{else}} {{dropdown @key true}} {{/if}}" + // Chapters
       "{{#if ../last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}} {{#each .}}" + // Chapters
       "{{#if long_name}} <li class='odsa_li'> {{#unless ../../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\">{{#if sections}}<span class='glyphicon glyphicon-chevron-right'></span>{{/if}}<strong> Module: </strong> {{long_name}} </a>" + // Modules
       "<ul class=\"odsa_ul\"> <li class='odsa_li' hidden><a data-key=\"long_name\"></a><input value=\"{{long_name}}\"></li>" + // Module Name
