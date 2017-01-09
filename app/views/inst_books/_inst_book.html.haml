@@ -5,6 +5,24 @@
 %tr
   %td= inst_book.title
   %td= link_to lms_course_code, course_offering_url, :target => "_blank"
+  / %td
+  /   = form_tag '/inst_books/configure/'+ inst_book.id.to_s, :method => :get, :target => "_blank"  do
+  /     = submit_tag "Configure Book", class: "btn btn-primary", :target => "_blank"
+  /     .col-xs-1
+  /       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#configure-book-modal' } }
+  /     #configure-book-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  /       .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+  /         .modal-content
+  /           .modal-header
+  /             %p.lead Book Configuration
+  /           .modal-body
+  /             %p
+  /               This view will allow instructors to configure OpenDSA book before they generate the canvas course. Instructors can add/delete OpenDSA chapters/modules, reorder chapters/modules if needed,
+  /               and adjust exercises points and due dates in addition to general book configuration like programming
+  /               language used for the book code examples.
+  /               Once the course is generated, Instructors can only adjust exercises points and due dates.
+  /             %p
+  /               Note: In order for the book configuration changes to take effect, Canvas course has to be re-generated using "Generate Canvas Course" button.
   %td
     - if inst_book.last_compiled == nil
       - btn_label = "Generate Canvas Course"
@@ -14,12 +32,22 @@
     - form_name = 'generate_course_' + inst_book.id.to_s
     = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=generate_course', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'generate_course'; return true;" do
       = submit_tag btn_label, name: form_name, class: "btn btn-primary", title: btn_label + ' confirmation.', data: {confirm: 'Re-generating canvas course will override due dates and number of points of all the assignments. Do you want to continue?'}
-  / %td
-  /   = form_tag '/inst_books/configure/'+ inst_book.id.to_s, :method => :get, :target => "_blank"  do
-  /     = submit_tag "Configure Book", class: "btn btn-primary", :target => "_blank"
-
-  - if inst_book.last_compiled != nil
+      .col-xs-1
+        %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#generate-course-modal' } }
+      #generate-course-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+        .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+          .modal-content
+            .modal-header
+              %p.lead Generate Canvas Course
+            .modal-body
+              %p
+                When you click this button OpenDSA book will be compiled into Canvas course.
+                If this is the first time to generate the course, all OpenDSA chapters and modules
+                will be created in the course. In case OpenDSA was already compiled, this process
+                will only update the assignments points and due dates.
+  - if inst_book.last_compiled != nil and current_user.global_role.is_admin?
     %td
       - form_name = 'compile_book_' + inst_book.id.to_s
       = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=compile_book', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
         = submit_tag "Compile Book", name: form_name, class: "btn btn-primary", title: 'Compile book confirmation.', data: {confirm: "Book compilaiton process will recreate the book pages on OpenDSA server. Assignments due dates and points in Canvas course won't be affected by this action. Do you want to continue?"}
+
