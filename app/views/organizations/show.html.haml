@@ -22,6 +22,7 @@
           %thead
             %th Term
             %th Section
+            %th OpenDSA Book
             - if user_signed_in? && current_user.global_role.is_admin?
               %th Canvas course
             %th Instructor(s)
@@ -39,6 +40,15 @@
                   o.course, o.term)
                 - if user_signed_in? && current_user.global_role.is_admin?
                   %td= link_to lms_course_code, course_offering_url, :target => "_blank"
+                - if o.odsa_books.many?
+                  %td
+                    %table.table.table-striped
+                      - o.odsa_books.each do |bk|
+                        %tr
+                          %td= bk.title
+                - else
+                  %td!= o.odsa_books.map{ |i| i.title }.to_sentence
+
                 %td!= o.instructors.map{ |i| link_to i.display_name,
                   user_path(i) }.to_sentence
                 / %td= render partial: "course_offerings/self_enrollment",

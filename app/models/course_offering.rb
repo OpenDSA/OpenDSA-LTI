@@ -109,6 +109,13 @@ class CourseOffering < ActiveRecord::Base
     course_enrollments.where(course_role: CourseRole.student).map(&:user)
   end
 
+  # -------------------------------------------------------------
+  # Public: Gets all inst_books used in this CourseOffering.
+  #
+  def odsa_books
+    inst_books
+  end
+
 
   # -------------------------------------------------------------
   # Public: Gets a relation representing all Users who are instructors in
