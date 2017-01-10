@@ -11,19 +11,19 @@
       %th Actions
 
   %tbody
-    - @course_offerings.each do |course_offering|
+    - @course_offerings.active.each do |o|
       %tr
-        %td= course_offering.term.display_name
-        %td= course_offering.course.number
-        %td= link_to course_offering.label,
-          course_offering_path(course_offering)
-        %td= course_offering.url
-        %td= course_offering.self_enrollment_allowed
+        %td= o.term.display_name
+        %td= o.course.number
+        %td= link_to o.label,
+          course_offering_path(o)
+        %td= o.url
+        %td= o.self_enrollment_allowed
         %td
-          = button_link 'Show', course_offering, size: 'sm'
-          = button_link 'Edit', edit_course_offering_path(course_offering),
+          = button_link 'Show', o, size: 'sm'
+          = button_link 'Edit', edit_course_offering_path(o),
             size: 'sm'
-          = button_link 'Destroy', course_offering, method: :delete,
+          = button_link 'Destroy', o, method: :delete,
             size: 'sm', data: { confirm: 'Are you sure?' }
 
 = button_link 'New Course Offering', new_course_offering_path

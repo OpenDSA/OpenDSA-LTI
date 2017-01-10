@@ -3,9 +3,9 @@
 %h1
   = @course.number_and_name
   %small= @term.display_name
-- if @course_offerings && @course_offerings.any?
+- if @course_offerings.active && @course_offerings.active.any?
   %p
-    - @course_offerings.each_with_index do |offering, i|
+    - @course_offerings.active.each_with_index do |offering, i|
       - if i > 0
         %br/
       %strong= offering.display_name
@@ -39,8 +39,8 @@
             .progress-bar
               .text-primary
                 0%
-    - @course_offerings.each do |offering|
-      - if @course_offerings.size > 1
+    - @course_offerings.active.each do |offering|
+      - if @course_offerings.active.size > 1
         %h2= offering.display_name
         = link_to
       %table.table.table-striped
@@ -70,7 +70,7 @@
         / %th Graders
         / %th Enroll
     %tbody
-      - @course.course_offerings.each do |o|
+      - @course.course_offerings.active.each do |o|
         %tr
           %td= o.term.display_name
           %td= o.display_name
