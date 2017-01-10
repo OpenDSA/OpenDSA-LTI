@@ -284,3 +284,12 @@ ul.wysihtml5-toolbar li {
   border-top: 1px solid black;
   border-bottom: 1px solid black;
 }
+
+.modal-dialog {
+  overflow-y: initial !important
+}
+
+.modal-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
