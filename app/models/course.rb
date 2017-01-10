@@ -66,6 +66,12 @@ class Course < ActiveRecord::Base
 
 
   # -------------------------------------------------------------
+
+  def active_course_offerings
+    course_offerings.where(archived: false)
+  end
+
+  # -------------------------------------------------------------
   def display_name
     number_and_name
   end

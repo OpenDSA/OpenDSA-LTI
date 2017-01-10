@@ -14,7 +14,7 @@ class OrganizationsController < ApplicationController
     @organizations = Organization.accessible_by(current_ability).
       includes(courses: :course_offerings).
       joins(courses: :course_offerings).
-      where('course_offerings.term_id' => @term).
+      where('course_offerings.term_id' => @term , 'course_offerings.archived' => false).
       distinct
   end
 
@@ -33,7 +33,7 @@ class OrganizationsController < ApplicationController
     @organization = Organization.accessible_by(current_ability).
       includes(courses: :course_offerings).
       joins(courses: :course_offerings).
-      where('course_offerings.term_id' => @term).
+      where('course_offerings.term_id' => @term, 'course_offerings.archived' => false).
       find(params[:id]) rescue nil
   end
 

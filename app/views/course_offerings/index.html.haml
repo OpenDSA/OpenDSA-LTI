@@ -11,7 +11,7 @@
       %th Actions
 
   %tbody
-    - @course_offerings.active.each do |o|
+    - @course_offerings.each do |o|
       %tr
         %td= o.term.display_name
         %td= o.course.number

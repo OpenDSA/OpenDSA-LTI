@@ -118,7 +118,7 @@ class User < ActiveRecord::Base
 
   # -------------------------------------------------------------
   def course_offerings_for_term(term, course)
-    conditions = { term: term, 'users.id' => self }
+    conditions = { term: term, 'users.id' => self, 'course_offerings.archived' => false}
     if course
       conditions[:course] = course
     end

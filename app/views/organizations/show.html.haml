@@ -28,7 +28,7 @@
             %th Instructor(s)
             / %th Enroll
           %tbody
-            - course.course_offerings.active.each do |o|
+            - course.course_offerings.each do |o|
               - lms_course_code = o.lms_course_code
               - lms_url = o.lms_instance.url
               - lms_course_num = o.lms_course_num
