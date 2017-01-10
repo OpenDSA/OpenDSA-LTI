@@ -27,9 +27,9 @@
             %thead
               %th Term
               %th Section
-              %th OpenDSA Book
               - if user_signed_in? && current_user.global_role.is_admin?
                 %th Canvas course
+              %th OpenDSA Book
               %th Instructor(s)
               / %th Enroll
             %tbody
