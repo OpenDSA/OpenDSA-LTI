@@ -29,7 +29,7 @@
       format: "YYYY-MM-DD HH:MM"
     });
    });
-  
+
   /*
    * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
    */
@@ -120,7 +120,7 @@
      alert("Ready for Download!");
      $('#downloadLink').toggle();
    });
-*/
+   */
 
   $(document).on('click', '#odsa-submit-co', function(e) {
     handleSubmit();
@@ -198,6 +198,8 @@
     inputHTML = inputHTML.replace(/ class=""/g, "");
     inputHTML = inputHTML.replace(/ type="[^"]+"/g, "");
     inputHTML = inputHTML.replace(/ type=""/g, "");
+    inputHTML = inputHTML.replace(/ size="[^"]+"/g, "");
+    inputHTML = inputHTML.replace(/ size=""/g, "");
     inputHTML = inputHTML.replace(/ readonly=/g, "");
     inputHTML = inputHTML.replace(/ disabled=""/g, "");
     inputHTML = inputHTML.replace(/ hidden=""/g, "");
@@ -291,7 +293,7 @@
         return "hidden";
       }
     });
-	
+
 	Handlebars.registerHelper('dropdown', function(key, canDelete) {
 		var html = "<div class=\"dropdown instDropdown\">";
 		html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
@@ -523,7 +525,7 @@
     $('li.odsa_li').addClass("ui-widget-content ui-corner-all");
     $(".odsa_sortable").sortable();
   }
-  
+
   /*
    * Function to set the default size of all text inputs.
    */
