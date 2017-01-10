@@ -65,19 +65,29 @@
       %tr
         %th Term
         %th Section
+        %th OpenDSA Book
         %th Instructors
         / %th Graders
         / %th Enroll
     %tbody
-      - @course.course_offerings.each do |off|
+      - @course.course_offerings.each do |o|
         %tr
-          %td= off.term.display_name
-          %td= off.display_name
-          %td!= off.instructors.map{ |i| link_to i.display_name,
+          %td= o.term.display_name
+          %td= o.display_name
+          - if o.odsa_books.many?
+            %td
+              %table.table.table-striped
+                - o.odsa_books.each do |bk|
+                  %tr
+                    %td= bk.title
+          - else
+            %td!= o.odsa_books.map{ |i| i.title }.to_sentence
+
+          %td!= o.instructors.map{ |i| link_to i.display_name,
             user_path(i) }.to_sentence
-          / %td!= off.graders.map{ |i| link_to i.display_name,
+          / %td!= o.graders.map{ |i| link_to i.display_name,
           /   user_path(i) }.to_sentence
           / %td
           /   = render partial: 'course_offerings/self_enrollment',
-          /     locals: { off: off }
+          /     locals: { o: o }
 
