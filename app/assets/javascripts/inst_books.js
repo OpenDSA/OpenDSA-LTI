@@ -255,7 +255,7 @@
     //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
     var html = "<div class='col-sm-3 input-group date datetimepicker'>";
-    html += "<input class=\"form-control\" data-source=\"" + chapter + "/" + mod + "/" + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
+    html += "<input class=\"form-control\" data-source=\"" + chapter + "/" + mod + "/Sections/" + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
     html += "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
     html += "</div>";
     return html;
@@ -347,12 +347,12 @@
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, parent, mod, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, mod.long_name, chapter));
       } else if (key == "hard_deadline") {
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, parent, mod, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, mod.long_name, chapter));
       } else if (typeof(value) === 'object') {
         return new Handlebars.SafeString("<input value=\"" + value + "\" hidden>");
       } else if (key == "long_name") {
@@ -362,15 +362,16 @@
       }
     });
 
-    Handlebars.registerHelper('exCheck', function(key, value, parent, section, mod, chapter) {
+    Handlebars.registerHelper('exCheck', function(key, value, parent, parentOb, section, mod, chapter) {
+      //alert(Object.getOwnPropertyNames(mod));
       if (key == "points") {
         //return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" mod + "/" + section + "/" + parent + "\" value=\"" + value + "\">");
-        return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + mod + "/" + section + "/" + parent + "\" value=\"" + value + "\">");
+        return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + mod.long_name + "/Sections/" + section + "/" + parentOb.long_name + "\" value=\"" + value + "\">");
       } else if (key == "threshold") {
         if(parent.includes("CON")) {
           return new Handlebars.SafeString("<input value=\"" + value + "\">");
         } else {
-          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + chapter + "/" + mod + "/" + section + "/" + parent + "\" value=\"" + value + "\">");
+          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + chapter + "/" + mod.long_name + "/Sections/" + section + "/" + parentOb.long_name + "\" value=\"" + value + "\">");
         }
       } else {
         return new Handlebars.SafeString("<input value=\"" + value + "\">");
@@ -434,14 +435,14 @@
                                 "<ul class=\"odsa_ul\">" + // Exercise Data
                                 "{{#each .}}" + // Open Exercise Data
                                   "<li class=\"odsa_li\" {{hideExer @key}}> <a data-key=\"{{@key}}\">" + // Exercise Data Line Item
-                                    "{{keyCheck @key}}: </a> {{exCheck @key this @../key @../../key @../../key @../../../../key}}" + // Exercise Data Item
+                                    "{{keyCheck @key}}: </a> {{exCheck @key this @../key @../this @../../key @../../../this @../../../../key}}" + // Exercise Data Item
                                   "</li>" + // Close Exercise Data line Item
                                 "{{/each}}" + // Close Exercise Data
                                 "</ul>" + // Close Exercise Data
                               "</li>" + // Close Exercise Line Item
                             "{{else}}" + // If Not Exercise
                               "<li {{hideSec @key}}>" + // Section Data Line Item
-                                "<a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{secCheck @key this @../key @../../key @../../../key}}" + // Section Data Item
+                                "<a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{secCheck @key this @../key @../../../this @../../../key}}" + // Section Data Item
                               "</li>" + // Close Section Data Line Item
                             "{{/if}}" + // Close Exercise If
                           "{{/each}}" + // Close Section Data
