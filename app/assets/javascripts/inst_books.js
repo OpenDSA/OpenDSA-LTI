@@ -369,9 +369,7 @@
     });
 
     Handlebars.registerHelper('exCheck', function(key, value, parent, parentOb, section, mod, chapter) {
-      //alert(Object.getOwnPropertyNames(mod));
       if (key == "points") {
-        //return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" mod + "/" + section + "/" + parent + "\" value=\"" + value + "\">");
         return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + mod.long_name + "/Sections/" + section + "/" + parentOb.long_name + "\" value=\"" + value + "\">");
       } else if (key == "threshold") {
         if(parent.includes("CON")) {
