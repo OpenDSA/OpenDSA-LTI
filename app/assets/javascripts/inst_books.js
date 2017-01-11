@@ -288,7 +288,7 @@
     });
 
     Handlebars.registerHelper('hideSec', function(key) {
-      if (key == "lms_assignment_id" || key == "lms_item_id" || key == "hard_deadline") {
+      if (key == "lms_assignment_id" || key == "lms_item_id" || key == "hard_deadline" || key == "showsection") {
         return "hidden";
       } else if (key.includes("CON")) {
         return "hidden";
