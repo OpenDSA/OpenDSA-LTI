@@ -255,7 +255,7 @@
     //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
     var html = "<div class='col-sm-3 input-group date datetimepicker'>";
-    html += "<input class=\"form-control\" data-source=\"" + chapter + "/" + mod + "/Sections/" + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
+    html += "<input class=\"form-control date-input\" data-source=\"" + chapter + "/" + mod + "/Sections/" + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
     html += "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
     html += "</div>";
     return html;
@@ -292,6 +292,12 @@
         return "hidden";
       } else if (key.includes("CON")) {
         return "hidden";
+      }
+    });
+
+    Handlebars.registerHelper('sameLine', function(key) {
+      if(key == 'points' || key == 'threshold') {
+        return "same-line";
       }
     });
 
@@ -434,7 +440,7 @@
                                 "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> <strong> Exercise: </strong> {{long_name}} </a>" + // Exercise Title
                                 "<ul class=\"odsa_ul\">" + // Exercise Data
                                 "{{#each .}}" + // Open Exercise Data
-                                  "<li class=\"odsa_li\" {{hideExer @key}}> <a data-key=\"{{@key}}\">" + // Exercise Data Line Item
+                                  "<li class=\"odsa_li {{sameLine @key}}\" {{hideExer @key}}> <a data-key=\"{{@key}}\">" + // Exercise Data Line Item
                                     "{{keyCheck @key}}: </a> {{exCheck @key this @../key @../this @../../key @../../../this @../../../../key}}" + // Exercise Data Item
                                   "</li>" + // Close Exercise Data line Item
                                 "{{/each}}" + // Close Exercise Data
