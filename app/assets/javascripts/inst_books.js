@@ -64,7 +64,7 @@
    * Sets the data-key attribute of a form tag when the user changes it.
    */
   $(document).on('blur', '#odsa_content form', function() {
-    $(this).attr('data-key', $(this + "input[type='radio']:checked").val());
+    $(this).attr('data-key', $("input[name=\"" + $(this).attr('data-name') + "\"]:checked").val());
   });
 
   /*
@@ -288,7 +288,7 @@
     });
 
     Handlebars.registerHelper('hideSec', function(key) {
-      if (key == "lms_assignment_id" || key == "lms_item_id" || key == "hard_deadline" || key == "showsection") {
+      if (key == "lms_assignment_id" || key == "lms_item_id" || key == "hard_deadline") {
         return "hidden";
       } else if (key.includes("CON")) {
         return "hidden";
@@ -343,9 +343,9 @@
     Handlebars.registerHelper('secCheck', function(key, value, parent, mod, chapter) {
       if (key == "required" || key == "showsection") {
         if (value == "true") {
-          return new Handlebars.SafeString("<form data-key=\"" + value + "\"><label><input type=\"radio\" name=\"radio\" value=\"true\" checked>True</label><label><input type=\"radio\" name=\"radio\" value=\"false\">False</label></form>");
+          return new Handlebars.SafeString("<form data-name=\"" + parent + "\" data-key=\"true\"><label><input data-type=\"radio\" type=\"radio\" name=\"" + parent + "\" value=\"true\" checked>True</label><label><input data-type=\"radio\" type=\"radio\" name=\"" + parent + "\" value=\"false\">False</label></form>");
         } else {
-          return new Handlebars.SafeString("<form data-key=\"" + value + "\"><label><input type=\"radio\" name=\"radio\" value=\"true\">True</label><label><input type=\"radio\" name=\"radio\" value=\"false\" checked>False</label></form>");
+          return new Handlebars.SafeString("<form data-name=\"" + parent + "\" data-key=\"false\"><label><input data-type=\"radio\" type=\"radio\" name=\"" + parent + "\" value=\"true\">True</label><label><input data-type=\"radio\" type=\"radio\" name=\"" + parent + "\" value=\"false\" checked>False</label></form>");
         }
       } else if (key == "lms_item_id" || key == "lms_assignment_id") {
         return new Handlebars.SafeString("<input value=\"null\" disabled>");
