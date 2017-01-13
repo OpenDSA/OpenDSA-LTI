@@ -20,13 +20,30 @@
   /*
    * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
    */
-  $(document).on('focus', '.datetimepicker', function() {
-    $(this).parent().css("position", "relative");
-    $(this).datetimepicker({
+   $(document).on('focus', '.timemodal', function() {
+	$(this).parent().css("position", "relative");
+    $(this).parent().datetimepicker({
       showClose: true,
       sideBySide: true,
+      keepInvalid: true,
+	    allowInputToggle: true,
       format: "YYYY-MM-DD HH:MM"
     });
+   });
+
+  /*
+   * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
+   */
+  $(document).on('click', '.input-group-addon', function() {
+    $(this).parent().css("position", "relative");
+    $(this).parent().datetimepicker({
+      showClose: true,
+      sideBySide: true,
+	    keepInvalid: true,
+	    allowInputToggle: true,
+      format: "YYYY-MM-DD HH:MM"
+    });
+	$(this).parent().data("DateTimePicker").show();
   });
 
   /*
@@ -47,7 +64,7 @@
    * Sets the data-key attribute of a form tag when the user changes it.
    */
   $(document).on('blur', '#odsa_content form', function() {
-    $(this).attr('data-key', $(this + "input[type='radio']:checked").val());
+    $(this).attr('data-key', $("input[name=\"" + $(this).attr('data-name') + "\"]:checked").val());
   });
 
   /*
@@ -104,7 +121,7 @@
      alert("Ready for Download!");
      $('#downloadLink').toggle();
    });
-*/
+   */
 
   $(document).on('click', '#odsa-submit-co', function(e) {
     handleSubmit();
@@ -182,6 +199,8 @@
     inputHTML = inputHTML.replace(/ class=""/g, "");
     inputHTML = inputHTML.replace(/ type="[^"]+"/g, "");
     inputHTML = inputHTML.replace(/ type=""/g, "");
+    inputHTML = inputHTML.replace(/ size="[^"]+"/g, "");
+    inputHTML = inputHTML.replace(/ size=""/g, "");
     inputHTML = inputHTML.replace(/ readonly=/g, "");
     inputHTML = inputHTML.replace(/ disabled=""/g, "");
     inputHTML = inputHTML.replace(/ hidden=""/g, "");
@@ -232,26 +251,13 @@
   /*
    * Function to return the html to make a datetimepicker object.
    */
-  var datepick = function(value, parent, chapter) {
+  var datepick = function(value, parent, mod, chapter) {
     //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
     var html = "<div class='col-sm-3 input-group date datetimepicker'>";
-    html += "<input class=\"form-control\" data-source=\"" + chapter + "/" + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
+    html += "<input class=\"form-control date-input\" data-source=\" Chapter: " + chapter + ", Module: " + mod + ", Section: " + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
     html += "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
     html += "</div>";
-    return html;
-  }
-
-  /*
-   * Function to return the html to make a dropdown menu object.
-   */
-  var dropdown = function() {
-    var html = "<div class=\"dropdown instDropdown\">";
-    html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
-    html += "<ul class=\"dropdown-menu pull-right\">";
-    html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"{{@key}}\" class=\"chapterLoad\">Set Due Dates</a></li>";
-    html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
-    html += "</ul></div>";
     return html;
   }
 
@@ -267,7 +273,7 @@
   }
 
   /*
-   * Function to read in a json key and value pair and convert it into the
+   * Function to read in a json object and convert it into the
    * proper html to be dispayed to the user.
    */
   var encode = function(data) {
@@ -282,12 +288,30 @@
     });
 
     Handlebars.registerHelper('hideSec', function(key) {
-      if (key == "lms_assignment_id" || key == "lms_item_id" || key == "hard_deadline") {
+      if (key == "lms_assignment_id" || key == "lms_item_id" || key == "hard_deadline" || key == "showsection") {
         return "hidden";
       } else if (key.includes("CON")) {
         return "hidden";
       }
     });
+
+    Handlebars.registerHelper('sameLine', function(key) {
+      if(key == 'points' || key == 'threshold') {
+        return "same-line";
+      }
+    });
+
+	Handlebars.registerHelper('dropdown', function(key, canDelete) {
+		var html = "<div class=\"dropdown instDropdown\">";
+		html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
+		html += "<ul class=\"dropdown-menu pull-right\">";
+		html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"" + key + "\" class=\"chapterLoad\">Set Due Dates</a></li>";
+		if(canDelete) {
+			html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
+		}
+		html += "</ul></div>";
+		return new Handlebars.SafeString(html);
+	});
 
     Handlebars.registerHelper('keyCheck', function(key) {
       if (key == "long_name") {
@@ -316,14 +340,12 @@
       }
     });
 
-    Handlebars.registerHelper('valCheck', function(key, value, parent, chapter) {
+    Handlebars.registerHelper('secCheck', function(key, value, parent, mod, chapter) {
       if (key == "required" || key == "showsection") {
         if (value == "true") {
-          //return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
-          return new Handlebars.SafeString("<form data-key=\"" + value + "\"><label><input type=\"radio\" name=\"radio\" value=\"true\" checked>True</label><label><input type=\"radio\" name=\"radio\" value=\"false\">False</label></form>");
+          return new Handlebars.SafeString("<form data-name=\"" + parent + "\" data-key=\"true\"><label><input data-type=\"radio\" type=\"radio\" name=\"" + parent + "\" value=\"true\" checked>True</label><label><input data-type=\"radio\" type=\"radio\" name=\"" + parent + "\" value=\"false\">False</label></form>");
         } else {
-          //return new Handlebars.SafeString("<select data-key=\"" + value + "\"><option value=\"true\">true</option><option value=\"false\">false</option></select>");
-          return new Handlebars.SafeString("<form data-key=\"" + value + "\"><label><input type=\"radio\" name=\"radio\" value=\"true\">True</label><label><input type=\"radio\" name=\"radio\" value=\"false\" checked>False</label></form>");
+          return new Handlebars.SafeString("<form data-name=\"" + parent + "\" data-key=\"false\"><label><input data-type=\"radio\" type=\"radio\" name=\"" + parent + "\" value=\"true\">True</label><label><input data-type=\"radio\" type=\"radio\" name=\"" + parent + "\" value=\"false\" checked>False</label></form>");
         }
       } else if (key == "lms_item_id" || key == "lms_assignment_id") {
         return new Handlebars.SafeString("<input value=\"null\" disabled>");
@@ -331,75 +353,123 @@
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, parent, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, mod.long_name, chapter));
       } else if (key == "hard_deadline") {
         if (typeof(value) === "object") {
           value = null;
         }
-        return new Handlebars.SafeString(datepick(value, parent, chapter));
+        return new Handlebars.SafeString(datepick(value, parent, mod.long_name, chapter));
       } else if (typeof(value) === 'object') {
-        //return new Handlebars.SafeString("<input value=\"{}\">");
         return new Handlebars.SafeString("<input value=\"" + value + "\" hidden>");
       } else if (key == "long_name") {
         return new Handlebars.SafeString("<input value=\"" + value + "\" disabled>");
-      } else if (key == "points") {
-        return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+      } else {
+        return new Handlebars.SafeString("<input value=\"" + value + "\">");
+      }
+    });
+
+    Handlebars.registerHelper('exCheck', function(key, value, parent, parentOb, section, mod, chapter) {
+      if (key == "points") {
+        return new Handlebars.SafeString("<input class=\"points\" data-source=\" Chapter: " + chapter + ", Module: " + mod.long_name + ", Section: " + section + ", Exercise: " + parentOb.long_name + "\" value=\"" + value + "\">");
       } else if (key == "threshold") {
-        if(parent.includes("PRO") || parent.includes("PE")) {
-          return new Handlebars.SafeString("<input class=\"threshold-pro\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
-        } else if(parent.includes("CON")) {
+        if(parent.includes("CON")) {
           return new Handlebars.SafeString("<input value=\"" + value + "\">");
         } else {
-          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + chapter + "/" + parent + "\" value=\"" + value + "\">");
+          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\" Chapter: " + chapter + ", Module: " + mod.long_name + ", Section: " + section + ", Exercise: " + parentOb.long_name + "\" value=\"" + value + "\">");
         }
       } else {
         return new Handlebars.SafeString("<input value=\"" + value + "\">");
       }
     });
 
-    var hSource = "<ul class='odsa_ul'>" +
-      "<li class='odsa_li' hidden><a data-key=\"inst_book_id\">instance book id: </a><input value=\"{{inst_book_id}}\"></li>" +
-      "<li class='odsa_li'><a data-key=\"title\">title: </a><input id=\"book-title\" value=\"{{title}}\"></li>" +
-      "<li class='odsa_li'><a data-key=\"desc\">description: </a><input id=\"book-desc\" value=\"{{desc}}\"></li>" +
-      "</ul>";
+    var hSource = "<ul class=\"odsa_ul\">" +
+       "<li class='odsa_li' hidden> <a data-key=\"inst_book_id\"> instance book id: </a> <input value=\"{{inst_book_id}}\"> </li>" +
+       "<li class='odsa_li'> <a data-key=\"title\"> title: </a> <input id=\"book-title\" value=\"{{title}}\"> </li>" +
+       "<li class='odsa_li'> <a data-key=\"desc\">description: </a> <input id=\"book-desc\" value=\"{{desc}}\"> </li>" +
+       "</ul>";
     var hTemplate = Handlebars.compile(hSource);
     var hhtml = hTemplate(data);
     $('#heading').html(hhtml);
 
-    var oSource = "<ul class='odsa_ul'>" +
-      "<li class='odsa_li' hidden><a data-key=\"course_id\">course id: </a><input value=\"{{course_id}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"LMS_url\">LMS url: </a><input value=\"{{LMS_url}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"build_dir\">build directory: </a><input value=\"{{build_dir}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"code_dir\">code directory: </a><input value=\"{{code_dir}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"lang\">language: </a><input value=\"{{lang}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"code_lang\">code language: </a><input value=\"{}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"build_JSAV\">build JSAV: </a><input value=\"{{build_JSAV}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"tabbed_codeinc\">tabbed code inc: </a><input value=\"{{tabbed_codeinc}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"build_cmap\">build cmap: </a><input value=\"{{build_cmap}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"suppress_todo\">suppress todo: </a><input value=\"{{suppress_todo}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"assumes\">assumes: </a><input value=\"{{assumes}}\"></li>" +
-      "<li class='odsa_li' hidden><a data-key=\"dispModComp\">display Mod Comp: </a><input value=\"{{dispModComp}}\"></li>" +
-      "</ul>";
+    var oSource = "<ul class=\"odsa_ul\">" +
+       "<li class='odsa_li' hidden> <a data-key=\"course_id\"> course id: </a> <input value=\"{{course_id}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"LMS_url\"> LMS url: </a> <input value=\"{{LMS_url}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"build_dir\"> build directory: </a> <input value=\"{{build_dir}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"code_dir\"> code directory: </a> <input value=\"{{code_dir}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"lang\"> language: </a> <input value=\"{{lang}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"code_lang\"> code language: </a> <input value=\"{}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"build_JSAV\"> build JSAV: </a> <input value=\"{{build_JSAV}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"tabbed_codeinc\"> tabbed code inc: </a> <input value=\"{{tabbed_codeinc}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"build_cmap\"> build cmap: </a> <input value=\"{{build_cmap}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"suppress_todo\"> suppress todo: </a> <input value=\"{{suppress_todo}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"assumes\"> assumes: </a> <input value=\"{{assumes}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"dispModComp\"> display Mod Comp: </a> <input value=\"{{dispModComp}}\"> </li>" +
+       "</ul>";
     var oTemplate = Handlebars.compile(oSource);
     var ohtml = oTemplate(data);
     $('#options').html(ohtml);
 
-    var cSource = "<h1> Chapters: </h1> {{#if last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}} {{#each chapters}}" + // List
-      "<li class='odsa_li'> {{#unless ../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Chapter: </strong> {{@key}} </a>" + dropdown() + // Chapters
-      "{{#if ../last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}} {{#each .}}" + // Chapters
-      "{{#if long_name}} <li class='odsa_li'> {{#unless ../../last_compiled}} <span class='glyphicon glyphicon-th-list'></span> {{/unless}} <a data-key=\"{{@key}}\">{{#if sections}}<span class='glyphicon glyphicon-chevron-right'></span>{{/if}}<strong> Module: </strong> {{long_name}} </a>" + // Modules
-      "<ul class=\"odsa_ul\"> <li class='odsa_li' hidden><a data-key=\"long_name\"></a><input value=\"{{long_name}}\"></li>" + // Module Name
-      "<li class='odsa_li'> {{#if sections}} <a data-key=\"sections\"> <span class='glyphicon glyphicon-chevron-right'></span> Sections</a> {{else}} <a data-key=\"sections\" hidden> </a> {{/if}} <ul class=\"odsa_ul\"> {{#each sections}}" + // Module Sections
-      "<li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> {{@key}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Sections
-      "{{#if long_name}} <li class='odsa_li'><a data-key=\"{{@key}}\"><span class='glyphicon glyphicon-chevron-right'></span> <strong> Exercise: </strong> {{long_name}} </a> <ul class=\"odsa_ul\"> {{#each .}}" + // Exercises
-      "<li class='odsa_li' {{hideExer @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../../key}} </li>" + // Exercise Data
-      "{{/each}} </ul></li>" + // Close Exercise Data
-      "{{else}} <li {{hideSec @key}}><a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{valCheck @key this @../key @../../../key}} </li> {{/if}}" + // Parse Additional Learning Tools
-      "{{/each}}" + // Close Exercises
-      "</ul></li>" + // Close Sections
-      "{{/each}} </ul> </ul> {{/if}} </li>" + // Close Modules
-      "{{/each}} </ul></li>" + // Close Chapters
-      "{{/each}} </ul>"; // Close List
+    var cSource = "<h1> Chapters: </h1>" + // Header
+      "{{#if last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Chapters Sortable
+        "{{#each chapters}}" + // Open Chapters
+          "<li class=\"odsa_li\">" + // Chapter Line Item
+            "{{#unless ../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
+            "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> <strong> Chapter: </strong> {{@key}} </a>" + // Chapter Title
+            "{{#if ../last_compiled}} {{dropdown @key false}} {{else}} {{dropdown @key true}} {{/if}}" + // Dropdown Menu
+            "{{#if ../last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Modules Sortable
+            "{{#each .}}" + // Open Modules
+              "{{#if long_name}}" + // Check Module Name
+              "<li class=\"odsa_li\">" + // Module Line item
+                "{{#unless ../../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
+                "<a data-key=\"{{@key}}\"> {{#if sections}} <span class=\"glyphicon glyphicon-chevron-right\"></span> {{/if}} <strong> Module: </strong> {{long_name}} </a>" + // Module Title
+                "<ul class=\"odsa_ul\">" + // Module Data
+                  "<li class=\"odsa_li\" hidden> <a data-key=\"long_name\"></a> <input value=\"{{long_name}}\"> </li>" + // Module Long Name
+                  "{{#if sections}}" + // Has Sections
+                    "<li class=\"odsa_li\">" + // Module Sections
+                    "<a data-key=\"sections\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> Sections </a>" + // Section Header
+                      "<ul class=\"odsa_ul\">" + // Section List
+                      "{{#each sections}}" + // Open Sections
+                        "<li class=\"odsa_li\">" + // Section Line item
+                          "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> {{@key}} </a>" + // Section Name
+                          "<ul class=\"odsa_ul\">" + // Section Data
+                          "{{#each .}}" + // Open Section Data
+                            "{{#if long_name}}" + // If Exercise
+                              "<li class=\"odsa_li\">" + // Exercise Line item
+                                "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> <strong> Exercise: </strong> {{long_name}} </a>" + // Exercise Title
+                                "<ul class=\"odsa_ul\">" + // Exercise Data
+                                "{{#each .}}" + // Open Exercise Data
+                                  "<li class=\"odsa_li {{sameLine @key}}\" {{hideExer @key}}> <a data-key=\"{{@key}}\">" + // Exercise Data Line Item
+                                    "{{keyCheck @key}}: </a> {{exCheck @key this @../key @../this @../../key @../../../this @../../../../key}}" + // Exercise Data Item
+                                  "</li>" + // Close Exercise Data line Item
+                                "{{/each}}" + // Close Exercise Data
+                                "</ul>" + // Close Exercise Data
+                              "</li>" + // Close Exercise Line Item
+                            "{{else}}" + // If Not Exercise
+                              "<li {{hideSec @key}}>" + // Section Data Line Item
+                                "<a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{secCheck @key this @../key @../../../this @../../../key}}" + // Section Data Item
+                              "</li>" + // Close Section Data Line Item
+                            "{{/if}}" + // Close Exercise If
+                          "{{/each}}" + // Close Section Data
+                          "</ul>" + // Close Section Data
+                        "</li>" + // Close Section Line Item
+                      "{{/each}}" + // Close Sections
+                      "</ul>" + // Close Sections
+                    "</li>" + // Close Module Sections
+                  "{{else}}" + // No Sections
+                    "<li class=\"odsa_li\" hidden>" + //Module Sections
+                      "<a data-key=\"sections\"> </a>" + // Section Header
+                      "<ul class=\"odsa_ul\">" + // Section List
+                      "</ul>" + // Close Section List
+                    "</li>" + // Close Module Sections
+                  "{{/if}}" + // Close Section Header If
+                "</ul>" + // Close Module Data
+              "</li>" + // Close Module Line Item
+              "{{/if}}" + // Close Check Module Name
+            "{{/each}}" + // Close Modules
+            "</ul>" + // Close Modules
+          "</li>" + // Close Chapter Line Item
+        "{{/each}}" + // Close chapters
+        "</ul>"; // Close Chapters
 
     var cTemplate = Handlebars.compile(cSource);
     var chtml = cTemplate(data);
@@ -512,6 +582,19 @@
   }
 
   /*
+   * Function to set the default size of all text inputs.
+   */
+  var sizeInputs = function() {
+	$('input:text').each(function(index, element) {
+		if($(element).val().length > 10) {
+			$(element).attr('size', $(element).val().length);
+		} else {
+			$(element).attr('size', 10);
+		}
+	});
+  }
+
+  /*
    * Function to build a new json book.
    */
   var newJSON = function() {
@@ -543,6 +626,7 @@
     $('#chapters').html(chapterString);
 
     addClasses();
+	  sizeInputs();
   }
 
   /*
@@ -556,6 +640,7 @@
     encode(jsonFile);
 
     addClasses();
+	  sizeInputs();
   }
 
   /*
@@ -639,7 +724,10 @@
       if($(element).val() != parseFloat($(element).val())) {
         messages.push('Points must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
         return false;
-      }
+      } else if($(element).val() < 0) {
+		messages.push('Points must be a positive value. SOURCE: ' + $(element).attr('data-source'));
+		return false;
+	  }
     })
     $('.form-control').each(function(index, element) {
       if(!(/^\d\d\d\d-\d\d-\d\d \d\d:\d\d$/.test($(element).val())) && $(element).val() != 'null') {
@@ -648,24 +736,16 @@
       }
     })
     $('.threshold').each(function(index, element) {
-      if($(element).val() != parseFloat($(element).val())) {
-        messages.push('Thresholds must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
+      if($(element).val() > 10 || $(element).val() < 0) {
+        messages.push('Thresholds must be between 1 and 10 or 0 and 1.0 SOURCE: ' + $(element).attr('data-source'));
         return false;
-      }
-      if($(element).val() > 10 || $(element).val() < 1) {
-        messages.push('Thresholds must be between 1 and 10 SOURCE: ' + $(element).attr('data-source'));
-        return false;
-      }
-    })
-    $('.threshold-pro').each(function(index, element) {
-      if($(element).val() != parseFloat($(element).val())) {
-        messages.push('Thresholds must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
-        return false;
-      }
-      if($(element).val() > 1 || $(element).val() < 0) {
-        messages.push('Thresholds for proficiency exercises must be between 0 and 1.0 SOURCE: ' + $(element).attr('data-source'));
-        return false;
-      }
+      } else if($(element).val() < 1 && $(element).val() != parseFloat($(element).val())) {
+		messages.push('Thresholds between 0 and 1.0 must be a decimal. SOURCE: ' + $(element).attr('data-source'));
+		return false;
+	  } else if($(element).val() >= 1 && $(element).val() != parseInt($(element).val())) {
+		messages.push('Thresholds between 1 and 10 must be an integer. SOURCE: ' + $(element).attr('data-source'));
+		return false;
+	  }
     })
     return messages;
   };

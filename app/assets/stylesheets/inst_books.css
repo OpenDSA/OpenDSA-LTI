@@ -2,14 +2,6 @@ h1 {
 	width: 30%;
 }
 
-// input {
-//   width: 300px;
-// }
-
-// form input {
-//   width: 50px;
-// }
-
 option {
 	width: 300px;
 }
@@ -48,6 +40,11 @@ li.odsa_li button {
 	width: 20%;
 }
 
+li.same-line {
+	display: inline-block;
+	width: 44%;
+}
+
 input.odsa_in {
 	width: 25%;
 }
@@ -57,6 +54,21 @@ button.odsa_button {
 	border: 1px solid black;
 	border-radius: 10px;
 	padding: 2px 10px 2px 10px;
+}
+
+div.datetimepicker {
+	display: inline-block;
+	width: 50%;
+	height: 20px;
+	margin: 10px 5px 10px 5px;
+}
+
+input.date-input {
+	width: 80% !important;
+}
+
+span.input-group-addon {
+	height: 34px;
 }
 
 #odsa_content {

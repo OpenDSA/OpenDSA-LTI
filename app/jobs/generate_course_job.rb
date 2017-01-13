@@ -293,7 +293,10 @@ class GenerateCourseJob < ProgressJob::Base
 
     if section.gradable
       assignment_opts[:assignment__points_possible__] = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", section.id).first.points
-      # TODO: add the due date
+      if section.soft_deadline
+        assignment_opts[:assignment__due_at__] = section.soft_deadline.try(:strftime, "%Y-%m-%dT%H:%m:%S%:z")
+      end
+
       opts[:module_item__type__] = 'Assignment'
       if section.lms_item_id && section.lms_assignment_id
         opts[:module_item__content_id__] = section.lms_assignment_id
@@ -350,7 +353,10 @@ class GenerateCourseJob < ProgressJob::Base
     opts[:module_item__title__] = title
     if section.gradable
       assignment_opts[:assignment__points_possible__] = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", section.id).first.points
-      # TODO: add the due date
+      if section.soft_deadline
+        assignment_opts[:assignment__due_at__] = section.soft_deadline.try(:strftime, "%Y-%m-%dT%H:%m:%S%:z")
+      end
+
       opts[:module_item__type__] = 'Assignment'
       if section.lms_item_id && section.lms_assignment_id
         opts[:module_item__content_id__] = section.lms_assignment_id
