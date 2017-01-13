@@ -255,7 +255,7 @@
     //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
     var html = "<div class='col-sm-3 input-group date datetimepicker'>";
-    html += "<input class=\"form-control date-input\" data-source=\"" + chapter + "/" + mod + "/Sections/" + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
+    html += "<input class=\"form-control date-input\" data-source=\" Chapter: " + chapter + ", Module: " + mod + ", Section: " + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
     html += "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
     html += "</div>";
     return html;
@@ -370,12 +370,12 @@
 
     Handlebars.registerHelper('exCheck', function(key, value, parent, parentOb, section, mod, chapter) {
       if (key == "points") {
-        return new Handlebars.SafeString("<input class=\"points\" data-source=\"" + chapter + "/" + mod.long_name + "/Sections/" + section + "/" + parentOb.long_name + "\" value=\"" + value + "\">");
+        return new Handlebars.SafeString("<input class=\"points\" data-source=\" Chapter: " + chapter + ", Module: " + mod.long_name + ", Section: " + section + ", Exercise: " + parentOb.long_name + "\" value=\"" + value + "\">");
       } else if (key == "threshold") {
         if(parent.includes("CON")) {
           return new Handlebars.SafeString("<input value=\"" + value + "\">");
         } else {
-          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\"" + chapter + "/" + mod.long_name + "/Sections/" + section + "/" + parentOb.long_name + "\" value=\"" + value + "\">");
+          return new Handlebars.SafeString("<input class=\"threshold\" data-source=\" Chapter: " + chapter + ", Module: " + mod.long_name + ", Section: " + section + ", Exercise: " + parentOb.long_name + "\" value=\"" + value + "\">");
         }
       } else {
         return new Handlebars.SafeString("<input value=\"" + value + "\">");
@@ -724,7 +724,10 @@
       if($(element).val() != parseFloat($(element).val())) {
         messages.push('Points must be a numeric value. SOURCE: ' + $(element).attr('data-source'));
         return false;
-      }
+      } else if($(element).val() < 0) {
+		messages.push('Points must be a positive value. SOURCE: ' + $(element).attr('data-source'));
+		return false;
+	  }
     })
     $('.form-control').each(function(index, element) {
       if(!(/^\d\d\d\d-\d\d-\d\d \d\d:\d\d$/.test($(element).val())) && $(element).val() != 'null') {
