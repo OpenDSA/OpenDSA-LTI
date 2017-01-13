@@ -5,24 +5,24 @@
 %tr
   %td= inst_book.title
   %td= link_to lms_course_code, course_offering_url, :target => "_blank"
-  %td
-    = form_tag '/inst_books/configure/'+ inst_book.id.to_s, :method => :get, :target => "_blank"  do
-      = submit_tag "Configure Book", class: "btn btn-primary", :target => "_blank"
-      .col-xs-1
-        %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#configure-book-modal' } }
-      #configure-book-modal.modal.fade{role: 'dialog', tabindex: '-1' }
-        .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
-          .modal-content
-            .modal-header
-              %p.lead Book Configuration
-            .modal-body
-              %p
-                This view will allow instructors to configure OpenDSA book before they generate the canvas course. Instructors can add/delete OpenDSA chapters/modules, reorder chapters/modules if needed,
-                and adjust exercises points and due dates in addition to general book configuration like programming
-                language used for the book code examples.
-                Once the course is generated, Instructors can only adjust exercises points and due dates.
-              %p
-                Note: In order for the book configuration changes to take effect, Canvas course has to be re-generated using "Generate Canvas Course" button.
+  / %td
+  /   = form_tag '/inst_books/configure/'+ inst_book.id.to_s, :method => :get, :target => "_blank"  do
+  /     = submit_tag "Configure Book", class: "btn btn-primary", :target => "_blank"
+  /     .col-xs-1
+  /       %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#configure-book-modal' } }
+  /     #configure-book-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  /       .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+  /         .modal-content
+  /           .modal-header
+  /             %p.lead Book Configuration
+  /           .modal-body
+  /             %p
+  /               This view will allow instructors to configure OpenDSA book before they generate the canvas course. Instructors can add/delete OpenDSA chapters/modules, reorder chapters/modules if needed,
+  /               and adjust exercises points and due dates in addition to general book configuration like programming
+  /               language used for the book code examples.
+  /               Once the course is generated, Instructors can only adjust exercises points and due dates.
+  /             %p
+  /               Note: In order for the book configuration changes to take effect, Canvas course has to be re-generated using "Generate Canvas Course" button.
   %td
     - if inst_book.last_compiled == nil
       - btn_label = "Generate Canvas Course"
