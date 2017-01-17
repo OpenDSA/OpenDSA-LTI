@@ -1,12 +1,28 @@
+- if @inst_book
+  %h2
+    Select an updated configuration file for book: #{@inst_book.title}.
+- else
+  %h2
+    Select a configuration file to upload.
+
 = form_tag upload_create_admin_inst_books_path, id: :upload_book, multipart: true do
   = file_field('form', 'file')
-  = submit_tag 'Submit File'
+  - confirm_msg = "Are you sure you want to upload new book configuration"+"\n"
+  - if @inst_book
+    - confirm_msg = "Are you sure you want to update book configuration: "+"\n"+"Id: "+@inst_book.id.to_s+"\n"+"Title: '"+ @inst_book.title+"'"+"\n"
+    = hidden_field(:inst_book, :id)
+  = submit_tag 'Submit File', data: { confirm: confirm_msg }
   :javascript
     $(function(){
+      $("input:file").change(function (){
+        var filename = $('input[type=file]').val().split('\\').pop();
+        var confirm_msg = $("#upload_book input[data-confirm]").data('confirm') + ' using this file: ' + filename + '?'
+        $("#upload_book input[data-confirm]").data('confirm', confirm_msg)
+      });
       $('#upload_book').submit(function (e) {
         if ($(this).find('#form_file').val() == '') {
-          e.preventDefault();
           alert('Please select a book configuration file to upload!');
+          e.preventDefault();
         }
       });
     })

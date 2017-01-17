@@ -25,10 +25,10 @@ class InstBook < ActiveRecord::Base
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
-  def self.save_data_from_json(json, current_user)
+  def self.save_data_from_json(json, current_user, inst_book=nil)
     book_data = json
     update_mode = false
-    inst_book_id = book_data['inst_book_id']
+    inst_book_id = inst_book
     options = {}
     options['build_dir'] = book_data['build_dir'] || "Books"
     options['code_dir'] = book_data['code_dir'] || "SourceCode/"
@@ -90,18 +90,5 @@ class InstBook < ActiveRecord::Base
       end
       return b
   end
-
-  def total_points
-    total_points = 0
-    inst_chapters.each do |chapter|
-      chapter_points = chapter.total_points
-      if chapter_points == nil
-        chapter_points = 0
-      end
-      total_points = total_points + chapter_points
-    end
-    return total_points
-  end
-
   #~ Private instance methods .................................................
 end

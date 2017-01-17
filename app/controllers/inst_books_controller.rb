@@ -27,7 +27,7 @@ class InstBooksController < ApplicationController
   def update
     inst_book = params['inst_book']
 
-    InstBook.save_data_from_json(inst_book, current_user)
+    InstBook.save_data_from_json(inst_book, current_user, inst_book['inst_book_id'])
 
     respond_to do |format|
       msg = { :status => "success", :message => "Book configuration uploaded successfully!" }
