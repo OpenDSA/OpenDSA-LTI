@@ -23,7 +23,8 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   end
 
   action_item only: :index do |inst_book|
-    link_to 'Upload Books', upload_books_admin_inst_books_path() if authorized? :upload_books, inst_book
+    # link_to 'Upload Books', upload_books_admin_inst_books_path() if authorized? :upload_books, inst_book
+    link_to 'Upload Books', upload_books_admin_inst_books_path(inst_book)
   end
 
   action_item only: :show  do
@@ -52,7 +53,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     end
 
     def upload_books
-      if !authorized? :upload_books
+      if !current_user.global_role.is_admin? and !current_user.global_role.is_instructor?
         redirect_to admin_inst_books_path
       end
     end
@@ -92,7 +93,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     id_column
     column :title
     # column :desc
-    column :template
+    column 'Template?', :template
     if current_user.global_role.is_admin?
       column "Owner", :user
     end

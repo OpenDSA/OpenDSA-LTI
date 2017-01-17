@@ -153,7 +153,6 @@ CodeWorkout::Application.routes.draw do
     # get 'performance' => :calc_performance, as: :calc_performance
   end
 
-  #OmniAuth for Facebook
   devise_for :users,
     controllers: {omniauth_callbacks: 'users/omniauth_callbacks', registrations: "registrations" },
     skip: [:registrations, :sessions]
