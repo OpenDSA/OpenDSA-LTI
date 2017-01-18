@@ -48,18 +48,23 @@ class OdsaExerciseProgressesController < ApplicationController
   # Retrieves proficiency status of all exercises
   def show_section
     book_progress = OdsaBookProgress.where("user_id=? and inst_book_id=?",
-                                                                          current_user.id, params[:inst_book_id]).first
+                                           current_user.id, params[:inst_book_id]).first
     proficient_exercises = []
     if book_progress
       proficient_exercises = book_progress.get_proficient_exercises
     end
 
     respond_to do |format|
-
-      format.json  { render :json => {
-                                      :proficient_exercises => proficient_exercises}}
+      format.json  { render :json => {:proficient_exercises => proficient_exercises}}
     end
   end
 
+  def get_count
+    practiced_ex = OdsaExerciseProgress.count(:conditions => "proficient_date IS NOT NULL")
+
+    respond_to do |format|
+      format.json  { render :json => {:practiced_ex => practiced_ex}}
+    end
+  end
   #~ Private instance methods .................................................
 end
