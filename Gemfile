@@ -142,3 +142,4 @@ gem 'json'
 gem "browser"
 gem "figaro"
 gem 'data-confirm-modal'
+gem 'active_record_union'

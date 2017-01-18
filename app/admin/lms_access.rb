@@ -6,7 +6,7 @@ ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
     record.user = current_user
   end
 
-  menu :label => "LMS Accesses", parent: 'LMS config', priority: 30
+  menu label: "LMS Accesses", parent: 'LMS config', priority: 30
   permit_params :lms_instance_id, :user_id, :access_token
 
   index do

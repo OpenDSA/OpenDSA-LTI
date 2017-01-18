@@ -1,6 +1,6 @@
 ActiveAdmin.register LmsType do
 
-  menu :label => "LMS Types",parent: 'LMS config', priority: 10
+  menu label: "LMS Types",parent: 'LMS config', priority: 10
   permit_params :name
   actions :all, except: [:destroy]
 

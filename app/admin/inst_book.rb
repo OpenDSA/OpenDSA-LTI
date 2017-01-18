@@ -4,7 +4,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   config.clear_action_items!
   actions :all, except: [:new]
 
-  menu :label => "Book Instances",parent: 'OpenDSA Books', priority: 20
+  menu label: "Book Instances", parent: 'OpenDSA Books', priority: 20
   permit_params :template, :title, :desc, :course_offering_id, :user_id
 
   member_action :update_configuration, method: :get do
@@ -23,7 +23,6 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   end
 
   action_item only: :index do |inst_book|
-    # link_to 'Upload Books', upload_books_admin_inst_books_path() if authorized? :upload_books, inst_book
     link_to 'Upload Books', upload_books_admin_inst_books_path(inst_book)
   end
 
@@ -37,6 +36,11 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   end
 
   controller do
+    def scoped_collection
+      InstBook.joins(:course_offering).where('course_offerings.archived = false').
+      union(InstBook.where("template = ?", 1))
+    end
+
     def clone
       inst_book = InstBook.find(params[:id])
       title = inst_book.title

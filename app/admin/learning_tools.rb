@@ -1,5 +1,5 @@
 ActiveAdmin.register LearningTool, sort_order: :created_at_asc do
-  menu :label => "Learning Tools",parent: 'LMS config', priority: 5
+  menu label: "Learning Tools",parent: 'LMS config', priority: 5
   permit_params :name, :key, :secret, :launch_url
   actions :all
 
