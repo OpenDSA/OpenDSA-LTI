@@ -117,9 +117,15 @@ class GenerateCourseJob < ProgressJob::Base
         chapter.save!
       end
 
+      if chapter.lms_chapter_id == nil
+        publish_chapter = true
+      else
+        publish_chapter = false
+      end
+
       save_lms_chapter(client, lms_course_id, chapter)
       # Publish the module and its all sections
-      if chapter.lms_chapter_id == nil
+      if publish_chapter
         opts = {}
         opts[:module__published__] = true
         res = client.update_module(lms_course_id, chapter.lms_chapter_id, opts)
