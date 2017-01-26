@@ -118,14 +118,23 @@ class User < ActiveRecord::Base
 
   # -------------------------------------------------------------
   def course_offerings_for_term(term, course)
-    conditions = { term: term, 'users.id' => self, 'course_offerings.archived' => false}
+    conditions = { term: term, 'course_offerings.archived' => false}
+    if !self.global_role.is_admin?
+      conditions['users.id'] = self
+    end
     if course
       conditions[:course] = course
     end
-    CourseOffering.
-      joins(course_enrollments: :user).
-      where(conditions).
-      distinct
+    if !self.global_role.is_admin?
+      CourseOffering.
+        joins(course_enrollments: :user).
+        where(conditions).
+        distinct
+    else
+      CourseOffering.
+        where(conditions).
+        distinct
+    end
   end
 
 
