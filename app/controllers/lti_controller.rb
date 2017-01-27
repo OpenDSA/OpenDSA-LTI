@@ -88,7 +88,7 @@ class LtiController < ApplicationController
     tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
     tc.description = "OpenDSA LTI Tool Provider supports LIS Outcome pass-back."
     tc.canvas_privacy_public!
-    tc.canvas_resource_selection!({:url => host + '/lti/resource'})
+    tc.canvas_resource_selection!({:url => host + '/courses'})
 
     render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
   end
