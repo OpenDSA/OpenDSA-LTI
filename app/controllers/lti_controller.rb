@@ -106,23 +106,7 @@ class LtiController < ApplicationController
 
     render('error') and return unless lti_authorize!
 
-    # TODO: get user info from @tp object
-    # register the user if he is not yet registered.
-    email = params[:lis_person_contact_email_primary]
-    first_name = params[:lis_person_name_given]
-    last_name = params[:lis_person_name_family]
-    @user = User.where(email: email).first
-    if @user.blank?
-      # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
-      @user = User.new(:email => email,
-                       :password => email,
-                       :password_confirmation => email,
-                       :first_name => first_name,
-                       :last_name => last_name)
-      @user.save
-    end
     sign_in @user
-    lti_enroll
 
     @section_html = File.read(File.join('public/OpenDSA/Books',
                                                             custom_book_path,
