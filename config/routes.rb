@@ -3,18 +3,8 @@ CodeWorkout::Application.routes.draw do
   root 'home#index'
 
   post 'lti/launch'
-
   post 'lti/assessment'
-
-  post 'lti/exercise_attempts'
-
-  post 'lti/user_interaction'
-
-  post 'lti/exercise_progress'
-
-  post 'lti/book_progress'
-
-  post 'lti/user_module'
+  get 'xml_config', to: 'lti#xml_config', as: :xml_config
 
   resources :odsa_user_interactions
   resources :odsa_exercise_attempts

@@ -82,6 +82,17 @@ class LtiController < ApplicationController
     end
   end
 
+  def xml_config
+    host = request.scheme + "://" + request.host_with_port
+    tc = IMS::LTI::ToolConfig.new(:title => "openDSA Tool Provider", :launch_url => host + '/lti/launch')
+    tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
+    tc.description = "OpenDSA LTI Tool Provider supports LIS Outcome pass-back."
+    tc.canvas_privacy_public!
+    tc.canvas_resource_selection!({:url => host + '/lti/resource'})
+
+    render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
+  end
+
   private
     def lti_enroll
       inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
