@@ -99,28 +99,23 @@ class GenerateCourseJob < ProgressJob::Base
 
     chapters.each do |chapter|
       opts = {:module__name__ => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name,
-              :module__position__ => chapter.position}
+                   :module__position__ => chapter.position}
 
       update_stage('Generating: ' + opts[:module__name__])
 
+      publish_chapter = false
       if !chapter.lms_chapter_id
+        publish_chapter = true
         res = client.create_module(lms_course_id, chapter.name, opts)
         chapter.lms_chapter_id = res['id']
         chapter.save!
       end
-
 
       if !chapter.lms_assignment_group_id and chapter.has_gradable_sections?
         assignment_group_opts = {:name => opts[:module__name__]}
         res = client.create_assignment_group(lms_course_id, assignment_group_opts)
         chapter.lms_assignment_group_id = res['id']
         chapter.save!
-      end
-
-      if !chapter.lms_chapter_id
-        publish_chapter = true
-      else
-        publish_chapter = false
       end
 
       save_lms_chapter(client, lms_course_id, chapter)
