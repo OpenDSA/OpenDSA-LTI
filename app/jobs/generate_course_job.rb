@@ -117,7 +117,7 @@ class GenerateCourseJob < ProgressJob::Base
         chapter.save!
       end
 
-      if chapter.lms_chapter_id == nil
+      if !chapter.lms_chapter_id
         publish_chapter = true
       else
         publish_chapter = false
