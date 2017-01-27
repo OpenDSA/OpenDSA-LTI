@@ -94,23 +94,37 @@ class LtiController < ApplicationController
   end
 
   def resource
-
-    custom_book_path='vt/cs3114-d60ca814-91a4-4211-83f6-45dc113cef43/spring-2017/MW123456'
-    custom_inst_book_id=59
-    custom_section_file_name='InSort'
+    @custom_book_path = 'vt/cs3114-d60ca814-91a4-4211-83f6-45dc113cef43/spring-2017/TR1234'
+    @custom_inst_book_id = 60
+    @custom_inst_section_id = nil
+    @custom_section_file_name = 'InSort'
+    @custom_section_title = '00.01.01 - Chapter Introduction: Sorting'
 
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
-    @inst_book = InstBook.find_by(id: custom_inst_book_id)
+    @inst_book = InstBook.find_by(id: @custom_inst_book_id)
     $oauth_creds = @inst_book.lms_creds
 
     render('error') and return unless lti_authorize!
 
+    email = params[:lis_person_contact_email_primary]
+    first_name = params[:lis_person_name_given]
+    last_name = params[:lis_person_name_family]
+    @user = User.where(email: email).first
+    if @user.blank?
+      # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
+      @user = User.new(:email => email,
+                       :password => email,
+                       :password_confirmation => email,
+                       :first_name => first_name,
+                       :last_name => last_name)
+      @user.save
+    end
     sign_in @user
 
     @section_html = File.read(File.join('public/OpenDSA/Books',
-                                                            custom_book_path,
-                                                            '/lti_html/', "#{custom_section_file_name}.html")) and return
+                                                            @custom_book_path,
+                                                            '/lti_html/', "#{@custom_section_file_name}.html")) and return
   end
 
   private
