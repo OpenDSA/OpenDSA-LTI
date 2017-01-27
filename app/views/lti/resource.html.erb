@@ -1,0 +1,29 @@
+<script>
+  (function() {
+    var TP = {};
+  <% if @tp.outcome_service? %>
+    TP.outcomeService = true;
+    TP.exerciseName = "<%= params[:custom_ex_name] %>";
+    TP.instBookSectionExerciseId = "<%= params[:custom_inst_bk_sec_ex] %>";
+    TP.outcomeService = true;
+  <% else %>
+    TP.outcomeService = false;
+  <% end %>
+
+    TP.toParams = {};
+    TP.toParams.launch_params = {};
+    <% @tp.to_params.each do |key, value| %>
+      TP.toParams.launch_params.<%= key %> = "<%= value %>";
+    <% end%>
+    TP.userEmail = "<%= @user.email %>";
+    TP.sectionTitle = "<%= params[:custom_section_title] %>";
+    TP.instBookId = "<%= params[:custom_inst_book_id] %>";
+    TP.instSectionId = "<%= params[:custom_inst_section_id] %>";
+
+    window.ODSA = window.ODSA || {};
+    window.ODSA.TP = TP;
+  }());
+</script>
+
+<%= @section_html.html_safe %>
+

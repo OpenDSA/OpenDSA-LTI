@@ -1,7 +1,7 @@
 class LtiController < ApplicationController
   layout 'lti', only: [:launch]
 
-  after_action :allow_iframe, only: :launch
+  after_action :allow_iframe, only: [:launch, :resource]
   # the consumer keys/secrets
 
   def launch
@@ -94,14 +94,39 @@ class LtiController < ApplicationController
   end
 
   def resource
-    host = request.scheme + "://" + request.host_with_port
-    tc = IMS::LTI::ToolConfig.new(:title => "openDSA Tool Provider", :launch_url => host + '/lti/launch')
-    tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
-    tc.description = "OpenDSA LTI Tool Provider supports LIS Outcome pass-back."
-    tc.canvas_privacy_public!
-    tc.canvas_resource_selection!({:url => host + '/lti/resource'})
 
-    render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
+    custom_book_path='vt/cs3114-d60ca814-91a4-4211-83f6-45dc113cef43/spring-2017/MW123456'
+    custom_inst_book_id=59
+    custom_section_file_name='InSort'
+
+    # must include the oauth proxy object
+    require 'oauth/request_proxy/rack_request'
+    @inst_book = InstBook.find_by(id: custom_inst_book_id)
+    $oauth_creds = @inst_book.lms_creds
+
+    render('error') and return unless lti_authorize!
+
+    # TODO: get user info from @tp object
+    # register the user if he is not yet registered.
+    email = params[:lis_person_contact_email_primary]
+    first_name = params[:lis_person_name_given]
+    last_name = params[:lis_person_name_family]
+    @user = User.where(email: email).first
+    if @user.blank?
+      # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
+      @user = User.new(:email => email,
+                       :password => email,
+                       :password_confirmation => email,
+                       :first_name => first_name,
+                       :last_name => last_name)
+      @user.save
+    end
+    sign_in @user
+    lti_enroll
+
+    @section_html = File.read(File.join('public/OpenDSA/Books',
+                                                            custom_book_path,
+                                                            '/lti_html/', "#{custom_section_file_name}.html")) and return
   end
 
   private
