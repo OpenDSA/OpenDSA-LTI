@@ -1,7 +1,7 @@
 (function() {
 
-    function getModName(mod_name) {
-        mod_name = mod_name || '';
+    var getModName = function(mod_name) {
+        var mod_name = mod_name || '';
         if (mod_name.indexOf('/') > -1) {
             return mod_name.split('/')[1]
         } else {
@@ -9,7 +9,7 @@
         }
     }
 
-    function getResourceURL(obj) {
+    var getResourceURL = function(obj) {
         if (!$.isEmptyObject(obj)) {
             var odsa_url = odsa_launch_url + '?' + $.param(obj);
 
@@ -23,26 +23,28 @@
     }
 
     $(function() {
-        book_name = jsonFile['title'];
-        chapters = [];
+        var book_name = jsonFile['title'];
+        var chapters = [];
         // prepare tree data
         $.each(jsonFile['chapters'], function(ch_index, ch_obj) {
-            tree_ch_obj = {
+            var tree_ch_obj = {
                 'text': ch_index,
                 'children': []
             };
             $.each(ch_obj, function(mod_index, mod_obj) {
                 if (mod_obj !== null && typeof mod_obj === 'object') {
+                    var rst_file_name = getModName(mod_index);
                     if (mod_obj.hasOwnProperty('long_name')) {
-                        var mod_name = mod_obj['long_name']
+                        var mod_name = mod_obj['long_name'];
                     } else {
-                        var mod_name = getMOdName(mod_index)
+                        var mod_name = rst_file_name;
                     }
-                    tree_mod_obj = {
+                    var tree_mod_obj = {
                         'text': mod_name,
                         'children': []
                     };
                     if (mod_obj['sections'] != null) {
+                        var sec_count = 0;
                         $.each(mod_obj['sections'], function(sec_index, sec_obj) {
                             if (sec_obj !== null && typeof sec_obj === 'object') {
                                 var tree_sec_obj = {
@@ -50,12 +52,14 @@
                                     'type': 'section',
                                     'url_params': {
                                         'custom_inst_book_id': inst_book_id,
-                                        'custom_inst_section_id': 'custom_inst_section_id',
-                                        'custom_section_file_name': 'custom_section_file_name',
-                                        'custom_section_title': 'custom_section_title'
+                                        'custom_inst_section_id': sec_obj['id'],
+                                        'custom_section_file_name': rst_file_name + '-' + ("0" + sec_count).slice(-2),
+                                        'custom_section_title': sec_index
                                     }
                                 }
+
                                 tree_mod_obj['children'].push(tree_sec_obj);
+                                sec_count += 1;
                             }
                         });
                     }

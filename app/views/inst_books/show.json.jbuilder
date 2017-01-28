@@ -41,6 +41,7 @@ json.chapters do
 
                # section object
                 json.set! section_name do
+                  json.set! :id, inst_section.id
                   json.set! :soft_deadline, inst_section.soft_deadline.try(:strftime, "%Y-%m-%d %H:%m:%S")
                   json.set! :hard_deadline, inst_section.soft_deadline.try(:strftime, "%Y-%m-%d %H:%m:%S")
                   json.set! :showsection, inst_section.show
