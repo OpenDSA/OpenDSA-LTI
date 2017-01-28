@@ -7,6 +7,7 @@ class LtiController < ApplicationController
   def launch
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
+    require 'oauth/request_proxy/action_controller_request'
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
     $oauth_creds = @inst_book.lms_creds
 
@@ -159,22 +160,24 @@ class LtiController < ApplicationController
         return false
       end
 
-      # if !@tp.valid_request?(request)
-      #   @message = "The OAuth signature was invalid"
-      #   return false
-      # end
+      if !params.has_key?(:selection_directive)
+        if !@tp.valid_request?(request)
+          @message = "The OAuth signature was invalid"
+          return false
+        end
 
-      # if Time.now.utc.to_i - @tp.request_oauth_timestamp.to_i > 60*60
-      #   @message = "Your request is too old."
-      #   return false
-      # end
+        if Time.now.utc.to_i - @tp.request_oauth_timestamp.to_i > 60*60
+          @message = "Your request is too old."
+          return false
+        end
 
-      # # this isn't actually checking anything like it should, just want people
-      # # implementing real tools to be aware they need to check the nonce
-      # if was_nonce_used_in_last_x_minutes?(@tp.request_oauth_nonce, 60)
-      #   @message = "Why are you reusing the nonce?"
-      #   return false
-      # end
+        # this isn't actually checking anything like it should, just want people
+        # implementing real tools to be aware they need to check the nonce
+        if was_nonce_used_in_last_x_minutes?(@tp.request_oauth_nonce, 60)
+          @message = "Why are you reusing the nonce?"
+          return false
+        end
+      end
 
       return true
     end
