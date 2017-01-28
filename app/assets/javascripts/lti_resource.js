@@ -1,5 +1,5 @@
 (function() {
-
+    // get the rst module name
     var getModName = function(mod_name) {
         var mod_name = mod_name || '';
         if (mod_name.indexOf('/') > -1) {
@@ -7,20 +7,19 @@
         } else {
             return mod_name
         }
-    }
-
+    };
+    // prepare and send back the complete url used by canvas to configure lti launch
     var getResourceURL = function(obj) {
         if (!$.isEmptyObject(obj)) {
             var odsa_url = odsa_launch_url + '?' + $.param(obj);
-
             var urlParams = {
                 'embed_type': 'basic_lti',
                 'url': odsa_url
-            }
-            return return_url + '?' + $.param(urlParams)
+            };
+            return return_url + '?' + $.param(urlParams);
         }
-        return ''
-    }
+        return '';
+    };
 
     $(function() {
         var book_name = jsonFile['title'];
@@ -57,7 +56,6 @@
                                         'custom_section_title': sec_index
                                     }
                                 }
-
                                 tree_mod_obj['children'].push(tree_sec_obj);
                                 sec_count += 1;
                             }
