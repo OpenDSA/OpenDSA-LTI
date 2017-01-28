@@ -7,7 +7,6 @@ class LtiController < ApplicationController
   def launch
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
-    require 'oauth/request_proxy/action_controller_request'
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
     $oauth_creds = @inst_book.lms_creds
 
@@ -32,8 +31,9 @@ class LtiController < ApplicationController
     lti_enroll
 
     @section_html = File.read(File.join('public/OpenDSA/Books',
-                                                            params[:custom_book_path],
-                                                            '/lti_html/', "#{params[:custom_section_file_name].to_s}.html")) and return
+                                    params[:custom_book_path],
+                                    '/lti_html/',
+                                    "#{params[:custom_section_file_name].to_s}.html")) and return
   end
 
   def assessment
@@ -118,7 +118,7 @@ class LtiController < ApplicationController
   end
 
   def resource_dev
-    @inst_book = InstBook.find_by(:id => 58)
+    @inst_book = InstBook.find_by(:id => 63)
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
     @inst_book_json = ApplicationController.new.render_to_string(
         template: 'inst_books/show.json.jbuilder',

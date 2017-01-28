@@ -61,6 +61,7 @@ json.chapters do
                       for inst_book_section_exercise in exercises
                         exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
                         json.set! exercise_name do
+                          json.set! :id, inst_book_section_exercise.id
                           json.set! :long_name, InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.name
                           json.set! :required, inst_book_section_exercise.required
                           json.set! :points, inst_book_section_exercise.points.to_f

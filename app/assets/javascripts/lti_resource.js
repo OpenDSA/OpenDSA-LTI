@@ -46,6 +46,14 @@
                         var sec_count = 0;
                         $.each(mod_obj['sections'], function(sec_index, sec_obj) {
                             if (sec_obj !== null && typeof sec_obj === 'object') {
+                                var custom_ex_name = '';
+                                // get exercise name
+                                $.each(sec_obj, function(key, value) {
+                                    if (value !== null && typeof value === 'object') {
+                                        custom_ex_name = key;
+                                    }
+                                });
+                                var custom_inst_bk_sec_ex = sec_obj[custom_ex_name]['id'];
                                 var tree_sec_obj = {
                                     'text': sec_index,
                                     'type': 'section',
@@ -53,7 +61,10 @@
                                         'custom_inst_book_id': inst_book_id,
                                         'custom_inst_section_id': sec_obj['id'],
                                         'custom_section_file_name': rst_file_name + '-' + ("0" + sec_count).slice(-2),
-                                        'custom_section_title': sec_index
+                                        'custom_section_title': sec_index,
+                                        'custom_book_path': book_path,
+                                        'custom_ex_name': custom_ex_name,
+                                        'custom_inst_bk_sec_ex': custom_inst_bk_sec_ex
                                     }
                                 }
                                 tree_mod_obj['children'].push(tree_sec_obj);

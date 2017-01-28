@@ -3,5 +3,6 @@
   window.return_url = "#{params[:launch_presentation_return_url].html_safe}"
   window.odsa_launch_url = "#{@launch_url}"
   window.inst_book_id = #{@inst_book.id}
+  window.book_path = "#{book_path(@inst_book)}"
 
 #using_json

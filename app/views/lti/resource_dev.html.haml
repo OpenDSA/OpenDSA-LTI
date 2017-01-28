@@ -3,5 +3,6 @@
   window.return_url = "https://192.168.33.10:9292/lti/resource_dev"
   window.odsa_launch_url = "#{@launch_url.html_safe}"
   window.inst_book_id = #{@inst_book.id}
+  window.book_path = "#{book_path(@inst_book)}"
 
 #using_json
