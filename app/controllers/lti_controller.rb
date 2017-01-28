@@ -97,6 +97,7 @@ class LtiController < ApplicationController
   def resource
     @custom_inst_book_id = 60
     @inst_book = InstBook.find_by(id: @custom_inst_book_id)
+    @launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
@@ -118,7 +119,8 @@ class LtiController < ApplicationController
   end
 
   def resource_dev
-    @inst_book = InstBook.find_by(:id => 11)
+    @inst_book = InstBook.find_by(:id => 58)
+    @launch_url = request.protocol + request.host_with_port + "/lti/launch"
     @inst_book_json = ApplicationController.new.render_to_string(
         template: 'inst_books/show.json.jbuilder',
         locals: {:@inst_book => @inst_book})

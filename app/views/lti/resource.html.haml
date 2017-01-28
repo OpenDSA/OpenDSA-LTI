@@ -1,4 +1,7 @@
 :javascript
   window.jsonFile = #{@inst_book_json.html_safe}
+  window.return_url = "#{params[:launch_presentation_return_url].html_safe}"
+  window.odsa_launch_url = "#{@launch_url.html_safe}"
+  window.inst_book_id = #{@inst_book.id}
 
 #using_json
