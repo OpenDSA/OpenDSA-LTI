@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
   def markdown(text)
     markdown = Redcarpet::Markdown.new(
       LoofahRender.new(
-        safe_links_only: true, xhtml: true),
+      safe_links_only: true, xhtml: true),
       no_intra_emphasis: true,
       tables: true,
       fenced_code_blocks: true,

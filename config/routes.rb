@@ -5,6 +5,7 @@ CodeWorkout::Application.routes.draw do
   post 'lti/launch'
   post 'lti/assessment'
   get 'lti/xml_config', to: 'lti#xml_config', as: :xml_config
+  # get 'lti/resource', to: 'lti#resource', as: :lti_resource_get
   post 'lti/resource', to: 'lti#resource', as: :lti_resource
 
   resources :odsa_user_interactions
