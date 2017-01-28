@@ -11,13 +11,11 @@
 
     function getResourceURL(obj) {
         if (!$.isEmptyObject(obj)) {
-            var odsa_launch_url = obj['odsa_launch_url']
-            delete obj.odsa_launch_url;
             var odsa_url = odsa_launch_url + '?' + $.param(obj);
 
             var urlParams = {
                 'embed_type': 'basic_lti',
-                'url': "'" + odsa_url + "'"
+                'url': odsa_url
             }
             return return_url + '?' + $.param(urlParams)
         }
@@ -51,7 +49,6 @@
                                     'text': sec_index,
                                     'type': 'section',
                                     'url_params': {
-                                        'odsa_launch_url': odsa_launch_url,
                                         'custom_inst_book_id': inst_book_id,
                                         'custom_inst_section_id': 'custom_inst_section_id',
                                         'custom_section_file_name': 'custom_section_file_name',
