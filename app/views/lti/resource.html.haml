@@ -1,9 +1,4 @@
 :javascript
-  $(function(){
-      $(".test-class").click(function() {
-          window.location.href = "https://opendsax.cs.vt.edu/lti/launch?embed_type=basic_lti&url=https://opendsax.cs.vt.edu/lti/launch";
-      });
-  })
+  window.jsonFile = #{@inst_book_json.html_safe}
 
-%button.test-class
-  Test
+#using_json
