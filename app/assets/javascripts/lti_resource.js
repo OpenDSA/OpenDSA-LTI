@@ -43,7 +43,7 @@
                         'children': []
                     };
                     if (mod_obj['sections'] != null) {
-                        var sec_count = 0;
+                        var sec_count = 1;
                         $.each(mod_obj['sections'], function(sec_index, sec_obj) {
                             if (sec_obj !== null && typeof sec_obj === 'object') {
                                 var custom_ex_name = '';
