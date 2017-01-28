@@ -1,5 +1,5 @@
 class LtiController < ApplicationController
-  layout 'lti', only: [:launch]
+  layout 'lti', only: [:launch, :resource]
 
   after_action :allow_iframe, only: [:launch, :resource]
   # the consumer keys/secrets
