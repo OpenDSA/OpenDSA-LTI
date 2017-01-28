@@ -17,7 +17,7 @@
 
             var urlParams = {
                 'embed_type': 'basic_lti',
-                'url': odsa_url
+                'url': "'" + odsa_url + "'"
             }
             return return_url + '?' + $.param(urlParams)
         }
