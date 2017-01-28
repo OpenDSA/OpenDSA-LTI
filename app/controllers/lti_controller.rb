@@ -95,7 +95,7 @@ class LtiController < ApplicationController
   end
 
   def resource
-    @inst_book = InstBook.find_by(:id => 60)
+    @inst_book = InstBook.find_by(:id => 67)
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
     # must include the oauth proxy object
