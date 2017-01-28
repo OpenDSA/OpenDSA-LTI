@@ -95,38 +95,35 @@ class LtiController < ApplicationController
   end
 
   def resource
-    render layout: 'application'
-    # @custom_book_path = 'vt/cs3114-d60ca814-91a4-4211-83f6-45dc113cef43/spring-2017/TR1234'
-    # @custom_inst_book_id = 60
-    # @custom_inst_section_id = nil
-    # @custom_section_file_name = 'InSort'
-    # @custom_section_title = '00.01.01 - Chapter Introduction: Sorting'
+    @custom_inst_book_id = 60
+    @inst_book = InstBook.find_by(id: @custom_inst_book_id)
 
-    # # must include the oauth proxy object
-    # require 'oauth/request_proxy/rack_request'
-    # @inst_book = InstBook.find_by(id: @custom_inst_book_id)
-    # $oauth_creds = @inst_book.lms_creds
+    # must include the oauth proxy object
+    require 'oauth/request_proxy/rack_request'
+    $oauth_creds = @inst_book.lms_creds
 
-    # render('error') and return unless lti_authorize!
+    render('error') and return unless lti_authorize!
 
-    # email = params[:lis_person_contact_email_primary]
-    # first_name = params[:lis_person_name_given]
-    # last_name = params[:lis_person_name_family]
-    # @user = User.where(email: email).first
-    # if @user.blank?
-    #   # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
-    #   @user = User.new(:email => email,
-    #                    :password => email,
-    #                    :password_confirmation => email,
-    #                    :first_name => first_name,
-    #                    :last_name => last_name)
-    #   @user.save
-    # end
-    # sign_in @user
+    email = params[:lis_person_contact_email_primary]
+    first_name = params[:lis_person_name_given]
+    last_name = params[:lis_person_name_family]
+    @user = User.where(email: email).first
+    sign_in @user
 
-    # @section_html = File.read(File.join('public/OpenDSA/Books',
-    #                                                         @custom_book_path,
-    #                                                         '/lti_html/', "#{@custom_section_file_name}.html")) and return
+    @inst_book_json = ApplicationController.new.render_to_string(
+        template: 'inst_books/show.json.jbuilder',
+        locals: {:@inst_book => @inst_book})
+
+    render layout: 'lti_resource'
+  end
+
+  def resource_dev
+    @inst_book = InstBook.find_by(:id => 11)
+    @inst_book_json = ApplicationController.new.render_to_string(
+        template: 'inst_books/show.json.jbuilder',
+        locals: {:@inst_book => @inst_book})
+
+    render layout: 'lti_resource'
   end
 
   private

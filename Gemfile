@@ -143,3 +143,4 @@ gem "browser"
 gem "figaro"
 gem 'data-confirm-modal'
 gem 'active_record_union'
+gem 'jstree-rails-4', '~> 3.2', '>= 3.2.1'

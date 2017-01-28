@@ -258,6 +258,7 @@ GEM
       railties (>= 3.2)
       sprockets-rails
     json (1.8.3)
+    jstree-rails-4 (3.2.1)
     jwt (1.0.0)
     kaminari (0.16.1)
       actionpack (>= 3.0.0)
@@ -503,6 +504,7 @@ DEPENDENCIES
   jquery-ui-rails
   js-routes
   json
+  jstree-rails-4 (~> 3.2, >= 3.2.1)
   kaminari
   log_file
   loofah
