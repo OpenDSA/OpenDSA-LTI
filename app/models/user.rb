@@ -8,9 +8,7 @@ class User < ActiveRecord::Base
   extend FriendlyId
   friendly_id :email_or_id
 
-
   #~ Relationships ............................................................
-
   belongs_to  :global_role
   belongs_to  :time_zone
   has_many    :course_enrollments, -> { includes :course_role, :course_offering }, inverse_of: :user, dependent: :destroy
@@ -36,6 +34,25 @@ class User < ActiveRecord::Base
     :omniauth_providers => [:facebook, :google_oauth2, :cas]
 
   before_create :set_default_role
+
+  after_save :update_lms_access
+
+  def update_lms_access
+    if self.global_role.is_instructor? or self.global_role.is_admin?
+        lms_access = LmsAccess.where("user_id = ?", self.id).first
+      if !lms_access
+          lms_access = LmsAccess.new(
+                                 lms_instance: LmsInstance.first,
+                                 user: self,
+                                 access_token: 'Fill in your access token.')
+      end
+      if !lms_access.consumer_key? or !lms_access.consumer_secret?
+          lms_access.consumer_key = self.email
+          lms_access.consumer_secret = self.encrypted_password
+          lms_access.save
+      end
+    end
+  end
 
   paginates_per 100
 
@@ -259,6 +276,14 @@ class User < ActiveRecord::Base
   # -------------------------------------------------------------
   def normalize_friendly_id(value)
     value.split('@').map{ |x| CGI.escape x }.join('@')
+  end
+
+  def get_lms_creds
+    self.update_lms_access
+    lms_access = LmsAccess.where(user_id: self.id).first
+    consumer_key = lms_access.consumer_key
+    consumer_secret = lms_access.consumer_secret
+    {consumer_key => consumer_secret}
   end
 
 

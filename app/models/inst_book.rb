@@ -67,13 +67,6 @@ class InstBook < ActiveRecord::Base
   end
 
   #~ Instance methods .........................................................
-  # --------------------------------------------------------------------------
-  # return lms credintials associated with the course offering
-  def lms_creds
-    consumer_key = course_offering.lms_instance['consumer_key']
-    consumer_secret = course_offering.lms_instance['consumer_secret']
-    {consumer_key => consumer_secret}
-  end
 
   # --------------------------------------------------------------------------
   # clone book configuration

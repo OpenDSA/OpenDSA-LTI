@@ -1,8 +1,11 @@
 class UsersController < InheritedResources::Base
   load_and_authorize_resource
 
-
   #~ Action methods ...........................................................
+  def show
+    @creds = current_user.get_lms_creds
+  end
+
   def edit_access
   end
   # -------------------------------------------------------------

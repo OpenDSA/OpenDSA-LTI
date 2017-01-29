@@ -1,6 +1,7 @@
 class GenerateCourseJob < ProgressJob::Base
   def initialize(inst_book_id, launch_url, user_id)
     @user_id = user_id
+    @user = User.find_by(id: user_id)
     @inst_book = InstBook.find_by(id: inst_book_id)
     @odsa_launch_url = launch_url
     @course_offering = CourseOffering.where(:id => @inst_book.course_offering_id).first
@@ -47,12 +48,13 @@ class GenerateCourseJob < ProgressJob::Base
     canvas_course = client.get_single_course_courses(lms_course_id)
     @inst_book.course_offering.lms_course_code =  canvas_course.course_code
     @inst_book.course_offering.save!
+    consumer_key, consumer_secret = @user.get_lms_creds.first
 
     tool_data ={
       "tool_name" => "OpenDSA-LTI",
       "privacy_level" => "public",
-      "consumer_key" => @inst_book.course_offering.lms_instance['consumer_key'],
-      "consumer_secret" => @inst_book.course_offering.lms_instance['consumer_secret'],
+      "consumer_key" => consumer_key
+      "consumer_secret" => consumer_secret,
       "launch_url" => @odsa_launch_url
     }
 

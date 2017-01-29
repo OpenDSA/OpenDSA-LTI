@@ -8,7 +8,7 @@ class LtiController < ApplicationController
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
-    $oauth_creds = @inst_book.lms_creds
+    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
 
@@ -40,7 +40,7 @@ class LtiController < ApplicationController
     request_params = JSON.parse(request.body.read.to_s)
     inst_book_id = request_params['instBookId']
     @inst_book = InstBook.find_by(id: inst_book_id)
-    $oauth_creds = @inst_book.lms_creds
+    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
     launch_params = request_params['toParams']['launch_params']
     if launch_params
       key = launch_params['oauth_consumer_key']
@@ -100,7 +100,7 @@ class LtiController < ApplicationController
 
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
-    $oauth_creds = @inst_book.lms_creds
+    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
 
@@ -118,7 +118,8 @@ class LtiController < ApplicationController
   end
 
   def resource_dev
-    @inst_book = InstBook.find_by(:id => 63)
+    @inst_book = InstBook.find_by(:id => 11) # laptop
+    # @inst_book = InstBook.find_by(:id => 63) # lab desktop
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
     @inst_book_json = ApplicationController.new.render_to_string(
         template: 'inst_books/show.json.jbuilder',

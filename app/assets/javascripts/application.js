@@ -24,8 +24,6 @@
 //= require cocoon
 //= require cm
 //= require book
-//= require course_offerings_form.js
-//= require lti_resource.js
 //= require counter.js
 //= require data-confirm-modal
 //= require moment
@@ -33,7 +31,7 @@
 //= require mustache.min
 //= require handlebars.min
 //= require jstree
-
+//= require clipboard
 // Add the route helpers directly into the window object for easy access.
 $.extend(window, Routes);
 
@@ -88,4 +86,6 @@ $.fn.editable.defaults.mode = 'inline';
 
 $(document).ready(function() {
     $('.xeditable').editable();
+    var clip = new Clipboard('.clipboard-btn');
+    console.log(clip);
 });
