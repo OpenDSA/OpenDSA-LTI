@@ -7,6 +7,8 @@
   #~ Private instance methods .................................................
 class InstBook < ActiveRecord::Base
 
+  enum book_type: {Complete: 0, Exercises: 1}
+
   #~ Relationships ............................................................
   belongs_to :course_offering, inverse_of: :inst_books
   belongs_to :user, inverse_of: :inst_books

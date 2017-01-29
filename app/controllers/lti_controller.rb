@@ -95,7 +95,7 @@ class LtiController < ApplicationController
   end
 
   def resource
-    @inst_book = InstBook.find_by(:id => 67)
+    @inst_book = InstBook.where("book_type = ?", InstBook.book_types[:Exercises]).first
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
     # must include the oauth proxy object
@@ -118,8 +118,7 @@ class LtiController < ApplicationController
   end
 
   def resource_dev
-    @inst_book = InstBook.find_by(:id => 11) # laptop
-    # @inst_book = InstBook.find_by(:id => 63) # lab desktop
+    @inst_book = InstBook.where("book_type = ?", InstBook.book_types[:Exercises]).first
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
     @inst_book_json = ApplicationController.new.render_to_string(
         template: 'inst_books/show.json.jbuilder',

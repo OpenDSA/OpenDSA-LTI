@@ -5,7 +5,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   actions :all, except: [:new]
 
   menu label: "Book Instances", parent: 'OpenDSA Books', priority: 20
-  permit_params :template, :title, :desc, :course_offering_id, :user_id
+  permit_params :template, :title, :desc, :course_offering_id, :user_id, :book_type
 
   member_action :update_configuration, method: :get do
   end
@@ -137,6 +137,9 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
         if f.object.course_offering_id == nil
           f.input :template
         end
+      end
+      if current_user.global_role.is_admin?
+        f.input :book_type, as: :select, collection: InstBook.book_types.keys
       end
       f.input :title
       f.input :desc
