@@ -1,9 +1,10 @@
 class GenerateCourseJob < ProgressJob::Base
-  def initialize(inst_book_id, launch_url, user_id)
+  def initialize(inst_book_id, launch_url, resource_selection_url, user_id)
     @user_id = user_id
     @user = User.find_by(id: user_id)
     @inst_book = InstBook.find_by(id: inst_book_id)
     @odsa_launch_url = launch_url
+    @odsa_resource_selection_url = resource_selection_url
     @course_offering = CourseOffering.where(:id => @inst_book.course_offering_id).first
     @term = Term.where(:id => @course_offering.term_id).first
     @course = Course.where(:id => @course_offering.course_id).first
@@ -38,6 +39,7 @@ class GenerateCourseJob < ProgressJob::Base
   def inst_book_compile
     lms_instance_id = @inst_book.course_offering.lms_instance['id']
     user_lms_access = LmsAccess.where(lms_instance_id: lms_instance_id).where(user_id: @user_id).first
+    puts user_lms_access.access_token
     @created_LTI_tools = []
     require 'pandarus'
     client = Pandarus::Client.new(
@@ -53,9 +55,10 @@ class GenerateCourseJob < ProgressJob::Base
     tool_data ={
       "tool_name" => "OpenDSA-LTI",
       "privacy_level" => "public",
-      "consumer_key" => consumer_key
+      "consumer_key" => consumer_key,
       "consumer_secret" => consumer_secret,
-      "launch_url" => @odsa_launch_url
+      "launch_url" => @odsa_launch_url,
+      "resource_selection_url" => @odsa_resource_selection_url
     }
 
     save_lti_app(client, lms_course_id, tool_data)
@@ -84,6 +87,10 @@ class GenerateCourseJob < ProgressJob::Base
     end
 
     opts = {:url => launch_url}
+    if tool_data.key?("resource_selection_url")
+        opts[:resource_selection__enabled__] = true
+        opts[:resource_selection__url__] = tool_data.key?("resource_selection_url")
+    end
 
     if !tool_exists and !@created_LTI_tools.include? tool_name
       res = client.create_external_tool_courses(lms_course_id, tool_name,

@@ -7,8 +7,10 @@ class InstBooksController < ApplicationController
   # POST /inst_books/:id
   def compile
     if params[:operation] == 'generate_course'
-      launch_url = request.protocol + request.host_with_port + "/lti/launch"
-      @job = Delayed::Job.enqueue GenerateCourseJob.new(params[:id], launch_url, current_user.id)
+      host_port = request.protocol + request.host_with_port
+      launch_url = host_port + "/lti/launch"
+      resource_selection_url = host_port + "/lti/resource"
+      @job = Delayed::Job.enqueue GenerateCourseJob.new(params[:id], launch_url, resource_selection_url, current_user.id)
     else
       @job = Delayed::Job.enqueue CompileBookJob.new(params[:id], current_user.id)
     end
@@ -17,7 +19,6 @@ class InstBooksController < ApplicationController
   # -------------------------------------------------------------
   # POST /inst_books/configure/:id
   def configure
-
     @inst_book_json = ApplicationController.new.render_to_string(
         template: 'inst_books/show.json.jbuilder',
         locals: {:@inst_book => @inst_book})

@@ -1,14 +1,20 @@
 (function() {
-    var check_completeness, form_alert, handle_submit, init, reset_alert_area;
+    var check_completeness, form_alert, handle_submit, init, reset_alert_area, valid_token;
 
     $(document).ready(function() {
 
-        $('#organization-select').change(function() { //change majors when user changes school
+        $('#organization-select').change(function() {
             return load_courses();
         });
 
-        $('#lms-instance-select').change(function() { //change majors when user changes school
+        $('#lms-instance-select').change(function() {
             return handle_lms_access();
+        });
+
+        $('#lms-access-token').change(function() {
+            $("#lms-access-token-check").hide("slow");
+            // return handle_access_token();
+
         });
 
         $('#btn-submit-co').click(function() {
@@ -33,6 +39,31 @@
         });
     };
 
+    handle_access_token = function() {
+        if ($('#lms-access-token').val()) {
+
+            var request = $("#lms-instance-select option:selected").text() + "/api/v1/courses?access_token=" + $('#lms-access-token').val();
+            console.log(request);
+            $("#lms-access-token-check").removeClass("fa-times");
+            $("#lms-access-token-check").removeClass("fa-check");
+            $("#lms-access-token-check").addClass("fa-check")
+                // $("#lms-access-token-check").hide("slow");
+            var aj = $.ajax({
+                url: request,
+                type: 'get',
+                data: $(this).serialize()
+            }).done(function(data) {
+                $("#lms-access-token-check").addClass("fa-check")
+                $("#lms-access-token-check").show("slow");
+                valid_token = true;
+            }).fail(function(jqXHR, textStatus) {
+                $("#lms-access-token-check").addClass("fa-times")
+                $("#lms-access-token-check").show("slow");
+                valid_token = false;
+            });
+        }
+    };
+
     handle_lms_access = function() {
         if ($('#lms-instance-select').val()) {
             var request = "/lms_accesses/" + $('#lms-instance-select').val() + "/search";
@@ -42,10 +73,21 @@
                 type: 'get',
                 data: $(this).serialize()
             }).done(function(data) {
-                if (data && data['access_token'] != null) {
-                    $('#lms-access-token').val(data['access_token']);
-                    // $("#lms-access-update-btn").show("slow");
-                    // $("#lms-access-token-group").hide("slow");
+                if (data) {
+                    if (data['access_token'] != null) {
+                        $('#lms-access-token').val(data['access_token']);
+                        // $("#lms-access-update-btn").show("slow");
+                        // $("#lms-access-token-group").hide("slow");
+                    }
+                    $("#lms-access-token-check").removeClass("fa-times");
+                    $("#lms-access-token-check").removeClass("fa-check");
+                    valid_token = data['valid_token'];
+                    if (data['valid_token']) {
+                        $("#lms-access-token-check").addClass("fa-check")
+                    } else {
+                        $("#lms-access-token-check").addClass("fa-times")
+                    }
+                    $("#lms-access-token-check").show("slow");
                 }
             }).fail(function(data) {
                 console.log('AJAX request has FAILED');
@@ -64,7 +106,8 @@
     };
 
     init = function() {
-        $("#lms-access-update-btn").hide();
+        // $("#lms-access-update-btn").hide();
+        $("#lms-access-token-check").hide();
         // $("#lms-access-token-group").hide();
     };
 

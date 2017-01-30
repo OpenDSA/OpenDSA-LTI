@@ -299,3 +299,15 @@ ul.wysihtml5-toolbar li {
   font-weight: normal;
   font-family:"Georgia", Courier, monospace;
 }
+
+#lms-access-token-check.fa-check {
+    color: green;
+    text-shadow: 1px 1px 1px #ccc;
+    font-size: 2em;
+}
+
+#lms-access-token-check.fa-times {
+    color: red;
+    text-shadow: 1px 1px 1px #ccc;
+    font-size: 2em;
+}

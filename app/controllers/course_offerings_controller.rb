@@ -57,11 +57,17 @@ class CourseOfferingsController < ApplicationController
         # Add course_offering to the new book
         cloned_book.course_offering_id = course_offering.id
         cloned_book.save!
+
         if !params['lms_access_token'].blank?
-          lms_access = LmsAccess.new(
-                                 lms_instance: lms_instance,
-                                 user: current_user,
-                                 access_token: params[:lms_access_token])
+          lms_access = LmsAccess.where("user_id = ?", current_user.id).first
+          if !lms_access
+            lms_access = LmsAccess.new(
+                                   lms_instance: lms_instance,
+                                   user: current_user,
+                                   access_token: params[:lms_access_token])
+            lms_access.save!
+          end
+          lms_access.access_token = params[:lms_access_token]
           lms_access.save!
         end
 
