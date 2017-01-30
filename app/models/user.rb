@@ -43,13 +43,12 @@ class User < ActiveRecord::Base
       if !lms_access
           lms_access = LmsAccess.new(
                                  lms_instance: LmsInstance.first,
-                                 user: self,
-                                 access_token: 'Fill in your access token.')
+                                 user: self)
       end
       if !lms_access.consumer_key? or !lms_access.consumer_secret?
           lms_access.consumer_key = self.email
           lms_access.consumer_secret = self.encrypted_password
-          lms_access.save
+          lms_access.save!
       end
     end
   end

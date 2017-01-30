@@ -6,8 +6,6 @@ class LmsAccess < ActiveRecord::Base
 
   #~ Validation ...............................................................
 
-  validates :access_token, presence: true
-
   def self.get_oauth_creds(key)
     lms_access = LmsAccess.where(consumer_key: key).first
     consumer_key = lms_access.consumer_key

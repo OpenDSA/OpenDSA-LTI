@@ -3,7 +3,9 @@ class UsersController < InheritedResources::Base
 
   #~ Action methods ...........................................................
   def show
-    @creds = current_user.get_lms_creds
+    if @user.global_role.is_instructor? or @user.global_role.is_admin?
+      @creds = current_user.get_lms_creds
+    end
   end
 
   def edit_access
