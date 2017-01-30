@@ -40,10 +40,10 @@ class LtiController < ApplicationController
     request_params = JSON.parse(request.body.read.to_s)
     inst_book_id = request_params['instBookId']
     @inst_book = InstBook.find_by(id: inst_book_id)
-    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
     launch_params = request_params['toParams']['launch_params']
     if launch_params
       key = launch_params['oauth_consumer_key']
+      $oauth_creds = LmsAccess.get_oauth_creds(key)
     else
       @message = "The tool never launched"
       render(:error)
