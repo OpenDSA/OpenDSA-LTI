@@ -89,7 +89,7 @@ class GenerateCourseJob < ProgressJob::Base
     opts = {:url => launch_url}
     if tool_data.key?("resource_selection_url")
         opts[:resource_selection__enabled__] = true
-        opts[:resource_selection__url__] = tool_data.key?("resource_selection_url")
+        opts[:resource_selection__url__] = tool_data["resource_selection_url"]
     end
 
     if !tool_exists and !@created_LTI_tools.include? tool_name
