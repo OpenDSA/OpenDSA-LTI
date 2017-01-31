@@ -11,7 +11,7 @@ If your institution has its own Canvas installation, then you can
 attach an OpenDSA eTextbook to any course where you have instructor
 permissions.
 If you don't have access to Canvas at your institution, then you can
-create a Canvas course at the public Canvas site, 
+create a Canvas course at the public Canvas site,
 <a href="https://canvas.instructure.com">https://canvas.instructure.com</a>
 </p>
 
@@ -32,11 +32,11 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
     asking for instructor access.
 
   %li
-    Go your institution's Canvas site, create an account at the public site
+    Go to your institution's Canvas site, create an account at the public site
     at <a href="https://canvas.instructure.com">https://canvas.instructure.com</a>
     Once there, create a course.
     Give it a name, and copy the course ID that you will find at the
-    end of the course URL. 
+    end of the course URL.
     You will use this ID later.
 
   %li
@@ -50,5 +50,31 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
     Once you have created your course offering, you will be redirected
     to the page where you can configure your eTextbook, and then
     generate the course in Canvas. Click the "Generate Course" button,
-    and this process will take care of generating 
-    modules, assignments, and assignments groups in Canvas.
+    and this process will take care of generating
+    modules, assignments, and assignments groups in your Canvas course.
+
+<p>
+If you only want to include your choice of OpenDSA visualizations and exercises without compiling the entire book, please follow these steps.
+
+%ol
+  %li
+    Get access to an OpenDSA instructor account as described earlier.
+
+  %li
+    Login using your instructor account and click on your email address at the upper right corner of the home page. Copy the
+    %code Consumer key
+    and the
+    %code Consumer secret
+    to use them later.
+
+  %li
+    Go to your Canvas course and click the "Settings" link in the left sidebar. Click the "Apps" tab and then click "View App Configurations".
+
+  %li
+    Click "+ App" to add a new LTI application. Select "By URL" under "Configuration Type" dropdown menu. Write "OpenDSA" in the name field. Paste in the
+    %code Consumer key
+    and the
+    %code Consumer secret
+    you have copied in the earlier step. Finally add OpenDSA LTI config URL
+    %code #{@config_url}
+    to the "Config URL" field and click "Submit".

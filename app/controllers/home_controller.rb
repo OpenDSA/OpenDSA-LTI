@@ -6,6 +6,10 @@ class HomeController < ApplicationController
   def index
   end
 
+  def guide
+    @config_url = request.scheme + "://" + request.host_with_port + '/lti/xml_config'
+  end
+
   def about
   end
 
