@@ -27,17 +27,17 @@
     .col-sm-4
       %input#key.form-control{:type => "text", :value => consumer_key, :readonly => "readonly"}
     %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#key", :type => "button"}
-      = image_tag("clippy.svg", :class => "clippy", :title => "Copy consumer secret to clipboard", :width => "13")
+      = image_tag("clippy.svg", :class => "clippy", :title => "Copy Consumer Key to clipboard", :width => "13")
 
   %p
 
   .row
     %strong
-      = label_tag :secret, 'Consumer secret:', class: 'col-xs-1'
+      = label_tag :secret, 'Shared Secret:', class: 'col-xs-1'
     .col-sm-4
       %input#secret.form-control{:type => "text", :value => consumer_secret, :readonly => "readonly"}
     %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#secret", :type => "button"}
-      = image_tag("clippy.svg", :class => "clippy", :title => "Copy consumer secret to clipboard", :width => "13")
+      = image_tag("clippy.svg", :class => "clippy", :title => "Copy Shared Secret to clipboard", :width => "13")
 
 %br
 
