@@ -24,15 +24,15 @@
     %strong Consumer Key:
     %span#key
       = consumer_key
-    %button.clipboard-btn.btn{:alt => "Copy consumer key to clipboard", "data-clipboard-target" => "#key", :type => "button"}
-      %img.clippy{:src => "clippy.svg", :width => "13"}
+    %button.clipboard-btn.btn{"data-clipboard-target" => "#key", :type => "button"}
+      = image_tag("clippy.svg", :class => "clippy", :title => "Copy consumer key to clipboard", :width => "13")
 
   %p
     %strong Consumer Secret:
     %span#secret
       = consumer_secret
-    %button.clipboard-btn.btn{"data-clipboard-demo" => "", "data-clipboard-target" => "#secret", :type => "button"}
-      %img.clippy{:alt => "Copy consumer secret to clipboard", :src => "clippy.svg", :width => "13"}
+    %button.clipboard-btn.btn{"data-clipboard-target" => "#secret", :type => "button"}
+      = image_tag("clippy.svg", :class => "clippy", :title => "Copy consumer secret to clipboard", :width => "13")
 
 %br
 
