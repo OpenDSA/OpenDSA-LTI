@@ -20,18 +20,23 @@
 
 - if @user.global_role.is_instructor? or @user.global_role.is_admin?
   - consumer_key, consumer_secret = @creds.first
-  %p
-    %strong Consumer Key:
-    %span#key
-      = consumer_key
-    %button.clipboard-btn.btn{"data-clipboard-target" => "#key", :type => "button"}
-      = image_tag("clippy.svg", :class => "clippy", :title => "Copy consumer key to clipboard", :width => "13")
+
+  .row
+    %strong
+      = label_tag :key, 'Consumer Key:', class: 'col-xs-1'
+    .col-sm-4
+      %input#key.form-control{:type => "text", :value => consumer_key, :readonly => "readonly"}
+    %button.clipboard-btn.btn.btn-primary{"data-clipboard-target" => "#key", :type => "button"}
+      = image_tag("clippy.svg", :class => "clippy", :title => "Copy consumer secret to clipboard", :width => "13")
 
   %p
-    %strong Consumer Secret:
-    %span#secret
-      = consumer_secret
-    %button.clipboard-btn.btn{"data-clipboard-target" => "#secret", :type => "button"}
+
+  .row
+    %strong
+      = label_tag :secret, 'Consumer secret:', class: 'col-xs-1'
+    .col-sm-4
+      %input#secret.form-control{:type => "text", :value => consumer_secret, :readonly => "readonly"}
+    %button.clipboard-btn.btn.btn-primary{"data-clipboard-target" => "#secret", :type => "button"}
       = image_tag("clippy.svg", :class => "clippy", :title => "Copy consumer secret to clipboard", :width => "13")
 
 %br
