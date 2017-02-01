@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+<h2>ODSA EXERCISE ATTEMPT</h2>
+<table>
+  <tr>
+    <th>hint_used</th>
+    <th>count_attempts</th>
+    <th>earned_proficiency</th>
+    <th>time_done</th>
+  </tr>
+  <tr>
+    <th><%= hint_used ? "true" : "false" %></th>
+    <th><%= count_attempts %></th>
+    <th><%= earned_proficiency %></th>
+    <th><%= time_done %></th>
+  </tr>
+</table>
+
+<h2>ODSA EXERCISE PROGRESS</h2>
+<table>
+  <tr>
+    <th> current_score </th>
+    <th> highest_score </th>
+    <th> total_correct </th>
+    <th> proficient_date </th>
+    <th> first_done </th>
+    <th> last_done </th>
+    <th> correct_exercises </th>
+  </tr>
+  <tr>
+    <th><%= current_score %></th>
+    <th><%= highest_score %></th>
+    <th><%= total_correct %></th>
+    <th><%= proficient_date %></th>
+    <th><%= first_done %></th>
+    <th><%= last_done %></th>
+    <th><%= correct_exercises %></th>
+
+  </tr>
+</table>
+
+</body>
+</html>

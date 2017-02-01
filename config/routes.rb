@@ -1,5 +1,4 @@
 CodeWorkout::Application.routes.draw do
-
   root 'home#index'
 
   post 'lti/launch'

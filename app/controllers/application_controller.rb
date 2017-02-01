@@ -62,4 +62,7 @@ class ApplicationController < ActionController::Base
     response.headers.except! 'X-Frame-Options'
   end
 
+  #me my code
+  helper :table
+
 end
