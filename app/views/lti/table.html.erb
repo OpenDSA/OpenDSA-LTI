@@ -21,43 +21,42 @@ tr:nth-child(even) {
 </head>
 <body>
 <h2>ODSA EXERCISE ATTEMPT</h2>
-<table>
+<table style="font-family: arial, sans-serif;border-collapse: collapse;width: 100%;">
   <tr>
-    <th>hint_used</th>
-    <th>count_attempts</th>
-    <th>earned_proficiency</th>
-    <th>time_done</th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">hint_used</th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">count_attempts</th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">earned_proficiency</th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">time_done</th>
   </tr>
-  <tr>
-    <th><%= hint_used ? "true" : "false" %></th>
-    <th><%= count_attempts %></th>
-    <th><%= earned_proficiency %></th>
-    <th><%= time_done %></th>
+  <tr style="background-color: #dddddd;">
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= hint_used ? "true" : "false" %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= count_attempts %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= earned_proficiency %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= time_done %></th>
   </tr>
 </table>
 
 <h2>ODSA EXERCISE PROGRESS</h2>
-<table>
+<table style="font-family: arial, sans-serif;border-collapse: collapse;width: 100%">
   <tr>
-    <th> current_score </th>
-    <th> highest_score </th>
-    <th> total_correct </th>
-    <th> proficient_date </th>
-    <th> first_done </th>
-    <th> last_done </th>
-    <th> correct_exercises </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> current_score </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> highest_score </th>-
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> total_correct </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> proficient_date </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> first_done </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> last_done </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> correct_exercises </th>
   </tr>
-  <tr>
-    <th><%= current_score %></th>
-    <th><%= highest_score %></th>
-    <th><%= total_correct %></th>
-    <th><%= proficient_date %></th>
-    <th><%= first_done %></th>
-    <th><%= last_done %></th>
-    <th><%= correct_exercises %></th>
-
+  <tr style="background-color: #dddddd;">
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= current_score %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= highest_score %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= total_correct %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= proficient_date %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= first_done %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= last_done %></th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= correct_exercises %></th>
   </tr>
 </table>
-
+<h2><%= attempts %></h2>
 </body>
 </html>

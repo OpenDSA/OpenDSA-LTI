@@ -37,9 +37,48 @@ class LtiController < ApplicationController
   end
 
   def assessment
+
     request_params = JSON.parse(request.body.read.to_s)
     inst_book_id = request_params['instBookId']
     @inst_book = InstBook.find_by(id: inst_book_id)
+    inst_sect_id = request_params['instSectionId']
+    @inst_section_id = InstSection.find_by(id:inst_sect_id)
+    inst_book_sect_exe_id = request_params['instBookSectionExerciseId']
+    @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id:inst_book_sect_exe_id)
+    
+
+    #my code
+    puts "section exercise_id #{@inst_book_section_exercise_id}"
+    #@odsa_exercise_attempts = OdsaExerciseAttempt.where(
+     #                           "inst_book_section_exercise_id=?",
+     #                            params[:inst_book_section_exercise_id]).first
+    #puts @odsa_exercise_attempts.inspect
+    @odsa_exercise_attempts = OdsaExerciseAttempt.find_by(:inst_book_id == @inst_book, 
+      :inst_section_id == @inst_section_id, :inst_book_section_exercise_id == @inst_book_section_exercise_id )
+
+    #exercise_progress = OdsaExerciseProgress.where(
+     #                             "inst_book_section_exercise_id=?",
+      #                            params[:inst_book_section_exercise_id]).first
+
+
+    d = @odsa_exercise_attempts.user_id
+    puts "user_id: #{d}"
+
+    @odsa_exercise_progress = OdsaExerciseProgress.find_by(:inst_book_id == @inst_book)
+
+    a = @odsa_exercise_attempts
+    b = @odsa_exercise_progress
+    #data = DataTb.new(a, b)
+    #puts "after data"
+    puts "start render_to_string"
+    TableHelper.arg(a, b)
+    f = render_to_string "lti/table.html.erb"
+    puts "done with rendering"
+    puts f
+    
+    #end
+
+    #$oauth_creds = @inst_book.lms_creds
     launch_params = request_params['toParams']['launch_params']
     if launch_params
       key = launch_params['oauth_consumer_key']
@@ -53,8 +92,13 @@ class LtiController < ApplicationController
       "lis_outcome_service_url" => "#{launch_params['lis_outcome_service_url']}",
       "lis_result_sourcedid" => "#{launch_params['lis_result_sourcedid']}"
     }
+
     # @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
     @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], lti_param)
+    #     # add extension
+    @tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
+
+
 
 
     if !@tp.outcome_service?
@@ -64,7 +108,9 @@ class LtiController < ApplicationController
 
     # post the given score to the TC
     score = (request_params['toParams']['score'] != '' ? request_params['toParams']['score'] : nil)
-    res = @tp.post_replace_result!(score)
+    #res = @tp.post_replace_result!(score)
+    puts "no text"
+    res = @tp.post_extended_replace_result!(score: score, text: f)
 
     if res.success?
       # @score = request_params['score']

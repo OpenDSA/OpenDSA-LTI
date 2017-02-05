@@ -8,7 +8,12 @@ module TableHelper #< Mustache
 		@odsa_exercise_progress  = odsa_exercise_progress
 		puts "initialized in DataTb"
 	end
-
+	def attempts
+		puts "getting attempts"
+		puts @odsa_exercise_attempts.inspect
+		puts @odsa_exercise_progress.inspect
+		return @odsa_exercise_attempts
+	end
 	def hint_used
 		puts "getting hint for template_path with #{@odsa_exercise_attempts.hint_used}"
 		return @odsa_exercise_attempts.hint_used
@@ -26,25 +31,31 @@ module TableHelper #< Mustache
 		return @odsa_exercise_attempts.time_done
 	end
 	def current_score
-		return @odsa_exercise_progress.current_score;
+		puts "getting cuurent score"
+		return @odsa_exercise_progress.current_score
 	end
 	def highest_score
 		puts "highest_score"
 		return @odsa_exercise_progress.highest_score
 	end
 	def first_done
+		puts "getting first_done for template_path"
 		return @odsa_exercise_progress.first_done
 	end
 	def last_done
+		puts "getting time_done for template_path"
 		return @odsa_exercise_progress.last_done
 	end
 	def total_correct
+		puts "getting total_correct for template_path"
 		return @odsa_exercise_progress.total_correct
 	end
 	def proficient_date
+		puts "getting proficient_date for template_path"
 		return @odsa_exercise_progress.proficient_date
 	end
 	def correct_exercises
+		puts "getting correct_exercises for template_path #{@odsa_exercise_progress.correct_exercises}"
 		return @odsa_exercise_progress.correct_exercises
 	end
 
