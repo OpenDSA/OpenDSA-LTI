@@ -60,7 +60,7 @@ class OdsaExerciseProgressesController < ApplicationController
   end
 
   def get_count
-    practiced_ex = OdsaExerciseProgress.count(:conditions => "proficient_date IS NOT NULL")
+    practiced_ex = OdsaExerciseProgress.count(:conditions => "proficient_date IS NOT NULL") + CodeWorkout::EXERCISES_SOLVED
 
     respond_to do |format|
       format.json  { render :json => {:practiced_ex => practiced_ex}}
