@@ -9,7 +9,7 @@ CodeWorkout::Application.routes.draw do
   post 'lti/resource', to: 'lti#resource', as: :lti_resource
 
   resources :odsa_user_interactions
-  resources :odsa_exercise_attempts
+  # resources :odsa_exercise_attempts
   # resources :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id' => 'odsa_exercise_progresses#show_section'

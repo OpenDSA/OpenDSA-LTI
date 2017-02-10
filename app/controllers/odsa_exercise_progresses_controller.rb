@@ -2,7 +2,6 @@ class OdsaExerciseProgressesController < ApplicationController
   # load_and_authorize_resource
 
   #~ Action methods ...........................................................
-
   def update
     inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
     inst_book_section_exercise = InstBookSectionExercise.where(
@@ -26,7 +25,6 @@ class OdsaExerciseProgressesController < ApplicationController
       end
       format.json  { render :json => msg }
     end
-
   end
 
   def show_exercise
