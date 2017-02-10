@@ -6,7 +6,7 @@ $(function() {
 
     function count($this) {
         var aj = $.ajax({
-            url: "/odsa_exercise_progresses/get_count",
+            url: "/odsa_exercise_attempts/get_count",
             type: 'get',
             data: $(this).serialize()
         }).done(function(data) {
