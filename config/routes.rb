@@ -9,14 +9,14 @@ CodeWorkout::Application.routes.draw do
   post 'lti/resource', to: 'lti#resource', as: :lti_resource
 
   resources :odsa_user_interactions
-  # resources :odsa_exercise_attempts
+  resources :odsa_exercise_attempts
   # resources :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id' => 'odsa_exercise_progresses#show_section'
   get '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
   post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_pe'
-  get '/odsa_exercise_attempts/get_count' => 'odsa_exercise_attempts#get_count'
+  # get '/odsa_exercise_attempts/get_count' => 'odsa_exercise_attempts#get_count'
 
   # namespace path_helper hackery!
   # get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book
