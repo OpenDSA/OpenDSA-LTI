@@ -20,43 +20,47 @@ tr:nth-child(even) {
 </style>
 </head>
 <body>
-<h2>ODSA EXERCISE ATTEMPT</h2>
-<table style="font-family: arial, sans-serif;border-collapse: collapse;width: 100%;">
-  <tr>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">hint_used</th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">count_attempts</th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">earned_proficiency</th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">time_done</th>
-  </tr>
-  <tr style="background-color: #dddddd;">
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= hint_used ? "true" : "false" %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= count_attempts %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= earned_proficiency %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= time_done %></th>
-  </tr>
-</table>
-
 <h2>ODSA EXERCISE PROGRESS</h2>
 <table style="font-family: arial, sans-serif;border-collapse: collapse;width: 100%">
   <tr>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> current_score </th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> highest_score </th>-
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> total_correct </th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> proficient_date </th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> first_done </th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> last_done </th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> correct_exercises </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> user id </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> current score </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> highest score </th>-
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> total correct </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> proficient date </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> first done </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> last done </th>
   </tr>
-  <tr style="background-color: #dddddd;">
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= current_score %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= highest_score %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= total_correct %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= proficient_date %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= first_done %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= last_done %></th>
-    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= correct_exercises %></th>
+  <% @odsa_exercise_progress.collect! do |d| %>
+  <tr">
+    <% d.attributes.each do |x, y| %>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= y %></th>
+    <% end %>
   </tr>
+<% end %>
 </table>
-<h2><%= attempts %></h2>
+<h3> Attempts Sample</h3>
+<table style="font-family: arial, sans-serif;border-collapse: collapse;width: 100%">
+  <tr>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> id </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> user_id </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> question name </th>-
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> request type </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> correct </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> worth credit </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> time done </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> time taken</th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> earned proficiency </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> pe score </th>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> pe steps_fixed </th>
+  </tr>
+  <% @odsa_exercise_attempts.collect! do |d| %>
+  <tr">
+    <% d.attributes.each do |x, y| %>
+    <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"><%= y %></th>
+    <% end %>
+  </tr>
+<% end %>
+</table>
 </body>
 </html>

@@ -11,8 +11,16 @@ module TableHelper #< Mustache
 	def attempts
 		puts "getting attempts"
 		puts @odsa_exercise_attempts.inspect
-		puts @odsa_exercise_progress.inspect
+		puts "------------------------------------------------------------"
+		@odsa_exercise_attempts.collect! do |d|
+			d.attributes.each do |x|
+				puts x
+			end
+		end
 		return @odsa_exercise_attempts
+	end
+	def progress
+		return @odsa_exercise_progress
 	end
 	def hint_used
 		puts "getting hint for template_path with #{@odsa_exercise_attempts.hint_used}"

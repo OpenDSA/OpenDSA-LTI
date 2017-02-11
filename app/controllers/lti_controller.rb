@@ -37,7 +37,6 @@ class LtiController < ApplicationController
   end
 
   def assessment
-
     request_params = JSON.parse(request.body.read.to_s)
     inst_book_id = request_params['instBookId']
     @inst_book = InstBook.find_by(id: inst_book_id)
@@ -46,39 +45,35 @@ class LtiController < ApplicationController
     inst_book_sect_exe_id = request_params['instBookSectionExerciseId']
     @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id:inst_book_sect_exe_id)
     
+    
+    @current_user = User.where("email=?", request_params['userEmail']).select("id")
+    @num = 0
+    @current_user.collect! do |d|
+      d.attributes.each do |x, y|
+        @num = y
+      end
+    end
+    @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
+                                 request_params['instBookSectionExerciseId'], @num).select(
+                                 "id, user_id, question_name, request_type, 
+                                 correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned, 
+                                 pe_score, pe_steps_fixed")
+    puts "Hello again"
+    @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
+                                 request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
+                                 total_correct, proficient_date,first_done, last_done")
 
-    #my code
-    puts "section exercise_id #{@inst_book_section_exercise_id}"
-    #@odsa_exercise_attempts = OdsaExerciseAttempt.where(
-     #                           "inst_book_section_exercise_id=?",
-     #                            params[:inst_book_section_exercise_id]).first
-    #puts @odsa_exercise_attempts.inspect
-    @odsa_exercise_attempts = OdsaExerciseAttempt.find_by(:inst_book_id == @inst_book, 
-      :inst_section_id == @inst_section_id, :inst_book_section_exercise_id == @inst_book_section_exercise_id )
-
-    #exercise_progress = OdsaExerciseProgress.where(
-     #                             "inst_book_section_exercise_id=?",
-      #                            params[:inst_book_section_exercise_id]).first
-
-
-    d = @odsa_exercise_attempts.user_id
-    puts "user_id: #{d}"
-
-    @odsa_exercise_progress = OdsaExerciseProgress.find_by(:inst_book_id == @inst_book)
+    puts @odsa_exercise_progress.inspect
+    #@odsa_exercise_progress = OdsaExerciseProgress.find_by(:inst_book_id == @inst_book)
 
     a = @odsa_exercise_attempts
     b = @odsa_exercise_progress
-    #data = DataTb.new(a, b)
-    #puts "after data"
     puts "start render_to_string"
     TableHelper.arg(a, b)
     f = render_to_string "lti/table.html.erb"
     puts "done with rendering"
     puts f
     
-    #end
-
-    #$oauth_creds = @inst_book.lms_creds
     launch_params = request_params['toParams']['launch_params']
     if launch_params
       key = launch_params['oauth_consumer_key']
