@@ -39,7 +39,6 @@ class GenerateCourseJob < ProgressJob::Base
   def inst_book_compile
     lms_instance_id = @inst_book.course_offering.lms_instance['id']
     user_lms_access = LmsAccess.where(lms_instance_id: lms_instance_id).where(user_id: @user_id).first
-    puts user_lms_access.access_token
     @created_LTI_tools = []
     require 'pandarus'
     client = Pandarus::Client.new(
