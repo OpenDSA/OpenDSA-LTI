@@ -101,6 +101,7 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
 
     panel 'OpenDSA Books' do
       table_for course_offering.inst_books do
+        column :id
         column :title
         column "Book Description", :desc
       end
