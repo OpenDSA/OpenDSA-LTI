@@ -9,51 +9,99 @@
       - if i > 0
         %br/
       %strong= offering.display_name
-      - if offering.is_manager? current_user
-        = surround '(', (offering.instructors.any? ? '),' : ')') do
-          = link_to 'edit', edit_admin_course_offering_path(offering)
-        / - else
-        /   = link_to 'unenroll', course_offering_unenroll_path(offering),
-        /     method: :delete
+      = surround '(', (offering.instructors.any? ? '),' : ')') do
+        - if offering.is_manager? current_user
+          = link_to 'edit', edit_course_offering_path(offering)
+        - else
+          = link_to 'unenroll', course_offering_unenroll_path(offering),
+            method: :delete
       - if offering.instructors.any?
         = succeed ':' do
           = 'instructor'.pluralize(offering.instructors.size)
         = succeed (offering.graders.any? ? ',' : '') do
           != offering.instructors.map{ |i| link_to i.display_name,
             user_path(i) }.to_sentence
-      / - if offering.graders.any?
-      /   = succeed ':' do
-      /     = 'grader'.pluralize(offering.graders.size)
-      /   != offering.graders.map{ |i| link_to i.display_name,
-      /     user_path(i) }.to_sentence
+      - if offering.graders.any?
+        = succeed ':' do
+          = 'grader'.pluralize(offering.graders.size)
+        != offering.graders.map{ |i| link_to i.display_name,
+          user_path(i) }.to_sentence
 
-  - if !@is_student
-    .well
-      .row
-        .col-xs-12
-          .progress-status.text-primary
-            0/0
-      .row
-        .col-xs-12
-          .progress.progress-striped.active
-            .progress-bar
-              .text-primary
-                0%
-    - @course_offerings.each do |offering|
-      - if @course_offerings.size > 1
-        %h2= offering.display_name
-        = link_to
-      %table.table.table-striped
-        %thead
-          %tr
-            %th Book Title
-            %th Canvas Course
-            %th
-            %th
-            %th
-        %tbody#odsa
-          - @inst_book = offering.inst_books
-          = render @inst_book
+  -#- if can? :edit, @course
+    %p
+      = button_link 'Edit Course Properties', edit_course_path(@course)
+      = button_link 'Add an offering', new_course_path
+
+  .container-fluid
+    .navbar-collapse.collapse
+      %ul.nav.nav-tabs
+        %li.active
+          %a{ href: '#grades', data: { toggle: 'tab' } } Grades
+        - if !@is_student
+          %li
+            %a{ href: '#roster', data: { toggle: 'tab' } } Roster
+        - if !@is_student
+          %li
+            %a{ href: '#odsa', data: { toggle: 'tab' } } OpenDSA
+
+  %div.tab-content.under-collapsible
+
+    .tab-pane.fade{ id: 'grades' }
+
+    - if !@is_student
+      .tab-pane.fade{ id: 'roster' }
+        - @course_offerings.each do |offering|
+          - if @course_offerings.size > 1
+            %h2= offering.display_name
+            = link_to
+          = form_tag '/course_offerings/'+ offering.id.to_s + '/upload_roster', multipart: true do
+            = file_field( "form", "rosterfile" )
+            = submit_tag "Submit File"
+          %table.table.table-striped
+            %thead
+              %tr
+                %th Image
+                %th Last name
+                %th First name
+                %th Email
+                %th Role
+                %th
+                  %i.fa.fa-cog
+            %tbody#roster
+              - @sec = offering.course_enrollments.               |
+                page(params[:page]).per(params[:per])             |
+              = render @sec
+          - if @sec.is_a?(Array)
+            #roster_paginator= paginate @sec, remote: true
+
+    - if !@is_student
+      .tab-pane.fade{ id: 'odsa' }
+        .well
+          .row
+            .col-xs-12
+              .progress-status.text-primary
+                0/0
+          .row
+            .col-xs-12
+              .progress.progress-striped.active
+                .progress-bar
+                  .text-primary
+                    0%
+        - @course_offerings.each do |offering|
+          - if @course_offerings.size > 1
+            %h2= offering.display_name
+            = link_to
+          %table.table.table-striped
+            %thead
+              %tr
+                %th Book Title
+                %th LMS Course
+                %th
+                %th
+                %th
+            %tbody#odsa
+              - @inst_book = offering.inst_books
+              = render @inst_book
 
 
 -else
@@ -65,29 +113,19 @@
       %tr
         %th Term
         %th Section
-        %th OpenDSA Book
         %th Instructors
-        / %th Graders
-        / %th Enroll
+        %th Graders
+        %th Enroll
     %tbody
-      - @course.course_offerings.each do |o|
+      - @course.course_offerings.each do |off|
         %tr
-          %td= o.term.display_name
-          %td= o.display_name
-          - if o.odsa_books.many?
-            %td
-              %table.table.table-striped
-                - o.odsa_books.each do |bk|
-                  %tr
-                    %td= bk.title
-          - else
-            %td!= o.odsa_books.map{ |i| i.title }.to_sentence
-
-          %td!= o.instructors.map{ |i| link_to i.display_name,
+          %td= off.term.display_name
+          %td= off.display_name
+          %td!= off.instructors.map{ |i| link_to i.display_name,
             user_path(i) }.to_sentence
-          / %td!= o.graders.map{ |i| link_to i.display_name,
-          /   user_path(i) }.to_sentence
-          / %td
-          /   = render partial: 'course_offerings/self_enrollment',
-          /     locals: { o: o }
+          %td!= off.graders.map{ |i| link_to i.display_name,
+            user_path(i) }.to_sentence
+          %td
+            = render partial: 'course_offerings/self_enrollment',
+              locals: { off: off }
 
