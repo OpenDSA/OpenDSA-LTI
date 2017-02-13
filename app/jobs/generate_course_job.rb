@@ -189,9 +189,10 @@ class GenerateCourseJob < ProgressJob::Base
         section_item_position += 1
         learning_tool = nil
         learning_tool = section.learning_tool
-        if !learning_tool
-          section_file_name_seq += 1
-        end
+        section_file_name_seq += 1
+        # if !learning_tool
+        #   section_file_name_seq += 1
+        # end
       end
     else
       save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
