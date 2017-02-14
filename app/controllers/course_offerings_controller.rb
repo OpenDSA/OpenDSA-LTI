@@ -12,6 +12,12 @@ class CourseOfferingsController < ApplicationController
   # -------------------------------------------------------------
   # GET /course_offerings/1
   def show
+    @course_offering = CourseOffering.find_by(id: params[:id])
+    @url = url_for(organization_course_path(
+      @course_offering.course.organization,
+      @course_offering.course,
+      @course_offering.term))
+
   end
 
 
@@ -78,7 +84,7 @@ class CourseOfferingsController < ApplicationController
         enrollment.course_role_id = CourseRole.instructor.id
         enrollment.save!
       else
-        err_string = 'There was a problem while creating the workout.'
+        err_string = 'There was a problem while creating the course offering.'
         url = url_for new_course_offerings_path(notice: err_string)
       end
     end
