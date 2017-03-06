@@ -17,36 +17,23 @@ class CourseOfferingsController < ApplicationController
       @course_offering.course.organization,
       @course_offering.course,
       @course_offering.term))
-
-    @course_enrollment = CourseEnrollment.where("course_offering_id=?",
-                                 @course_offering.id)
-    @student_list = [] 
-    #puts @course_enrollment.inspect
-    @course_enrollment.each do |s|
-      q = User.where("id=?", s.user_id).select("id, first_name, last_name")
-      #q.each do |t| this loop works
-      #  puts "t is #{t.first_name} and #{t.last_name}"
-      #end
-      @student_list.push(q)
-        
-        
-      #@instBook = InstBook.where("course_offering_id=?",
-      #                           @course_offering.id)
-      #@instBook = @course_offering.odsa_books
-     #@exercise_list = []
-      #puts @instBook.inspect
-      #@instBookExer = InstBookSectionExercise.where("inst_book_id=?",
-      #                           @instBook.id)
-      #puts @instBook.inspect
-
-    end
   end
+
   # GET /course_offerings/:user_id/:inst_book_section_exercise_id
   def find_attempts
-  end
+    @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
+                                 request_params['instBookSectionExerciseId'], @num).select(
+                                 "id, user_id, question_name, request_type,
+                                 correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
+                                 pe_score, pe_steps_fixed")
+    puts "Hello again"
+    @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
+                                 request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
+                                 total_correct, proficient_date,first_done, last_done")
 
-  def postData
-    puts "123"
+    @attempts_json = ApplicationController.new.render_to_string(
+        template: 'course_offerings/find_attempts.json.jbuilder',
+        locals: {})
   end
 
   # -------------------------------------------------------------
