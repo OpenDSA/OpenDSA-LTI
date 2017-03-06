@@ -21,6 +21,9 @@
             $(this).prop('disabled', true);
             return handle_submit();
         });
+        $('myButton').click(function(){
+            alert("you have clicked on the display button")
+        })
 
         init();
     });

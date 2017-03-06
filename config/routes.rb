@@ -15,6 +15,15 @@ CodeWorkout::Application.routes.draw do
   get '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
   post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_pe'
+  
+
+  #me
+  #get '/Display' => 'course_offerings#postData'
+  #get '/course_offerings/:id/Display' => 'course_offerings#postData'
+  #post '/show' => 'course_offerings#postData'
+  #me end
+
+
 
   # namespace path_helper hackery!
   # get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book

@@ -63,15 +63,15 @@ class LtiController < ApplicationController
                                  request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
                                  total_correct, proficient_date,first_done, last_done")
 
-    puts @odsa_exercise_progress.inspect
+    #puts @odsa_exercise_progress.inspect
     #@odsa_exercise_progress = OdsaExerciseProgress.find_by(:inst_book_id == @inst_book)
 
     a = @odsa_exercise_attempts
     b = @odsa_exercise_progress
-    puts "start render_to_string"
+    #puts "start render_to_string"
     TableHelper.arg(a, b)
     f = render_to_string "lti/table.html.erb"
-    puts "done with rendering"
+    #puts "done with rendering"
     puts f
     
     launch_params = request_params['toParams']['launch_params']
