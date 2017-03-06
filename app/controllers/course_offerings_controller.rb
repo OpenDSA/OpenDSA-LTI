@@ -17,9 +17,11 @@ class CourseOfferingsController < ApplicationController
       @course_offering.course.organization,
       @course_offering.course,
       @course_offering.term))
-
   end
 
+  # GET /course_offerings/:user_id/:inst_book_section_exercise_id
+  def find_attempts
+  end
 
   # -------------------------------------------------------------
   # GET /course_offerings/new
