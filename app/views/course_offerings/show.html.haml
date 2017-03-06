@@ -267,6 +267,12 @@
       %p
       %button#display.btn.btn-primary Display
       %a#display1.myButton{:href => "#"} Display
+      :javascript
+        $('#display').click(function(){
+          console.log("clicked registered");
+          alert("you have clicked on the display button");
+        });
+
 
 
 

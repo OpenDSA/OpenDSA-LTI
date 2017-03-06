@@ -17,7 +17,7 @@ class CourseOfferingsController < ApplicationController
       @course_offering.course.organization,
       @course_offering.course,
       @course_offering.term))
-    
+
     @course_enrollment = CourseEnrollment.where("course_offering_id=?",
                                  @course_offering.id)
     @student_list = [] 
@@ -28,7 +28,6 @@ class CourseOfferingsController < ApplicationController
       #  puts "t is #{t.first_name} and #{t.last_name}"
       #end
       @student_list.push(q)
-        
         
       #@instBook = InstBook.where("course_offering_id=?",
       #                           @course_offering.id)
