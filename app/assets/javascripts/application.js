@@ -85,7 +85,7 @@ function percentBar(filled, capacity, id) {
 $.fn.editable.defaults.mode = 'inline';
 
 $(document).ready(function() {
-    $('.xeditable').editable();
+    // $('.xeditable').editable();
     var clip = new Clipboard('.clipboard-btn');
 
     clip.on('success', function(e) {
