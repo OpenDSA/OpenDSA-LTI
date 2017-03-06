@@ -17,6 +17,29 @@ class CourseOfferingsController < ApplicationController
       @course_offering.course.organization,
       @course_offering.course,
       @course_offering.term))
+    
+    @course_enrollment = CourseEnrollment.where("course_offering_id=?",
+                                 @course_offering.id)
+    @student_list = [] 
+    #puts @course_enrollment.inspect
+    @course_enrollment.each do |s|
+      q = User.where("id=?", s.user_id).select("id, first_name, last_name")
+      #q.each do |t| this loop works
+      #  puts "t is #{t.first_name} and #{t.last_name}"
+      #end
+      @student_list.push(q)
+        
+        
+      #@instBook = InstBook.where("course_offering_id=?",
+      #                           @course_offering.id)
+      #@instBook = @course_offering.odsa_books
+     #@exercise_list = []
+      #puts @instBook.inspect
+      #@instBookExer = InstBookSectionExercise.where("inst_book_id=?",
+      #                           @instBook.id)
+      #puts @instBook.inspect
+
+    end
   end
 
   # GET /course_offerings/:user_id/:inst_book_section_exercise_id

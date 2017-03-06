@@ -21,9 +21,11 @@
             $(this).prop('disabled', true);
             return handle_submit();
         });
-        $('myButton').click(function(){
+
+        $('#display').click(function(){
+            console.log("clicked registered")
             alert("you have clicked on the display button")
-        })
+        });
 
         init();
     });
