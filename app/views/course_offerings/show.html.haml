@@ -255,23 +255,22 @@
       %select#combobox{:size => "10"}
         - @student_list.each do |q|
           - q.each do |y|
-            %option{:value => "<haml_loud"}
+            %option{:value => y.id}
               #{y.first_name} #{y.last_name}
 
       %strong ___    Select Assignment:
       %select#comb{:size => "10"}
-        - @student_list.each do |q|
+        - @exercise_list.each do |k, q|
           - q.each do |y|
-            %option{:value => "<haml_loud"}
-              #{y.first_name} #{y.last_name}
+            %option{:value => k}
+              #{y.short_name}: #{y.name}
       %p
       %button#display.btn.btn-primary Display
-      %a#display1.myButton{:href => "#"} Display
-      :javascript
-        $('#display').click(function(){
-          console.log("clicked registered");
-          alert("you have clicked on the display button");
-        });
+      %p
+        %br/
+      #log
+
+      
 
 
 

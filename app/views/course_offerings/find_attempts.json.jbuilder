@@ -1,99 +1,64 @@
-json.set! :inst_book_id, @inst_book.id
-json.set! :title, @inst_book.title
-json.set! :desc, @inst_book.desc
-json.set! :last_compiled, @inst_book.last_compiled.try(:strftime, "%Y-%m-%d %H:%m:%S")
-
-options = @inst_book.options
-if options != nil && options != "null"
-  options = eval(options)
-  options.each do |key, value|
-    json.set! key, value
-  end
-end
-
+json.set! :odsa_exercise_attempts, @odsa_exercise_attempts
 # chapters
-json.chapters do
-
-  for inst_chapter in @inst_book.inst_chapters.order('position')
-
-    chapter_name = inst_chapter.name
-    # chapter object
-    json.set! chapter_name do
-      json.set! :lms_chapter_id, inst_chapter.lms_chapter_id
-      json.set! :lms_assignment_group_id, inst_chapter.lms_assignment_group_id
-
-      for inst_chapter_module in inst_chapter.inst_chapter_modules.order('module_position')
-        module_path = InstModule.where(:id => inst_chapter_module.inst_module_id).first.path
-
-        # module Object
-        json.set! module_path do
-          json.set! :lms_module_item_id, inst_chapter_module.lms_module_item_id
-          json.set! :lms_section_item_id, inst_chapter_module.lms_section_item_id
-          json.set! :long_name, InstModule.where(:id => inst_chapter_module.inst_module_id).first.name
-
-          # sections
-          json.sections do
-            sections = inst_chapter_module.inst_sections
-            if !sections.empty?
-
-              for inst_section in inst_chapter_module.inst_sections
-                section_name = inst_section.name
-
-               # section object
-                json.set! section_name do
-                  json.set! :id, inst_section.id
-                  json.set! :soft_deadline, inst_section.soft_deadline.try(:strftime, "%Y-%m-%d %H:%m:%S")
-                  json.set! :hard_deadline, inst_section.soft_deadline.try(:strftime, "%Y-%m-%d %H:%m:%S")
-                  json.set! :showsection, inst_section.show
-                  json.set! :lms_item_id, inst_section.lms_item_id
-                  json.set! :lms_assignment_id, inst_section.lms_assignment_id
-
-                  learning_tool = inst_section.learning_tool
-                  if learning_tool
-                    json.set! :learning_tool, learning_tool
-                    json.set! :resource_type, inst_section.resource_type
-                    json.set! :resource_name, inst_section.resource_name
-                    exercise = inst_section.inst_book_section_exercises.first
-                    json.set! :points, exercise.points.to_f
-                  else
-                    exercises = inst_section.inst_book_section_exercises
-                    if !exercises.empty?
-                      for inst_book_section_exercise in exercises
-                        exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
-                        json.set! exercise_name do
-                          json.set! :id, inst_book_section_exercise.id
-                          json.set! :long_name, InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.name
-                          json.set! :required, inst_book_section_exercise.required
-                          json.set! :points, inst_book_section_exercise.points.to_f
-                          json.set! :threshold, inst_book_section_exercise.threshold.to_f
-                          json.set! :options, inst_book_section_exercise.options
-                          options = inst_book_section_exercise.options
-                          if options != nil && options != "null"
-                            json.set! :exer_options, eval(options)
-                          end
-                        end
-                      end
-                    end
-                  end
-                end
-              end
-            else
-              json.nil!
-            end
-          end
-        end
-
-      end
-
-    end
-
+@odsa_exercise_attempts.collect do |d|
+    json.set! :id, d.id
+    json.set! :user_id, d.user_id
+    json.set! :question_name, d.question_name
+    json.set! :request_type, d.request_type
+    json.set! :correct, d.correct
+    json.set! :worth_credit, d.worth_credit
+    json.set! :time_done, d.time_done
+    json.set! :time_taken, d.time_taken
+    json.set! :earned_proficiency, d.earned_proficiency
+    json.set! :pe_score, d.pe_score
+    json.set! :pe_steps_fixed, d.pe_steps_fixed
   end
-
+# json.set! :question_name, @odsa_exercise_attempts.question_name
+# json.set! :request_type, @odsa_exercise_attempts.request_type
+# json.set! :correct, @odsa_exercise_attempts.correct
+# json.set! :worth_credit, @odsa_exercise_attempts.worth_credit
+# json.set! :time_done, @odsa_exercise_attempts.time_done.try(:strftime, "%Y-%m-%d %H:%m:%S")
+# json.set! :time_taken, @odsa_exercise_attempts.time_taken.try(:strftime, "%Y-%m-%d %H:%m:%S")
+# json.set! :earned_proficiency, @odsa_exercise_attempts.earned_proficiency
+# json.set! :points_earned, @odsa_exercise_attempts.points_earned
+# json.set! :pe_score, @odsa_exercise_attempts.pe_score
+# json.set! :pe_steps_fixed, @odsa_exercise_attempts.pe_steps_fixed
+#"id, user_id, question_name, request_type,
+#correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
+#pe_score, pe_steps_fixed")
+puts "///////////////////////////////////////////////////////"
+#puts "printing inspect #{@odsa_exercise_progress.inspect}"
+json.set! :odsa_exercise_progress, @odsa_exercise_progress
+@odsa_exercise_progress.collect do |d|
+    json.set! :user_id, d.user_id
+    json.set! :current_score, d.current_score
+    json.set! :highest_score, d.highest_score
+    json.set! :total_correct, d.total_correct
+    json.set! :proficient_date, d.proficient_date
+    json.set! :first_done, d.first_done
+    json.set! :last_done, d.last_done
 end
-course_offering = CourseOffering.where(:id => @inst_book.course_offering_id).first
 
-if course_offering != nil
-  json.course_id course_offering.lms_course_num
-  lms_instance_id = course_offering.lms_instance_id
-  json.LMS_url LmsInstance.where(:id => lms_instance_id).first.url
-end
+#user_id, current_score, highest_score,
+# total_correct, proficient_date,first_done, last_done"
+# json.set! :inst_book_id, @inst_book.id
+# json.set! :title, @inst_book.title
+# json.set! :desc, @inst_book.desc
+# json.set! :last_compiled, @inst_book.last_compiled.try(:strftime, "%Y-%m-%d %H:%m:%S")
+
+# options = @odsa_exercise_progress.options
+# if options != nil && options != "null"
+#   options = eval(options)
+#   options.each do |key, value|
+#     json.set! key, value
+#   end
+# end
+# options = @odsa_exercise_attempts.options
+# if options != nil && options != "null"
+#   options = eval(options)
+#   options.each do |key, value|
+#     json.set! key, value
+#   end
+# end
+
+  puts "time"

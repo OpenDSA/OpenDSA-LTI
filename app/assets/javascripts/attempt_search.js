@@ -21,10 +21,6 @@
             $(this).prop('disabled', true);
             return handle_submit();
         });
-        $('#display').click(function(){
-          console.log("clicked registered");
-          return handle_display();
-        });
 
         init();
     });
@@ -211,87 +207,6 @@
                 return window.location.href = data['url'];
             }
         });
-    };
-
-    handle_display = function(){
-        var messages = check_dis_completeness();
-        if (messages.length !== 0) {
-            alert(messages);
-            return;
-        }
-        //GET /course_offerings/:user_id/:inst_book_section_exercise_id
-        var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" 
-                        + $('#comb').find('option:selected').val();
-
-        var aj = $.ajax({
-            url: request,
-            type: 'get',
-            data: $(this).serialize()
-        }).done(function(data) {
-            console.dir(data);
-            if (data.odsa_exercise_progress.length === 0){
-                var p = '<p style="font-size:24px; align=center;"> You have not Attempted this exercise <p>';
-                $('#log').html(p);
-            }
-            else{
-                var header = '<p style="font-size:24px; align=center;"> OpenDSA Progres Table<p>';
-                header += '<table>';
-                header += '<tr>';
-                var elem = '<tr>';
-                Object.keys(data.odsa_exercise_progress[0]).map((e) =>{
-                    header += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ e + '</th>'; 
-                    elem   += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_progress[0][e] + '</td>';
-                 }
-                );
-                 header += '</tr>';
-                 elem += '</tr>';
-                var header1 = '<p style="font-size:24px; align=center;"> OpenDSA Attempt Table <p>';
-                header1 += '<table>';
-                header1 += '<tr>';
-                var elem1 = '<tr>';
-                Object.keys(data.odsa_exercise_attempts[0]).map((e) =>{
-                    header1 += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ e + '</th>'; 
-                    elem1   += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_attempts[0][e] + '</tb>';
-                 }
-                );
-                header1 += '</tr>';
-                elem1 += '</tr>';
-                for (var i = 1; i < data.odsa_exercise_attempts.length; i++){
-                    elem1 += '<tr>';
-                    Object.keys(data.odsa_exercise_attempts[i]).map((e) =>{
-                    elem1 += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_attempts[i][e] + '</td>';
-                    }
-                    );   
-                    elem1 += '</tr>';
-
-                }
-                 header1 += elem1;
-                 header += elem;
-                 header += '</table> ';
-                 header1 += '</table>';
-                 header += '<br>' + header1;
-                $('#log').html(header);
-            }
-            change_courses(data);
-        }).fail(function(data) {
-            alert("failure")
-            console.log('AJAX request has FAILED');
-        });
-    };
-
-    check_dis_completeness = function(){
-        var messages;
-        messages = [];
-        var selectbar1 = $('#combobox').find('option:selected').text();
-        var selectbar2 = $('#comb').find('option:selected').text();
-        //var selectbar3 = $('#combobox').find('option:selected').val();
-        //var selectbar4 = $('#comb').find('option:selected').val();
-        if (selectbar1 === '' || selectbar2 === '')
-        {
-            messages.push("You need to select a student or assignment");
-            return messages;
-        }
-        return messages
     };
 
 }).call(this);
