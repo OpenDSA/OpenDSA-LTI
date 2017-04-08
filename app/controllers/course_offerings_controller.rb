@@ -26,11 +26,86 @@ class CourseOfferingsController < ApplicationController
       q = User.where("id=?", s.user_id).select("id, first_name, last_name")
       @student_list.push(q)
     end
-    #puts @student_list.inspect
-    #puts @course_enrollment.inspect
     @instBook = InstBook.where("course_offering_id=?",
                                @course_offering.id)
     @instBook = @course_offering.odsa_books.first
+
+    @exercise_list = Hash.new
+
+    InstChapter.where(inst_book_id: @instBook.id).each do |l|
+      cPos = (l.position.to_s||"")+"."
+      b = InstChapterModule.where("inst_chapter_id=?", l.id)
+      b.each do |o|
+        mPos = cPos + (o.module_position.to_s||"")+"."
+        c = InstSection.where("inst_chapter_module_id=?", o.id)
+        c.each do |f|
+          if (f.gradable)
+            sPos = mPos + (f.position.to_s||"")+"."
+            puts f.inspect
+            t = InstBookSectionExercise.where("inst_section_id=?", f.id)
+            t.each do |v|
+              if v.points != 0
+                @exercise_list[v.id] = sPos + " " + f.name.to_s
+              end
+            end
+          end
+        end
+      end
+    end
+
+
+
+
+
+
+=begin
+  
+rescue Exception => e
+  
+end
+    #puts @student_list.inspect
+    #puts @course_enrollment.inspect
+  
+    @InstChapter = InstChapter.where(inst_book_id: @instBook.id)
+
+    @new_exercise_list = []
+
+    @InstChapter.each do |l|
+      b = InstChapterModule.where("inst_chapter_id=?", l.id)
+      #puts b.inspect
+      @new_exercise_list.push(b)
+    end
+    @exercise_list = Hash.new
+    @new_exercise_list.each do |g|
+      g.each do |o|
+        c = InstSection.where("inst_chapter_module_id=?", o.id)
+        c.each do |f|
+          if (f.gradable)
+            puts f.name
+            t = InstBookSectionExercise.where("inst_section_id=?", f.id)
+            t.each do |v|
+              if v.points != 0
+                #q = InstExercise.where("id=?", v.inst_exercise_id).select("id, name, short_name")
+                @exercise_list[v.id] = f
+                #puts q.inspect
+              end
+            end
+          end
+        end
+      end
+    end
+
+=end
+
+
+
+
+
+=begin
+  
+rescue Exception => e
+  
+end
     @exercise_list = Hash.new
     @inst_book_section_exercise = InstBookSectionExercise.where("inst_book_id=?",
                                @instBook.id)
@@ -38,7 +113,7 @@ class CourseOfferingsController < ApplicationController
       q = InstExercise.where("id=?", s.inst_exercise_id).select("id, name, short_name")
       @exercise_list[s.id] = q
     end
-
+=end
     
   end
 

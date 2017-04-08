@@ -261,9 +261,8 @@
       %strong ___    Select Assignment:
       %select#comb{:size => "10"}
         - @exercise_list.each do |k, q|
-          - q.each do |y|
-            %option{:value => k}
-              #{y.short_name}: #{y.name}
+          %option{:value => k}
+            #{q}
       %p
       %button#display.btn.btn-primary Display
       %p
