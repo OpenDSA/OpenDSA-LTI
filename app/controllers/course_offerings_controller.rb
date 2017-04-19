@@ -32,6 +32,11 @@ class CourseOfferingsController < ApplicationController
 
     @exercise_list = Hash.new
 
+=begin
+  
+rescue Exception => e
+  
+end
     InstChapter.where(inst_book_id: @instBook.id).each do |l|
       cPos = (l.position.to_s||"")+"."
       b = InstChapterModule.where("inst_chapter_id=?", l.id)
@@ -52,92 +57,46 @@ class CourseOfferingsController < ApplicationController
         end
       end
     end
+=end
+  chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
 
-    # chapters = InstChapter.where(inst_book_id: @inst_book.id).order('position')
+  chapters.each do |chapter|
 
-    # chapters.each do |chapter|
+    modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
 
-    #   modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
+    modules.each do |inst_ch_module|
 
-    #   modules.each do |inst_ch_module|
+      sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
 
-    #     sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
+      section_item_position = 1
 
-    #     section_item_position = 1
+      if !sections.empty?
+        sections.each do |section|
+          title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
+                  (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
+                  section_item_position.to_s.rjust(2, "0") + " - "
+          learning_tool = nil
+          if section
+            title = title + section.name
 
-    #     if !sections.empty?
-    #       sections.each do |section|
-    #         title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
-    #                 (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
-    #                 section_item_position.to_s.rjust(2, "0") + " - "
-
-    #         learning_tool = nil
-    #         if section
-    #           title = title + section.name
-
-    #           learning_tool = section.learning_tool
-    #           if !learning_tool
-    #             if section.gradable
-    #               # get the section_id and the title
-    #             end
-    #           end
-    #         end
-    #         section_item_position += 1
-    #       end
-    #     end
-    #   end
-    # end
-
-
-
-
-=begin
-
-rescue Exception => e
-
-end
-    #puts @student_list.inspect
-    #puts @course_enrollment.inspect
-
-    @InstChapter = InstChapter.where(inst_book_id: @instBook.id)
-
-    @new_exercise_list = []
-
-    @InstChapter.each do |l|
-      b = InstChapterModule.where("inst_chapter_id=?", l.id)
-      #puts b.inspect
-      @new_exercise_list.push(b)
-    end
-    @exercise_list = Hash.new
-    @new_exercise_list.each do |g|
-      g.each do |o|
-        c = InstSection.where("inst_chapter_module_id=?", o.id)
-        c.each do |f|
-          if (f.gradable)
-            puts f.name
-            t = InstBookSectionExercise.where("inst_section_id=?", f.id)
-            t.each do |v|
-              if v.points != 0
-                #q = InstExercise.where("id=?", v.inst_exercise_id).select("id, name, short_name")
-                @exercise_list[v.id] = f
-                #puts q.inspect
+            learning_tool = section.learning_tool
+            if !learning_tool
+              if section.gradable
+                @exercise_list[section.id] = title
+                  # get the section_id and the title
               end
             end
           end
+          section_item_position += 1
         end
       end
     end
-
-=end
-
-
-
-
+  end
 
 =begin
-
+  
 rescue Exception => e
-
+  
 end
     @exercise_list = Hash.new
     @inst_book_section_exercise = InstBookSectionExercise.where("inst_book_id=?",
@@ -147,13 +106,17 @@ end
       @exercise_list[s.id] = q
     end
 =end
-
+    
   end
 
-  # GET /course_offerings/:user_id/:inst_book_section_exercise_id
+  # GET /course_offerings/:user_id/:inst_section_id
   def find_attempts
+    puts "finding attempts_json"
     @user_id = User.find_by(id: params[:user_id])
-    @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id: params[:inst_book_section_exercise_id])
+    @inst_section = InstSection.find_by(id: params[:inst_section_id])
+    @inst_book_section_exercise = InstBookSectionExercise.where(inst_section_id: @inst_section.id).first #not sure about the first
+    @inst_book_section_exercise_id = @inst_book_section_exercise.id
+    #InstBookSectionExercise.find_by(id: params[:inst_book_section_exercise_id])
 
     @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
                                  @inst_book_section_exercise_id, @user_id).select(
@@ -163,7 +126,7 @@ end
     @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
                                  @inst_book_section_exercise_id, @user_id).select("user_id, current_score, highest_score,
                                  total_correct, proficient_date,first_done, last_done")
-
+                                 
     @attempts_json = ApplicationController.new.render_to_string(
         template: 'course_offerings/find_attempts.json.jbuilder',
         locals: {:@odsa_exercise_attempts => @odsa_exercise_attempts,

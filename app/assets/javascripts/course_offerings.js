@@ -219,7 +219,7 @@
             alert(messages);
             return;
         }
-        //GET /course_offerings/:user_id/:inst_book_section_exercise_id
+        //GET /course_offerings/:user_id/:inst_section_id
         var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" 
                         + $('#comb').find('option:selected').val();
 
@@ -228,7 +228,8 @@
             type: 'get',
             data: $(this).serialize()
         }).done(function(data) {
-            console.dir(data);
+            //console.dir(data);
+
             if (data.odsa_exercise_progress.length === 0){
                 var p = '<p style="font-size:24px; align=center;"> You have not Attempted this exercise <p>';
                 $('#log').html(p);
@@ -238,32 +239,43 @@
                 header += '<table>';
                 header += '<tr>';
                 var elem = '<tr>';
-                Object.keys(data.odsa_exercise_progress[0]).map((e) =>{
+                header += buildProgressHeader();
+                elem += getFieldMember(data.odsa_exercise_progress[0]);
+
+                /**Object.keys(data.odsa_exercise_progress[0]).map((e) =>{
                     header += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ e + '</th>'; 
                     elem   += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_progress[0][e] + '</td>';
                  }
                 );
                  header += '</tr>';
                  elem += '</tr>';
+                */
+
+
                 var header1 = '<p style="font-size:24px; align=center;"> OpenDSA Attempt Table <p>';
                 header1 += '<table>';
                 header1 += '<tr>';
                 var elem1 = '<tr>';
-                Object.keys(data.odsa_exercise_attempts[0]).map((e) =>{
+
+                /**Object.keys(data.odsa_exercise_attempts[0]).map((e) =>{
                     header1 += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ e + '</th>'; 
                     elem1   += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_attempts[0][e] + '</tb>';
                  }
                 );
                 header1 += '</tr>';
                 elem1 += '</tr>';
-                for (var i = 1; i < data.odsa_exercise_attempts.length; i++){
-                    elem1 += '<tr>';
+                */
+                header1 += getAttemptHeader();
+
+                for (var i = 0; i < data.odsa_exercise_attempts.length; i++){
+                    /**elem1 += '<tr>';
                     Object.keys(data.odsa_exercise_attempts[i]).map((e) =>{
                     elem1 += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_attempts[i][e] + '</td>';
                     }
                     );   
                     elem1 += '</tr>';
-
+                    */
+                    elem1 += getAttemptMemeber(data.odsa_exercise_attempts[i]);
                 }
                  header1 += elem1;
                  header += elem;
@@ -278,7 +290,50 @@
             console.log('AJAX request has FAILED');
         });
     };
+    getFieldMember = function(pData){
+        console.dir(pData)
+        var member = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.current_score  + '</th>';
+        member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.highest_score + '</th>';
+        member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.total_correct + '</th>';
+        member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.proficient_date.substring(0, 10) + " " + pData.proficient_date.substring(11, 16) + '</th>';
+        member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.first_done.substring(0, 10) + " " + pData.first_done.substring(11, 16) + '</th>';
+        member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.last_done.substring(0, 10) + " " + pData.last_done.substring(11, 16) + '</th>';
+        return member;
+    }
 
+    buildProgressHeader = function(){
+      var elem = '<tr> <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Current Score </th>';
+      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Highest Score </th>';
+      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Tottal Correct </th>';
+      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Proficient Date </th>';
+      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> First Done </th>';
+      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th> </tr>';
+      return elem
+    }
+    getAttemptHeader = function(){
+        var head = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Question name </th>';
+        head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Request Type </th>';
+        head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Correct </th>';
+        head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Worth Credit </th>';
+        head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Done </th>';
+        head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Taken</th>';
+        head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Earned proficiency </th>';
+        head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Pe Score </th>';
+        head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Pe Steps_fixed </th></tr>';
+        return head;
+    }
+    getAttemptMemeber = function(aData){
+        var memb = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+  aData.question_name + '</th>';
+        memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.request_type + '</th>';
+        memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.correct + '</th>';
+        memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.worth_credit + '</th>';
+        memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_done.substring(0, 10) + " " + aData.time_done.substring(11, 16) + '</th>';
+        memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_taken + '</th>';
+        memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.earned_proficiency + '</th>';
+        memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.pe_score + '</th>';
+        memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.pe_steps_fixed + '</th></tr>';
+        return memb;
+    }
     check_dis_completeness = function(){
         var messages;
         messages = [];

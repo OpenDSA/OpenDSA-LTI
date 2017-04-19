@@ -11,7 +11,6 @@ class LtiController < ApplicationController
     $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
-
     # TODO: get user info from @tp object
     # register the user if he is not yet registered.
     email = params[:lis_person_contact_email_primary]
