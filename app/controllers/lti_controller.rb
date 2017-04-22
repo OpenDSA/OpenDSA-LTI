@@ -8,6 +8,7 @@ class LtiController < ApplicationController
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
+    @course_offering = CourseOffering.find_by(id: @inst_book.course_offering_id)
     $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
@@ -29,6 +30,20 @@ class LtiController < ApplicationController
     sign_in @user
     lti_enroll
 
+    course_off_html = params[:custom_course_offering]
+    if course_off_html
+      puts 'hello0'
+      #list = CourseOfferingsController.new
+      #list.show()
+      #list.find_attempts()
+      #redirect_to 'course_offerings_controller/show' 'course_offerings_controller/find_attempts' 'course_offerings/show.html.haml' and return
+      #url_for(:controller => :course_offerings_controller, :action => :show)
+      @course_offering_html = File.read('course_offerings/show.html.haml') and return
+      render 'course_offerings/show.html.haml'
+      puts 'hello0'
+    end
+
+    
     @section_html = File.read(File.join('public/OpenDSA/Books',
                                     params[:custom_book_path],
                                     '/lti_html/',
@@ -57,7 +72,6 @@ class LtiController < ApplicationController
                                  "id, user_id, question_name, request_type, 
                                  correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned, 
                                  pe_score, pe_steps_fixed")
-    puts "Hello again"
     @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
                                  request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
                                  total_correct, proficient_date,first_done, last_done")
@@ -71,7 +85,6 @@ class LtiController < ApplicationController
     TableHelper.arg(a, b)
     f = render_to_string "lti/table.html.erb"
     #puts "done with rendering"
-    puts f
     
     launch_params = request_params['toParams']['launch_params']
     if launch_params
