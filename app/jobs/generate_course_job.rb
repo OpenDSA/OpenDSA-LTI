@@ -20,8 +20,8 @@ class GenerateCourseJob < ProgressJob::Base
 
     update_stage('Compiling OpenDSA book')
     inst_book_json = ApplicationController.new.render_to_string(
-      template: 'inst_books/show.json.jbuilder',
-      locals: {:@inst_book => @inst_book})
+                      template: 'inst_books/show.json.jbuilder',
+                      locals: {:@inst_book => @inst_book})
 
     require 'json'
     config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
@@ -87,8 +87,26 @@ class GenerateCourseJob < ProgressJob::Base
 
     opts = {:url => launch_url}
     if tool_data.key?("resource_selection_url")
-        opts[:resource_selection__enabled__] = true
-        opts[:resource_selection__url__] = tool_data["resource_selection_url"]
+      opts[:resource_selection__enabled__] = true
+      opts[:resource_selection__url__] = tool_data["resource_selection_url"]
+    end
+
+    # Add OpenDSA tools menu item in case the lti app is "OpenDSA-LTI"
+    if tool_name == "OpenDSA-LTI"
+      odsa_url_opts = {
+        :custom_inst_book_id => @inst_book.id,
+        :custom_course_offering_id => @course_offering.id
+      }
+      require "addressable/uri"
+      uri = Addressable::URI.new
+      uri.query_values = odsa_url_opts
+      odsa_launch_url = launch_url + '?' + uri.query
+
+      opts[:course_navigation__enabled__] = true
+      opts[:course_navigation__text__] = "OpenDSA Tools"
+      opts[:course_navigation__url__] = odsa_launch_url
+      opts[:course_navigation__visibility__] = "admins"
+      opts[:course_navigation__default__] = true
     end
 
     if !tool_exists and !@created_LTI_tools.include? tool_name
@@ -133,7 +151,6 @@ class GenerateCourseJob < ProgressJob::Base
         opts[:module__published__] = true
         res = client.update_module(lms_course_id, chapter.lms_chapter_id, opts)
       end
-
       update_progress
     end
   end
@@ -207,16 +224,13 @@ class GenerateCourseJob < ProgressJob::Base
   # in canvas, module item that has external link will map OpenDSA non-gradable section
   def save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
                                     section, module_item_position, section_item_position, section_file_name_seq)
-
     module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
     if module_name.include? '/'
       module_name = module_name.split('/')[1]
     end
-
     title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
             (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
             section_item_position.to_s.rjust(2, "0") + " - "
-
     learning_tool = nil
     if section
       section_file_name = module_name + "-" + section_file_name_seq.to_s.rjust(2, "0")
@@ -241,12 +255,10 @@ class GenerateCourseJob < ProgressJob::Base
           :custom_course_number => @course.number,
           :custom_course_name => @course.name
           }
-
         require "addressable/uri"
         uri = Addressable::URI.new
         uri.query_values = learning_tool_url_opts
         launch_url = launch_url + '?' + uri.query
-
       end
     else
       section_file_name = module_name
@@ -261,20 +273,17 @@ class GenerateCourseJob < ProgressJob::Base
         :custom_section_file_name => section_file_name,
         :custom_section_title => title
       }
-
       require "addressable/uri"
       uri = Addressable::URI.new
       uri.query_values = odsa_url_opts
       launch_url = @odsa_launch_url + '?' + uri.query
     end
-
     opts = {:module_item__title__ => title,
             :module_item__type__ => 'ExternalTool',
             :module_item__position__ => module_item_position + section_item_position,
             :module_item__external_url__ => launch_url,
             :module_item__indent__ => 1
             }
-
     if learning_tool
       save_learning_tool(client, lms_course_id, chapter, section, title, opts)
     else
@@ -291,7 +300,6 @@ class GenerateCourseJob < ProgressJob::Base
         end
       end
     end
-
   end
 
   def save_learning_tool(client, lms_course_id, chapter, section, title, opts)
@@ -336,7 +344,6 @@ class GenerateCourseJob < ProgressJob::Base
         section.save!
       end
     end
-
   end
 
 
@@ -396,7 +403,6 @@ class GenerateCourseJob < ProgressJob::Base
         section.save!
       end
     end
-
   end
 
   # -------------------------------------------------------------
@@ -418,9 +424,6 @@ class GenerateCourseJob < ProgressJob::Base
     sanitize_filename(course.slug)+"/"+
     sanitize_filename(term.slug)+"/"+
     sanitize_filename(course_offering.label)
-
   end
-
-
 
 end
