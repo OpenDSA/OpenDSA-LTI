@@ -58,7 +58,6 @@ class CourseOfferingsController < ApplicationController
 
   # GET /course_offerings/:user_id/:inst_section_id
   def find_attempts
-    puts "finding attempts_json"
     @user_id = User.find_by(id: params[:user_id])
     @inst_section = InstSection.find_by(id: params[:inst_section_id])
     @inst_book_section_exercise = InstBookSectionExercise.where(inst_section_id: @inst_section.id).first #not sure about the first
