@@ -30,8 +30,7 @@ class LtiController < ApplicationController
     sign_in @user
     lti_enroll
 
-    if params.has_key?(:custom_course_offering)
-      @course_offering_param = params[:custom_course_offering]
+    if params.has_key?(:custom_course_offering_id)
       @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
       @student_list = []
       @course_enrollment.each do |s|
