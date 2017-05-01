@@ -2,6 +2,7 @@ class InstBookSectionExercise < ActiveRecord::Base
   #~ Relationships ............................................................
   belongs_to :inst_book
   belongs_to :inst_section
+  belongs_to :inst_exercise      # I define this relation
   has_many :odsa_user_interactions
   has_many :odsa_exercise_attempts
   has_many :odsa_exercise_progresses

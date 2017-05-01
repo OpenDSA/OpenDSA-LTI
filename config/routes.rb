@@ -1,5 +1,4 @@
 CodeWorkout::Application.routes.draw do
-
   root 'home#index'
 
   post 'lti/launch'
@@ -18,6 +17,12 @@ CodeWorkout::Application.routes.draw do
   post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_pe'
   # get '/odsa_exercise_attempts/get_count' => 'odsa_exercise_attempts#get_count'
 
+  #me
+  #get '/Display' => 'course_offerings#postData'
+  #get '/course_offerings/:id/Display' => 'course_offerings#postData'
+  #post '/show' => 'course_offerings#postData'
+  #me end
+
   # namespace path_helper hackery!
   # get '/v1/inst_books/:id', to: 'inst_books#show', as: :inst_book
 
@@ -35,18 +40,12 @@ CodeWorkout::Application.routes.draw do
   # routes anchored at /admin
   # First, we have to override some of the ActiveAdmin auto-generated
   # routes, since our user ids and file ids use restricted characters
-  get '/admin/users/:id/edit(.:format)' => 'admin/users#edit',
-    constraints: { id: /[^\/]+/ }
-  get '/admin/users/:id/edit_access(.:format)' => 'admin/users#edit_access',
-    constraints: { id: /[^\/]+/ }
-  get '/admin/users/:id' => 'admin/users#show',
-    constraints: { id: /[^\/]+/ }
-  patch '/admin/users/:id' => 'admin/users#update',
-    constraints: { id: /[^\/]+/ }
-  put '/admin/users/:id' => 'admin/users#update',
-    constraints: { id: /[^\/]+/ }
-  delete '/admin/users/:id' => 'admin/users#destroy',
-    constraints: { id: /[^\/]+/ }
+  get '/admin/users/:id/edit(.:format)' => 'admin/users#edit', constraints: { id: /[^\/]+/ }
+  get '/admin/users/:id/edit_access(.:format)' => 'admin/users#edit_access', constraints: { id: /[^\/]+/ }
+  get '/admin/users/:id' => 'admin/users#show', constraints: { id: /[^\/]+/ }
+  patch '/admin/users/:id' => 'admin/users#update', constraints: { id: /[^\/]+/ }
+  put '/admin/users/:id' => 'admin/users#update', constraints: { id: /[^\/]+/ }
+  delete '/admin/users/:id' => 'admin/users#destroy', constraints: { id: /[^\/]+/ }
   ActiveAdmin.routes(self)
 
   post 'inst_books/update' => 'inst_books#update', as: :book_update
@@ -55,14 +54,13 @@ CodeWorkout::Application.routes.draw do
   resources :inst_books
 
   get 'sse/feedback_wait'
-  # get 'sse/feedback_update'
   get 'sse/feedback_poll'
   post '/course_offerings/:id/upload_roster' => 'course_offerings#upload_roster'
   get '/course_offerings/new' => 'course_offerings#new', as: :new_course_offerings
   post '/course_offerings' => 'course_offerings#create', as: :create_course_offerings
-
+  get '/course_offerings/:id' => 'course_offerings#show', as: :show_course_offerings
+  get '/course_offerings/:user_id/:inst_section_id' => 'course_offerings#find_attempts', as: :find_attempts
   get '/lms_accesses/:lms_instance_id/search' => 'lms_accesses#search', as: :lms_access_search
-
   get '/request_extension' => 'workout_offerings#request_extension'
   post '/add_extension' => 'workout_offerings#add_extension'
 
@@ -78,15 +76,11 @@ CodeWorkout::Application.routes.draw do
     get  'exercises/upload' => 'exercises#upload', as: :exercises_upload
     get  'exercises/download' => 'exercises#download', as: :exercises_download
     post 'exercises/upload_create' => 'exercises#upload_create'
-    get  'exercises/upload_mcqs' => 'exercises#upload_mcqs',
-      as: :exercises_upload_mcqs
+    get  'exercises/upload_mcqs' => 'exercises#upload_mcqs', as: :exercises_upload_mcqs
     post 'exercises/create_mcqs' => 'exercises#create_mcqs'
-    get  '/exercises/any' => 'exercises#random_exercise',
-      as: :random_exercise
-    get 'exercises/:id/practice' => 'exercises#practice',
-      as: :exercise_practice
-    patch 'exercises/:id/practice' => 'exercises#evaluate',
-      as: :exercise_evaluate
+    get  '/exercises/any' => 'exercises#random_exercise', as: :random_exercise
+    get 'exercises/:id/practice' => 'exercises#practice', as: :exercise_practice
+    patch 'exercises/:id/practice' => 'exercises#evaluate', as: :exercise_evaluate
     post 'exercises/search' => 'exercises#search', as: :search
 
     # At the bottom, so the routes above take precedence over existing ids
@@ -96,12 +90,9 @@ CodeWorkout::Application.routes.draw do
     get  'workouts/download' => 'workouts#download'
     get  'workouts/:id/add_exercises' => 'workouts#add_exercises'
     post 'workouts/link_exercises'  => 'workouts#link_exercises'
-    get  'workouts/new_with_search/:searchkey'  => 'workouts#new_with_search',
-      as: :workouts_with_search
-    post 'workouts/new_with_search'  => 'workouts#new_with_search',
-      as: :workouts_exercise_search
-    get  'workouts/:id/practice' => 'workouts#practice',
-      as: :practice_workout
+    get  'workouts/new_with_search/:searchkey'  => 'workouts#new_with_search', as: :workouts_with_search
+    post 'workouts/new_with_search'  => 'workouts#new_with_search', as: :workouts_exercise_search
+    get  'workouts/:id/practice' => 'workouts#practice', as: :practice_workout
     get  'workouts/:id/evaluate' => 'workouts#evaluate', as: :workout_evaluate
     get  'workouts_dummy' => 'workouts#dummy'
     get  'workouts_import' => 'workouts#upload_yaml'
@@ -127,12 +118,10 @@ CodeWorkout::Application.routes.draw do
     get ':id(/:term_id)' => 'courses#show', as: :course
   end
 
-
   resources :course_offerings, only: [ :edit, :update ] do
     # post 'enroll' => :enroll, as: :enroll
     # delete 'unenroll' => :unenroll, as: :unenroll
-    match 'upload_roster/:action', controller: 'upload_roster',
-      as: :upload_roster, via: [:get, :post]
+    match 'upload_roster/:action', controller: 'upload_roster', as: :upload_roster, via: [:get, :post]
     post 'generate_gradebook' => :generate_gradebook, as: :gradebook
     get 'add_workout' => :add_workout, as: :add_workout
     post 'store_workout/:id' => :store_workout, as: :store_workout
@@ -161,5 +150,4 @@ CodeWorkout::Application.routes.draw do
     post '/login' => 'devise/sessions#create', as: :user_session
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session
   end
-
 end

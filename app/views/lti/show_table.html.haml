@@ -1,36 +1,3 @@
-= render partial: 'layouts/breadcrumb',
-  locals: {wid: nil, exid: nil, off: @course_offering}
-%p#notice= notice
-
-%p
-  %strong Course:
-  = link_to @course_offering.course.number_and_name, @url
-
-%p
-  %strong Term:
-  = @course_offering.term.display_name
-
-%p
-  %strong Label:
-  = @course_offering.label
-
-%p
-  %strong Instructor(s):
-  - @course_offering.instructors.each do |instructor|
-    = link_to instructor.display_name, user_path(instructor)
-
--# = link_to 'foo'
--#Tutorial: https://www.tutorialspoint.com/jqueryui/jqueryui_autocomplete
--#API: http://api.jqueryui.com/autocomplete/
--#demo: https://jqueryui.com/autocomplete/#combobox
--#So, your work will touch the following action
--#course_offerings#show
--#and the follow view
--#course_offering/view
--#and here is the new route
--#get '/course_offerings/:id' => 'course_offerings#show', as: :show_course_offerings
-
--# my code 
 !!!
 %html{:lang => "en"}
   %head
@@ -39,7 +6,6 @@
     %meta{:content => "width=device-width, initial-scale=1", :name => "viewport"}/
     %title jQuery UI Autocomplete - Combobox
     %link{:href => "//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css", :rel => "stylesheet"}/
-    %link{:href => "/resources/demos/style.css", :rel => "stylesheet"}/
     :css
        .myButton {
         -moz-box-shadow: 3px 4px 0px 0px #899599;
@@ -105,6 +71,7 @@
       }
     %script{:src => "https://code.jquery.com/jquery-1.12.4.js"}
     %script{:src => "https://code.jquery.com/ui/1.12.1/jquery-ui.js"}
+    
     :javascript
       $( function() {
         $.widget( "custom.combobox", {
@@ -268,10 +235,5 @@
       %p
         %br/
       #log
-
       
-
-
-
-
-
+= javascript_include_tag('lti_table.js')

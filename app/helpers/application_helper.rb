@@ -2,7 +2,6 @@ module ApplicationHelper
   include ActionView::Helpers::JavaScriptHelper
   include ActionView::Helpers::UrlHelper
 
-
   # -------------------------------------------------------------
   # For using nested layouts
   def inside_layout(layout = 'wrapper', &block)
