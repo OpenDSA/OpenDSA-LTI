@@ -31,7 +31,7 @@
                 $('#log').html(p);
             }
             else{
-                var header = '<p style="font-size:24px; align=center;"> OpenDSA Progres Table<p>';
+                var header = '<p style="font-size:24px; align=center;"> OpenDSA Progress Table<p>';
                 header += '<table>';
                 header += '<tr>';
                 var elem = '<tr>';
@@ -82,8 +82,8 @@
     buildProgressHeader = function(){
       var elem = '<tr> <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Current Score </th>';
       elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Highest Score </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Tottal Correct </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Tottal Attempts </th>';
+      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Total Correct </th>';
+      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Total Attempts </th>';
       elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Proficient Date </th>';
       elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> First Done </th>';
       elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th> </tr>';
