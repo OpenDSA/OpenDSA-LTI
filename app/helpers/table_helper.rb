@@ -6,12 +6,8 @@ module TableHelper #< Mustache
 	def self.arg (odsa_exercise_attempts, odsa_exercise_progress)
 		@odsa_exercise_attempts = odsa_exercise_attempts
 		@odsa_exercise_progress  = odsa_exercise_progress
-		puts "initialized in DataTb"
 	end
 	def attempts
-		puts "getting attempts"
-		puts @odsa_exercise_attempts.inspect
-		puts "------------------------------------------------------------"
 		@odsa_exercise_attempts.collect! do |d|
 			d.attributes.each do |x|
 				puts x
@@ -68,5 +64,3 @@ module TableHelper #< Mustache
 	end
 
 end
-#puts "finding files"
-#puts DataTb.render

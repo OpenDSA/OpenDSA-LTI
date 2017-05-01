@@ -63,7 +63,6 @@ class CourseOfferingsController < ApplicationController
     @inst_section = InstSection.find_by(id: params[:inst_section_id])
     @inst_book_section_exercise = InstBookSectionExercise.where(inst_section_id: @inst_section.id).first #not sure about the first
     @inst_book_section_exercise_id = @inst_book_section_exercise.id
-    #InstBookSectionExercise.find_by(id: params[:inst_book_section_exercise_id])
 
     @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
                                  @inst_book_section_exercise_id, @user_id).select(
@@ -77,7 +76,8 @@ class CourseOfferingsController < ApplicationController
     @attempts_json = ApplicationController.new.render_to_string(
         template: 'course_offerings/find_attempts.json.jbuilder',
         locals: {:@odsa_exercise_attempts => @odsa_exercise_attempts,
-          :@odsa_exercise_progress => @odsa_exercise_progress})
+                 :@odsa_exercise_progress => @odsa_exercise_progress,
+                 :@inst_section => @inst_section})
   end
 
   # -------------------------------------------------------------

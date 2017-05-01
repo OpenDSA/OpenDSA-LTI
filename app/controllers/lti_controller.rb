@@ -77,10 +77,8 @@ class LtiController < ApplicationController
 
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
-    inst_book_id = request_params['instBookId']
-    @inst_book = InstBook.find_by(id: inst_book_id)
-    inst_sect_id = request_params['instSectionId']
-    @inst_section_id = InstSection.find_by(id:inst_sect_id)
+    @inst_book = InstBook.find_by(id: request_params['instBookId'])
+    @inst_section = InstSection.find_by(id: request_params['instSectionId'])
     inst_book_sect_exe_id = request_params['instBookSectionExerciseId']
     @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id:inst_book_sect_exe_id)
 
@@ -136,20 +134,16 @@ class LtiController < ApplicationController
     res = @tp.post_extended_replace_result!(score: score, text: f)
 
     if res.success?
-      # @score = request_params['score']
-      # @tp.lti_msg = "Message shown when arriving back at Tool Consumer."
+      @inst_section.lms_posted = true
+      @inst_section.time_posted = Time.now
       render :json => { :message => 'success', :res => res.to_json }.to_json
-      # error = Error.new(:class_name => 'post_replace_result_success', :message => res.inspect, :params => lti_param.to_s)
-      # error.save!
-      # erb :assessment_finished
     else
+      @inst_section.lms_posted = false
       render :json => { :message => 'failure', :res => res.to_json }.to_json
       error = Error.new(:class_name => 'post_replace_result_fail', :message => res.inspect, :params => lti_param.to_s)
       error.save!
-      # @tp.lti_errormsg = "The Tool Consumer failed to add the score."
-      # show_error "Your score was not recorded: #{res.description}"
-      # return erb :error
     end
+    @inst_section.save!
   end
 
   def xml_config

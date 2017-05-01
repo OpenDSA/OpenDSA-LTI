@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170129192247) do
+ActiveRecord::Schema.define(version: 20170501203500) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -247,6 +247,8 @@ ActiveRecord::Schema.define(version: 20170129192247) do
     t.string   "learning_tool"
     t.string   "resource_type"
     t.string   "resource_name"
+    t.boolean  "lms_posted"
+    t.datetime "time_posted"
   end
 
   add_index "inst_sections", ["inst_chapter_module_id"], name: "inst_sections_inst_chapter_module_id_fk", using: :btree
