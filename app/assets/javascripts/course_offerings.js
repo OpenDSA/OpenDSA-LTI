@@ -228,8 +228,6 @@
             type: 'get',
             data: $(this).serialize()
         }).done(function(data) {
-            //console.dir(data);
-
             if (data.odsa_exercise_progress.length === 0){
                 var p = '<p style="font-size:24px; align=center;"> You have not Attempted this exercise <p>';
                 $('#log').html(p);
@@ -241,40 +239,13 @@
                 var elem = '<tr>';
                 header += buildProgressHeader();
                 elem += getFieldMember(data.odsa_exercise_progress[0], data.odsa_exercise_attempts);
-
-                /**Object.keys(data.odsa_exercise_progress[0]).map((e) =>{
-                    header += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ e + '</th>'; 
-                    elem   += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_progress[0][e] + '</td>';
-                 }
-                );
-                 header += '</tr>';
-                 elem += '</tr>';
-                */
-
-
                 var header1 = '<p style="font-size:24px; align=center;"> OpenDSA Attempt Table <p>';
                 header1 += '<table>';
                 header1 += '<tr>';
                 var elem1 = '<tr>';
-
-                /**Object.keys(data.odsa_exercise_attempts[0]).map((e) =>{
-                    header1 += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ e + '</th>'; 
-                    elem1   += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_attempts[0][e] + '</tb>';
-                 }
-                );
-                header1 += '</tr>';
-                elem1 += '</tr>';
-                */
                 header1 += getAttemptHeader();
                 var proficiencyFlag = -1;
                 for (var i = 0; i < data.odsa_exercise_attempts.length; i++){
-                    /**elem1 += '<tr>';
-                    Object.keys(data.odsa_exercise_attempts[i]).map((e) =>{
-                    elem1 += '<td style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+ data.odsa_exercise_attempts[i][e] + '</td>';
-                    }
-                    );   
-                    elem1 += '</tr>';
-                    */
                     if (data.odsa_exercise_attempts[i].earned_proficiency != null
                         && data.odsa_exercise_attempts[i].earned_proficiency && proficiencyFlag == -1){
                         proficiencyFlag = 1;
@@ -326,9 +297,6 @@
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Worth Credit </th>';
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Done </th>';
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Taken (s)</th>';
-        //head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Earned proficiency </th>';
-        //head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Pe Score </th>';
-        //head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Pe Steps_fixed </th></tr>';
         return head;
     }
     getAttemptMemeber = function(aData, j){
@@ -336,11 +304,6 @@
         console.dir(aData.earned_proficiency + " and j = " + j)
         if (aData.earned_proficiency != null && j == 1){
             memb += '<tr bgcolor="#FF0000"><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+  aData.question_name + '</th>';
-            /**memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.request_type + '</th>';
-            memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.correct + '</th>';
-            memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.worth_credit + '</th>';
-            memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_done.substring(0, 10) + " " + aData.time_done.substring(11, 16) + '</th>';
-            memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_taken + '</th>';*/
         }else{
             memb += '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+  aData.question_name + '</th>';
         }
@@ -349,10 +312,6 @@
         memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.worth_credit + '</th>';
         memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_done.substring(0, 10) + " " + aData.time_done.substring(11, 16) + '</th>';
         memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_taken + '</th>';
-        //memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.earned_proficiency + '</th>';
-        //memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.pe_score + '</th>';
-        //memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.pe_steps_fixed + '</th></tr>';
-        //}
         
         return memb;
 
@@ -363,8 +322,6 @@
         messages = [];
         var selectbar1 = $('#combobox').find('option:selected').text();
         var selectbar2 = $('#comb').find('option:selected').text();
-        //var selectbar3 = $('#combobox').find('option:selected').val();
-        //var selectbar4 = $('#comb').find('option:selected').val();
         if (selectbar1 === '' || selectbar2 === '')
         {
             messages.push("You need to select a student or assignment");

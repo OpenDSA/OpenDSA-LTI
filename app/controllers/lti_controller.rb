@@ -30,17 +30,74 @@ class LtiController < ApplicationController
     sign_in @user
     lti_enroll
 
-    course_off_html = params[:custom_course_offering]
-    if course_off_html
-      puts 'hello0'
+
+
+
+    @course_offering_param = params[:custom_course_offering]
+
+    @course_enrollment = CourseEnrollment.where("course_offering_id=?",
+                                 @course_offering.id)
+
+     @student_list = []
+    #puts @course_enrollment.inspect
+    @course_enrollment.each do |s|
+      q = User.where("id=?", s.user_id).select("id, first_name, last_name")
+      @student_list.push(q)
+    end
+    @instBook = InstBook.where("course_offering_id=?",
+                               @course_offering.id)
+    @instBook = @course_offering.odsa_books.first
+
+    @exercise_list = Hash.new
+
+  chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
+
+  chapters.each do |chapter|
+
+    modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
+
+    modules.each do |inst_ch_module|
+
+      sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
+
+      section_item_position = 1
+
+      if !sections.empty?
+        sections.each do |section|
+          title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
+                  (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
+                  section_item_position.to_s.rjust(2, "0") + " - "
+          learning_tool = nil
+          if section
+            title = title + section.name
+
+            learning_tool = section.learning_tool
+            if !learning_tool
+              if section.gradable
+                @exercise_list[section.id] = title
+                  # get the section_id and the title
+              end
+            end
+          end
+          section_item_position += 1
+        end
+      end
+    end
+  end
+
+
+    if @course_offering_param
+      #puts 'hello0'
       #list = CourseOfferingsController.new
       #list.show()
       #list.find_attempts()
-      #redirect_to 'course_offerings_controller/show' 'course_offerings_controller/find_attempts' 'course_offerings/show.html.haml' and return
+      #redirect_to 'course_offerings_controller/show' and return
+      #puts 'mornig'
       #url_for(:controller => :course_offerings_controller, :action => :show)
-      @course_offering_html = File.read('course_offerings/show.html.haml') and return
-      render 'course_offerings/show.html.haml'
+      #@course_offering_html = File.read('course_offerings/show.html.haml') and return
+      render 'show_table.html.haml'
       puts 'hello0'
+      return
     end
 
     

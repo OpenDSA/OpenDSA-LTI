@@ -32,32 +32,6 @@ class CourseOfferingsController < ApplicationController
 
     @exercise_list = Hash.new
 
-=begin
-  
-rescue Exception => e
-  
-end
-    InstChapter.where(inst_book_id: @instBook.id).each do |l|
-      cPos = (l.position.to_s||"")+"."
-      b = InstChapterModule.where("inst_chapter_id=?", l.id)
-      b.each do |o|
-        mPos = cPos + (o.module_position.to_s||"")+"."
-        c = InstSection.where("inst_chapter_module_id=?", o.id)
-        c.each do |f|
-          if (f.gradable)
-            sPos = mPos + (f.position.to_s||"")+"."
-            puts f.inspect
-            t = InstBookSectionExercise.where("inst_section_id=?", f.id)
-            t.each do |v|
-              if v.points != 0
-                @exercise_list[v.id] = sPos + " " + f.name.to_s
-              end
-            end
-          end
-        end
-      end
-    end
-=end
   chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
 
   chapters.each do |chapter|
@@ -92,20 +66,6 @@ end
       end
     end
   end
-
-=begin
-  
-rescue Exception => e
-  
-end
-    @exercise_list = Hash.new
-    @inst_book_section_exercise = InstBookSectionExercise.where("inst_book_id=?",
-                               @instBook.id)
-    @inst_book_section_exercise.each do |s|
-      q = InstExercise.where("id=?", s.inst_exercise_id).select("id, name, short_name")
-      @exercise_list[s.id] = q
-    end
-=end
     
   end
 
