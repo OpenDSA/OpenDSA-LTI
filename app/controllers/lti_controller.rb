@@ -30,81 +30,50 @@ class LtiController < ApplicationController
     sign_in @user
     lti_enroll
 
+    if params.has_key?(:custom_course_offering)
+      @course_offering_param = params[:custom_course_offering]
+      @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
+      @student_list = []
+      @course_enrollment.each do |s|
+        q = User.where("id=?", s.user_id).select("id, first_name, last_name")
+        @student_list.push(q)
+      end
+      @instBook = @course_offering.odsa_books.first
+      @exercise_list = Hash.new
 
-
-
-    @course_offering_param = params[:custom_course_offering]
-
-    @course_enrollment = CourseEnrollment.where("course_offering_id=?",
-                                 @course_offering.id)
-
-     @student_list = []
-    #puts @course_enrollment.inspect
-    @course_enrollment.each do |s|
-      q = User.where("id=?", s.user_id).select("id, first_name, last_name")
-      @student_list.push(q)
-    end
-    @instBook = InstBook.where("course_offering_id=?",
-                               @course_offering.id)
-    @instBook = @course_offering.odsa_books.first
-
-    @exercise_list = Hash.new
-
-  chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
-
-  chapters.each do |chapter|
-
-    modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
-
-    modules.each do |inst_ch_module|
-
-      sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
-
-      section_item_position = 1
-
-      if !sections.empty?
-        sections.each do |section|
-          title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
-                  (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
-                  section_item_position.to_s.rjust(2, "0") + " - "
-          learning_tool = nil
-          if section
-            title = title + section.name
-
-            learning_tool = section.learning_tool
-            if !learning_tool
-              if section.gradable
-                @exercise_list[section.id] = title
-                  # get the section_id and the title
+      chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
+      chapters.each do |chapter|
+        modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
+        modules.each do |inst_ch_module|
+          sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
+          section_item_position = 1
+          if !sections.empty?
+            sections.each do |section|
+              title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
+                      (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
+                      section_item_position.to_s.rjust(2, "0") + " - "
+              learning_tool = nil
+              if section
+                title = title + section.name
+                learning_tool = section.learning_tool
+                if !learning_tool
+                  if section.gradable
+                    @exercise_list[section.id] = title
+                  end
+                end
               end
+              section_item_position += 1
             end
           end
-          section_item_position += 1
         end
       end
-    end
-  end
-
-
-    if @course_offering_param
-      #puts 'hello0'
-      #list = CourseOfferingsController.new
-      #list.show()
-      #list.find_attempts()
-      #redirect_to 'course_offerings_controller/show' and return
-      #puts 'mornig'
-      #url_for(:controller => :course_offerings_controller, :action => :show)
-      #@course_offering_html = File.read('course_offerings/show.html.haml') and return
-      render 'show_table.html.haml'
-      puts 'hello0'
-      return
+      render 'show_table.html.haml' and return
     end
 
-    
     @section_html = File.read(File.join('public/OpenDSA/Books',
-                                    params[:custom_book_path],
-                                    '/lti_html/',
-                                    "#{params[:custom_section_file_name].to_s}.html")) and return
+                              params[:custom_book_path],
+                              '/lti_html/',
+                              "#{params[:custom_section_file_name].to_s}.html")) and return
   end
 
   def assessment
@@ -115,8 +84,7 @@ class LtiController < ApplicationController
     @inst_section_id = InstSection.find_by(id:inst_sect_id)
     inst_book_sect_exe_id = request_params['instBookSectionExerciseId']
     @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id:inst_book_sect_exe_id)
-    
-    
+
     @current_user = User.where("email=?", request_params['userEmail']).select("id")
     @num = 0
     @current_user.collect! do |d|
@@ -124,25 +92,21 @@ class LtiController < ApplicationController
         @num = y
       end
     end
+
     @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
                                  request_params['instBookSectionExerciseId'], @num).select(
-                                 "id, user_id, question_name, request_type, 
-                                 correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned, 
+                                 "id, user_id, question_name, request_type,
+                                 correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
                                  pe_score, pe_steps_fixed")
     @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
                                  request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
                                  total_correct, proficient_date,first_done, last_done")
 
-    #puts @odsa_exercise_progress.inspect
-    #@odsa_exercise_progress = OdsaExerciseProgress.find_by(:inst_book_id == @inst_book)
-
     a = @odsa_exercise_attempts
     b = @odsa_exercise_progress
-    #puts "start render_to_string"
     TableHelper.arg(a, b)
     f = render_to_string "lti/table.html.erb"
-    #puts "done with rendering"
-    
+
     launch_params = request_params['toParams']['launch_params']
     if launch_params
       key = launch_params['oauth_consumer_key']
@@ -159,11 +123,8 @@ class LtiController < ApplicationController
 
     # @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
     @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], lti_param)
-    #     # add extension
+    # add extension
     @tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
-
-
-
 
     if !@tp.outcome_service?
       @message = "This tool wasn't lunched as an outcome service"
@@ -173,7 +134,6 @@ class LtiController < ApplicationController
     # post the given score to the TC
     score = (request_params['toParams']['score'] != '' ? request_params['toParams']['score'] : nil)
     #res = @tp.post_replace_result!(score)
-    puts "no text"
     res = @tp.post_extended_replace_result!(score: score, text: f)
 
     if res.success?
