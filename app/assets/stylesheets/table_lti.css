@@ -1,0 +1,62 @@
+  .myButton {
+    -moz-box-shadow: 3px 4px 0px 0px #899599;
+    -webkit-box-shadow: 3px 4px 0px 0px #899599;
+    box-shadow: 3px 4px 0px 0px #899599;
+    background-color:#ededed;
+    -moz-border-radius:15px;
+    -webkit-border-radius:15px;
+    border-radius:15px;
+    border:1px solid #d6bcd6;
+    display:inline-block;
+    cursor:pointer;
+    color:#040404;
+    font-family:Arial;
+    font-size:17px;
+    font-weight:bold;
+    padding:2px 33px;
+    text-decoration:none;
+    text-shadow:0px 0px 0px #e1e2ed;
+  }
+  .myButton:hover {
+   background-color:#bab1ba;
+  }
+  .myButton:active {
+    position:relative;
+    top:1px;
+  }
+  .custom-combobox {
+    position: relative;
+    display: inline-block;
+  }
+  .custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+  }
+  .ui-autocomplete {
+    max-height: 300px;
+    overflow-y: auto;   /* prevent horizontal scrollbar */
+    overflow-x: hidden; /* add padding to account for vertical scrollbar */
+    z-index:1000 !important;
+  }
+  .custom-combobox-input {
+    margin: 0;
+    padding: 5px 10px;
+  }
+  .custom-comb {
+    position: relative;
+    display: inline-block;
+  }
+  .custom-comb-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+  }
+  .custom-comb-input {
+    margin: 0;
+    padding: 5px 10px;
+  }

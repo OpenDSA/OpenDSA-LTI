@@ -30,7 +30,12 @@ class LtiController < ApplicationController
     sign_in @user
     lti_enroll
 
-    if params.has_key?(:custom_course_offering_id)
+    puts ('no key')
+    # I change this to be custom intanbook id becuase it is not working on mine yet
+    if params.has_key?(:custom_inst_book_id)
+
+      puts ('param have key')
+
       @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
       @student_list = []
       @course_enrollment.each do |s|

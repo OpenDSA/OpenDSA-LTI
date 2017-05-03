@@ -1,12 +1,161 @@
-(function() {
+$( function() {
+        $.widget( "custom.combobox", {
+          _create: function() {
+            this.wrapper = $( "<span>" )
+              .addClass( "custom-combobox" )
+              .addClass( "custom-comb" )
+              .insertAfter( this.element );
+ 
+            this.element.hide();
+            this._createAutocomplete();
+            this._createShowAllButton();
+          },
+ 
+          _createAutocomplete: function() {
+            var selected = this.element.children( ":selected" ),
+              value = selected.val() ? selected.text() : "";
+ 
+            this.input = $( "<input>" )
+              .appendTo( this.wrapper )
+              .val( value )
+              .attr( "title", "" )
+              .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+              .addClass( "custom-comb-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+              .autocomplete({
+                delay: 0,
+                minLength: 0,
+                source: $.proxy( this, "_source" )
+              })
+              .tooltip({
+                classes: {
+                  "ui-tooltip": "ui-state-highlight"
+                }
+              });
+ 
+            this._on( this.input, {
+              autocompleteselect: function( event, ui ) {
+                ui.item.option.selected = true;
+                this._trigger( "select", event, {
+                  item: ui.item.option
+                });
+              },
+ 
+              autocompletechange: "_removeIfInvalid"
+            });
+          },
+ 
+          _createShowAllButton: function() {
+            var input = this.input,
+              wasOpen = false;
+ 
+            $( "<a>" )
+              .attr( "tabIndex", -1 )
+              .attr( "title", "Show All Items" )
+              .tooltip()
+              .appendTo( this.wrapper )
+              .button({
+                icons: {
+                  primary: "ui-icon-triangle-1-s"
+                },
+                text: false
+              })
+              .removeClass( "ui-corner-all" )
+              .addClass( "custom-combobox-toggle ui-corner-right" )
+              .addClass( "custom-comb-toggle ui-corner-right" )
+              .on( "mousedown", function() {
+                wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+              })
+              .on( "click", function() {
+                input.trigger( "focus" );
+ 
+                // Close if already visible
+                if ( wasOpen ) {
+                  return;
+                }
+ 
+                // Pass empty string as value to search for, displaying all results
+                input.autocomplete( "search", "" );
+              });
+          },
+ 
+          _source: function( request, response ) {
+            var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+            response( this.element.children( "option" ).map(function() {
+              var text = $( this ).text();
+              if ( this.value && ( !request.term || matcher.test(text) ) )
+                return {
+                  label: text,
+                  value: text,
+                  option: this
+                };
+            }) );
+          },
+ 
+          _removeIfInvalid: function( event, ui ) {
+ 
+            // Selected an item, nothing to do
+            if ( ui.item ) {
+              return;
+            }
+ 
+            // Search for a match (case-insensitive)
+            var value = this.input.val(),
+              valueLowerCase = value.toLowerCase(),
+              valid = false;
+            this.element.children( "option" ).each(function() {
+              if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+                this.selected = valid = true;
+                return false;
+              }
+            });
+ 
+            // Found a match, nothing to do
+            if ( valid ) {
+              return;
+            }
+ 
+            // Remove invalid value
+            this.input
+              .val( "" )
+              .attr( "title", value + " didn't match any item" )
+              .tooltip( "open" );
+            this.element.val( "" );
+            this._delay(function() {
+              this.input.tooltip( "close" ).attr( "title", "" );
+            }, 2500 );
+            this.input.autocomplete( "instance" ).term = "";
+          },
+ 
+          _destroy: function() {
+            this.wrapper.remove();
+            this.element.show();
+          }
+        });
+ 
+        
+        
+      } );
 
+(function() {
+    
     console.dir("lti tablejs")
 
     $(document).ready(function() {
-        $('#display').click(function() {
-            console.log("clicked registered");
-            return handle_display();
-        });
+    $( "#combobox" ).combobox();
+    $( "#toggle" ).on( "click", function() {
+          $( "#combobox" ).toggle();
+    });
+
+    $( "#comb" ).combobox();
+    $( "#toggle" ).on( "click", function() {
+        $( "#comb" ).toggle();
+    });
+
+    $('#display').click(function() {
+        console.log("clicked registered");
+        return handle_display();
+    });
+
     });
 
 
@@ -69,7 +218,11 @@
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.highest_score + '</th>';
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.total_correct + '</th>';
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + attempts.length + '</th>';
-        member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.proficient_date.substring(0, 10) + " " + pData.proficient_date.substring(11, 16) + '</th>';
+        if (pData.proficient_date != null){
+            member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.proficient_date.substring(0, 10) + " " + pData.proficient_date.substring(11, 16) + '</th>';
+        }else{
+            member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> N/A</th>';
+        }
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.first_done.substring(0, 10) + " " + pData.first_done.substring(11, 16) + '</th>';
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.last_done.substring(0, 10) + " " + pData.last_done.substring(11, 16) + '</th>';
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + sData.lms_posted + '</th>';
@@ -103,7 +256,7 @@
         var memb = "";
         console.dir(aData.earned_proficiency + " and j = " + j)
         if (aData.earned_proficiency != null && j == 1) {
-            memb += '<tr bgcolor="#FF0000"><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + aData.question_name + '</th>';
+            memb += '<tr bgcolor="#008000"><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + aData.question_name + '</th>';
         } else {
             memb += '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + aData.question_name + '</th>';
         }
