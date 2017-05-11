@@ -32,7 +32,7 @@ class LtiController < ApplicationController
 
     puts ('no key')
     # I change this to be custom intanbook id becuase it is not working on mine yet
-    if params.has_key?(:custom_inst_book_id)
+    if params.has_key?(:custom_course_offering_id)
 
       puts ('param have key')
 
@@ -43,7 +43,7 @@ class LtiController < ApplicationController
         @student_list.push(q)
       end
       @instBook = @course_offering.odsa_books.first
-      @exercise_list = Hash.new
+      @exercise_list = Hash.new{|hsh,key| hsh[key] = []}
 
       chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
       chapters.each do |chapter|
@@ -62,7 +62,15 @@ class LtiController < ApplicationController
                 learning_tool = section.learning_tool
                 if !learning_tool
                   if section.gradable
-                    @exercise_list[section.id] = title
+                    attempted = OdsaExerciseAttempt.where(inst_section_id: section.id)
+                    if attempted.empty?
+                      @exercise_list[section.id].push(title)
+                    else
+                      @exercise_list[section.id].push(title)
+                      @exercise_list[section.id].push('attemp_flag')
+                    end
+                      
+
                   end
                 end
               end
