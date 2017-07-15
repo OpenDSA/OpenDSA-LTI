@@ -12,7 +12,7 @@ class LmsAccessesController < ApplicationController
     lms_instance = LmsInstance.where("id = ?", params['lms_instance_id']).first
 
     valid_token = false
-    if lms_access['access_token']
+    if lms_access and lms_access['access_token']
       require 'pandarus'
       client = Pandarus::Client.new(
         prefix: lms_instance.url + '/api',
@@ -27,6 +27,10 @@ class LmsAccessesController < ApplicationController
           valid_token = false
         end
       end
+    end
+
+    if !lms_access
+      lms_access = {}
     end
 
     lms_access['valid_token'] = valid_token

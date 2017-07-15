@@ -21,9 +21,9 @@
             $(this).prop('disabled', true);
             return handle_submit();
         });
-        $('#display').click(function(){
-          console.log("clicked registered");
-          return handle_display();
+        $('#display').click(function() {
+            console.log("clicked registered");
+            return handle_display();
         });
 
         init();
@@ -82,6 +82,8 @@
                         $('#lms-access-token').val(data['access_token']);
                         // $("#lms-access-update-btn").show("slow");
                         // $("#lms-access-token-group").hide("slow");
+                    } else {
+                        $('#lms-access-token').val('');
                     }
                     $("#lms-access-token-check").removeClass("fa-times");
                     $("#lms-access-token-check").removeClass("fa-check");
@@ -142,11 +144,9 @@
         if ($('#lms-instance-select').val() === '') {
             messages.push('One of the LMS instances has to be selected.');
         }
-        if ($('#lms-access-token-group').is(":visible")) {
-            if ($('#lms-access-token').val() === '') {
-                messages.push('You have to provide an access token for the selected Canvas instance.');
-            }
-        };
+        if (!valid_token) {
+            messages.push('You have to provide an access token for the selected Canvas instance.');
+        }
         if ($('#lms-course-num').val() === '') {
             messages.push('You have to write LMS course Id.');
         }
@@ -168,6 +168,7 @@
         if ($('#inst-book-select').val() === '') {
             messages.push('One of book instances has to be selected.');
         }
+
         return messages;
     };
 
@@ -213,26 +214,24 @@
         });
     };
 
-    handle_display = function(){
+    handle_display = function() {
         var messages = check_dis_completeness();
         if (messages.length !== 0) {
             alert(messages);
             return;
         }
         //GET /course_offerings/:user_id/:inst_section_id
-        var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" 
-                        + $('#comb').find('option:selected').val();
+        var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('#comb').find('option:selected').val();
 
         var aj = $.ajax({
             url: request,
             type: 'get',
             data: $(this).serialize()
         }).done(function(data) {
-            if (data.odsa_exercise_progress.length === 0){
+            if (data.odsa_exercise_progress.length === 0) {
                 var p = '<p style="font-size:24px; align=center;"> You have not Attempted this exercise <p>';
                 $('#log').html(p);
-            }
-            else{
+            } else {
                 var header = '<p style="font-size:24px; align=center;"> OpenDSA Progres Table<p>';
                 header += '<table>';
                 header += '<tr>';
@@ -245,21 +244,20 @@
                 var elem1 = '<tr>';
                 header1 += getAttemptHeader();
                 var proficiencyFlag = -1;
-                for (var i = 0; i < data.odsa_exercise_attempts.length; i++){
-                    if (data.odsa_exercise_attempts[i].earned_proficiency != null
-                        && data.odsa_exercise_attempts[i].earned_proficiency && proficiencyFlag == -1){
+                for (var i = 0; i < data.odsa_exercise_attempts.length; i++) {
+                    if (data.odsa_exercise_attempts[i].earned_proficiency != null && data.odsa_exercise_attempts[i].earned_proficiency && proficiencyFlag == -1) {
                         proficiencyFlag = 1;
                         elem1 += getAttemptMemeber(data.odsa_exercise_attempts[i], proficiencyFlag);
                         proficiencyFlag = 2;
-                    }else{
+                    } else {
                         elem1 += getAttemptMemeber(data.odsa_exercise_attempts[i], proficiencyFlag);
                     }
                 }
-                 header1 += elem1;
-                 header += elem;
-                 header += '</table> ';
-                 header1 += '</table>';
-                 header += '<br>' + header1;
+                header1 += elem1;
+                header += elem;
+                header += '</table> ';
+                header1 += '</table>';
+                header += '<br>' + header1;
                 $('#log').html(header);
             }
             change_courses(data);
@@ -268,9 +266,9 @@
             console.log('AJAX request has FAILED');
         });
     };
-    getFieldMember = function(pData, attempts){
+    getFieldMember = function(pData, attempts) {
         console.dir(pData)
-        var member = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.current_score  + '</th>';
+        var member = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.current_score + '</th>';
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.highest_score + '</th>';
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.total_correct + '</th>';
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + attempts.length + '</th>';
@@ -280,17 +278,17 @@
         return member;
     }
 
-    buildProgressHeader = function(){
-      var elem = '<tr> <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Current Score </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Highest Score </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Tottal Correct </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Tottal Attempts </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Proficient Date </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> First Done </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th> </tr>';
-      return elem
+    buildProgressHeader = function() {
+        var elem = '<tr> <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Current Score </th>';
+        elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Highest Score </th>';
+        elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Tottal Correct </th>';
+        elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Tottal Attempts </th>';
+        elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Proficient Date </th>';
+        elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> First Done </th>';
+        elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th> </tr>';
+        return elem
     }
-    getAttemptHeader = function(){
+    getAttemptHeader = function() {
         var head = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Question name </th>';
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Request Type </th>';
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Correct </th>';
@@ -299,31 +297,30 @@
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Taken (s)</th>';
         return head;
     }
-    getAttemptMemeber = function(aData, j){
+    getAttemptMemeber = function(aData, j) {
         var memb = "";
         console.dir(aData.earned_proficiency + " and j = " + j)
-        if (aData.earned_proficiency != null && j == 1){
-            memb += '<tr bgcolor="#FF0000"><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+  aData.question_name + '</th>';
-        }else{
-            memb += '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">'+  aData.question_name + '</th>';
+        if (aData.earned_proficiency != null && j == 1) {
+            memb += '<tr bgcolor="#FF0000"><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + aData.question_name + '</th>';
+        } else {
+            memb += '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + aData.question_name + '</th>';
         }
         memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.request_type + '</th>';
         memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.correct + '</th>';
         memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.worth_credit + '</th>';
         memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_done.substring(0, 10) + " " + aData.time_done.substring(11, 16) + '</th>';
         memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_taken + '</th>';
-        
+
         return memb;
 
-        
+
     }
-    check_dis_completeness = function(){
+    check_dis_completeness = function() {
         var messages;
         messages = [];
         var selectbar1 = $('#combobox').find('option:selected').text();
         var selectbar2 = $('#comb').find('option:selected').text();
-        if (selectbar1 === '' || selectbar2 === '')
-        {
+        if (selectbar1 === '' || selectbar2 === '') {
             messages.push("You need to select a student or assignment");
             return messages;
         }
