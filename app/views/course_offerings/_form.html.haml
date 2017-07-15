@@ -29,8 +29,8 @@
     .col-xs-1
       = link_to admin_courses_path, title: "Create new course", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
-    .col-xs-1
-      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#course-help-modal' } }
+    / .col-xs-1
+    /   %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#course-help-modal' } }
 
   .form-group
     = label_tag :term_select, 'Term:', class: 'control-label col-xs-1'
@@ -40,8 +40,8 @@
     .col-xs-1
       = link_to admin_terms_path, title: "Create new term", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
-    .col-xs-1
-      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#term-help-modal' } }
+    / .col-xs-1
+    /   %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#term-help-modal' } }
 
   .form-group
     = label_tag :name, 'Label', class: 'control-label col-xs-2'
@@ -70,28 +70,27 @@
     .col-xs-1
       = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
-    .col-xs-1
-      %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#inst-book-help-modal' } }
+    / .col-xs-1
+    /   %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#inst-book-help-modal' } }
 
   .form-group
     = label_tag :lms_instance_select, 'Canvas Instance:', class: 'control-label col-xs-1'
     .col-xs-3
       = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
       { id: 'lms-instance-select', class: 'form-control' }
-    #lms-access-update-btn.col-xs-1
-      = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas instance", class: 'btn btn-default', :target => "_blank" do
-        %i.glyphicon.glyphicon-new-window
 
   #lms-access-token-group.form-group
     = label_tag :name, 'Canvas access token', class: 'control-label col-xs-2'
     .col-lg-4.col-md-4.col-xs-4
-      = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 100,
-        placeholder: 'e.g. 7~iYir4J6xo9iMXigxIM9BEqP5zWhJiUyuO845P83aEit2doF9Ed0nrO70qceI3Cr2'
+      = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 100, disabled: 'true'
       %small.col-xs-11.text.text-warning
-        Put your Canvas access token for the selected Canvas
+        Update your Canvas access token for the selected Canvas
         instance. If you have not already created a Canvas access token,
         then follow the instructions <a href="https://guides.instructure.com/m/4214/l/40399-how-do-i-obtain-an-api-access-token-for-an-account" target="_blank">here</a>
         to make one.
+    #lms-access-update-btn.col-xs-1
+      = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas instance", class: 'btn btn-default', :target => "_blank" do
+        %i.glyphicon.glyphicon-new-window
     #lms-access-token-check.col-xs-1.fa.fa-check
 
   .form-group
