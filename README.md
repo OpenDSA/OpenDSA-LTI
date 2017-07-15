@@ -385,7 +385,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Production deployment is initiated from the development environment. It starts with changes you make to OpenDSA-LTI or OpenDSA repositories in OpenDSA-DevStack. First, test these changes locally using OpenDSA-DevStack development servers. Second, commit and push OpenDSA-LTI and OpenDSA changes. Finally, initiate the production deployment command from within OpenDSA-DevStack. It is very important to push your changes before the deployment. Every time you deploy your code Capistrano will go and clone the latest version of OpenDSA-LTI then perform the deployment tasks. One of the tasks gets the latest version of OpenDSA from GitHub as well.
 
-  - The following steps need to be done only once to generate a pair of authentication keys. **Note:** Do not enter a passphrase and replace `prod_server` with your domain name.
+  - The following steps need to be done **only once** to generate a pair of authentication keys. **Note:** Do not enter a passphrase and replace **prod_server** with your domain name.
     <pre>
       <code>
     $ cd OpenDSA-DevStack
