@@ -35,20 +35,23 @@
 
 %ul
   %li
-    %a{ href: 'http://opendsa.cs.vt.edu/ODSA/Books/CS2114' }
+    - url = @config_url + '/ODSA/Books/CS2'
+    %a{ href: url , target: "_blank" }
       Here
     is an example book instance for the data structures component of a
     typical CS2-level course.
 
   %li
-    %a{ href: 'http://opendsa.cs.vt.edu/ODSA/Books/CS3114' }
+    - url = @config_url + '/ODSA/Books/CS3'
+    %a{ href: url, target: "_blank" }
       Here
     is an example book instance for a typical Data Structures and
     Algorithms course taken after a traditional CS2 course.
     (that we refer to as "CS3").
 
   %li
-    %a{ href: 'http://opendsa.cs.vt.edu/ODSA/Books/Everything' }
+    - url = @config_url + '/ODSA/Books/Everything'
+    %a{ href: url, target: "_blank" }
       Here
     is a book instance that shows all of the exisiting modules,
     including ones that are not fully ready for classroom use.
