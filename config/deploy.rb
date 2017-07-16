@@ -51,6 +51,10 @@ set :passenger_restart_with_touch, true
 # default value: 1
 set :delayed_job_workers, 2
 
+set :ssh_options, {
+  port: 2222
+}
+
 # String to be prefixed to worker process names
 # This feature allows a prefix name to be placed in front of the process.
 # For example:  reports/delayed_job.0  instead of just delayed_job.0
