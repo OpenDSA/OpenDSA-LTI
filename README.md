@@ -208,7 +208,7 @@ The following server requirements will be fine for supporting hundreds of users.
   - For the next steps, **Switch back to OpenDSA-DevStack termainal**
 
 ### Deploy OpenDSA-LTI
-  - You need to make some changes to OpenDSA-LTI repository related to your spesific production server. To do that you need to fork [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA-LTI) to your github account and then add your own repository as a remote to OpenDSA-LTI in OpenDSA-DevStack. This way you can make your own changes to OpenDSA-LTI and keep up to date with the latest changes done in the originial repository.
+  - You need to make some changes to OpenDSA-LTI repository related to your specific production server. To do that you need to fork [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA-LTI) to your github account and then add your own repository as a remote to OpenDSA-LTI in OpenDSA-DevStack. This way you can make your own changes to OpenDSA-LTI and keep up to date with the latest changes done in the originial repository.
   - In your OpenDSA-DevStack terminal, add your forked repository, replace `your_username` with you github account
   ```
   $ cd /vagrant/OpenDSA-LTI
@@ -385,7 +385,11 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Production deployment is initiated from the development environment. It starts with changes you make to OpenDSA-LTI or OpenDSA repositories in OpenDSA-DevStack. First, test these changes locally using OpenDSA-DevStack development servers. Second, commit and push OpenDSA-LTI and OpenDSA changes. Finally, initiate the production deployment command from within OpenDSA-DevStack. It is very important to push your changes before the deployment. Every time you deploy your code Capistrano will go and clone the latest version of OpenDSA-LTI then perform the deployment tasks. One of the tasks gets the latest version of OpenDSA from GitHub as well.
 
-  - The following steps need to be done **only once** to generate a pair of authentication keys. **Note:** Do not enter a passphrase and replace **prod_server** with your domain name.
+  - The following steps need to be done **only once** to generate a
+ pair of authentication keys. Replace **prod_server** with your domain
+ name.
+ **Note:** Do not enter a passphrase.
+
     <pre>
       <code>
     $ cd OpenDSA-DevStack
@@ -395,6 +399,9 @@ The following server requirements will be fine for supporting hundreds of users.
     $ cat .ssh/id_rsa.pub | ssh deploy@<b>prod_server</b> 'cat >> .ssh/authorized_keys'
 
     <b>Enter deploy user password for the last time</b>
+    <b>If you choose to also maintain a staging server, then add:</b>
+
+    $ cat .ssh/id_rsa.pub | ssh deploy@<b>staging_server</b> 'cat >> .ssh/authorized_keys'
       </code>
     </pre>
 
