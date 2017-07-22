@@ -13,7 +13,7 @@ The following server requirements will be fine for supporting hundreds of users.
 ## Installation Instructions
 
 ### Install OpenDSA-DevStack on your local machine
-  - OpenDSA-LTI is using a remote server automation and deployment tool called [Capistrano](http://capistranorb.com/). Each time you want to deploy new changes to OpenDSA-LTI production server you have to initiate the deployment command from within the develpment environment [OpenDSA-DevStack](https://github.com/OpenDSA/OpenDSA-DevStack).
+  - OpenDSA-LTI is using a remote server automation and deployment tool called [Capistrano](http://capistranorb.com/). Each time you want to deploy new changes to the OpenDSA-LTI production server you have to initiate the deployment command from within the development environment [OpenDSA-DevStack](https://github.com/OpenDSA/OpenDSA-DevStack).
 
   - Once you have OpenDSA-DevStack up and running open a new terminal and do the following to generate a pair of authentication keys. **Note:** Do not enter a passphrase.
   ```
@@ -47,7 +47,7 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
 
 ### Creating `deploy` user on your production server
-  - The first thing we will do on our new server is create the user account we'll be using to run OpenDSA-LTI and work from there. Open a new terminal, ssh to your production server, and do the following
+  - The first thing we will do on our new server is to create the user account we'll be using to run OpenDSA-LTI and work from there. Open a new terminal, ssh to your production server, and do the following
   ```
   $ sudo adduser deploy
   $ sudo adduser deploy sudo
@@ -58,7 +58,7 @@ The following server requirements will be fine for supporting hundreds of users.
   $ touch authorized_keys
   ```
 
-  - Before we move forward is that we're going to setup SSH to authenticate via keys instead of having to use a password to login. It's more secure and will save you time in the long run. **Switch back to OpenDSA-DevStack termainal** to append the new public key to `deploy@<prod_server>`:.ssh/authorized_keys and enter `deploy` user password one last time:
+  - Before we move forward is that we're going to setup SSH to authenticate via keys instead of having to use a password to login. It's more secure and will save you time in the long run. **Switch back to OpenDSA-DevStack terminal** to append the new public key to `deploy@<prod_server>`:.ssh/authorized_keys and enter `deploy` user password one last time:
   ```
   $ cd
   $ cat .ssh/id_rsa.pub | ssh deploy@<prod_server> 'cat >> .ssh/authorized_keys'
@@ -126,7 +126,7 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
 
   - Open up the server's IP address in your browser to make sure that nginx is up and running. The service command also provides some other methods such as `restart` and `stop` that allow you to easily restart and stop your webserver.
-  - Next, we need to update the Nginx configuration file and update couple of things. You'll want to open up `/etc/nginx/nginx.conf` in your favorite editor or simply use nano:
+  - Next, we need to update the Nginx configuration file and update a couple of things. You'll want to open up `/etc/nginx/nginx.conf` in your favorite editor or simply use nano:
   ```
   $ sudo nano /etc/nginx/nginx.conf
   ```
@@ -205,10 +205,10 @@ The following server requirements will be fine for supporting hundreds of users.
   $ make pull
   ```
 
-  - For the next steps, **Switch back to OpenDSA-DevStack termainal**
+  - For the next steps, **Switch back to OpenDSA-DevStack terminal**
 
 ### Deploy OpenDSA-LTI
-  - You need to make some changes to OpenDSA-LTI repository related to your specific production server. To do that you need to fork [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA-LTI) to your github account and then add your own repository as a remote to OpenDSA-LTI in OpenDSA-DevStack. This way you can make your own changes to OpenDSA-LTI and keep up to date with the latest changes done in the originial repository.
+  - You need to make some changes to OpenDSA-LTI repository related to your specific production server. To do that you need to fork [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA-LTI) to your GitHub account and then add your own repository as a remote to OpenDSA-LTI in OpenDSA-DevStack. This way you can make your own changes to OpenDSA-LTI and keep up to date with the latest changes done in the originial repository.
   - In your OpenDSA-DevStack terminal, add your forked repository, replace `your_username` with you github account
   ```
   $ cd /vagrant/OpenDSA-LTI
@@ -230,7 +230,7 @@ The following server requirements will be fine for supporting hundreds of users.
   ...
   ```
 
-  - Second, you need to open up `/vagrant/OpenDSA-LTI/config/deploy/production.rb` file to set the server IP address of you production server. Replace `128.173.236.80` with your server IP address.
+  - Second, you need to open up `/vagrant/OpenDSA-LTI/config/deploy/production.rb` file to set the server IP address of your production server. Replace `128.173.236.80` with your server IP address.
   ```
   set :stage, :production
 
@@ -264,22 +264,22 @@ The following server requirements will be fine for supporting hundreds of users.
   $ git push forked master
   ```
 
-  - **Switch to OpenDSA-DevStack termainal**
+  - **Switch to OpenDSA-DevStack terminal**
   - Deploy OpenDSA-LTI for the first time **(this step will fail!)**. But it will create OpenDSA-LTI folder structure in the production server.
   ```
   $ cd /vagrant/OpenDSA-LTI
   $ bundle exec cap production deploy
   ```
 
-  - First time deployment failed because the shared files `database.yaml` and `secrets.yaml` weren't created on the production server yet.
-  - **Switch back to the production server termainal** and do the following
+  - First-time deployment failed because the shared files `database.yaml` and `secrets.yaml` weren't created on the production server yet.
+  - **Switch back to the production server terminal** and do the following
   ```
   $ cd /home/deploy/OpenDSA-LTI/shared/config
   $ touch database.yml
   $ touch secrets.yml
   ```
 
-  - You need to put database credintials in database.yml and generate a new secret for production and save it in secrets.yml.
+  - You need to put database credentials in database.yml and generate a new secret for production and save it in secrets.yml.
   - First update databse.yml
   ```
   $ cd /home/deploy/OpenDSA-LTI/shared/config
@@ -326,13 +326,13 @@ The following server requirements will be fine for supporting hundreds of users.
     secret_key_base: secret_string
   ```
 
-  - Now production server is ready for deployment, **switch back to OpenDSA-DevStack termainal** and execute the following
+  - Now production server is ready for deployment, **switch back to OpenDSA-DevStack terminal** and execute the following
   ```
   $ cd /vagrant/OpenDSA-LTI
   $ bundle exec cap production deploy
   ```
 
-  - If you have configured a staging server you can deploy your changes to the staging server the same way as the production. Switch to OpenDSA-DevStack termainal and execute the following
+  - If you have configured a staging server you can deploy your changes to the staging server the same way as the production. Switch to OpenDSA-DevStack terminal and execute the following
   ```
   $ cd /vagrant/OpenDSA-LTI
   $ bundle exec cap staging deploy
@@ -340,7 +340,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
 ### Final Steps
 
-  - **Switch to the production server termainal**
+  - **Switch to the production server terminal**
   - Adding The Nginx Host. In order to get Nginx to respond with the Rails application, we need to modify it's sites-enabled. Open up `/etc/nginx/sites-enabled/default` in your text editor and we will replace the file's contents with the below configuration. Replace `prod_server_name` with your domain name.
 
   ```
