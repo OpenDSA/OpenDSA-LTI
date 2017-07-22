@@ -381,7 +381,12 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Follow the instructions on the [OpenDSA-DevStack](https://github.com/OpenDSA/OpenDSA-DevStack#production-deployment-workflow) page to perform a deployment on the production server.
 
-### Export anonymized OpenDSA-LTI data
+## Export anonymized OpenDSA-LTI data
+
+- OpenDSA stores massive interactions data and exercises attempts. If you want to use this data for learning analytics research tasks, you may need to export the data from the database and anonymize it first.
+
+### Export and anonymize
+
 - Export databse schema from https://opendsa-server.cs.vt.edu server using MySQL workbench data export tool
 - Provision the OpenDSA-DevStack VM
 - `vagrant ssh` into the VM
@@ -403,7 +408,7 @@ The following server requirements will be fine for supporting hundreds of users.
     + UPDATE `opendsa`.`users` SET `encrypted_password` = "encrypted_password";
 - Re-export the anynomized schema from OpenDSA-DevStack.
 
-### Import anonymized OpenDSA-LTI data
+### Import anonymized data
 - Provision the OpenDSA-DevStack VM
 - `vagrant ssh` into the VM
 - `cd /vagrant/OpenDSA-LTI`
