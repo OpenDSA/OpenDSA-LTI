@@ -264,6 +264,7 @@ The following server requirements will be fine for supporting hundreds of users.
   $ git push forked master
   ```
 
+  - **Switch to OpenDSA-DevStack termainal**
   - Deploy OpenDSA-LTI for the first time **(this step will fail!)**. But it will create OpenDSA-LTI folder structure in the production server.
   ```
   $ cd /vagrant/OpenDSA-LTI
@@ -325,7 +326,7 @@ The following server requirements will be fine for supporting hundreds of users.
     secret_key_base: secret_string
   ```
 
-  - Now production server is ready for deployment, switch back to OpenDSA-DevStack termainal and execute the following
+  - Now production server is ready for deployment, **switch back to OpenDSA-DevStack termainal** and execute the following
   ```
   $ cd /vagrant/OpenDSA-LTI
   $ bundle exec cap production deploy
@@ -339,6 +340,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
 ### Final Steps
 
+  - **Switch to the production server termainal**
   - Adding The Nginx Host. In order to get Nginx to respond with the Rails application, we need to modify it's sites-enabled. Open up `/etc/nginx/sites-enabled/default` in your text editor and we will replace the file's contents with the below configuration. Replace `prod_server_name` with your domain name.
 
   ```
@@ -367,60 +369,17 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Replace /etc/nginx/ssl/nginx.crt and /etc/nginx/ssl/nginx.key with your valid certificate and key.
 
-  - Restart Nginix web server
+  - Restart Nginx web server
 
   ```
   $ sudo service nginx restart
-  ```
-
-  - **TO BE REMOVED:** To populate your database with initial starter data execute the following
-
-  ```
-  $ bundle exec cap production invoke:rake TASK=db:reset_populate
   ```
 
   - Go to [https://prod_server_name](https://prod_server_name) you should see OpenDSA Rails application landing page. Congratulations!!!
 
 ### Production deployment workflow
 
-  - Production deployment is initiated from the development environment. It starts with changes you make to OpenDSA-LTI or OpenDSA repositories in OpenDSA-DevStack. First, test these changes locally using OpenDSA-DevStack development servers. Second, commit and push OpenDSA-LTI and OpenDSA changes. Finally, initiate the production deployment command from within OpenDSA-DevStack. It is very important to push your changes before the deployment. Every time you deploy your code Capistrano will go and clone the latest version of OpenDSA-LTI then perform the deployment tasks. One of the tasks gets the latest version of OpenDSA from GitHub as well.
-
-  - The following steps need to be done **only once** to generate a
- pair of authentication keys. Replace **prod_server** with your
- production server's domain name.
- **Note:** Do not enter a passphrase.
-
-    <pre>
-      <code>
-    $ cd OpenDSA-DevStack
-    $ vagrant up
-    $ vagrant ssh
-    $ ssh-keygen -t rsa
-    $ cat .ssh/id_rsa.pub | ssh deploy@<b>prod_server</b> 'cat >> .ssh/authorized_keys'
-
-    <b>Enter deploy user password for the last time</b>
-    <b>If you choose to also maintain a staging server, then add:</b>
-
-    $ cat .ssh/id_rsa.pub | ssh deploy@<b>staging_server</b> 'cat >> .ssh/authorized_keys'
-      </code>
-    </pre>
-
-  - Here are the steps you need to follow every time you want to perform a production deployment:
-    <pre>
-      <code>
-    $ cd OpenDSA-DevStack
-    $ vagrant up
-    $ vagrant ssh
-    $ cd /vagrant/OpenDSA-LTI
-    $ <b>git pull any new code</b>
-    $ <b>commit and push any changes</b>
-    Execute the following command to deploy to the <b>staging</b> server:
-    $ bundle exec cap staging deploy
-    Execute the following command to deploy to the <b>production</b> server:
-    $ bundle exec cap production deploy
-      </code>
-    </pre>
-
+  - Follow the instructions on the [OpenDSA-DevStack](https://github.com/OpenDSA/OpenDSA-DevStack#production-deployment-workflow) page to perform a deployment on the production server.
 
 ### Export anonymized OpenDSA-LTI data
 - Export databse schema from https://opendsa-server.cs.vt.edu server using MySQL workbench data export tool
