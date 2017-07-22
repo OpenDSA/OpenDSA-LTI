@@ -43,30 +43,29 @@
         });
     };
 
-    handle_access_token = function() {
-        if ($('#lms-access-token').val()) {
+    // handle_access_token = function() {
+    //     if ($('#lms-access-token').val()) {
 
-            var request = $("#lms-instance-select option:selected").text() + "/api/v1/courses?access_token=" + $('#lms-access-token').val();
-            console.log(request);
-            $("#lms-access-token-check").removeClass("fa-times");
-            $("#lms-access-token-check").removeClass("fa-check");
-            $("#lms-access-token-check").addClass("fa-check")
-                // $("#lms-access-token-check").hide("slow");
-            var aj = $.ajax({
-                url: request,
-                type: 'get',
-                data: $(this).serialize()
-            }).done(function(data) {
-                $("#lms-access-token-check").addClass("fa-check")
-                $("#lms-access-token-check").show("slow");
-                valid_token = true;
-            }).fail(function(jqXHR, textStatus) {
-                $("#lms-access-token-check").addClass("fa-times")
-                $("#lms-access-token-check").show("slow");
-                valid_token = false;
-            });
-        }
-    };
+    //         var request = $("#lms-instance-select option:selected").text() + "/api/v1/courses?access_token=" + $('#lms-access-token').val();
+    //         $("#lms-access-token-check").removeClass("fa-times");
+    //         $("#lms-access-token-check").removeClass("fa-check");
+    //         $("#lms-access-token-check").addClass("fa-check")
+    //             // $("#lms-access-token-check").hide("slow");
+    //         var aj = $.ajax({
+    //             url: request,
+    //             type: 'get',
+    //             data: $(this).serialize()
+    //         }).done(function(data) {
+    //             $("#lms-access-token-check").addClass("fa-check")
+    //             $("#lms-access-token-check").show("slow");
+    //             valid_token = true;
+    //         }).fail(function(jqXHR, textStatus) {
+    //             $("#lms-access-token-check").addClass("fa-times")
+    //             $("#lms-access-token-check").show("slow");
+    //             valid_token = false;
+    //         });
+    //     }
+    // };
 
     handle_lms_access = function() {
         if ($('#lms-instance-select').val()) {
@@ -90,8 +89,10 @@
                     valid_token = data['valid_token'];
                     if (data['valid_token']) {
                         $("#lms-access-token-check").addClass("fa-check")
+                        $("#lms-access-token-desc").hide("slow");
                     } else {
                         $("#lms-access-token-check").addClass("fa-times")
+                        $("#lms-access-token-desc").show("slow");
                     }
                     $("#lms-access-token-check").show("slow");
                 }
@@ -114,6 +115,7 @@
     init = function() {
         // $("#lms-access-update-btn").hide();
         $("#lms-access-token-check").hide();
+        $("#lms-access-token-desc").hide();
         // $("#lms-access-token-group").hide();
     };
 
