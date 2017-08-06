@@ -172,6 +172,10 @@ class User < ActiveRecord::Base
       (first_name.blank? ? last_name : (first_name + ' ' + last_name))
   end
 
+  def user_display_name
+    first_name + ' ' + last_name + ' - ' + email
+  end
+
 
   # -------------------------------------------------------------
   # Gets the username (without the domain) of the e-mail address, if possible.

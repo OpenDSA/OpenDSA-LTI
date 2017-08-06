@@ -243,13 +243,15 @@ ActiveAdmin.setup do |config|
   #
   config.filters = true
 
-  config.display_name_methods = [:admin_display_name,
-                                                    :display_name,
-                                                    :full_name,
-                                                    :name,
-                                                    :username,
-                                                    :login,
-                                                    :title,
-                                                    :email,
-                                                    :to_s ]
+  config.display_name_methods = [
+                                 :user_display_name,
+                                 :admin_display_name,
+                                 :display_name,
+                                 :full_name,
+                                 :name,
+                                 :username,
+                                 :login,
+                                 :title,
+                                 :email,
+                                 :to_s ]
 end

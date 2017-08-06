@@ -16,6 +16,9 @@ ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
     column :user, sortable: 'user.display_name' do |c|
       link_to c.user.display_name, admin_user_path(c.user)
     end
+    column :user, sortable: 'user.email' do |c|
+      link_to c.user.email, admin_user_path(c.user)
+    end
     column :access_token do |c|
       link_to c.access_token, admin_lms_access_path(c)
     end
