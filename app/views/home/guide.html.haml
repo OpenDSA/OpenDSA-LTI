@@ -32,11 +32,11 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
     asking for instructor access.
 
   %li
-    Go to your institution's Canvas site, create an account at the public site
-    at <a href="https://canvas.instructure.com">https://canvas.instructure.com</a>
+    Go to your institution's Canvas site, or create an account at the public site
+    at <a href="https://canvas.instructure.com">https://canvas.instructure.com</a>.
     Once there, create a course.
-    Give it a name, and copy the course ID that you will find at the
-    end of the course URL.
+    Give it a name, and copy the course ID (the number that you will find at the
+    end of the course URL).
     You will use this ID later.
 
   %li
@@ -44,7 +44,7 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
     then click "Create new course".
     This will take you to a simple form that asks for the necessary
     information to define your course instance.
-    Fill in all of the fields, and the click "Submit".
+    Fill in all of the fields, and then click "Submit".
 
   %li
     Once you have created your course offering, you will be redirected
@@ -58,7 +58,12 @@ If you only want to include your choice of OpenDSA visualizations and exercises 
 
 %ol
   %li
-    Get access to an OpenDSA instructor account as described earlier.
+    Get access to an OpenDSA instructor account.
+    Click "Sign Up" in the upper-right corner of this page to create a
+    new account, and then send email to
+    %a{ href: 'mailto:opendsa@cs.vt.edu' }
+      opendsa@cs.vt.edu
+    asking for instructor access.
 
   %li
     Login using your instructor account and click on your email address at the upper right corner of the home page. Copy the
@@ -71,17 +76,28 @@ If you only want to include your choice of OpenDSA visualizations and exercises 
     Go to your Canvas course and click the "Settings" link in the left sidebar. Click the "Apps" tab and then click "View App Configurations".
 
   %li
-    Click "+ App" to add a new LTI application. Select "By URL" under "Configuration Type" dropdown menu. Write "OpenDSA" in the name field. Paste in the
+    Click "+ App" to add a new LTI application. Select "By URL" under the "Configuration Type" dropdown menu. Write "OpenDSA" in the name field. Paste in the
     %code Consumer Key
     and the
-    %code Shared Secret
-    you have copied in the earlier step. Finally add OpenDSA LTI config URL
+    %code Shared Secret that
+    you copied in the earlier step. Finally, add the OpenDSA LTI configuration URL
     %code #{@config_url}
     to the "Config URL" field and click "Submit".
   %li
-    In your Canvas course, while inserting content into a module, select "External Tool". You should see the configured app "OpenDSA-LTI" with a "find" icon. Click the app to bring up a new dialog where you can pick one of OpenDSA’s interactive materials to be inserted as a page or resource within the current module.
+    In your Canvas course, when you want to insert OpenDSA content
+    into a module, select "External Tool". You should see the
+    configured app "OpenDSA-LTI" with a "find" icon. Click the app to
+    bring up a new dialog where you can pick one of OpenDSA’s
+    interactive materials to be inserted as a page or resource within
+    the current module.
   %li
-    If you want OpenDSA exercise to report a score back to Canvas, you have to create a Canvas assignment. Go to the Assignments option in the left menu, then create new assignment by clicking on "+ Assignment " button on the upper right. FIll in the necessary information and select "External Tool" as the "Submission Type". You will see OpenDSA-LTI app, click it to choose the exercise.
+    If you want an OpenDSA exercise to report a score back to Canvas,
+    you have to create a Canvas assignment. Go to the Assignments
+    option in the left menu, then create a new assignment by clicking
+    on the "+ Assignment " button on the upper right. Fill in the
+    necessary information and select "External Tool" as the
+    "Submission Type". You will see OpenDSA-LTI app, click it to
+    choose the exercise.
 
 
 
