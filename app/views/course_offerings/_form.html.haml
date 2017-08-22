@@ -85,8 +85,8 @@
       = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 100, disabled: 'true'
       %small.col-xs-11.text.text-warning#lms-access-token-desc
         Your access token allows the OpenDSA application to generate the book instance in your Canvas course on your behalf. First, you need to generate Canvas access token by following
-        the instructions <a href="https://guides.instructure.com/m/4214/l/40399-how-do-i-obtain-an-api-access-token-for-an-account" target="_blank">here</a>. Second, go to OpenDSA
-        = link_to the "LMS Accesses", admin_lms_accesses_path, :target => "_blank"
+        the instructions <a href="https://guides.instructure.com/m/4214/l/40399-how-do-i-obtain-an-api-access-token-for-an-account" target="_blank">here</a>. Second, go to the OpenDSA
+        = link_to "LMS Accesses", admin_lms_accesses_path, :target => "_blank"
         page to save your access token.
     #lms-access-update-btn.col-xs-1
       = link_to admin_lms_accesses_path, title: "Update your access token for the selected Canvas instance", class: 'btn btn-default', :target => "_blank" do
