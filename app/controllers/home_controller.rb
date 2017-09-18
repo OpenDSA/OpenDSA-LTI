@@ -15,6 +15,7 @@ class HomeController < ApplicationController
   end
 
   def about
+    @config_url = request.scheme + "://" + request.host_with_port
   end
 
   def license
