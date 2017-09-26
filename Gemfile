@@ -146,3 +146,4 @@ gem 'active_record_union'
 gem 'jstree-rails-4', '~> 3.2', '>= 3.2.1'
 gem 'clipboard-rails'
 gem "mustache", "~> 1.0"
+gem "whenever", :require => false
