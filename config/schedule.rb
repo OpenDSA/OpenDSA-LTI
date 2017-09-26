@@ -19,6 +19,7 @@
 
 # Learn more: http://github.com/javan/whenever
 
+env :PATH, ENV['PATH']
 set :output, "/home/deploy/OpenDSA-LTI/current/log/cron_log.log"
 every :reboot do
   command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production bin/delayed_job -n 2 start"
