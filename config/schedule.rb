@@ -21,9 +21,10 @@
 
 set :output, "/home/deploy/OpenDSA-LTI/current/log/cron_log.log"
 every :reboot do
-  command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production script/delayed_job start"
+  command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production bin/delayed_job start"
 end
 
 every 10.hours do
- command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production script/delayed_job restart"
+ command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production bin/delayed_job restart"
 end
+
