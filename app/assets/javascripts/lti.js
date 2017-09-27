@@ -266,15 +266,6 @@
         return messages
     };
 
-    // get the rst module name
-    var getModName = function(mod_name) {
-        var mod_name = mod_name || '';
-        if (mod_name.indexOf('/') > -1) {
-            return mod_name.split('/')[1]
-        } else {
-            return mod_name
-        }
-    };
     // prepare and send back the complete url used by canvas to configure lti launch
     var getResourceURL = function(obj) {
         if (!$.isEmptyObject(obj)) {
@@ -289,56 +280,31 @@
     };
 
     $(function() {
-        var book_name = jsonFile['title'];
         var chapters = [];
         // prepare tree data
-        $.each(jsonFile['chapters'], function(ch_index, ch_obj) {
+        $.each(jsonFile, function(ch_index, ch_obj) {
             var tree_ch_obj = {
                 'text': ch_index,
                 'children': []
             };
-            $.each(ch_obj, function(mod_index, mod_obj) {
-                if (mod_obj !== null && typeof mod_obj === 'object') {
-                    var rst_file_name = getModName(mod_index);
-                    if (mod_obj.hasOwnProperty('long_name')) {
-                        var mod_name = mod_obj['long_name'];
-                    } else {
-                        var mod_name = rst_file_name;
-                    }
+            $.each(ch_obj, function(mod_index, exercises) {
+                if (exercises !== null) {
                     var tree_mod_obj = {
-                        'text': mod_name,
+                        'text': mod_index,
                         'children': []
                     };
-                    if (mod_obj['sections'] != null) {
-                        var sec_count = 1;
-                        $.each(mod_obj['sections'], function(sec_index, sec_obj) {
-                            if (sec_obj !== null && typeof sec_obj === 'object') {
-                                var custom_ex_name = '';
-                                // get exercise name
-                                $.each(sec_obj, function(key, value) {
-                                    if (value !== null && typeof value === 'object') {
-                                        custom_ex_name = key;
-                                    }
-                                });
-                                var custom_inst_bk_sec_ex = sec_obj[custom_ex_name]['id'];
-                                var tree_sec_obj = {
-                                    'text': sec_index,
-                                    'type': 'section',
-                                    'url_params': {
-                                        'custom_inst_book_id': inst_book_id,
-                                        'custom_inst_section_id': sec_obj['id'],
-                                        'custom_section_file_name': rst_file_name + '-' + ("0" + sec_count).slice(-2),
-                                        'custom_section_title': sec_index,
-                                        'custom_book_path': book_path,
-                                        'custom_ex_name': custom_ex_name,
-                                        'custom_inst_bk_sec_ex': custom_inst_bk_sec_ex
-                                    }
+                    $.each(exercises, function(ex_index, ex) {
+                        if (ex !== null) {
+                            var tree_sec_obj = {
+                                'text': ex.long_name,
+                                'type': 'section',
+                                'url_params': {
+                                    'ex_id': ex.id
                                 }
-                                tree_mod_obj['children'].push(tree_sec_obj);
-                                sec_count += 1;
                             }
-                        });
-                    }
+                            tree_mod_obj['children'].push(tree_sec_obj);
+                        }
+                    });
                     tree_ch_obj['children'].push(tree_mod_obj);
                 }
             });
@@ -360,7 +326,7 @@
         .jstree({
             'core': {
                 'data': [{
-                    'text': book_name,
+                    'text': 'OpenDSA Exercises',
                     'state': {
                         'opened': true,
                         'selected': true

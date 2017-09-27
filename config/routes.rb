@@ -2,6 +2,7 @@ CodeWorkout::Application.routes.draw do
   root 'home#index'
 
   post 'lti/launch'
+  post 'lti/launch_ex'
   post 'lti/assessment'
   get 'lti/xml_config', to: 'lti#xml_config', as: :xml_config
   get 'lti/resource_dev', to: 'lti#resource_dev', as: :lti_resource_dev

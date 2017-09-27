@@ -1,7 +1,7 @@
 class LtiController < ApplicationController
   layout 'lti', only: [:launch]
 
-  after_action :allow_iframe, only: [:launch, :resource]
+  after_action :allow_iframe, only: [:launch, :launch_ex, :resource]
   # the consumer keys/secrets
 
   def launch
@@ -88,6 +88,42 @@ class LtiController < ApplicationController
                               "#{params[:custom_section_file_name].to_s}.html")) and return
   end
 
+  def launch_ex
+    require 'oauth/request_proxy/rack_request'
+    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+
+    render('error') and return unless lti_authorize!
+    # TODO: get user info from @tp object
+    # register the user if he is not yet registered.
+    email = params[:lis_person_contact_email_primary]
+    first_name = params[:lis_person_name_given]
+    last_name = params[:lis_person_name_family]
+    @user = User.where(email: email).first
+    if @user.blank?
+      # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
+      @user = User.new(:email => email,
+                       :password => email,
+                       :password_confirmation => email,
+                       :first_name => first_name,
+                       :last_name => last_name)
+      @user.save
+    end
+    sign_in @user
+    #lti_enroll
+    
+    exercise = InstExercise.find_by(id: params[:ex_id])
+    require 'rst_parser'
+    ex_info = RstParser.get_exercise_map()[exercise.short_name]
+
+    if ex_info.respond_to? :html_path
+      @html_url = request.protocol + request.host_with_port + ex_info.html_path
+      return
+    else
+      # TODO get css and js from ex_info.links, ex_info.scripts
+
+    end
+  end
+
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
     @inst_book = InstBook.find_by(id: request_params['instBookId'])
@@ -170,9 +206,31 @@ class LtiController < ApplicationController
     render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
   end
 
+  # def resource
+  #   @inst_book = InstBook.where("book_type = ?", InstBook.book_types[:Exercises]).first
+  #   @launch_url = request.protocol + request.host_with_port + "/lti/launch"
+
+  #   # must include the oauth proxy object
+  #   require 'oauth/request_proxy/rack_request'
+  #   $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+
+  #   render('error') and return unless lti_authorize!
+
+  #   email = params[:lis_person_contact_email_primary]
+  #   first_name = params[:lis_person_name_given]
+  #   last_name = params[:lis_person_name_family]
+  #   @user = User.where(email: email).first
+  #   sign_in @user
+
+  #   @inst_book_json = ApplicationController.new.render_to_string(
+  #       template: 'inst_books/show.json.jbuilder',
+  #       locals: {:@inst_book => @inst_book})
+
+  #   render layout: 'lti_resource'
+  # end
+
   def resource
-    @inst_book = InstBook.where("book_type = ?", InstBook.book_types[:Exercises]).first
-    @launch_url = request.protocol + request.host_with_port + "/lti/launch"
+    @launch_url = request.protocol + request.host_with_port + "/lti/launch_ex"
 
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
@@ -186,9 +244,10 @@ class LtiController < ApplicationController
     @user = User.where(email: email).first
     sign_in @user
 
-    @inst_book_json = ApplicationController.new.render_to_string(
-        template: 'inst_books/show.json.jbuilder',
-        locals: {:@inst_book => @inst_book})
+    require 'rst_parser'
+    exercises = RstParser.get_exercise_info()
+
+    @json = exercises.to_json()
 
     render layout: 'lti_resource'
   end
@@ -204,6 +263,9 @@ class LtiController < ApplicationController
   end
 
   private
+
+    
+
     def lti_enroll
       inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
       course_offering = CourseOffering.find_by(id: inst_book.course_offering_id)
