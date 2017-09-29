@@ -156,7 +156,8 @@ namespace :deploy do
   desc "remove template books"
   after :finishing, 'deploy:delete_templates' do
     on roles :all do
-      execute "cd #{current_path}; bundle exec rake db:delete_templates"
+      env :PATH, ENV['PATH']
+      execute "cd #{current_path}; bundle exec rake db:delete_templates;"
     end
   end
 
