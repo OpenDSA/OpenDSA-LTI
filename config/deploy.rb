@@ -118,6 +118,7 @@ set :delayed_job_workers, 2
 
 namespace :deploy do
 
+
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
@@ -147,7 +148,17 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; git checkout master; make pull;"
+      execute "cd ~/OpenDSA; git checkout master; make pull; make rst2json;"
+      # upload _generated config files
+    end
+  end
+
+  desc "remove template books"
+  after :finishing, 'deploy:delete_templates' do
+    on roles :all do
+      task :delete_templates do
+        run "cd #{current_path}; bundle exec rake db:delete_templates RAILS_ENV=#{rails_env}"
+      end
     end
   end
 
