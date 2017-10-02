@@ -110,17 +110,22 @@ class LtiController < ApplicationController
     end
     sign_in @user
     #lti_enroll
-    
-    exercise = InstExercise.find_by(id: params[:ex_id])
-    require 'rst_parser'
-    ex_info = RstParser.get_exercise_map()[exercise.short_name]
 
-    if ex_info.respond_to? :html_path
-      @html_url = request.protocol + request.host_with_port + ex_info.html_path
-      return
+    require 'RST/rst_parser'
+    @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
+    if @ex.instance_of?(AvEmbed)
+      @html_url = @ex.av_address
+      render "launch_avembed", layout: 'lti_launch'
     else
-      # TODO get css and js from ex_info.links, ex_info.scripts
-
+      @links = []
+      @ex.links.each do |link|
+        @links << link
+      end
+      @scripts = []
+      @ex.scripts.each do |script|
+        @scripts << script
+      end
+      render 'launch_inlineav', layout: 'lti_launch'
     end
   end
 
@@ -244,7 +249,7 @@ class LtiController < ApplicationController
     @user = User.where(email: email).first
     sign_in @user
 
-    require 'rst_parser'
+    require 'RST/rst_parser'
     exercises = RstParser.get_exercise_info()
 
     @json = exercises.to_json()

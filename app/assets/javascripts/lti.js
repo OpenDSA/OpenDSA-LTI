@@ -299,7 +299,7 @@
                                 'text': ex.long_name,
                                 'type': 'section',
                                 'url_params': {
-                                    'ex_id': ex.id
+                                    'ex_short_name': ex.short_name
                                 }
                             }
                             tree_mod_obj['children'].push(tree_sec_obj);
