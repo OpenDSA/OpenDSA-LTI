@@ -115,20 +115,20 @@ set :delayed_job_workers, 2
 # default value: "#{Rails.root}/tmp/pids" or "#{Dir.pwd}/tmp/pids"
 # set :delayed_job_pid_dir, 'path_to_pid_dir'
 
-after 'deploy:pull_opendsa', 'db:delete_templates'
+# after 'deploy:pull_opendsa', 'db:delete_templates'
 
-namespace :db do
-  desc "remove template books"
-  task :delete_templates do
-    on roles(:all) do
-      within release_path do
-        with rails_env: fetch(:rails_env) do
-          execute :rake, 'db:delete_templates'
-        end
-      end
-    end
-  end
-end
+# namespace :db do
+#   desc "remove template books"
+#   task :delete_templates do
+#     on roles(:all) do
+#       within release_path do
+#         with rails_env: fetch(:rails_env) do
+#           execute :rake, 'db:delete_templates'
+#         end
+#       end
+#     end
+#   end
+# end
 
 namespace :deploy do
 
