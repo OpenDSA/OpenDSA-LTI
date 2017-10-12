@@ -194,7 +194,6 @@ class GenerateCourseJob < ProgressJob::Base
 
     sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
 
-
     section_item_position = 1
     section_file_name_seq = 1
     hidden_sections = 0
@@ -202,7 +201,6 @@ class GenerateCourseJob < ProgressJob::Base
     if !sections.empty?
       sections.each do |section|
         if !section.show
-          print "#{section.name} hidden\n"
           hidden_sections += 1
           next
         end
