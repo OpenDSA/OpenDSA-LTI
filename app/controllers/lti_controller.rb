@@ -30,7 +30,6 @@ class LtiController < ApplicationController
     sign_in @user
     lti_enroll
 
-    puts ('no key')
     # I change this to be custom intanbook id becuase it is not working on mine yet
     if params.has_key?(:custom_course_offering_id)
 
@@ -42,7 +41,9 @@ class LtiController < ApplicationController
         q = User.where("id=?", s.user_id).select("id, first_name, last_name")
         @student_list.push(q)
       end
+      @course_id =  @course_offering.id
       @instBook = @course_offering.odsa_books.first
+      
       @exercise_list = Hash.new{|hsh,key| hsh[key] = []}
 
       chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
@@ -69,8 +70,6 @@ class LtiController < ApplicationController
                       @exercise_list[section.id].push(title)
                       @exercise_list[section.id].push('attemp_flag')
                     end
-                      
-
                   end
                 end
               end
