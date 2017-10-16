@@ -1,0 +1,38 @@
+%html{:lang => "en"}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "utf-8"}/
+    %meta{:content => "width=device-width, initial-scale=1", :name => "viewport"}/
+    %title jQuery UI Autocomplete - Combobox
+    %link{:href => "//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css", :rel => "stylesheet"}/
+    %script{:src => "https://code.jquery.com/jquery-1.12.4.js"}
+    %script{:src => "https://code.jquery.com/ui/1.12.1/jquery-ui.js"}
+
+    = stylesheet_link_tag "table_lti"
+  %body
+    .ui-widget
+      %strong Select Student:
+      %select#combobox{:size => "10"}
+        - @student_list.each do |q|
+          - q.each do |y|
+            %option{:value => y.id}
+              #{y.first_name} #{y.last_name}
+
+      %strong ___    Select Assignment:
+      %select#comb{:size => "10"}
+        - @exercise_list.each do |k, q|
+          - if q[1]
+            .text_color
+              %option{:bgcolor => "#FF0000;", :value => k}
+                %strong #{q[0]}-
+          - else
+            .text_color
+              %option{:style => "display:inline; background-color:#FF0000; color:red;", :value => k}
+                %strong #{q[0]}
+      %p
+      %button#display.btn.btn-primary{:name => @course_id} Select
+      %p
+        %br/
+      #log
+
+= javascript_include_tag('lti_table.js')
