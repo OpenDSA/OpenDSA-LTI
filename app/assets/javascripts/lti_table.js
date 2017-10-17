@@ -151,20 +151,28 @@ $(function() {
       $("#comb").toggle();
     });
 
-    $('#display').click(function() {
+    $('#select').click(function() {
+      console.log("clicked registered");
+      return handle_select_student();
+      //handle_select_student();
+      //handle_display()
+    });
+    /*$('#display').click(function() {
       console.log("clicked registered");
       return handle_display();
-    });
+    });*/
 
   });
 
 
   handle_display = function() {
-    var messages = check_dis_completeness();
+    var messages = check_dis_completeness("table");
     if (messages.length !== 0) {
       alert(messages);
+      $('#display_table').html('');
       return;
     }
+    debugger;
     //GET /course_offerings/:user_id/:inst_section_id
     var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('#comb').find('option:selected').val();
 
@@ -175,7 +183,7 @@ $(function() {
     }).done(function(data) {
       if (data.odsa_exercise_progress.length == 0 || data.odsa_exercise_attempts.length == 0) {
         var p = '<p style="font-size:24px; align=center;"> You have not Attempted this exercise <p>';
-        $('#log').html(p);
+        $('#display_table').html(p);
       } else if (data.odsa_exercise_attempts[0].pe_score != null || data.odsa_exercise_attempts[0].pe_steps_fixed != null) {
 
         var khan_ac_exercise = true;
@@ -205,7 +213,7 @@ $(function() {
         header += '</table> ';
         header1 += '</table>';
         header += '<br>' + header1;
-        $('#log').html(header);
+        $('#display_table').html(header);
       } else {
 
         var header = '<p style="font-size:24px; align=center;"> OpenDSA Progress Table<p>';
@@ -234,10 +242,10 @@ $(function() {
         header += '</table> ';
         header1 += '</table>';
         header += '<br>' + header1;
-        $('#log').html(header);
+        $('#display_table').html(header);
       }
 
-      change_courses(data);
+      //change_courses(data);
     }).fail(function(data) {
       alert("failure")
       console.log('AJAX request has FAILED');
@@ -321,14 +329,86 @@ $(function() {
 
 
   }
-  check_dis_completeness = function() {
+  handle_select_student = function(){
+        var messages = check_dis_completeness("individual_student");
+        if (messages.length !== 0) {
+            alert(messages);
+            return;
+        }
+        //GET /course_offerings/:user_id/course_offering_id/exercise_list
+        var al = $('#combobox').find('option:selected').val();
+        var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + document.getElementById('select').name + "/exercise_list";
+        var aj = $.ajax({
+            url: request,
+            type: 'get',
+            data: $(this).serialize()
+        }).done(function(data) {
+            if (data.odsa_exercise_attempts.length === 0) {
+                var p = '<p style="font-size:24px; align=center;"> Select a student name <p>';
+                $('#log').html(p);
+            } else {
+                //$('#log').html(p);
+
+                //$('#log').html("<%= j render(partial: 'show_individual_exercise') %>")
+                  //<%= escape_javascript(render(:partial => 'lti/show_individual_exercise.html.haml')) %>");
+                //.append("<%= j render(:partial => 'views/lti/show_individual_exercise') %>");
+                //var elem = '<div class="ui-widget">';
+                var elem = '<label><strong>Select Exercise </strong></label>';
+                elem += '<select id="comb">';
+                //elem += '<% @exercise_list.each do |k, q| %>';
+                //elem += '<% if q[1] %>';
+                var keys = Object.keys(data.odsa_exercise_attempts);
+                
+                for (var i = 0; i < keys.length; i++){
+                  var exercise = data.odsa_exercise_attempts[keys[i]];
+                  if (exercise.length > 1){
+                    elem += ' <option value="' + keys[i] + '">';
+                    elem += '<strong>' + exercise[0] + '</strong>';
+                    elem += '</option>';
+                  }
+                }
+                elem += '</select>';
+                elem += '<button class="btn btn-primary" id="display" onclick="handle_display()" name="display" style="float:right;">Display Detail </button>';
+                //elem += '</div>';
+                //elem += '<button class="btn btn-primary" id="submit">Submit</button>';                  
+                $('#log').html(elem);
+               /* var aj = $.ajax({
+                    url: '/course_offerings/indAssigment/assignmentList/student/exercise',
+                    type: 'get',
+                    data_none: $(this).serialize()
+                }).done(function(data_none) {
+                    console.log(" redered the individual attempt");
+                  }).fail(function(data) {
+                    alert("fail from the inner render")
+                    console.log('AJAX request has FAILED');
+                  });*/
+        }
+        //change_courses(data);
+        }).fail(function(data) {
+            alert("failure")
+            console.log('AJAX request has FAILED');
+        });1
+    }
+
+  check_dis_completeness = function(flag) {
     var messages;
     messages = [];
     var selectbar1 = $('#combobox').find('option:selected').text();
-    var selectbar2 = $('#comb').find('option:selected').text();
-    if (selectbar1 === '' || selectbar2 === '') {
-      messages.push("You need to select a student or assignment");
+    if (flag === 'individual_student'){
+      if (selectbar1 === '' ){
+        messages.push("You need to select a student");
       return messages;
+      }
+    }else if ("table"){
+      var selectbar2 = $('#comb').find('option:selected').text();
+      if (selectbar1 === '' || selectbar2 === '') {
+        messages.push("You need to select a student or assignment");
+        return messages;
+      }
+      return messages
+    }else{
+      console.log ("unknown error from lti_table.js module")
+      alert ("unknown error from lti_table.js module, written by: Souleymane Dia")
     }
     return messages
   };

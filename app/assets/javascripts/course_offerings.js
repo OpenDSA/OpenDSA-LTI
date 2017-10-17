@@ -21,9 +21,11 @@
             $(this).prop('disabled', true);
             return handle_submit();
         });
+
         $('#display').click(function() {
             console.log("clicked registered");
-            return handle_display();
+            return handle_select_student();
+            //return handle_display();
         });
 
         init();
@@ -215,6 +217,33 @@
             }
         });
     };
+    
+    handle_select_student = function(){
+        var messages = check_dis_completeness();
+        if (messages.length !== 0) {
+            alert(messages);
+            return;
+        }
+        //GET /course_offerings/:user_id/course_offering_id/exercise_list
+        var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('display').attr('name') + "/exercise_list";
+        var aj = $.ajax({
+            url: request,
+            type: 'get',
+            data: $(this).serialize()
+        }).done(function(data) {
+            if (data.odsa_exercise_progress.length === 0) {
+                var p = '<p style="font-size:24px; align=center;"> Select a student name <p>';
+                $('#log').html(p);
+            } else {
+                //$('#log').html(p);
+                $('#log').append("<%= j render(:partial => 'views/lti/show_individual_exercise') %>"); 
+        }
+        change_courses(data);
+        }).fail(function(data) {
+            alert("failure")
+            console.log('AJAX request has FAILED');
+        });
+    }
 
     handle_display = function() {
         var messages = check_dis_completeness();
@@ -321,9 +350,12 @@
         var messages;
         messages = [];
         var selectbar1 = $('#combobox').find('option:selected').text();
-        var selectbar2 = $('#comb').find('option:selected').text();
-        if (selectbar1 === '' || selectbar2 === '') {
-            messages.push("You need to select a student or assignment");
+        //var selectbar2 = $('#comb').find('option:selected').text();
+        // || selectbar2 === ''
+        debugger;
+        console.log(selectbar1)
+        if (selectbar1 === '') {
+            messages.push("You need to select a student or assignment =" + selectbar1);
             return messages;
         }
         return messages
