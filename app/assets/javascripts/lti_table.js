@@ -152,6 +152,8 @@ $(function() {
     });
 
     $('#select').click(function() {
+      $('#log').html("");
+      $('#display_table').html("");
       console.log("clicked registered");
       return handle_select_student();
       //handle_select_student();
@@ -358,30 +360,27 @@ $(function() {
                 //elem += '<% @exercise_list.each do |k, q| %>';
                 //elem += '<% if q[1] %>';
                 var keys = Object.keys(data.odsa_exercise_attempts);
-                
+                var attempt_flag = false;
                 for (var i = 0; i < keys.length; i++){
                   var exercise = data.odsa_exercise_attempts[keys[i]];
                   if (exercise.length > 1){
+                    attempt_flag = true
                     elem += ' <option value="' + keys[i] + '">';
                     elem += '<strong>' + exercise[0] + '</strong>';
                     elem += '</option>';
                   }
                 }
+                if (!attempt_flag){
+                  elem += ' <option value="No_attempt">';
+                    elem += '<strong> No_attempt Made</strong>';
+                    elem += '</option>';
+                }
                 elem += '</select>';
-                elem += '<button class="btn btn-primary" id="display" onclick="handle_display()" name="display" style="float:right;">Display Detail </button>';
-                //elem += '</div>';
-                //elem += '<button class="btn btn-primary" id="submit">Submit</button>';                  
+                if (attempt_flag){
+                  elem += '<button class="btn btn-primary" id="display" onclick="handle_display()" name="display" style="float:right;">Display Detail </button>';
+                }                  
                 $('#log').html(elem);
-               /* var aj = $.ajax({
-                    url: '/course_offerings/indAssigment/assignmentList/student/exercise',
-                    type: 'get',
-                    data_none: $(this).serialize()
-                }).done(function(data_none) {
-                    console.log(" redered the individual attempt");
-                  }).fail(function(data) {
-                    alert("fail from the inner render")
-                    console.log('AJAX request has FAILED');
-                  });*/
+            
         }
         //change_courses(data);
         }).fail(function(data) {
