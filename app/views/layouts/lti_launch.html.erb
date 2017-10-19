@@ -20,9 +20,9 @@
 
     TP.toParams = {};
     TP.toParams.launch_params = {};
-    <% @tp.to_params.each do |key, value| %>
-      TP.toParams.launch_params.<%= key %> = "<%= value %>";
-    <% end%>
+  <% @tp.to_params.each do |key, value| %>
+    TP.toParams.launch_params.<%= key %> = "<%= value %>";
+  <% end%>
     TP.userEmail = "<%= @user.email %>";
     TP.instExerciseId = <%= @ex.id %>
     TP.sectionTitle = "<%= @ex.short_name %>"
@@ -34,8 +34,6 @@
     settings.BOOK_LANG = "en";
     settings.REQ_FULL_SS = true;
     settings.LOCAL_MODE = true;
-
-    window.ODSA = window.ODSA || {};
     window.ODSA.SETTINGS = settings;
   }());
   </script>
@@ -67,6 +65,61 @@
   <script>ODSA.SETTINGS.DISP_MOD_COMP = true;ODSA.SETTINGS.MODULE_NAME = "<%= @ex.mod_name %>"; ODSA.SETTINGS.BUILD_CMAP = false;JSAV_OPTIONS['lang']='en';JSAV_EXERCISE_OPTIONS['code']='java';</script>
   <div class="content">
     <%= yield %>
+  </div>
+  <div class="footer">
+    <p>
+      <span class="email_div" style="display:inline;">
+        <a class="contact" href="mailto:" id="contact_us" rel="nofollow" style="float:left;color:blue;">Contact Us |</a>
+        <a class="bugreport-link" href="#" id="bugreport-link" style="float:left;color:blue;">| Report a bug</a>
+      </span>
+    </p>
+    © Copyright 2017 by OpenDSA Project Contributors and distributed under an MIT license.
+  </div>
+  <div class="bugreport-popup " id="bugreport-box">
+    <a class="close" href="#"><img alt="Close Window" class="btn_close" src="/OpenDSA/Books/vt/cs3114/spring-2018/Test/html/_static/Images/close_pop.png" title="Close Window"/></a>
+    <form action="https://#" class="report" method="post">
+      <fieldset class="textbox">
+        <div class="error" id="bug_error"></div>
+        <label>
+          <span>Summary*:</span>
+          <input id="b_title" placeholder="Summary" type="text"/>
+        </label>
+      <label class="os">
+        <span>Operating system*:</span>
+        <select id="b_os">
+          <option value="windows">Windows</option>
+          <option value="macos">Mac OS</option>
+          <option value="linux">Linux</option>
+          <option value="ios">iOS</option>
+          <option value="android">Android</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label class="browser">
+        <span>Browser*:</span>
+        <select id="b_browser">
+          <option value="chrome">Chrome</option>
+          <option value="safari">Safari</option>
+          <option value="internetexplorer">Internet Explorer</option>
+          <option value="opera">Opera</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label class="description">
+        <span>Description*:</span><br>
+        <textarea cols="25" id="b_description" placeholder="***BUG** Please enter: (1) a consice description of the problem. (2) steps to reproduce bug. (3) the version of your browser and operating system." rows="5"></textarea>
+        </br>
+      </label>
+      <label class="screenshot">
+        <span>Attach a screenshot (optional):</span>
+        <input accept="image/*" id="b_screenshot" placeholder="Attach a screenshot (optional)" type="file">
+        </input>
+      </label>
+      <p>
+      <input id="bug-submit-button" type="submit" value="Submit →"/>
+      </p>
+      </fieldset>
+    </form>
   </div>
 </body>
 </html>

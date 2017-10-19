@@ -1,6 +1,5 @@
 require "find"
 require "json/ext"
-require "byebug"
 require "json"
 require "nokogiri"
 require_relative "avembed"
@@ -36,8 +35,8 @@ module RstParser
       "SeniorAlgAnal": "Advanced Analysis",
       "Sorting": "Sorting",
       "Spatial": "Spatial Data Structures",
-      "Tutorials": "Programming Tutorials"#,
-      #"Development": "Under Development"
+      "Tutorials": "Programming Tutorials",
+      "Development": "Under Development"
   }
 
   EX_RE = Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe)")
@@ -101,6 +100,9 @@ module RstParser
         if path.end_with?(".rst")
           extract_exercises(path, exercises[long_name], short_name.to_s)
         end
+      end
+      if exercises[long_name].empty?
+        exercises.delete(long_name)
       end
     end
     return exercises
@@ -175,10 +177,12 @@ module RstParser
         end
 
         if (directive == 'inlineav' and ex_type == 'ss')
-          if options.has_key?('links') and options.has_key?('scripts')
-            links = []
-            options.delete('links').split(' ').each do |l|
-              links << File.join("", "OpenDSA", l)
+          links = []
+          if options.has_key?('scripts')
+            if options.has_key?('links')
+              options.delete('links').split(' ').each do |l|
+                links << File.join("", "OpenDSA", l)
+              end
             end
             scripts = []
             options.delete('scripts').split(' ').each do |s|
