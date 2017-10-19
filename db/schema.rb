@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170715223741) do
+ActiveRecord::Schema.define(version: 20171019185509) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -209,6 +209,18 @@ ActiveRecord::Schema.define(version: 20170715223741) do
 
   add_index "inst_chapters", ["inst_book_id"], name: "inst_chapters_inst_book_id_fk", using: :btree
 
+  create_table "inst_course_offering_exercises", force: true do |t|
+    t.integer  "course_offering_id",  null: false
+    t.integer  "inst_exercise_id",    null: false
+    t.string   "resource_link_id",    null: false
+    t.string   "resource_link_title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "inst_course_offering_exercises", ["course_offering_id"], name: "inst_course_offering_exercises_course_offering_id_fk", using: :btree
+  add_index "inst_course_offering_exercises", ["inst_exercise_id"], name: "inst_course_offering_exercises_inst_exercise_id_fk", using: :btree
+
   create_table "inst_exercises", force: true do |t|
     t.string   "name"
     t.string   "short_name",             null: false
@@ -338,51 +350,55 @@ ActiveRecord::Schema.define(version: 20170715223741) do
   end
 
   create_table "odsa_exercise_attempts", force: true do |t|
-    t.integer  "user_id",                                                          null: false
-    t.integer  "inst_book_id",                                                     null: false
-    t.integer  "inst_section_id",                                                  null: false
-    t.integer  "inst_book_section_exercise_id",                                    null: false
-    t.boolean  "worth_credit",                                                     null: false
-    t.datetime "time_done",                                                        null: false
-    t.integer  "time_taken",                                                       null: false
-    t.integer  "count_hints",                                                      null: false
-    t.boolean  "hint_used",                                                        null: false
-    t.decimal  "points_earned",                            precision: 5, scale: 2, null: false
-    t.boolean  "earned_proficiency",                                               null: false
-    t.integer  "count_attempts",                limit: 8,                          null: false
-    t.string   "ip_address",                    limit: 20,                         null: false
-    t.string   "question_name",                 limit: 50,                         null: false
-    t.string   "request_type",                  limit: 50
+    t.integer  "user_id",                                                             null: false
+    t.integer  "inst_book_id"
+    t.integer  "inst_section_id"
+    t.integer  "inst_book_section_exercise_id"
+    t.boolean  "worth_credit",                                                        null: false
+    t.datetime "time_done",                                                           null: false
+    t.integer  "time_taken",                                                          null: false
+    t.integer  "count_hints",                                                         null: false
+    t.boolean  "hint_used",                                                           null: false
+    t.decimal  "points_earned",                               precision: 5, scale: 2, null: false
+    t.boolean  "earned_proficiency",                                                  null: false
+    t.integer  "count_attempts",                   limit: 8,                          null: false
+    t.string   "ip_address",                       limit: 20,                         null: false
+    t.string   "question_name",                    limit: 50,                         null: false
+    t.string   "request_type",                     limit: 50
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "correct"
-    t.decimal  "pe_score",                                 precision: 5, scale: 2
+    t.decimal  "pe_score",                                    precision: 5, scale: 2
     t.integer  "pe_steps_fixed"
+    t.integer  "inst_course_offering_exercise_id"
   end
 
   add_index "odsa_exercise_attempts", ["inst_book_id"], name: "odsa_exercise_attempts_inst_book_id_fk", using: :btree
   add_index "odsa_exercise_attempts", ["inst_book_section_exercise_id"], name: "odsa_exercise_attempts_inst_book_section_exercise_id_fk", using: :btree
+  add_index "odsa_exercise_attempts", ["inst_course_offering_exercise_id"], name: "odsa_exercise_attempts_inst_course_offering_exercise_id_fk", using: :btree
   add_index "odsa_exercise_attempts", ["inst_section_id"], name: "odsa_exercise_attempts_inst_section_id_fk", using: :btree
   add_index "odsa_exercise_attempts", ["user_id"], name: "odsa_exercise_attempts_user_id_fk", using: :btree
 
   create_table "odsa_exercise_progresses", force: true do |t|
-    t.integer  "user_id",                       null: false
-    t.integer  "inst_book_section_exercise_id", null: false
-    t.integer  "current_score",                 null: false
-    t.integer  "highest_score",                 null: false
-    t.datetime "first_done",                    null: false
-    t.datetime "last_done",                     null: false
-    t.integer  "total_correct",                 null: false
-    t.integer  "total_worth_credit",            null: false
-    t.datetime "proficient_date",               null: false
+    t.integer  "user_id",                          null: false
+    t.integer  "inst_book_section_exercise_id"
+    t.integer  "current_score",                    null: false
+    t.integer  "highest_score",                    null: false
+    t.datetime "first_done",                       null: false
+    t.datetime "last_done",                        null: false
+    t.integer  "total_correct",                    null: false
+    t.integer  "total_worth_credit",               null: false
+    t.datetime "proficient_date",                  null: false
     t.string   "current_exercise"
     t.string   "correct_exercises"
     t.string   "hinted_exercise"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "inst_course_offering_exercise_id"
   end
 
   add_index "odsa_exercise_progresses", ["inst_book_section_exercise_id"], name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk", using: :btree
+  add_index "odsa_exercise_progresses", ["inst_course_offering_exercise_id"], name: "odsa_exercise_progresses_inst_course_offering_exercise_id_fk", using: :btree
   add_index "odsa_exercise_progresses", ["user_id", "inst_book_section_exercise_id"], name: "index_odsa_ex_prog_on_user_id_and_inst_bk_sec_ex_id", unique: true, using: :btree
 
   create_table "odsa_module_progresses", force: true do |t|
@@ -415,26 +431,28 @@ ActiveRecord::Schema.define(version: 20170715223741) do
   add_index "odsa_student_extensions", ["user_id"], name: "odsa_student_extensions_user_id_fk", using: :btree
 
   create_table "odsa_user_interactions", force: true do |t|
-    t.integer  "user_id",                                          null: false
-    t.integer  "inst_book_id",                                     null: false
+    t.integer  "user_id",                                             null: false
+    t.integer  "inst_book_id"
     t.integer  "inst_section_id"
     t.integer  "inst_book_section_exercise_id"
-    t.string   "name",                          limit: 50,         null: false
-    t.text     "description",                   limit: 2147483647, null: false
-    t.datetime "action_time",                                      null: false
-    t.integer  "uiid",                          limit: 8,          null: false
-    t.string   "browser_family",                limit: 20,         null: false
-    t.string   "browser_version",               limit: 20,         null: false
-    t.string   "os_family",                     limit: 50,         null: false
-    t.string   "os_version",                    limit: 20,         null: false
-    t.string   "device",                        limit: 50,         null: false
-    t.string   "ip_address",                    limit: 20,         null: false
+    t.string   "name",                             limit: 50,         null: false
+    t.text     "description",                      limit: 2147483647, null: false
+    t.datetime "action_time",                                         null: false
+    t.integer  "uiid",                             limit: 8,          null: false
+    t.string   "browser_family",                   limit: 20,         null: false
+    t.string   "browser_version",                  limit: 20,         null: false
+    t.string   "os_family",                        limit: 50,         null: false
+    t.string   "os_version",                       limit: 20,         null: false
+    t.string   "device",                           limit: 50,         null: false
+    t.string   "ip_address",                       limit: 20,         null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "inst_course_offering_exercise_id"
   end
 
   add_index "odsa_user_interactions", ["inst_book_id"], name: "odsa_user_interactions_inst_book_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_book_section_exercise_id"], name: "odsa_user_interactions_inst_book_section_exercise_id_fk", using: :btree
+  add_index "odsa_user_interactions", ["inst_course_offering_exercise_id"], name: "odsa_user_interactions_inst_course_offering_exercise_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_section_id"], name: "odsa_user_interactions_inst_section_id_fk", using: :btree
   add_index "odsa_user_interactions", ["user_id"], name: "odsa_user_interactions_user_id_fk", using: :btree
 
@@ -527,6 +545,9 @@ ActiveRecord::Schema.define(version: 20170715223741) do
 
   add_foreign_key "inst_chapters", "inst_books", name: "inst_chapters_inst_book_id_fk"
 
+  add_foreign_key "inst_course_offering_exercises", "course_offerings", name: "inst_course_offering_exercises_course_offering_id_fk"
+  add_foreign_key "inst_course_offering_exercises", "inst_exercises", name: "inst_course_offering_exercises_inst_exercise_id_fk"
+
   add_foreign_key "inst_sections", "inst_chapter_modules", name: "inst_sections_inst_chapter_module_id_fk"
   add_foreign_key "inst_sections", "inst_modules", name: "inst_sections_inst_module_id_fk"
 
@@ -540,10 +561,12 @@ ActiveRecord::Schema.define(version: 20170715223741) do
 
   add_foreign_key "odsa_exercise_attempts", "inst_book_section_exercises", name: "odsa_exercise_attempts_inst_book_section_exercise_id_fk"
   add_foreign_key "odsa_exercise_attempts", "inst_books", name: "odsa_exercise_attempts_inst_book_id_fk"
+  add_foreign_key "odsa_exercise_attempts", "inst_course_offering_exercises", name: "odsa_exercise_attempts_inst_course_offering_exercise_id_fk"
   add_foreign_key "odsa_exercise_attempts", "inst_sections", name: "odsa_exercise_attempts_inst_section_id_fk"
   add_foreign_key "odsa_exercise_attempts", "users", name: "odsa_exercise_attempts_user_id_fk"
 
   add_foreign_key "odsa_exercise_progresses", "inst_book_section_exercises", name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk"
+  add_foreign_key "odsa_exercise_progresses", "inst_course_offering_exercises", name: "odsa_exercise_progresses_inst_course_offering_exercise_id_fk"
   add_foreign_key "odsa_exercise_progresses", "users", name: "odsa_exercise_progresses_user_id_fk"
 
   add_foreign_key "odsa_module_progresses", "inst_books", name: "odsa_module_progresses_inst_book_id_fk"
@@ -554,7 +577,7 @@ ActiveRecord::Schema.define(version: 20170715223741) do
   add_foreign_key "odsa_student_extensions", "users", name: "odsa_student_extensions_user_id_fk"
 
   add_foreign_key "odsa_user_interactions", "inst_book_section_exercises", name: "odsa_user_interactions_inst_book_section_exercise_id_fk"
-  add_foreign_key "odsa_user_interactions", "inst_books", name: "odsa_user_interactions_inst_book_id_fk"
+  add_foreign_key "odsa_user_interactions", "inst_course_offering_exercises", name: "odsa_user_interactions_inst_course_offering_exercise_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_sections", name: "odsa_user_interactions_inst_section_id_fk"
   add_foreign_key "odsa_user_interactions", "users", name: "odsa_user_interactions_user_id_fk"
 

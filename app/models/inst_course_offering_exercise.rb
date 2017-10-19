@@ -1,22 +1,13 @@
-class OdsaExerciseProgress < ActiveRecord::Base
+class InstCourseOfferingExercise < ActiveRecord::Base
+
   #~ Relationships ............................................................
-  belongs_to :inst_book_section_exercise
-  belongs_to :inst_course_offering_exercise
-  belongs_to :user
+  belongs_to :course_offering, inverse_of: :inst_course_offering_exercises
+  belongs_to :inst_exercise
 
   #~ Validation ...............................................................
   #~ Constants ................................................................
   #~ Hooks ....................................................................
-  after_initialize :set_defaults, unless: :persisted?
   #~ Class methods ............................................................
   #~ Instance methods .........................................................
-  def set_defaults
-    self.current_score ||= 0
-    self.highest_score ||= 0
-    self.total_correct ||= 0
-    self.total_worth_credit ||= 0
-  end
   #~ Private instance methods .................................................
-
-end
-
+end class

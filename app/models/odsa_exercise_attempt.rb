@@ -24,6 +24,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   belongs_to :inst_book
   belongs_to :inst_section
   belongs_to :inst_book_section_exercise
+  belongs_to :inst_course_offering_exercise
 
   #~ Validation ...............................................................
   #~ Constants ................................................................
