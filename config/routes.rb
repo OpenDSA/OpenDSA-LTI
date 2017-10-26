@@ -7,6 +7,7 @@ CodeWorkout::Application.routes.draw do
   get 'lti/xml_config', to: 'lti#xml_config', as: :xml_config
   get 'lti/resource_dev', to: 'lti#resource_dev', as: :lti_resource_dev
   post 'lti/resource', to: 'lti#resource', as: :lti_resource
+  post 'lti/course_offering', to: 'lti#create_course_offering', as: :lti_course_offering
 
   resources :odsa_user_interactions
   resources :odsa_exercise_attempts
@@ -120,6 +121,7 @@ CodeWorkout::Application.routes.draw do
     post ':id/:term_id/generate_gradebook/' => 'courses#generate_gradebook', as: :course_gradebook
     get ':id(/:term_id)' => 'courses#show', as: :course
   end
+  post 'organizations' => 'organizations#create', as: :organization_create
 
   resources :course_offerings, only: [ :edit, :update ] do
     # post 'enroll' => :enroll, as: :enroll

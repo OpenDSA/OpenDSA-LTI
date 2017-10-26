@@ -37,6 +37,16 @@ class OrganizationsController < ApplicationController
       find(params[:id]) rescue nil
   end
 
+  def create
+    org = Organization.new(name: params[:organization_name],
+                           abbreviation: params[:organization_abbreviation])
+    if org.save
+      render :json => org, :status => :created
+    else
+      render :json => org.errors.full_messages, :status => :bad_request
+    end
+  end
+
 
   #~ Private instance methods .................................................
   private

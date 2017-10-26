@@ -72,6 +72,7 @@ group :development, :test do
   gem 'pry'
   gem 'thin'
   gem 'request-log-analyzer'
+  gem 'byebug'
 end
 gem 'faker'
 gem 'factory_girl_rails'

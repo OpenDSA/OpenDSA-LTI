@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171019185509) do
+ActiveRecord::Schema.define(version: 20171023152922) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -218,7 +218,7 @@ ActiveRecord::Schema.define(version: 20171019185509) do
     t.datetime "updated_at"
   end
 
-  add_index "inst_course_offering_exercises", ["course_offering_id"], name: "inst_course_offering_exercises_course_offering_id_fk", using: :btree
+  add_index "inst_course_offering_exercises", ["course_offering_id", "resource_link_id"], name: "index_inst_course_offering_exercises_on_course_offering_resource", unique: true, using: :btree
   add_index "inst_course_offering_exercises", ["inst_exercise_id"], name: "inst_course_offering_exercises_inst_exercise_id_fk", using: :btree
 
   create_table "inst_exercises", force: true do |t|
@@ -313,9 +313,11 @@ ActiveRecord::Schema.define(version: 20171019185509) do
     t.integer  "lms_type_id"
     t.string   "consumer_key"
     t.string   "consumer_secret"
+    t.integer  "organization_id"
   end
 
   add_index "lms_instances", ["lms_type_id"], name: "lms_instances_lms_type_id_fk", using: :btree
+  add_index "lms_instances", ["organization_id"], name: "lms_instances_organization_id_fk", using: :btree
   add_index "lms_instances", ["url"], name: "index_lms_instances_on_url", unique: true, using: :btree
 
   create_table "lms_types", force: true do |t|
@@ -555,6 +557,7 @@ ActiveRecord::Schema.define(version: 20171019185509) do
   add_foreign_key "lms_accesses", "users", name: "lms_accesses_user_id_fk"
 
   add_foreign_key "lms_instances", "lms_types", name: "lms_instances_lms_type_id_fk"
+  add_foreign_key "lms_instances", "organizations", name: "lms_instances_organization_id_fk"
 
   add_foreign_key "odsa_book_progresses", "inst_books", name: "odsa_book_progresses_inst_book_id_fk"
   add_foreign_key "odsa_book_progresses", "users", name: "odsa_book_progresses_user_id_fk"
@@ -577,6 +580,7 @@ ActiveRecord::Schema.define(version: 20171019185509) do
   add_foreign_key "odsa_student_extensions", "users", name: "odsa_student_extensions_user_id_fk"
 
   add_foreign_key "odsa_user_interactions", "inst_book_section_exercises", name: "odsa_user_interactions_inst_book_section_exercise_id_fk"
+  add_foreign_key "odsa_user_interactions", "inst_books", name: "odsa_user_interactions_inst_book_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_course_offering_exercises", name: "odsa_user_interactions_inst_course_offering_exercise_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_sections", name: "odsa_user_interactions_inst_section_id_fk"
   add_foreign_key "odsa_user_interactions", "users", name: "odsa_user_interactions_user_id_fk"

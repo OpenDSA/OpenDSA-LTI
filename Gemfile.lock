@@ -124,6 +124,7 @@ GEM
       thor
     browser (2.2.0)
     builder (3.2.2)
+    byebug (9.1.0)
     cancancan (1.10.1)
     capistrano (3.2.1)
       i18n
@@ -470,6 +471,7 @@ DEPENDENCIES
   bootstrap-wysihtml5-rails
   bootstrap3-datetimepicker-rails (~> 4.14.30)
   browser
+  byebug
   cancancan
   capistrano
   capistrano-bower
@@ -551,4 +553,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.15.3
+   1.15.4

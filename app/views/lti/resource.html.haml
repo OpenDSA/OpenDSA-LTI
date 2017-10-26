@@ -1,6 +1,54 @@
+.col-xs-offset-1
+  .row
+    .col-xs-9.alert-msg#alert-box{style: 'display: none;'}
+      .alert.alert-danger.alert-dismissable{role: 'alert'}
+        %button#dismiss-button{type: 'button', class: 'close'}
+          %span
+            &times;
+        %ul#alert-messages
+
+  - unless @organizations.blank?
+    .row
+      %form.form-horizontal#organization_form{method: 'post'}
+        .form-group#select_organization_input
+          %label.col-xs-3.control-label{for: '#select_organization', style: 'width: 33.33%'}
+            Select your organization:
+          .col-xs-6
+            %select.form-control#select_organization{required: true}
+              %option{:value => -2, disabled: true, selected: true}
+              - @organizations.each do |org|
+                %option{:value => org.id}
+                  #{org.name}
+              %option{:value => -1}
+                Other
+
+        #other_organization_inputs{style: 'display:none'}
+          .form-group
+            %label.col-xs-3.control-label{for: '#organization_name', style: 'width: 33.33%'}
+              Organization name:
+            .col-xs-6
+              %input.form-control#organization_name{type: 'text'}
+
+          .form-group
+            %label.col-xs-3.control-label{for: '#organization_abbreviation', style: 'width: 33.33%'}
+              Organization abbreviation:
+            .col-xs-6
+              %input.form-control#organization_abbreviation{type: 'text'}
+
+        .col-xs-offset-4
+          = submit_tag 'Submit', class: 'btn btn-primary'
+
+#using_json
+
 :javascript
   window.jsonFile = #{@json.html_safe}
   window.return_url = "#{params[:launch_presentation_return_url].html_safe}"
   window.odsa_launch_url = "#{@launch_url}"
-
-#using_json
+  window.odsa_organizations = #{@organizations.to_json.html_safe}
+  window.odsa_course_info = {
+    lms_instance_id: #{@lms_instance_id},
+    lms_course_num: #{@lms_course_num},
+    lms_course_code: '#{@lms_course_code}',
+    course_name: '#{@course_name}'
+  }
+  

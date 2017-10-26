@@ -80,6 +80,16 @@ class Term < ActiveRecord::Base
     return result ? result : Term.first
   end
 
+  def self.current_or_next_term
+    now = DateTime.now
+    result = Term.
+      where('starts_on <= :now and :now < ends_on', now: now).first
+    if result == nil
+      result = Term.where('starts_on > :now', now: now).order(starts_on: :asc).first
+    end
+    return result ? result : Term.first
+  end
+
 
   #~ Instance methods .........................................................
 

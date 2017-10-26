@@ -320,7 +320,6 @@ class CourseOfferingsController < ApplicationController
     end
   end
 
-
   # -------------------------------------------------------------
   def generate_gradebook
     @course_enrolled = CourseEnrollment.where(course_offering: @course_offering).

@@ -1,8 +1,9 @@
 class LmsInstance < ActiveRecord::Base
   #~ Relationships ............................................................
   has_many  :lms_accesses, inverse_of: :lms_instances
-  has_many  :course_offerings, inverse_of: :lms_instances
+  has_many  :course_offerings, inverse_of: :lms_instance
   belongs_to  :lms_type, inverse_of: :lms_instances
+  belongs_to :organization
   # has_many :users, :through => :lms_accesses
 
   #~ Validation ...............................................................

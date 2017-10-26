@@ -43,7 +43,7 @@ module RstParser
 
   # Retrieves info about all exercises
   def self.get_exercise_info
-    #return Rails.cache.fetch("all_exercises", expires_in: 12.hours) do
+    return Rails.cache.fetch("all_exercises", expires_in: 12.hours) do
       exercises = get_exercises()
 
       inst_exercises = InstExercise.all()
@@ -71,13 +71,13 @@ module RstParser
       end
 
       return exercises
-    #end
+    end
   end
 
   # Gets a hash map where the key is the short_name of the exercise
   # and the value is an ExerciseInfo object (located in rst_parser.rb)
   def self.get_exercise_map
-    #return Rails.cache.fetch("all_exercises_map", expires_in: 12.hours) do
+    return Rails.cache.fetch("all_exercises_map", expires_in: 12.hours) do
       exercises = get_exercise_info
       ex_map = {}
       exercises.each do |chapter, modules|
@@ -88,7 +88,7 @@ module RstParser
         end
       end
       return ex_map
-    #end
+    end
   end
 
   def self.get_exercises
