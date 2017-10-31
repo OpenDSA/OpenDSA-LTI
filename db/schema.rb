@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171023152922) do
+ActiveRecord::Schema.define(version: 20171027162724) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -210,12 +210,13 @@ ActiveRecord::Schema.define(version: 20171023152922) do
   add_index "inst_chapters", ["inst_book_id"], name: "inst_chapters_inst_book_id_fk", using: :btree
 
   create_table "inst_course_offering_exercises", force: true do |t|
-    t.integer  "course_offering_id",  null: false
-    t.integer  "inst_exercise_id",    null: false
-    t.string   "resource_link_id",    null: false
+    t.integer  "course_offering_id",                          null: false
+    t.integer  "inst_exercise_id",                            null: false
+    t.string   "resource_link_id",                            null: false
     t.string   "resource_link_title"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.decimal  "threshold",           precision: 5, scale: 2, null: false
   end
 
   add_index "inst_course_offering_exercises", ["course_offering_id", "resource_link_id"], name: "index_inst_course_offering_exercises_on_course_offering_resource", unique: true, using: :btree

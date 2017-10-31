@@ -99,33 +99,22 @@ class LtiController < ApplicationController
         course_offering: course_offering,
         inst_exercise_id: @ex.id,
         resource_link_id: params[:resource_link_id],
-        resource_link_title: params[:resource_link_title]
+        resource_link_title: params[:resource_link_title],
+        threshold: @ex.threshold
       )
       @course_off_ex.save
     end
 
     if @ex.instance_of?(AvEmbed)
-      @html_url = @ex.av_address
       render "launch_avembed", layout: 'lti_launch'
     else
-      @links = []
-      @ex.links.each do |link|
-        @links << link
-      end
-      @scripts = []
-      @ex.scripts.each do |script|
-        @scripts << script
-      end
       render 'launch_inlineav', layout: 'lti_launch'
     end
   end
 
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
-    @inst_book = InstBook.find_by(id: request_params['instBookId'])
-    @inst_section = InstSection.find_by(id: request_params['instSectionId'])
-    inst_book_sect_exe_id = request_params['instBookSectionExerciseId']
-    @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id:inst_book_sect_exe_id)
+    hasBook = request_params.key?('instBookId')
 
     @current_user = User.where("email=?", request_params['userEmail']).select("id")
     @num = 0
@@ -135,14 +124,24 @@ class LtiController < ApplicationController
       end
     end
 
-    @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
-                                 request_params['instBookSectionExerciseId'], @num).select(
-                                 "id, user_id, question_name, request_type,
-                                 correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
-                                 pe_score, pe_steps_fixed")
-    @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
-                                 request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
-                                 total_correct, proficient_date,first_done, last_done")
+    if hasBook
+      @inst_book = InstBook.find_by(id: request_params['instBookId'])
+      @inst_section = InstSection.find_by(id: request_params['instSectionId'])
+      inst_book_sect_exe_id = request_params['instBookSectionExerciseId']
+      @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id:inst_book_sect_exe_id)
+      
+
+      @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
+                                  request_params['instBookSectionExerciseId'], @num).select(
+                                  "id, user_id, question_name, request_type,
+                                  correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
+                                  pe_score, pe_steps_fixed")
+      @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
+                                  request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
+                                  total_correct, proficient_date,first_done, last_done")
+    else
+      # TODO
+    end
 
     a = @odsa_exercise_attempts
     b = @odsa_exercise_progress
@@ -179,16 +178,21 @@ class LtiController < ApplicationController
     res = @tp.post_extended_replace_result!(score: score, text: f)
 
     if res.success?
-      @inst_section.lms_posted = true
-      @inst_section.time_posted = Time.now
+      if hasBook
+        @inst_section.lms_posted = true
+        @inst_section.time_posted = Time.now
+        @inst_section.save!
+      end
       render :json => { :message => 'success', :res => res.to_json }.to_json
     else
-      @inst_section.lms_posted = false
+      if hasBook
+        @inst_section.lms_posted = false
+        @inst_section.save!
+      end
       render :json => { :message => 'failure', :res => res.to_json }.to_json
       error = Error.new(:class_name => 'post_replace_result_fail', :message => res.inspect, :params => lti_param.to_s)
       error.save!
     end
-    @inst_section.save!
   end
 
   def xml_config
@@ -197,7 +201,11 @@ class LtiController < ApplicationController
     tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
     tc.description = "OpenDSA LTI Tool Provider supports LIS Outcome pass-back."
     tc.canvas_privacy_public!
-    tc.canvas_resource_selection!({:url => host + '/lti/resource'})
+    tc.canvas_resource_selection!({
+      :url => host + '/lti/resource',
+      :selection_width => 800,
+      :selection_height => 600
+    })
 
     tc.set_ext_param('canvas.instructure.com', :canvas_api_base_url, '$Canvas.api.baseUrl')
 
@@ -323,7 +331,7 @@ class LtiController < ApplicationController
                                                lms_course_num: lms_course_num)
       if course_offering.blank?
         if organization_id.blank?
-          return 
+          return nil
         end
         course = Course.where(number: lms_course_code, 
           organization_id: organization_id).first

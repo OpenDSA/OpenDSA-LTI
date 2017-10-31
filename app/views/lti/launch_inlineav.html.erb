@@ -1,12 +1,12 @@
-<% @links.each do |l| %>
+<% @ex.links.each do |l| %>
   <link rel="stylesheet" href="<%= l %>"/>
 <% end %>
-<% @scripts.each do |s| %>
+<% @ex.scripts.each do |s| %>
   <script src="<%= s %>" type="text/javascript"></script>
 <% end %>
 <div class="section">
   <div id="<%= @ex.short_name %>" class="ssAV" data-points="<%= @ex.points %>" 
-      data-threshold="<%= @ex.threshold %>" data-type="<%= @ex.type %>" 
+      data-threshold="<%= @course_off_ex.threshold %>" data-type="<%= @ex.type %>" 
       data-required="<%= @ex.required %>" data-long-name="<%= @ex.long_name %>">
     <span class="jsavcounter"></span>
     <a class="jsavsettings" href="#">Settings</a>

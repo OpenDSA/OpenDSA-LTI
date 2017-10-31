@@ -6,18 +6,25 @@ class OdsaUserInteractionsController < ApplicationController
   # -------------------------------------------------------------
   # POST /odsa_user_interactions/create
   def create
-    inst_book = InstBook.find_by(id: params[:inst_book_id])
+    hasBook = params.key?(:inst_book_id)
+    if hasBook
+      inst_book = InstBook.find_by(id: params[:inst_book_id])
+    else
+      inst_course_offering_exercise = InstCourseOfferingExercise.find_by(id: params[:inst_course_offering_exercise_id])
+    end
 
     failed_to_save = false
     params[:eventList].each do |event|
-      if event[:inst_section_id] !=""
-        inst_section = InstSection.find_by(id: event[:inst_section_id])
-      end
-      if event[:av] != ""
-        inst_exercise = InstExercise.find_by(short_name: event[:av])
-        inst_book_section_exercise = InstBookSectionExercise.where(
-                                                  "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-                                                    params[:inst_book_id], inst_section.id, inst_exercise.id).first
+      if hasBook
+        if event[:inst_section_id] !=""
+          inst_section = InstSection.find_by(id: event[:inst_section_id])
+        end
+        if event[:av] != ""
+          inst_exercise = InstExercise.find_by(short_name: event[:av])
+          inst_book_section_exercise = InstBookSectionExercise.where(
+                                      "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+                                        params[:inst_book_id], inst_section.id, inst_exercise.id).first
+        end
       end
       # if browser.mobile?
       #   device = "Mobile"
@@ -31,6 +38,7 @@ class OdsaUserInteractionsController < ApplicationController
                                             user: current_user,
                                             inst_section: inst_section,
                                             inst_book_section_exercise: inst_book_section_exercise,
+                                            inst_course_offering_exercise: inst_course_offering_exercise,
                                             name: event[:type],
                                             description: event[:desc],
                                             action_time: Time.at(event[:tstamp].to_f / 1000),
