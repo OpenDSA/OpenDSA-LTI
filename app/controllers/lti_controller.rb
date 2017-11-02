@@ -80,11 +80,33 @@ class LtiController < ApplicationController
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
     hasBook = request_params.key?('instBookId')
-    user_id = User.where(email: request_params['userEmail']).select('id').first
 
     if hasBook
       inst_section = InstSection.find_by(id: request_params['instSectionId'])
+      
+      @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
+                                  request_params['instBookSectionExerciseId'], current_user.id).select(
+                                  "id, user_id, question_name, request_type,
+                                  correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
+                                  pe_score, pe_steps_fixed")
+      @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
+                                  request_params['instBookSectionExerciseId'], current_user.id).select("user_id, current_score, highest_score,
+                                  total_correct, proficient_date,first_done, last_done")
+    else
+      @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_course_offering_exercise_id=? AND user_id=?",
+                                  request_params['instCourseOfferingExerciseId'], current_user.id).select(
+                                  "id, user_id, question_name, request_type,
+                                  correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
+                                  pe_score, pe_steps_fixed")
+      @odsa_exercise_progress = OdsaExerciseProgress.where("inst_course_offering_exercise_id=? AND user_id=?",
+                                  request_params['instCourseOfferingExerciseId'], current_user.id).select("user_id, current_score, highest_score,
+                                  total_correct, proficient_date,first_done, last_done")
     end
+
+    a = @odsa_exercise_attempts
+    b = @odsa_exercise_progress
+    TableHelper.arg(a, b)
+    f = render_to_string "lti/table.html.erb"
 
     launch_params = request_params['toParams']['launch_params']
     if launch_params
@@ -94,6 +116,7 @@ class LtiController < ApplicationController
       @message = "The tool never launched"
       render(:error)
     end
+
     lti_param = {
       "lis_outcome_service_url" => "#{launch_params['lis_outcome_service_url']}",
       "lis_result_sourcedid" => "#{launch_params['lis_result_sourcedid']}"
@@ -112,7 +135,8 @@ class LtiController < ApplicationController
     # post the given score to the TC
     score = (request_params['toParams']['score'] != '' ? request_params['toParams']['score'] : nil)
     #res = @tp.post_replace_result!(score)
-    res = @tp.post_extended_replace_result!(score: score)#, text: f)
+    res = @tp.post_extended_replace_result!(score: score, text: f)
+
     if res.success?
       if hasBook
         inst_section.lms_posted = true
