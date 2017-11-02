@@ -1,12 +1,13 @@
-require 'byebug'
-
 class LtiController < ApplicationController
   layout 'lti', only: [:launch]
 
-  after_action :allow_iframe, only: [:launch, :launch_ex, :resource]
+  after_action :allow_iframe, only: [:launch, :resource]
   # the consumer keys/secrets
 
   def launch
+    if not params.key?(:custom_inst_book_id)
+      launch_ex and return
+    end
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
@@ -76,77 +77,14 @@ class LtiController < ApplicationController
                               "#{params[:custom_section_file_name].to_s}.html")) and return
   end
 
-  def launch_ex
-    require 'oauth/request_proxy/rack_request'
-    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
-    course_offering = CourseOffering.joins(:lms_instance).where(
-      lms_instances: {url: params[:custom_canvas_api_base_url]}, 
-      course_offerings: {lms_course_num: params[:custom_canvas_course_id]}
-    ).first
-
-    render('error') and return unless lti_authorize!
-    ensure_user()
-    lti_enroll(course_offering)
-
-    require 'RST/rst_parser'
-    @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
-    @course_off_ex = InstCourseOfferingExercise.find_by(
-      course_offering_id: course_offering.id, 
-      resource_link_id: params[:resource_link_id]
-    )
-    if @course_off_ex.blank?
-      @course_off_ex = InstCourseOfferingExercise.new(
-        course_offering: course_offering,
-        inst_exercise_id: @ex.id,
-        resource_link_id: params[:resource_link_id],
-        resource_link_title: params[:resource_link_title],
-        threshold: @ex.threshold
-      )
-      @course_off_ex.save
-    end
-
-    if @ex.instance_of?(AvEmbed)
-      render "launch_avembed", layout: 'lti_launch'
-    else
-      render 'launch_inlineav', layout: 'lti_launch'
-    end
-  end
-
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
     hasBook = request_params.key?('instBookId')
-
-    @current_user = User.where("email=?", request_params['userEmail']).select("id")
-    @num = 0
-    @current_user.collect! do |d|
-      d.attributes.each do |x, y|
-        @num = y
-      end
-    end
+    user_id = User.where(email: request_params['userEmail']).select('id').first
 
     if hasBook
-      @inst_book = InstBook.find_by(id: request_params['instBookId'])
-      @inst_section = InstSection.find_by(id: request_params['instSectionId'])
-      inst_book_sect_exe_id = request_params['instBookSectionExerciseId']
-      @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id:inst_book_sect_exe_id)
-      
-
-      @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
-                                  request_params['instBookSectionExerciseId'], @num).select(
-                                  "id, user_id, question_name, request_type,
-                                  correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
-                                  pe_score, pe_steps_fixed")
-      @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
-                                  request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
-                                  total_correct, proficient_date,first_done, last_done")
-    else
-      # TODO
+      inst_section = InstSection.find_by(id: request_params['instSectionId'])
     end
-
-    a = @odsa_exercise_attempts
-    b = @odsa_exercise_progress
-    TableHelper.arg(a, b)
-    f = render_to_string "lti/table.html.erb"
 
     launch_params = request_params['toParams']['launch_params']
     if launch_params
@@ -156,7 +94,6 @@ class LtiController < ApplicationController
       @message = "The tool never launched"
       render(:error)
     end
-
     lti_param = {
       "lis_outcome_service_url" => "#{launch_params['lis_outcome_service_url']}",
       "lis_result_sourcedid" => "#{launch_params['lis_result_sourcedid']}"
@@ -175,19 +112,18 @@ class LtiController < ApplicationController
     # post the given score to the TC
     score = (request_params['toParams']['score'] != '' ? request_params['toParams']['score'] : nil)
     #res = @tp.post_replace_result!(score)
-    res = @tp.post_extended_replace_result!(score: score, text: f)
-
+    res = @tp.post_extended_replace_result!(score: score)#, text: f)
     if res.success?
       if hasBook
-        @inst_section.lms_posted = true
-        @inst_section.time_posted = Time.now
-        @inst_section.save!
+        inst_section.lms_posted = true
+        inst_section.time_posted = Time.now
+        inst_section.save!
       end
       render :json => { :message => 'success', :res => res.to_json }.to_json
     else
       if hasBook
-        @inst_section.lms_posted = false
-        @inst_section.save!
+        inst_section.lms_posted = false
+        inst_section.save!
       end
       render :json => { :message => 'failure', :res => res.to_json }.to_json
       error = Error.new(:class_name => 'post_replace_result_fail', :message => res.inspect, :params => lti_param.to_s)
@@ -207,7 +143,9 @@ class LtiController < ApplicationController
       :selection_height => 600
     })
 
-    tc.set_ext_param('canvas.instructure.com', :canvas_api_base_url, '$Canvas.api.baseUrl')
+    tc.set_canvas_ext_param(:custom_fields, {
+      canvas_api_base_url: '$Canvas.api.baseUrl'
+    })
 
     render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
   end
@@ -231,7 +169,7 @@ class LtiController < ApplicationController
       @organizations = Organization.all
     end
     
-    @launch_url = request.protocol + request.host_with_port + "/lti/launch_ex"
+    @launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
@@ -266,6 +204,42 @@ class LtiController < ApplicationController
   end
 
   private
+
+    def launch_ex
+      require 'oauth/request_proxy/rack_request'
+      $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+      course_offering = CourseOffering.joins(:lms_instance).where(
+        lms_instances: {url: params[:custom_canvas_api_base_url]}, 
+        course_offerings: {lms_course_num: params[:custom_canvas_course_id]}
+      ).first
+
+      render('error') and return unless lti_authorize!
+      ensure_user()
+      lti_enroll(course_offering)
+
+      require 'RST/rst_parser'
+      @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
+      @course_off_ex = InstCourseOfferingExercise.find_by(
+        course_offering_id: course_offering.id, 
+        resource_link_id: params[:resource_link_id]
+      )
+      if @course_off_ex.blank?
+        @course_off_ex = InstCourseOfferingExercise.new(
+          course_offering: course_offering,
+          inst_exercise_id: @ex.id,
+          resource_link_id: params[:resource_link_id],
+          resource_link_title: params[:resource_link_title],
+          threshold: @ex.threshold
+        )
+        @course_off_ex.save
+      end
+
+      if @ex.instance_of?(AvEmbed)
+        render "launch_avembed", layout: 'lti_launch'
+      else
+        render 'launch_inlineav', layout: 'lti_launch'
+      end
+    end
 
     def lti_enroll(course_offering, role = CourseRole.student)
       if course_offering &&

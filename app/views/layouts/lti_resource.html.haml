@@ -5,9 +5,6 @@
     = stylesheet_link_tag 'bs', media: 'all'
     = stylesheet_link_tag 'jstree-default', media: 'all'
     = stylesheet_link_tag 'custom', media: 'all'
-    = javascript_include_tag 'jquery'
-    = javascript_include_tag 'jstree'
-    = javascript_include_tag 'lti_resource'
     = stylesheet_link_tag 'theme/warm/theme', media: 'all'
     = javascript_include_tag 'theme/warm/theme'
     = csrf_meta_tags
@@ -19,4 +16,8 @@
   %body
     .full-height.content#main
       = yield
+
+    = javascript_include_tag 'jquery'
+    = javascript_include_tag 'jstree'
+    = javascript_include_tag 'lti_resource'
     

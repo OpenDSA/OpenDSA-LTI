@@ -82,7 +82,7 @@ class OdsaExerciseAttemptsController < ApplicationController
                                                     current_user.id,
                                                     inst_book_section_exercise.id).first
         else
-          exercise_progress = OdsaExerciseProgress.find_by(
+          exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
             inst_course_offering_exercise_id: inst_course_offering_exercise.id)
         end
 

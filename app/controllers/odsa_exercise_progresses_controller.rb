@@ -51,7 +51,9 @@ class OdsaExerciseProgressesController < ApplicationController
       threshold = inst_book_section_exercise.threshold
     else
       inst_course_offering_exercise = InstCourseOfferingExercise.find_by(id: params[:inst_course_offering_exercise_id])
-      exercise_progress = OdsaExerciseProgress.find_by(inst_course_offering_exercise_id: inst_course_offering_exercise.id)
+      exercise_progress = OdsaExerciseProgress.find_by(
+        inst_course_offering_exercise_id: inst_course_offering_exercise.id,
+        user_id: current_user.id)
       threshold = inst_course_offering_exercise.threshold
     end
     # inst_book_section_exercise = InstBookSectionExercise.find_by(id: exercise_progress.inst_book_section_exercise_id)
