@@ -38,7 +38,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   controller do
     def scoped_collection
       InstBook.joins(:course_offering).where('course_offerings.archived = false').
-      union(InstBook.where("template = ?", 1))
+      union(InstBook.where("template = ? or course_offering_id is null", 1))
     end
 
     def clone

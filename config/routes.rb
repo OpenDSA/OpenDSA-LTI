@@ -111,6 +111,7 @@ CodeWorkout::Application.routes.draw do
     get 'search' => 'courses#search', as: :courses_search
     post 'find' => 'courses#find', as: :course_find
     get 'new' => 'courses#new'
+    get 'list' => 'courses#list', as: :course_list
     get ':id/edit' => 'courses#edit', as: :course_edit
     get ':course_id/:term_id/:id/practice(/:exercise_id)' => 'workout_offerings#practice', as: :workout_offering_practice
     get ':course_id/:term_id/:workout_offering_id/:id' => 'exercises#practice', as: :workout_offering_exercise
@@ -122,6 +123,7 @@ CodeWorkout::Application.routes.draw do
     get ':id(/:term_id)' => 'courses#show', as: :course
   end
   post 'organizations' => 'organizations#create', as: :organization_create
+  post 'courses' => 'courses#create'
 
   resources :course_offerings, only: [ :edit, :update ] do
     # post 'enroll' => :enroll, as: :enroll

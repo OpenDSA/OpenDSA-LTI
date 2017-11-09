@@ -1,53 +1,88 @@
 :javascript
-  window.jsonFile = #{@json.html_safe}
-  window.return_url = "#{params[:launch_presentation_return_url].html_safe}"
-  window.odsa_launch_url = "#{@launch_url}"
-  window.odsa_organizations = #{@organizations.to_json.html_safe}
+  window.jsonFile = #{@json.html_safe};
+  window.return_url = "#{params[:launch_presentation_return_url].html_safe}";
+  window.odsa_launch_url = "#{@launch_url}";
+  window.odsa_organizations = #{@organizations.blank? ? 'undefined' : @organiations.to_json.html_safe};
+  window.organization_id = #{@organization_id.blank? ? 'undefined' : @organization_id};
   window.odsa_course_info = {
-    lms_instance_id: #{@lms_instance_id},
-    lms_course_num: #{@lms_course_num},
-    lms_course_code: '#{@lms_course_code}',
-    course_name: '#{@course_name}'
-  }
+    course_offering: {
+      lms_instance_id: #{@lms_instance_id},
+      lms_course_num: #{@lms_course_num},
+      lms_course_code: '#{@lms_course_code}',
+      label: '#{@lms_course_code}'
+    }
+  };
+  window.course_offering_id = #{@course_offering.blank? ? 'undefined' : @course_offering.id};
 
-.col-xs-offset-1
-  .row
-    .col-xs-9.alert-msg#alert-box{style: 'display: none;'}
-      .alert.alert-danger.alert-dismissable{role: 'alert'}
-        %button#dismiss-button{type: 'button', class: 'close'}
-          %span
-            &times;
-        %ul#alert-messages
+.row
+  .col-xs-9.alert-msg#alert-box{style: 'display: none;'}
+    .alert.alert-danger.alert-dismissable{role: 'alert'}
+      %button#dismiss-button{type: 'button', class: 'close'}
+        %span
+          &times;
+      %ul#alert-messages
 
-  - unless @organizations.blank?
+  - if @course_offering.blank?
     .row
-      %form.form-horizontal#organization_form{method: 'post'}
-        .form-group#select_organization_input
-          %label.col-xs-3.control-label{for: '#select_organization', style: 'width: 33.33%'}
-            Select your organization:
+      %form.form-horizontal#course_info_form{method: 'post'}
+        %h3.col-xs-offset-1
+          Please provide some information about your course
+        - unless @organizations.blank?
+          .form-group#select_organization_input
+            %label.control-label{for: '#select_organization'}
+              Organization:
+            .col-xs-6
+              %select.form-control#select_organization{required: true}
+                %option{:value => -2, disabled: true, selected: true}
+                - @organizations.each do |org|
+                  %option{:value => org.id}
+                    #{org.name}
+                %option{:value => -1}
+                  Other
+
+          #other_organization_inputs{style: 'display:none'}
+            .form-group
+              %label.control-label{for: '#organization_name'}
+                Organization name:
+              .col-xs-6
+                %input.form-control#organization_name{type: 'text', placeholder: 'e.g. Virginia Tech'}
+
+            .form-group
+              %label.control-label{for: '#organization_abbreviation'}
+                Organization abbreviation:
+              .col-xs-6
+                %input.form-control#organization_abbreviation{type: 'text', placeholder: 'e.g. VT'}
+
+        .form-group#select_term_input
+          %label.control-label{for: '#select_term'}
+            Term:
           .col-xs-6
-            %select.form-control#select_organization{required: true}
+            %select.form-control#select_term{required: true}
               %option{:value => -2, disabled: true, selected: true}
-              - @organizations.each do |org|
-                %option{:value => org.id}
-                  #{org.name}
-              %option{:value => -1}
-                Other
+              - @terms.each do |term|
+                %option{:value => term.id}
+                  #{term.display_name}
 
-        #other_organization_inputs{style: 'display:none'}
+        .form-group#select_course_input
+          %label.control-label{for: '#select_course'}
+            Course:
+          .col-xs-6
+            %select.form-control#select_course{disabled: true, required: true}
+
+        #other_course_inputs{style: 'display:none'}
           .form-group
-            %label.col-xs-3.control-label{for: '#organization_name', style: 'width: 33.33%'}
-              Organization name:
+            %label.control-label{for: '#course_number'}
+              Course number:
             .col-xs-6
-              %input.form-control#organization_name{type: 'text'}
-
+              %input.form-control#course_number{type: 'text', placeholder: 'e.g. CS3114'}
+          
           .form-group
-            %label.col-xs-3.control-label{for: '#organization_abbreviation', style: 'width: 33.33%'}
-              Organization abbreviation:
+            %label.control-label{for: '#course_name'}
+              Course name:
             .col-xs-6
-              %input.form-control#organization_abbreviation{type: 'text'}
+              %input.form-control#course_name{type: 'text', placeholder: 'e.g. Data Structures and Algorithms'}
 
-        .col-xs-offset-4
+        .col-xs-offset-5
           = submit_tag 'Submit', class: 'btn btn-primary'
 
 #using_json

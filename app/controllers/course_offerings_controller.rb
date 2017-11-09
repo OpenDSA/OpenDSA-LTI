@@ -158,6 +158,10 @@ class CourseOfferingsController < ApplicationController
   # -------------------------------------------------------------
   # POST /course_offerings
   def create
+    unless params.key?(:inst_book_id)
+      create_lti_course_offering
+      return
+    end
     lms_instance = LmsInstance.find_by(id: params[:lms_instance_id])
     course = Course.find_by(id: params[:course_id])
     term = Term.find_by(id: params[:term_id])
@@ -275,7 +279,6 @@ class CourseOfferingsController < ApplicationController
   # TODO: Needs to be redone so that it will read an actual CSV
   #       file of student enrollment info and not just a list of
   #       e-mail addresses.
-
   def upload_roster
     form_contents = params[:form]
     puts form_contents.fetch(:rosterfile).path
@@ -369,6 +372,30 @@ class CourseOfferingsController < ApplicationController
 
   #~ Private instance methods .................................................
   private
+
+  def create_lti_course_offering
+    if not can? :create, CourseOffering
+      render :json => ['You are not authorized to create course offerings.'], :status => :forbidden
+      return
+    end
+    info = params[:course_offering]
+    course_offering = CourseOffering.new(
+      course_id: info[:course_id],
+      term_id: info[:term_id],
+      label: info[:label],
+      lms_instance_id: info[:lms_instance_id],
+      lms_course_code: info[:lms_course_code],
+      lms_course_num: info[:lms_course_num])
+    if course_offering.save
+      CourseEnrollment.create(
+        course_offering: course_offering,
+        user: current_user,
+        course_role: CourseRole.instructor)
+      render :json => course_offering, :status => :created
+    else
+      render :json => course_offering.errors.full_messages, :status => :bad_request 
+    end
+  end
 
     # -------------------------------------------------------------
     def rename_course_offering_id_param

@@ -186,11 +186,12 @@ class LtiController < ApplicationController
     @lms_course_code = params[:context_label]
     @lms_instance_id = lms_instance.id
     @organization_id = lms_instance.organization_id
-    @course_name = params[:context_title]
-    course_offering = ensure_course_offering(@lms_instance_id, @organization_id, 
-                      @lms_course_num, @lms_course_code, @course_name)
-    if course_offering.blank?
-      @organizations = Organization.all
+    @course_offering = CourseOffering.find_by(lms_instance_id: lms_instance.id, lms_course_num: @lms_course_num)
+    if @course_offering.blank?
+      if lms_instance.organization_id.blank?
+        @organizations = Organization.all
+      end
+      @terms = Term.on_or_future
     end
     
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
@@ -210,21 +211,6 @@ class LtiController < ApplicationController
     @json = exercises.to_json()
 
     render layout: 'lti_resource'
-  end
-
-  def create_course_offering
-    course_offering = ensure_course_offering(
-      params[:lms_instance_id],
-      params[:organization_id],
-      params[:lms_course_num],
-      params[:lms_course_code],
-      params[:course_name])
-    if course_offering.valid?
-      lti_enroll(course_offering, CourseRole.instructor)
-      render :json => course_offering, :status => :created
-    else
-      render :json => course_offering.errors.full_messages, :status => :bad_request 
-    end
   end
 
   private
@@ -271,9 +257,9 @@ class LtiController < ApplicationController
         !course_offering.is_enrolled?(current_user)
 
         CourseEnrollment.create(
-        course_offering: course_offering,
-        user: current_user,
-        course_role: role)
+          course_offering: course_offering,
+          user: current_user,
+          course_role: role)
       end
     end
 
