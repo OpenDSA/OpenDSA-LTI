@@ -1,0 +1,1 @@
+json.set! :odsa_exercise_attempts, @exercise_list
