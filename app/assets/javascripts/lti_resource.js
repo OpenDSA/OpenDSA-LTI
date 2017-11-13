@@ -57,7 +57,10 @@
           disableOtherCourseInputs();
         }
       });
-      if (!hasOrg) {
+      if (hasOrg) {
+        populateCourses(window.organization_id);
+      }
+      else {
         $('#select_organization').on('change', function () {
           var orgId = $('#select_organization').val();
           if (orgId == -1) {
