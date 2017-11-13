@@ -58,11 +58,14 @@ module RstParser
             if inst_ex_map.has_key?(ex.short_name)
               ex.id = inst_ex_map[ex.short_name]
             else
-              # the exercise has not been saved to the database yet
-              inst_ex = InstExercise.new
-              inst_ex.short_name = ex.short_name
-              inst_ex.name = ex.long_name
-              inst_ex.save
+              inst_ex = InstExercise.find_by(short_name: ex.short_name)
+              if inst_ex is nil
+                # the exercise has not been saved to the database yet
+                inst_ex = InstExercise.new
+                inst_ex.short_name = ex.short_name
+                inst_ex.name = ex.long_name
+                inst_ex.save
+              end
               inst_ex_map[ex.short_name] = inst_ex.id
               ex.id = inst_ex.id
             end
