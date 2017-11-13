@@ -63,13 +63,18 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     end
 
     def upload_create
-      hash = JSON.load(File.read(params[:form][:file].path))
+      script_path = "public/OpenDSA/tools/simple2full.py"
+      input_file = params[:form][:file].path
+      output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
+      output_file_path = "public/OpenDSA/config/temp/#{output_file}"
+      stdout = %x(python #{script_path} #{input_file} #{output_file_path})
+
+      hash = JSON.load(File.read(output_file_path))
       if params.has_key?(:inst_book)
         InstBook.save_data_from_json(hash, current_user, params[:inst_book]["id"])
       else
         InstBook.save_data_from_json(hash, current_user)
       end
-
 
       redirect_to admin_inst_books_path, notice: 'Book configuration uploaded successfully!'
     end
@@ -88,6 +93,12 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       title = inst_book.title
       inst_book.destroy
       redirect_to admin_inst_books_path, notice: "Book configuration '#{title}' was deleted successfully!"
+    end
+
+    def sanitize_filename(filename)
+      filename.gsub(/[^\w\s_-]+/, '')
+                    .gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2')
+                    .gsub(/\s+/, '_')
     end
   end
 

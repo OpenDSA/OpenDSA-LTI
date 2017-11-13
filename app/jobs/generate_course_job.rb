@@ -22,7 +22,6 @@ class GenerateCourseJob < ProgressJob::Base
     inst_book_json = ApplicationController.new.render_to_string(
                       template: 'inst_books/show.json.jbuilder',
                       locals: {:@inst_book => @inst_book})
-
     require 'json'
     config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
     config_file_path = "public/OpenDSA/config/temp/#{config_file}"
@@ -200,12 +199,16 @@ class GenerateCourseJob < ProgressJob::Base
 
     sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
 
-
     section_item_position = 1
     section_file_name_seq = 1
+    hidden_sections = 0
 
     if !sections.empty?
       sections.each do |section|
+        if !section.show
+          hidden_sections += 1
+          next
+        end
         save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
                                       section, module_item_position, section_item_position, section_file_name_seq)
         section_item_position += 1
@@ -221,7 +224,7 @@ class GenerateCourseJob < ProgressJob::Base
                                     nil, module_item_position, section_item_position, section_file_name_seq)
     end
 
-    module_item_position + section_item_position
+    module_item_position + section_item_position + hidden_sections
 
   end
 
