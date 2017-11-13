@@ -173,4 +173,15 @@ namespace :deploy do
     end
   end
 
+  after 'deploy:pull_opendsa', 'deploy:clear_rails_cache' do
+    on roles :all do
+      desc 'Clear the Rails Cache of specific entries'
+      task :clear_rails_cache do
+          # used by lib/RST/rst_parser.rb
+          Rails.cache.delete('odsa_all_exercises')
+          Rails.cache.delete('odsa_all_exercises_map')
+      end
+    end
+  end
+
 end
