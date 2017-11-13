@@ -12,7 +12,8 @@ CodeWorkout::Application.routes.draw do
   resources :odsa_exercise_attempts
   # resources :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
-  get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' => 'odsa_exercise_progresses#show_exercise'
+  get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' => 'odsa_exercise_progresses#show_exercise',
+     constraints: { inst_course_offering_exercise_id: /\d+/}
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id' => 'odsa_exercise_progresses#show_section'
   get '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
