@@ -59,7 +59,7 @@ module RstParser
               ex.id = inst_ex_map[ex.short_name]
             else
               inst_ex = InstExercise.find_by(short_name: ex.short_name)
-              if inst_ex is nil
+              if inst_ex.blank?
                 # the exercise has not been saved to the database yet
                 inst_ex = InstExercise.new
                 inst_ex.short_name = ex.short_name
