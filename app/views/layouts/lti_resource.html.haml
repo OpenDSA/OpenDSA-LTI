@@ -2,11 +2,12 @@
   %head
     %title OpenDSA
     %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1.0' }
-    = stylesheet_link_tag 'bs', media: 'all'
-    = stylesheet_link_tag 'jstree-default', media: 'all'
-    = stylesheet_link_tag 'custom', media: 'all'
+    = stylesheet_link_tag 'application', media: 'all'
+    = javascript_include_tag 'application', media: 'all'
     = stylesheet_link_tag 'theme/warm/theme', media: 'all'
     = stylesheet_link_tag 'lti_resource', media: 'all'
+    = javascript_include_tag 'theme/warm/theme'
+    = javascript_include_tag 'lti_resource'
     = csrf_meta_tags
     = favicon_link_tag 'favicon.ico'
     /[if lt IE 9]
@@ -16,7 +17,3 @@
   %body
     .full-height.content#main
       = yield
-
-    = javascript_include_tag 'theme/warm/theme'
-    = javascript_include_tag 'application'
-    
