@@ -164,32 +164,36 @@ class LtiController < ApplicationController
     tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
     tc.description = "OpenDSA LTI Tool Provider supports LIS Outcome pass-back."
     tc.canvas_privacy_public!
-    tc.canvas_resource_selection!({
-      :url => host + '/lti/resource',
-      :selection_width => 800,
-      :selection_height => 600
-    })
+    # tc.canvas_resource_selection!({
+    #   :url => host + '/lti/resource',
+    #   :selection_width => 800,
+    #   :selection_height => 600
+    # })
 
     tc.set_canvas_ext_param(:custom_fields, {
       canvas_api_base_url: '$Canvas.api.baseUrl'
     })
+    tc.set_canvas_ext_param(:assignment_selection, {
+      message_type: 'ContentItemSelectionRequest',
+      url: host + 'lti/resource'
+    })
+    tc.canvas_selector_dimensions!(800, 600)
 
     render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
   end
 
   def resource
-    lms_type = params[:tool_consumer_info_product_family_code].downcase
-    unless lms_type == 'canvas'
-      @message = "#{lms_type} is not supported"
-      render('error') and return
-    end
-
+    lms_type = ensure_lms_type(params[:tool_consumer_info_product_family_code])
     lms_instance = ensure_lms_instance()
+    
     @lms_course_num = params[:custom_canvas_course_id]
     @lms_course_code = params[:context_label]
     @lms_instance_id = lms_instance.id
     @organization_id = lms_instance.organization_id
-    @course_offering = CourseOffering.find_by(lms_instance_id: lms_instance.id, lms_course_num: @lms_course_num)
+    @course_offering = CourseOffering.find_by(
+        lms_instance_id: lms_instance.id, 
+        lms_course_num: @lms_course_num
+      )
     if @course_offering.blank?
       if lms_instance.organization_id.blank?
         @organizations = Organization.all
@@ -313,6 +317,19 @@ class LtiController < ApplicationController
       false
     end
 
+    def get_lms_course_num(lms_type_name)
+      if lms_type_name.downcase == 'canvas'
+        return params[:custom_canvas_course_id]
+      else
+        
+        # We either don't know what parameter the lms uses for course id
+        # or the lms does not provide us a course id (e.g. Moodle)
+        # so we generate a uuid to identify the course and tell the
+        # lms to provide the uuid on every resource or launch request
+        require 'SecureRandom'
+      end
+    end
+
     def ensure_course_offering(lms_instance_id, organization_id, lms_course_num, lms_course_code, course_name)
       course_offering = CourseOffering.find_by(lms_instance_id: lms_instance_id, 
                                                lms_course_num: lms_course_num)
@@ -343,12 +360,21 @@ class LtiController < ApplicationController
       return course_offering
     end
 
-    def ensure_lms_instance
-      lms_instance = LmsInstance.find_by(url: params[:custom_canvas_api_base_url])
+    def ensure_lms_type(type_name)
+      lms_type = LmsType.where('lower(name) = ?', lms_type_name.downcase).first
+      if lms_type.blank?
+        lms_type = LmsType.new(name: lms_type_name)
+        lms_type.save
+      end
+      return lms_type
+    end
+
+    def ensure_lms_instance(url, lms_type)
+      lms_instance = LmsInstance.find_by(url: url)
       if lms_instance.blank?
         lms_instance = LmsInstance.new(
-          url: params[:custom_canvas_api_base_url],
-          lms_type: LmsType.find_by('lower(name) = :name', name: params[:tool_consumer_info_product_family_code]),
+          url: url,
+          lms_type: lms_type,
         )
         lms_instance.save
       end

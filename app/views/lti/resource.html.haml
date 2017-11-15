@@ -1,6 +1,6 @@
 :javascript
   window.jsonFile = #{@json.html_safe};
-  window.return_url = "#{params[:launch_presentation_return_url].html_safe}";
+  window.return_url = "#{params[:content_item_return_url].html_safe}";
   window.odsa_launch_url = "#{@launch_url}";
   window.odsa_organizations = #{@organizations.blank? ? 'undefined' : @organiations.to_json.html_safe};
   window.organization_id = #{@organization_id.blank? ? 'undefined' : @organization_id};

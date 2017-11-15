@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027162724) do
+ActiveRecord::Schema.define(version: 20171115162625) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -51,13 +51,13 @@ ActiveRecord::Schema.define(version: 20171027162724) do
     t.integer  "late_policy_id"
     t.integer  "lms_instance_id",                         null: false
     t.string   "lms_course_code"
-    t.integer  "lms_course_num",                          null: false
+    t.string   "lms_course_num",                          null: false
     t.boolean  "archived",                default: false
   end
 
   add_index "course_offerings", ["course_id"], name: "index_course_offerings_on_course_id", using: :btree
   add_index "course_offerings", ["late_policy_id"], name: "course_offerings_late_policy_id_fk", using: :btree
-  add_index "course_offerings", ["lms_instance_id"], name: "course_offerings_lms_instance_id_fk", using: :btree
+  add_index "course_offerings", ["lms_instance_id", "lms_course_num"], name: "index_course_offerings_on_lms_instance_id_and_lms_course_num", using: :btree
   add_index "course_offerings", ["term_id"], name: "index_course_offerings_on_term_id", using: :btree
 
   create_table "course_roles", force: true do |t|
