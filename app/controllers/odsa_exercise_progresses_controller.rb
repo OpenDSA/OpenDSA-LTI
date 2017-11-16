@@ -4,7 +4,7 @@ class OdsaExerciseProgressesController < ApplicationController
   #~ Action methods ...........................................................
   def update
     inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
-    hasBook = params.key?([:inst_book_id])
+    hasBook = params.key?(:inst_book_id)
     if hasBook
       inst_book_section_exercise = InstBookSectionExercise.where(
                                     "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
@@ -31,10 +31,15 @@ class OdsaExerciseProgressesController < ApplicationController
     respond_to do |format|
       if exercise_progress.save
         msg = { :status => "success", :message => "Success!" }
+        format.json  { render :json => msg }
       else
-        msg = { :status => "fail", :message => "Fail!" }
+        msg = { :status => "fail", :message => exercise_progress.errors.full_messages }
+        format.json { render :json => msg, :status => :bad_request }
+        error = Error.new(:class_name => 'exercise_progress_save_fail', 
+            :message => exercise_progress.errors.full_messages.inspect, 
+            :params => params.to_s)
+        error.save!
       end
-      format.json  { render :json => msg }
     end
   end
 

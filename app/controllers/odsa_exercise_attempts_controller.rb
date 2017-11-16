@@ -90,8 +90,12 @@ class OdsaExerciseAttemptsController < ApplicationController
                                         :exercise_progress => exercise_progress,
                                         :threshold => threshold}}
       else
-        msg = { :status => "fail", :message => "Fail!" }
-        format.json  { render :json => msg }
+        msg = { :status => "fail", :message => exercise_attempt.errors.full_messages }
+        format.json  { render :json => msg, :status => :bad_request }
+        error = Error.new(:class_name => 'exercise_attempt_save_fail', 
+            :message => exercise_attempt.errors.full_messages.inspect,
+            :params => params.to_s)
+        error.save!
       end
     end
   end

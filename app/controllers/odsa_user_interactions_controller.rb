@@ -7,6 +7,7 @@ class OdsaUserInteractionsController < ApplicationController
   # POST /odsa_user_interactions/create
   def create
     failed_to_save = false
+    errors = []
     params[:eventList].each do |event|
       hasBook = event.key?(:inst_book_id)
       if hasBook
@@ -54,16 +55,22 @@ class OdsaUserInteractionsController < ApplicationController
         failed_to_save = false
       else
         failed_to_save = true
+        error_msgs << @user_interaction.errors.full_messages
       end
     end
 
     respond_to do |format|
       if !failed_to_save
         msg = { :status => "ok", :message => "Success!" }
+        status = :ok
       else
         msg = { :status => "fail", :message => "Fail!" }
+        status = :bad_request
+        error = Error.new(:class_name => 'user_interactions_save_fail', 
+          :message => error_msgs.inspect, :params => params.to_s)
+        error.save!
       end
-      format.json  { render :json => msg }
+      format.json  { render :json => msg, :status => status }
     end
   end
 

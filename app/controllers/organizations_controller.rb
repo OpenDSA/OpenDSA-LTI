@@ -44,6 +44,10 @@ class OrganizationsController < ApplicationController
       render :json => org, :status => :created
     else
       render :json => org.errors.full_messages, :status => :bad_request
+      error = Error.new(:class_name => 'organization_save_fail', 
+          :message => org.errors.full_messages.inspect, 
+          :params => params.to_s)
+      error.save!
     end
   end
 
