@@ -5,8 +5,9 @@ class LtiController < ApplicationController
   # the consumer keys/secrets
 
   def launch
-    if not params.key?(:custom_inst_book_id)
-      launch_ex and return
+    unless params.key?(:custom_inst_book_id)
+      launch_ex
+      return
     end
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
@@ -152,7 +153,7 @@ class LtiController < ApplicationController
         inst_section.lms_posted = false
         inst_section.save!
       end
-      render :json => { :message => 'failure', :res => res.to_json }.to_json
+      render :json => { :message => 'failure', :res => res.to_json }.to_json, :status => :bad_request
       error = Error.new(:class_name => 'post_replace_result_fail', :message => res.inspect, :params => lti_param.to_s)
       error.save!
     end
