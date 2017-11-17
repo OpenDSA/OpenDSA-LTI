@@ -55,7 +55,7 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
 
 <p>
 If you only want to include your choice of OpenDSA visualizations and exercises without compiling the entire book, please follow these steps.
-
+</p>
 %ol
   %li
     Get access to an OpenDSA instructor account.
@@ -84,21 +84,96 @@ If you only want to include your choice of OpenDSA visualizations and exercises 
     %code #{@config_url}
     to the "Config URL" field and click "Submit".
   %li
-    In your Canvas course, when you want to insert OpenDSA content
-    into a module, select "External Tool". You should see the
-    configured app "OpenDSA-LTI" with a "find" icon. Click the app to
-    bring up a new dialog where you can pick one of OpenDSA’s
-    interactive materials to be inserted as a page or resource within
-    the current module. If this is your first time going
-    through this process for your course, you will be asked to provide
-    some information that OpenDSA can use to identify your course offering.
+    To insert OpenDSA content that will be <b>ungraded</b> into your Canvas
+    course, follow these steps:
+    %ol
+      %li
+        Navigate to the "Modules" page in your Canvas course
+      %li
+        If you do not have any modules, or would like to create a new
+        module to hold the OpenDSA content, click the "+ Module" button 
+        in the top right. Provide a name for the module and click 
+        "Add Module". The module will then show up in the module list.
+        To make the module viewable by students, click the publish button to the 
+        far right of the module name, immediately to the left of the "+" button.
+      %li
+        Find the module that you would like to insert the OpenDSA content into
+        then click the "+" button to the far right of the module's name.
+      %li
+        In the dropdown box at the top of the pop-up window, 
+        select "External Tool". You will see a list of the external tools
+        that are configured for your course. Click on the tool labeled "OpenDSA"
+        or "OpenDSA-LTI".
+      %li
+        If this is your first time going through this process for your course,
+        you will be asked to provide some information that OpenDSA can use
+        to identify your course offering. Fill out the required fields
+        and click "Submit".
+      %li
+        A tree view will be displayed listing the categories of visualizations
+        and exercises that are available. To expand one of the categories, 
+        either double click on it, or click the arrow to the left of the 
+        folder icon. You will then see sub-categories that you can expand.
+        Expanding a sub-category will display the names of the 
+        exercises and visualizations contained within it.
+      %li
+        Once you find the resource you want to add, simply
+        click on it. The "URL" textbox in the Add Module window will then be 
+        automatically filled in with the url that will be used to launch
+        the resource. Change the "Page Name" textbox to use a more descriptive 
+        name for the new module item, then click "Add Item".
+      %li
+        The new module item will appear under the module name. To make the
+        module item viewable by students, click the publish button to the 
+        far right of the module name (to the immediate left of the gear icon).
+      %li
+        Click on the newly added module item to view the OpenDSA content.
+
   %li
-    If you want an OpenDSA exercise to report a score back to Canvas,
-    you have to create a Canvas assignment. In Canvas, go to the Assignments
-    option in the left menu, then create a new assignment by clicking
-    on the "+ Assignment" button in the upper right. Fill in the
-    necessary information and select "External Tool" as the
-    "Submission Type" then click "Find". You will see the OpenDSA-LTI app, 
-    click it to choose the exercise. If this is your first time going
-    through this process for your course, you will be asked to provide
-    some information that OpenDSA can use to identify your course offering.
+    To insert OpenDSA content that will be <b>graded</b> into your Canvas 
+    course, follow these steps:
+    %ol
+      %li
+        Navigate to the "Assignments" page in your Canvas course
+      %li
+        To add a new assignment group, click the "+ Group" button in the top
+        right.
+      %li
+        Click the "+ Assignment" button in the top right to be taken to the
+        assignment creation page.
+      %li
+        Find the input field labeled "Submission Type". In the 
+        dropdown box select "External Tool", then click the button
+        labeled "Find". A list of the external tools configured for your
+        course will be displayed. Find the tool named "OpenDSA" or 
+        "OpenDSA-LTI" and click on it to open the resource selection window.
+      %li
+        If this is your first time going through this process for your course,
+        you will be asked to provide some information that OpenDSA can use
+        to identify your course offering. Fill out the required fields
+        and click "Submit".
+      %li
+        A tree view will be displayed listing the categories of visualizations
+        and exercises that are available. To expand one of the categories, 
+        either double click on it, or click the arrow to the left of the 
+        folder icon. You will then see sub-categories that you can expand.
+        Expanding a sub-category will display the names of the 
+        exercises and visualizations contained within it.
+      %li
+        Once you find the resource you want to add, simply
+        click on it. The url textbox on the assignment creation page will 
+        then be automatically filled in with the url that will be used to launch
+        the resource you selected.
+      %li
+        Still on the Canvas assignment creation page, specify the number of
+        points the assignment will be worth, choose the assignment group, and
+        specify a due date. At the top of the page, give the assignment a 
+        descriptive name.
+      %li
+        Once you are satisfied with the assignmnent settings, either click
+        "Save and Publish" to make the assignment immediately visible to 
+        students, or click "Save" to add the assignment without making
+        it visible to students.
+      %li
+        After clicking "Save" or "Save and Publish", you will automatically
+        be taken to the page for the newly created assignment.
