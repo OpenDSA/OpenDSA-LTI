@@ -112,6 +112,13 @@ class OdsaExerciseAttemptsController < ApplicationController
       inst_book_section_exercise = InstBookSectionExercise.where(
                                     "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
                                     params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+      if inst_book_section_exercise == nil
+        respond_to do |format|
+          msg = { :status => "fail", :message => "Fail!" }
+          format.json  { render :json => msg }
+        end
+        return
+      end
       threshold = inst_book_section_exercise.threshold                                    
     else
       inst_course_offering_exercise = InstCourseOfferingExercise.find_by(
