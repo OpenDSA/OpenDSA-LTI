@@ -1,0 +1,86 @@
+= stylesheet_link_tag 'book_config', media: 'all'
+
+:javascript
+  window.ODSA = window.ODSA || {};
+  window.ODSA.availableModules = #{@availMods.to_json.html_safe};
+  window.ODSA.languages = #{@languages.to_json.html_safe}
+
+= javascript_include_tag 'split.min.js'
+= javascript_include_tag 'book_config'
+
+%div{id: 'add-chapter-dialog', title: 'Add Chapter'}
+  %p{id: 'dialog-errors'}
+  %form
+    %fieldset
+      %label{for: 'chapter-name'}
+        Name:
+      %input.text.ui-widget-content.ui-corner-all{type: 'text', name: 'chapter-name', id: 'chapter-name'}
+      -# Allow form submission using enter key
+      %input{id: 'add-chapter-submit', type: 'submit', tabindex: '-1', style: 'position:absolute; top: -1000px;'}
+
+.container
+  %h2
+    Book Settings
+  %form.form-horizontal#course_info_form{method: 'post'}
+    
+    .form-group
+      %label.control-label{for: '#book-title'}
+        Title:
+      .col-xs-6
+        %input.form-control#book-title{type: 'text', required: true}
+
+    .form-group
+      %label.control-label{for: '#book-desc'}
+        Description:
+      .col-xs-6
+        %textarea.form-control#book-desc{required: true}
+
+    .form-group
+      %label.control-label{for: '#book-lang'}
+        Language:
+      .col-xs-6
+        %select.form-control#book-lang{required: true}
+          %option{:value => -1, disabled: true, selected: true}
+          - @languages.each do |lang_code, lang_name|
+            %option{:value => lang_code}
+              #{lang_name}
+
+    %h2 
+      Book Content
+    %ul
+      %li
+        Books are organized into <i>chapters</i>, with each chapter containing
+        one or more <i>modules</i>
+      %li
+        Modules are indicated by this icon: <i class="fa fa-sticky-note-o"></i>
+      %li
+        To <b>add a chapter</b> to your book, click the "+ Chapter" button and
+        enter a name for the chapter.
+      %li
+        To <b>remove a chapter</b> and all of its modules from your book, right click 
+        on it and press "Delete"
+      %li
+        To <b>add a module</b> to your book, click and drag a module from 
+        the Available pane and drop it in the Included pane in the 
+        desired chapter.
+      %li
+        To <b>remove a module</b> from your book, right click on the module 
+        and press "Remove".
+      %li
+        <b>Reorder chapters and modules</b> in your book using drag-and-drop. 
+        The order of the chapters and modules in the Included pane will be the 
+        order of the chapters and modules in your book.
+    %div{id: 'split-container'}
+      %div.split.split-horizontal{id: 'chosen-pane'}
+        %h3.split-pane-header
+          Included Modules
+        %input.btn.btn-success{id: 'btn-add-chapter', type: 'button', value: '+ Chapter', disabled: true}
+        .split-pane-content
+          .tree-container
+            %div{id: 'included-modules'}
+      %div.split.split-horizontal{id: 'available-pane'}
+        %h3.split-pane-header
+          Available Modules
+        .split-pane-content
+          .tree-container
+            %div{id: 'available-modules'}

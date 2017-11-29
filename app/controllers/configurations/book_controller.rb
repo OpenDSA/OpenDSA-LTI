@@ -9,6 +9,7 @@ class RSTtoJSON
         json["type"] = "category"
         json["path"] = path
         json["text"] = File.basename(path)
+        json["id"] = path.sub(/.\/RST\/en\/?/, '')
         Dir.foreach(path) do |entry|
             child = {}
             if entry == '.' or entry == '..'
@@ -20,8 +21,11 @@ class RSTtoJSON
             if File.file?(subpath) and File.extname(subpath) == '.rst'
                 # must be a legitimate module within RST
                 child["type"] = "module"
-                child["path"] = subpath
-                child["text"] = entry
+                child["path"] = subpath.sub('./RST/en/', '').sub('.rst', '')
+                child["text"] = entry.sub('.rst', '')
+                # if json["id"] is blank, then the parent is the root node
+                child["parent_id"] = json["id"].blank? ? '#' : json["id"]
+                child["id"] = child["path"]
                 json["children"].push(child)
             elsif Dir.exists?(subpath)
                 # must be a directory so convert the subpath
@@ -135,6 +139,21 @@ end
 
 # The actual rails controller
 class Configurations::BookController < ApplicationController
+
+    def show
+        @availMods = {}
+        @languages = {
+            "en": "English", 
+            "fr": "Français", 
+            "pt": "Português", 
+            "fi": "Suomi",
+            "sv": "Svenska"
+        }
+        @languages.each do |lang_code, lang_name|
+            @availMods[lang_code] = RSTtoJSON.convert("./RST/#{lang_code}")
+        end
+        render
+    end
 
     # This action should be deleted and configuraiton json file should be send directly to edit action for editing
     def create_redirect

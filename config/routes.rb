@@ -56,6 +56,11 @@ CodeWorkout::Application.routes.draw do
   get 'inst_books/configure/:id' => 'inst_books#configure', as: :book_configure
   resources :inst_books
 
+  # book configuration interface
+  namespace :configurations do
+    get 'inst_book' => 'book#show'
+  end
+
   get 'sse/feedback_wait'
   get 'sse/feedback_poll'
   post '/course_offerings/:id/upload_roster' => 'course_offerings#upload_roster'
