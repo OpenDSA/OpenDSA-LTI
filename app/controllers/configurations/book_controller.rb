@@ -2,14 +2,13 @@ require 'json'
 
 # Helper classes
 class RSTtoJSON
-    @@searchDirs = ["en", "fi", "fr", "pt", "sv"]
-    def self.convert(path)
+    def self.convert(path, lang)
         json = {} # The json for this directory
         json["children"] = []
-        json["type"] = "category"
+        json["type"] = "chapter"
         json["path"] = path
         json["text"] = File.basename(path)
-        json["id"] = path.sub(/.\/RST\/en\/?/, '')
+        json["id"] = path.sub(/.\/RST\/#{lang}\/?/, '')
         Dir.foreach(path) do |entry|
             child = {}
             if entry == '.' or entry == '..'
@@ -19,21 +18,149 @@ class RSTtoJSON
             # Concatenate the subpath with the entry and path
             subpath = File.join(path, entry)
             if File.file?(subpath) and File.extname(subpath) == '.rst'
-                # must be a legitimate module within RST
-                child["type"] = "module"
-                child["path"] = subpath.sub('./RST/en/', '').sub('.rst', '')
-                child["text"] = entry.sub('.rst', '')
-                # if json["id"] is blank, then the parent is the root node
-                child["parent_id"] = json["id"].blank? ? '#' : json["id"]
-                child["id"] = child["path"]
-                json["children"].push(child)
+                mod_info = self.extract_module_info(subpath, lang)
+                mod_info[:parent_id] = json["id"].blank? ? '#' : json["id"]
+                json["children"].push(mod_info)
             elsif Dir.exists?(subpath)
                 # must be a directory so convert the subpath
-                child = self.convert(subpath)
+                child = self.convert(subpath, lang)
                 json["children"].push(child)
             end
         end
         return json
+    end
+
+    private
+
+    EX_RE = Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe)")
+    EXTR_RE = Regexp.new("^(\.\. )(extrtoolembed:: '([^']+)')")
+    SECTION_RE = Regexp.new('^-+$')
+
+    def self.extract_module_info(rst_path, lang)
+
+        lines = File.readlines(rst_path)
+        i = 0
+        mod_lname = ""
+        mod_sname = File.basename(rst_path, '.rst')
+        mod_path = rst_path.sub("./RST/#{lang}/", '').sub('.rst', '')
+        mod = {
+            id: mod_path,
+            path: mod_path,
+            short_name: mod_sname,
+            children: [],
+            type: 'module'
+        }
+        
+        while i < lines.count
+          line = lines[i]
+          sline = line.strip()
+          if sline.start_with?("==") and not lines[i - 1].strip().empty?
+            mod_lname = lines[i - 1].strip()
+            i += 1
+            break
+          end
+          i += 1
+        end
+        
+        if mod_lname == ""
+          mod_lname = mod_sname
+          i = 0
+        end
+
+        mod[:long_name] = mod_lname
+        mod[:text] = mod_sname == mod_lname ? mod_lname : "#{mod_lname} (#{mod_sname})"
+
+        curr_section = mod
+        while i < lines.count
+          line = lines[i]
+          sline = line.strip()
+    
+          if sline == ""
+            i += 1
+            next
+          end
+    
+          if SECTION_RE.match(sline) != nil
+            curr_section = {
+              text: lines[i - 1].strip(),
+              children: [], # exercises
+              type: 'section'
+            }
+            mod[:children] << curr_section
+            i += 1
+            next
+          end
+    
+          match_data = EX_RE.match(sline)
+          if match_data != nil
+            directive = match_data[2]
+            identifier = match_data[3]
+            ex_type = match_data[7]
+            ex_sname = match_data[5]
+            ex_lname = ""
+
+            i += 1
+            i, options = parse_directive_options(i, lines)
+    
+            if options.has_key?('long_name')
+              ex_lname = options.delete('long_name')
+            else
+              ex_lname = ex_sname
+            end
+    
+            ex_text = ex_lname == ex_sname ? ex_lname : "#{ex_lname} (#{ex_sname})"
+            curr_section[:children] << {
+                short_name: ex_sname, 
+                long_name: ex_lname, 
+                text: ex_text,
+                type: ex_type
+            }
+          else
+            match_data = EXTR_RE.match(sline)
+            if match_data != nil
+                ex_name = match_data[3]
+
+                i += 1
+                i, options = parse_directive_options(i, lines)
+                
+                learning_tool = options.fetch('learning_tool', 'code-workout')
+
+                curr_section[:children] << {
+                    short_name: ex_name,
+                    long_name: ex_name,
+                    learning_tool: learning_tool,
+                    text: ex_name,
+                    type: 'extr'
+                }
+            else
+                i += 1
+            end
+          end
+        end
+        return mod
+    end
+
+    def self.parse_directive_options(i, lines)
+        options = {}
+        if i < lines.count
+            line = lines[i]
+            sline = line.strip()
+
+            while sline.start_with?(":")
+                sline[0] = ''
+                tokens = sline.split(': ')
+                options[tokens[0]] = tokens[1]
+                i += 1
+                    if i < lines.count
+                    line = lines[i]
+                    sline = line.strip()
+                else
+                    break
+                end
+            end
+            
+        end
+        return i, options
     end
 end
 
@@ -150,8 +277,69 @@ class Configurations::BookController < ApplicationController
             "sv": "Svenska"
         }
         @languages.each do |lang_code, lang_name|
-            @availMods[lang_code] = RSTtoJSON.convert("./RST/#{lang_code}")
+            @availMods[lang_code] = RSTtoJSON.convert("./RST/#{lang_code}", lang_code)
         end
+        @code_languages = {
+            "Java": {
+                "ext": [
+                    "java"
+                ], 
+                "label": "Java", 
+                "lang": "java"
+            },
+            "Processing": {
+                "ext": [
+                    "pde"
+                ], 
+                "label": "Processing", 
+                "lang": "java"
+            }, 
+            "Java_Generic": {
+                "ext": [
+                    "java"
+                ], 
+                "label": "Java (Generic)", 
+                "lang": "java"
+            }, 
+            "C++": {
+                "ext": [
+                    "cpp", 
+                    "h"
+                ], 
+                "label": "C++", 
+                "lang": "C++"
+            },
+            "Pseudo": {
+                "ext": [
+                    "txt"
+                ], 
+                "label": "Pseudo Code", 
+                "lang": "pseudo"
+            },
+            "C": {
+                "ext": [
+                    "c",
+                    "h"
+                ],
+                "label": "C",
+                "lang": "c"
+            },
+            "Python": {
+                "ext": [
+                    "py"
+                ], 
+                "label": "Python", 
+                "lang": "python"
+            },
+            "JavaScript": {
+                "ext": [
+                    "js"
+                ],
+                "label": "JavaScript",
+                "lang": "javascript"
+            }
+        }
+        @learning_tools = LearningTool.all.select("id, name")
         render
     end
 
