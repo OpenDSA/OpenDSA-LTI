@@ -58,7 +58,7 @@ CodeWorkout::Application.routes.draw do
 
   # book configuration interface
   namespace :configurations do
-    get 'inst_book' => 'book#show'
+    get 'book' => 'book#show'
   end
 
   get 'sse/feedback_wait'

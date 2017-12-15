@@ -144,18 +144,20 @@
           %label{for: "JXOP-debug"}
             JSAV Debug (for exercise developers)
 
-    -# .form-group.border
-    -#   %label.control-label{}
-    -#     Global Slideshow Options
-    -#   .col-xs-6
-    -#     .form-group
-    -#       %input{type: "checkbox", id: "glob-ss-required"}
-    -#       %label{for: "glob-ss-required"}
-    -#         Required
-    -#     .form-group
-    -#       %label{for: "glob-ss-points"}
-    -#         Points:
-    -#       %input{type: "number", min: 0, value: 0, id: "glob-ss-points"}
+    .form-group.border
+      %label.control-label{}
+        Global Slideshow Options
+      .col-xs-6.col-md-5
+        .form-group
+          %label.control-label{for: "glob-ss-required"}
+            Required:
+          .col-xs-8
+            %input{type: "checkbox", id: "glob-ss-required"}
+        .form-group
+          %label.control-label{for: "glob-ss-points"}
+            Points:
+          .col-xs-8
+            %input{type: "number", min: 0, value: 0, step: 0.01, id: "glob-ss-points", required: true}
 
     .form-group.border
       %label.control-label{}
@@ -170,12 +172,12 @@
           %label.control-label{for: "glob-ka-points"}
             Points:
           .col-xs-8
-            %input{type: "number", min: 0, value: 1, id: "glob-ka-points"}
+            %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-ka-points", required: true}
         .form-group
           %label.control-label{for: "glob-ka-threshold"}
             Threshold:
           .col-xs-8
-            %input{type: "number", min: 1, value: 5, step: 1, id: "glob-ka-threshold"}
+            %input{type: "number", min: 1, value: 5, step: 1, id: "glob-ka-threshold", required: true}
 
     .form-group.border
       %label.control-label{}
@@ -190,12 +192,12 @@
           %label.control-label{for: "glob-pe-points"}
             Points:
           .col-xs-8
-            %input{type: "number", min: 0, value: 1, id: "glob-pe-points"}
+            %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-pe-points", required: true}
         .form-group
           %label.control-label{for: "glob-pe-threshold"}
             Threshold:
           .col-xs-8
-            %input{type: "number", min: 0.0, max: 1.0, value: 1.0, step: 0.1, id: "glob-pe-threshold"}
+            %input{type: "number", min: 0.0, max: 1.0, value: 1.0, step: 0.01, id: "glob-pe-threshold", required: true}
         -# .form-group
         -#   %label.control-label{for: "glob-pe-feedback"}
         -#     Feedback Mode:
@@ -221,7 +223,7 @@
           %label.control-label{for: 'glob-extr-points'}
             Points:
           .col-xs-8
-            %input{type: "number", min: 0, value: 1, id: "glob-extr-points"}
+            %input{type: "number", min: 0, value: 1, id: "glob-extr-points", required: true}
 
     - @learning_tools.each do |tool|
       .form-group.border
@@ -232,7 +234,7 @@
             %label.control-label{for: "glob-#{tool.name}-points"}
               Points:
             .col-xs-8
-              %input{type: "number", min: 0, value: 1, id: "glob-#{tool.name}-points"}
+              %input{type: "number", min: 0, value: 1, id: "glob-#{tool.name}-points", required: true}
 
     .form-group
       %label.control-label{for: "#other-options"}
@@ -256,7 +258,7 @@
         Book Content
       %ul
         %li
-          First, select your language above.
+          First, select your language or load a configuration above.
         %li
           Books are organized into <i class="fa fa-folder-o"></i><i>chapters</i>, with each chapter containing
           one or more <i class="fa fa-files-o"></i><i>modules</i>. You choose how to organize your desired
@@ -269,7 +271,7 @@
           enter a name for the chapter.
         %li
           To <b>remove a chapter</b> and all of its modules from your book, right click
-          on the <i class="fa fa-folder-o"></i>chapter and press "Delete".
+          on the <i class="fa fa-folder-o"></i>chapter, then click "Delete".
         %li
           To <b>add a module</b> to your book, click and drag a <i class="fa fa-files-o"></i>module from
           the Available pane and drop it in the Included pane in the
@@ -280,17 +282,19 @@
           module.
         %li
           To <b>remove a module</b> from your book, right click on the <i class="fa fa-files-o"></i>module
-          in the Included pane and press "Remove".
+          in the Included pane, then click "Remove".
         %li
           <b>Reorder chapters and modules</b> in your book using drag-and-drop.
           The order of the chapters and modules in the Included pane will be the
           order of the chapters and modules in your book.
         %li
           To <b>override the global settings for an individual exercise</b>,
-          right click on the exercise and select "Edit Settings".
+          right click on the exercise, then click "Edit Settings".
         %li
-          To <b>hide a <i class="fa fa-file-o"></i>section</b> in the book, right click on the section and
-          select "Hide Section".
+          To <b>hide a <i class="fa fa-file-o"></i>section</b> in the book, right click on the section,
+          then click "Hide Section".
+        %li
+          When you are finished, click the <b>Download Configuration</b> button at the bottom of the page
 
       .col-xs-12.icon-legend
         %div

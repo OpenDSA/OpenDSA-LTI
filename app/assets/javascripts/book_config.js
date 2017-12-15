@@ -781,9 +781,15 @@
   }
 
   function setGlobSsOptions(options) {
-    // currently the interface does not support changing slideshow options
-    // since Canvas limitations make giving points to slideshows
-    // infeasible (only one gradeable resource per assignment)
+    for (var option in options) {
+      var value = options[option];
+      if (typeof value === 'boolean') {
+        $('#glob-ss-' + option).prop('checked', value);
+      }
+      else {
+        $('#glob-ss-' + option).val(value);
+      }
+    }
   }
 
   function setGlobKaOptions(options) {
@@ -984,7 +990,7 @@
               };
             }
           }
-          if ($.inArray(node.type, ['ka', 'pe', 'extr']) >= 0) {
+          if ($.inArray(node.type, ['ka', 'pe', 'extr', 'ss']) >= 0) {
             return {
               'settings': {
                 label: 'Edit Exercise Settings',
@@ -992,27 +998,33 @@
                   exSettingsDialog.find('form')[0].reset();
                   var node = includedTree.jstree(true).get_node(args.reference);
                   var thresholdElem = $('#exercise-settings-threshold');
-                  if (node.type === 'ka') {
-                    thresholdElem.attr('step', 1);
-                    thresholdElem.attr('min', 1);
-                    thresholdElem.removeAttr('max');
-                    $('#exercise-settings-pe').css('display', 'none');
-                    $('#exercise-settings-required-group').css('display', '');
-                    $('#exercise-settings-threshold-group').css('display', '');
-                  }
-                  else if (node.type === 'pe') {
-                    thresholdElem.attr('min', 0);
-                    thresholdElem.attr('max', 1);
-                    thresholdElem.attr('step', 0.1);
-                    $('#exercise-settings-pe').css('display', '');
-                    $('#exercise-settings-required-group').css('display', '');
-                    $('#exercise-settings-threshold-group').css('display', '');
-                  }
-                  else if (node.type === 'extr') {
-                    // external tool
-                    $('#exercise-settings-pe').css('display', 'none');
-                    $('#exercise-settings-required-group').css('display', 'none');
-                    $('#exercise-settings-threshold-group').css('display', 'none');
+                  switch (node.type) {
+                    case 'ka':
+                      thresholdElem.attr('step', 1);
+                      thresholdElem.attr('min', 1);
+                      thresholdElem.removeAttr('max');
+                      $('#exercise-settings-pe').css('display', 'none');
+                      $('#exercise-settings-required-group').css('display', '');
+                      $('#exercise-settings-threshold-group').css('display', '');
+                      break;
+                    case 'pe':
+                      thresholdElem.attr('step', 1);
+                      thresholdElem.attr('min', 1);
+                      thresholdElem.removeAttr('max');
+                      $('#exercise-settings-pe').css('display', 'none');
+                      $('#exercise-settings-required-group').css('display', '');
+                      $('#exercise-settings-threshold-group').css('display', '');
+                      break;
+                    case 'extr':
+                      $('#exercise-settings-pe').css('display', 'none');
+                      $('#exercise-settings-required-group').css('display', 'none');
+                      $('#exercise-settings-threshold-group').css('display', 'none');
+                      break;
+                    case 'ss':
+                      $('#exercise-settings-pe').css('display', 'none');
+                      $('#exercise-settings-required-group').css('display', '');
+                      $('#exercise-settings-threshold-group').css('display', 'none');
+                      break;
                   }
                   var options = getOptions(node);
                   for (var option in options) {
