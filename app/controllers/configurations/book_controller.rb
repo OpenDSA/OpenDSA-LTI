@@ -32,9 +32,12 @@ class RSTtoJSON
 
     private
 
-    EX_RE = Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe)")
-    EXTR_RE = Regexp.new("^(\.\. )(extrtoolembed:: '([^']+)')")
-    SECTION_RE = Regexp.new('^-+$')
+    # use ||= to avoid "already intialized constant" warning
+    # since rails will reload the class on every request during development
+    EX_RE ||= Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe)")
+    EXTR_RE ||= Regexp.new("^(\.\. )(extrtoolembed:: '([^']+)')")
+    SECTION_RE ||= Regexp.new('^-+$')
+    URI_ESCAPE_RE ||= Regexp.new("[^#{URI::PATTERN::UNRESERVED}']")
 
     def self.extract_module_info(rst_path, lang)
 
@@ -44,7 +47,7 @@ class RSTtoJSON
         mod_sname = File.basename(rst_path, '.rst')
         mod_path = rst_path.sub("./RST/#{lang}/", '').sub('.rst', '')
         mod = {
-            id: mod_path,
+            id: URI.escape(mod_path, URI_ESCAPE_RE).gsub(/[%']/, ''),
             path: mod_path,
             short_name: mod_sname,
             children: [],
@@ -81,10 +84,12 @@ class RSTtoJSON
           end
     
           if SECTION_RE.match(sline) != nil
+            sectName = lines[i - 1].strip()
             curr_section = {
-              text: lines[i - 1].strip(),
+              text: sectName,
               children: [], # exercises
-              type: 'section'
+              type: 'section',
+              id: URI.escape("#{mod_path}|sect|#{sectName}", URI_ESCAPE_RE).gsub(/[%']/, '')
             }
             mod[:children] << curr_section
             i += 1
@@ -113,7 +118,8 @@ class RSTtoJSON
                 short_name: ex_sname, 
                 long_name: ex_lname, 
                 text: ex_text,
-                type: ex_type
+                type: ex_type,
+                id: URI.escape("#{mod_path}||#{ex_sname}", URI_ESCAPE_RE).gsub(/[%']/, '')
             }
           else
             match_data = EXTR_RE.match(sline)
@@ -130,7 +136,8 @@ class RSTtoJSON
                     long_name: ex_name,
                     learning_tool: learning_tool,
                     text: ex_name,
-                    type: 'extr'
+                    type: 'extr',
+                    id: URI.escape("#{mod_path}||#{ex_name}", URI_ESCAPE_RE).gsub(/[%']/, '')
                 }
             else
                 i += 1
@@ -340,6 +347,7 @@ class Configurations::BookController < ApplicationController
             }
         }
         @learning_tools = LearningTool.all.select("id, name")
+        @reference_configs = reference_book_configurations()
         render
     end
 
@@ -394,5 +402,26 @@ class Configurations::BookController < ApplicationController
     def configs
         manager = BookConfigurationManager.new("./Configuration")
         render json: manager.list
+    end
+
+    private
+
+    def reference_book_configurations()
+        config_dir = File.join("public", "OpenDSA", "config")
+        base_url = request.protocol + request.host_with_port + "/OpenDSA/config/"
+        configs = []
+        Dir.foreach(config_dir) do |entry|
+            if entry.include?("_generated.json") or not File.extname(entry) == '.json'
+                next
+            end
+            url = base_url + File.basename(entry)
+            title = JSON.parse(File.read(File.join(config_dir, entry)))["title"]
+            configs << {
+                title: title,
+                name: File.basename(entry, '.json'),
+                url: url 
+            }
+        end
+        return configs.sort_by! { |x| x[:title] }
     end
 end

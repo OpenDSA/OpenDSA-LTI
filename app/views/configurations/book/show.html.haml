@@ -78,23 +78,44 @@
 
 
 .container
+
+  %h2
+    Load Existing Configuration (Optional)
+  .col-xs-12.row
+    %label.dialog-control-label.col-lg-3.col-md-4{for: 'upload-config-file'}
+      Load Configuration File
+    .col-xs-4
+      %input.inline-input{type: 'file', id: 'upload-config-file', accept: '.json'}
+    %input.btn.btn-primary{type: 'button', id: 'config-file-load', value: 'Load', disabled: true}
+  .col-xs-12.row
+    .col-xs-offset-2
+      <b>- OR -</b>
+  .col-xs-12.row
+    %label.dialog-control-label.col-lg-3.col-md-4{for: 'reference-config'}
+      Select Reference Configuration
+    .col-xs-4
+      %select.form-control#reference-config
+        - @reference_configs.each do |config|
+          %option{:value => config[:url]}
+            #{config[:title]} (#{config[:name]})
+    %input.btn.btn-primary{type: 'button', id: 'reference-config-load', value: 'Load'}
+
   %h2
     Book Settings
   %form.form-horizontal{method: "post", id: 'book-config-form'}
-    
-    .form-group
+    .form-group.border
       %label.control-label{for: "#book-title"}
         Title
       .col-xs-6
         %input.form-control#book-title{type: "text", required: true}
 
-    .form-group
+    .form-group.border
       %label.control-label{for: "#book-desc"}
         Description
       .col-xs-6
         %textarea.form-control#book-desc{required: true}
 
-    .form-group
+    .form-group.border
       %label.control-label{for: "#book-lang"}
         Language
       .col-xs-6
@@ -104,7 +125,7 @@
             %option{:value => lang_code}
               #{lang_name}
 
-    .form-group   
+    .form-group.border 
       %label.control-label{for: "#code-langs"}
         Code Languages
       .col-xs-6{id: "code-langs"}
@@ -114,15 +135,15 @@
             %label{for: "code-lang-#{code_lang}"}
               #{code_info[:label]}
     
-    .form-group   
+    .form-group.border  
       %label.control-label{for: "#glob-exer-options"}
         Global Exercise Options
       .col-xs-6{id: "glob-exer-options"}
-        %input{type: "checkbox", name: "jsav-debug", id: "jsav-debug", value: 'JXOP-debug'}
-        %label{for: "jsav-debug"}
-          JSAV Debug (for developers)
+        %input{type: "checkbox", name: "JXOP-debug", id: "JXOP-debug", value: 'JXOP-debug'}
+        %label{for: "JXOP-debug"}
+          JSAV Debug (for exercise developers)
 
-    -# .form-group
+    -# .form-group.border
     -#   %label.control-label{}
     -#     Global Slideshow Options
     -#   .col-xs-6
@@ -135,7 +156,7 @@
     -#         Points:
     -#       %input{type: "number", min: 0, value: 0, id: "glob-ss-points"}
 
-    .form-group
+    .form-group.border
       %label.control-label{}
         Global Khan-Academy Exercise Options
       .col-xs-6
@@ -155,7 +176,7 @@
           .col-xs-8
             %input{type: "number", min: 1, value: 5, step: 1, id: "glob-ka-threshold"}
 
-    .form-group
+    .form-group.border
       %label.control-label{}
         Global Proficiency Exercise Options
       .col-xs-6
@@ -190,7 +211,8 @@
         -#       undo
         -#     %option{value: 'fix'}
         -#       fix
-    .form-group
+
+    .form-group.border
       %label.control-label{}
         Global External Tool Options
       .col-xs-6
@@ -201,7 +223,7 @@
             %input{type: "number", min: 0, value: 1, id: "glob-extr-points"}
         
     - @learning_tools.each do |tool|
-      .form-group
+      .form-group.border
         %label.control-label{}
           Global #{tool.name} Options
         .col-xs-6
@@ -251,7 +273,7 @@
           To <b>add a module</b> to your book, click and drag a <i class="fa fa-files-o"></i>module from 
           the Available pane and drop it in the Included pane in the 
           desired <i class="fa fa-folder-o"></i>chapter. You can select
-          multiple modules by holding Ctrl (Mac: Command ⌘) and clicking on
+          multiple modules by holding Ctrl (Mac: ⌘) and clicking on
           the desired modules. To select multiple sequentially listed modules,
           click on the first module, then hold Shift and click on the last
           module.
@@ -262,6 +284,12 @@
           <b>Reorder chapters and modules</b> in your book using drag-and-drop. 
           The order of the chapters and modules in the Included pane will be the 
           order of the chapters and modules in your book.
+        %li
+          To <b>override the global settings for an individual exercise</b>,
+          right click on the exercise and select "Edit Settings".
+        %li
+          To <b>hide a <i class="fa fa-file-o"></i>section</b> in the book, right click on the section and
+          select "Hide Section".
 
       .col-xs-12.icon-legend
         %div

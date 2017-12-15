@@ -127,3 +127,13 @@ input[type="checkbox"].align-checkbox {
   padding-right: 0px;
   text-align: right;
 }
+
+input.inline-input {
+  display: inline-block;
+}
+
+.form-group.border {
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed #C0C0C0
+}

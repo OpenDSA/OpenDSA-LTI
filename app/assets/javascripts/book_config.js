@@ -49,10 +49,13 @@
 }));
 
 (function () {
-  var availTree, includedTree, 
-      includedTreeElem, availTreeElem, 
+  var availTree, includedTree,
+      includedTreeElem, availTreeElem,
       langSelect, addChapterDialog, renameChapterDialog,
       exSettingsDialog;
+
+  // indicates if we are in the processing of loading an existing configuration
+  var loadingConfig = false;
 
   $(document).ready(function () {
     var pane1 = document.querySelector('#chosen-pane');
@@ -67,7 +70,9 @@
       initializeJsTree(ODSA.availableModules[langSelect.val()].children);
     }
     langSelect.on('change', function() {
-      initializeJsTree(ODSA.availableModules[langSelect.val()].children);
+      if (!loadingConfig) {
+        initializeJsTree(ODSA.availableModules[langSelect.val()].children);
+      }
     });
 
     addChapterDialog = $('#add-chapter-dialog').dialog({
@@ -196,20 +201,6 @@
       exSettingsDialog.dialog('close');
     }
 
-/*     var globFeedbackSelect = $('#glob-pe-feedback');
-    var globFixSelect = $('#glob-pe-fix');
-    function updateFeedbackFixSelects() {
-      var val = globFeedbackSelect.val();
-      if (val === 'continuous') {
-        globFixSelect.removeAttr('disabled');
-      }
-      else {
-        globFixSelect.attr('disabled', true);
-      }
-    }
-    updateFeedbackFixSelects();
-    globFeedbackSelect.on('change', updateFeedbackFixSelects); */
-
     var kaOptionList = ['required', 'points', 'threshold'];
     for (var i = 0; i < kaOptionList.length; i++) {
       var kaOption = kaOptionList[i];
@@ -256,7 +247,7 @@
       var config = allGlobalSettings();
       config.chapters = includedChapters();
 
-      var dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, 2));
+      var dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, 2) + '\n');
       var exportName = config.title.replace(' ', '_');
       var downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute("href", dataStr);
@@ -265,6 +256,53 @@
       document.body.appendChild(downloadAnchorNode);
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
+    });
+
+    $('#upload-config-file').on('change', function() {
+      $('#config-file-load').removeAttr('disabled');
+    });
+
+    if ($('#upload-config-file')[0].value !== '') {
+      $('#config-file-load').removeAttr('disabled');
+    }
+
+    $('#config-file-load').on('click', function() {
+      loadingConfig = true;
+      $('#config-file-load').attr('disabled', true);
+      $('#reference-config-load').attr('disabled', true);
+      var file = $('#upload-config-file')[0].files[0];
+      var reader = new FileReader();
+      reader.onload = (function(event) {
+        var config = JSON.parse(event.target.result);
+        loadConfiguration(config);
+        $('#config-file-load').removeAttr('disabled');
+        $('#reference-config-load').removeAttr('disabled');
+        loadingConfig = false;
+      });
+      reader.readAsText(file);
+    });
+
+    $('#reference-config-load').on('click', function(event) {
+      loadingConfig = true;
+      $('#config-file-load').attr('disabled', true);
+      $('#reference-config-load').attr('disabled', true);
+      var url = $('#reference-config').val();
+      $.ajax({
+        url: url,
+        success: function(data, txtStatus, xhr) {
+          loadConfiguration(data);
+        },
+        error: function(xhr, txtStatus, errorThrown) {
+          alert('Error loading configuration: ' + textStatus + ' ' + errorThrown);
+        },
+        complete: function(xhr, textStatus) {
+          $('#reference-config-load').removeAttr('disabled');
+          if ($('#upload-config-file')[0].value !== '') {
+            $('#config-file-load').removeAttr('disabled');
+          }
+          loadingConfig = false;
+        }
+      });
     });
   });
 
@@ -282,8 +320,9 @@
       $(elem).addClass('section-hidden');
     }
     if ($('#' + iconId).length === 0) {
-      elem.prepend('<i id="' + iconId + '" class="jstree-icon modified-icon">M</i>');
       var node = getIncludedNode(nodeId);
+      if (!node) return;
+      elem.prepend('<i id="' + iconId + '" class="jstree-icon modified-icon">M</i>');
       for (var i = 0; i < node.parents.length; i++) {
         var parentId = node.parents[i];
         if (parentId === '#') {
@@ -373,18 +412,7 @@
       node = getIncludedNode(node);
     }
     var opts = optionChanges[node.id] || {};
-    if (node.type === 'ka') {
-      opts = $.extend(globalKaSettings(), opts);
-    }
-    else if (node.type === 'pe') {
-      opts = $.extend(globalPeSettings(), opts);
-    }
-    else if (node.type === 'extr') {
-      opts = $.extend(globalExtrSettings(node.original.learning_tool), opts);
-    }
-    else {
-      return {};
-    }
+    opts = $.extend(globalTypeSettings(node), opts);
     return opts;
   }
 
@@ -400,7 +428,7 @@
     delete optionChanges[nodeId];
     markNotModified(nodeId);
   }
-  
+
   function removeModule(node) {
     if (node.original.included === false) return false;
     node.original.included = false;
@@ -425,13 +453,15 @@
     return valid;
   }
 
-  function addChapter() {
-    var elem = $('#chapter-name');
-    var name = $.trim(elem.val());
+  function addChapter(name) {
+    if (!name) {
+      var elem = $('#chapter-name');
+      name = $.trim(elem.val());
+    }
     var valid = validateChapterName(addChapterDialog, name);
 
     if (valid) {
-      includedTree.jstree(true).create_node('#', {text: name, type: 'chapter'}, "last");
+      includedTree.jstree(true).create_node('#', {text: name, type: 'chapter', id: 'chapter_' + encodeId(name)}, "last");
     }
 
     return valid;
@@ -439,7 +469,7 @@
 
   function validateChapterName(dialog, name, ignore) {
     var valid = !chapterExists(dialog, name, ignore);
-    valid = valid && checkRegexp(dialog, name, /^[\w\s]{1,100}$/, 
+    valid = valid && checkRegexp(dialog, name, /^[\w\s]{1,100}$/,
       'Name must be between 1 and 100 characters long.');
     return valid;
   }
@@ -481,7 +511,7 @@
 
   function globalExerSettings() {
     return {
-      'JXOP-debug': $('#jsav-debug').is('checked')
+      'JXOP-debug': $('#JXOP-debug').is(':checked').toString()
     };
   }
 
@@ -500,7 +530,7 @@
       threshold: Number.parseFloat($('#glob-pe-threshold').val())
     };
   }
-  
+
   function globalSsSettings() {
     return {
       required: false,
@@ -528,6 +558,12 @@
     return settings;
   }
 
+  function globalSectionSettings() {
+    return {
+      showsection: true
+    };
+  }
+
   function selectedCodeLanguages() {
     var checkboxes = $('input:checkbox[name=code-lang]:checked');
     var selected = {};
@@ -541,7 +577,7 @@
   function allGlobalSettings() {
     return {
       title: $('#book-title').val(),
-      description: $('#book-desc').val(),
+      desc: $('#book-desc').val(),
       build_dir: "Books",
       code_dir: "SourceCode/",
       lang: $('#book-lang').val(),
@@ -561,7 +597,7 @@
   function includedChapters() {
     var tree = includedTree.jstree().get_json();
     var chapters = {};
-    
+
     for (var i = 0; i < tree.length; i++) {
       var chapterNode = tree[i];
       var chapter = {};
@@ -608,21 +644,32 @@
     return includedTree.jstree().get_node(node);
   }
 
-  function setExerciseSettings(node, settings) {
-    var globalSettings;
+  function globalTypeSettings(node) {
+    var globals;
     switch (node.type) {
+      case 'ss':
+        globals = globalSsSettings();
+        break;
       case 'ka':
-        globalSettings = globalKaSettings();
+        globals = globalKaSettings();
         break;
       case 'pe':
-        globalSettings = globalPeSettings();
+        globals = globalPeSettings();
         break;
       case 'extr':
-        globalSettings = globalExtrSettings(node.original.learning_tool);
+        globals = globalExtrSettings(node.original.learning_tool);
+        break;
+      case 'section':
+        globals = globalSectionSettings();
         break;
       default:
-        return;
+        globals = {};
     }
+    return globals;
+  }
+
+  function setExerciseSettings(node, settings) {
+    var globalSettings = globalTypeSettings(node);
     var opts = getOptions(node);
     // delete any options that are no longer set
     for (var setting in opts) {
@@ -659,21 +706,175 @@
     }
   }
 
+  function cleanOptions(node, options) {
+    var globals = globalTypeSettings(node);
+    for (var setting in globals) {
+      if (setting in options && options[setting] === globals[setting]) {
+        delete options[setting];
+      }
+    }
+    return options;
+  }
+
+  function loadConfiguration(config) {
+    console.log(config);
+    $('#book-config-form')[0].reset();
+    for (var key in config) {
+      switch(key) {
+        case 'title':
+          $('#book-title').val(config.title);
+          break;
+        case 'desc':
+          $('#book-desc').val(config.desc);
+          break;
+        case 'code_lang':
+          setCodeLangs(config.code_lang);
+          break;
+        case 'lang':
+          $('#book-lang').val(config.lang);
+          break;
+        case 'build_JSAV':
+          $('#build-jsav').prop('checked', config.build_JSAV);
+          break;
+        case 'suppress_todo':
+          $('#suppress-todo').prop('checked', config.suppress_todo);
+          break;
+        case 'dispModComp':
+          $('#disp-mod-comp').prop('checked', config.dispModComp);
+          break;
+        case 'glob_exer_options':
+          setGlobExerOptions(config.glob_exer_options);
+          break;
+        case 'glob_ss_options':
+          setGlobSsOptions(config.glob_ss_options);
+          break;
+        case 'glob_ka_options':
+          setGlobKaOptions(config.glob_ka_options);
+          break;
+        case 'glob_pe_options':
+          setGlobPeOptions(config.glob_pe_options);
+          break;
+        case 'glob_extr_options':
+          setGlobExtrOptions(config.glob_extr_options);
+          break;
+        case 'chapters':
+          //loadChapters(config.chapters, config.lang);
+          break;
+        default:
+          //
+      }
+    }
+    initializeJsTree(ODSA.availableModules[config.lang].children, config.chapters);
+  }
+
+  function setCodeLangs(langs) {
+    for (var lang in ODSA.codeLanguages) {
+      // jquery doesn't work when element id's contain '+' characters, e.g. C++
+      var elem = document.getElementById('code-lang-' + lang);
+      elem.checked = (lang in langs);
+    }
+  }
+
+  function setGlobExerOptions(options) {
+    for (var option in options) {
+      $('#' + option).prop('checked', options[option]);
+    }
+  }
+
+  function setGlobSsOptions(options) {
+    // currently the interface does not support changing slideshow options
+    // since Canvas limitations make giving points to slideshows
+    // infeasible
+  }
+
+  function setGlobKaOptions(options) {
+    for (var option in options) {
+      var value = options[option];
+      if (typeof value === 'boolean') {
+        $('#glob-ka-' + option).prop('checked', value);
+      }
+      else {
+        $('#glob-ka-' + option).val(value);
+      }
+    }
+  }
+
+  function setGlobPeOptions(options) {
+    for (var option in options) {
+      var value = options[option];
+      if (typeof value === 'boolean') {
+        $('#glob-pe-' + option).prop('checked', value);
+      }
+      else {
+        $('#glob-pe-' + option).val(value);
+      }
+    }
+  }
+
+  function setGlobExtrOptions(options) {
+    for (var option in options) {
+      var value = options[option];
+      if (option === 'points') {
+        $('#glob-extr-points').val(value);
+      }
+      else {
+        for (var opt in value) {
+          var val = value[opt];
+          if (typeof val === 'boolean') {
+            $('#glob-' + option + '-' + opt).prop('checked', val);
+          }
+          else {
+            $('#glob-' + option + '-' + opt).val(val);
+          }
+        }
+      }
+    }
+  }
+
+  function loadChapters(chapters, lang) {
+    var avail = ODSA.availableModules[langSelect.val()].children;
+    var included = [];
+    for (var chapter in chapters) {
+      var modules = chapters[chapter];
+      var node = {text: chapter, id: chapter, type: 'chapter'};
+      for (var mod in modules) {
+        var children = modules[mod];
+        var tokens = mod.split('/');
+        if (tokens.length > 1) {
+
+        }
+        else {
+          var folder = tokens[0];
+          var file = tokens[1];
+
+        }
+      }
+    }
+  }
+
+  function encodeId(id) {
+    return encodeURIComponent(id).replace(/[%']/g, '');
+  }
+
   /**
    * Initialize the resource selection tree
    */
-  function initializeJsTree(availData) {
+  function initializeJsTree(availData, chapters) {
     if (availTree) {
       availTree.jstree('destroy');
       includedTree.jstree('destroy');
     }
 
-    var includedData = [];
-    if (langSelect.val() === 'en') {
+    optionChanges = {};
+    var includedData;
+    if (langSelect.val() === 'en' && !chapters) {
       includedData = [
-        {text: 'Preface', id: 'Preface', type: 'chapter'},
-        {text: 'Appendix', id: 'Appendix', type: 'chapter'}
+        {text: 'Preface', id: 'chapter_Preface', type: 'chapter'},
+        {text: 'Appendix', id: 'chapter_Appendix', type: 'chapter'}
       ];
+    }
+    else {
+      includedData = [];
     }
 
     itemTypes = {
@@ -853,6 +1054,7 @@
       },
       'node_customize': {
         default: function(elem, node) {
+          if (!node) return;
           var anchor = $(elem).find('#' + node.id + '_anchor');
           if (node.id in optionChanges) {
             markModified(node.id, anchor);
@@ -932,7 +1134,7 @@
         'core': {
           'check_callback': function (operation, node, node_parent, node_position, more) {
             // only allow deleting of nodes that were moved to the Included tree
-            return operation === 'copy_node' || 
+            return operation === 'copy_node' ||
               (operation === 'delete_node' && node.original.included);
           },
           'data': availData
@@ -948,13 +1150,14 @@
         restoreData(availTree, data.node, includedTree,data.original);
       });
 
-      // when nodes are moved to a different tree through drag and drop, 
+      // when nodes are moved to a different tree through drag and drop,
       // their original data is not copied by jsTree, so we have to copy
       // it over ourselves
       function restoreData(tree, node, origTree, original) {
         node = tree.jstree().get_node(node);
         original = origTree.jstree().get_node(original);
         Object.assign(node.original, original.original);
+        tree.jstree().set_id(node, original.id);
         $.each(node.children, function(index, child) {
           var origChild = original.children[index];
           restoreData(tree, child, origTree, origChild);
@@ -962,13 +1165,44 @@
       }
 
       $("#available-modules").bind('ready.jstree', function() {
+        if (chapters) {
+          for (var chapter in chapters) {
+            var modules = chapters[chapter];
+            addChapter(chapter);
+            var chapterNode = getIncludedNode('chapter_' + encodeId(chapter));
+            for (var mod in modules) {
+              var children = modules[mod];
+              var modId = encodeId(mod);
+              var modNode = getAvailNode(modId);
+              addModule(modNode, chapterNode);
+              for (var child in children) {
+                var id = '|';
+                var options = children[child];
+                if ('showsection' in options) {
+                  id += 'sect|' + child;
+                }
+                else {
+                  id += '|' + child;
+                }
+                id = modNode.id + encodeId(id);
+                var childNode = getIncludedNode(id);
+                options = cleanOptions(childNode, options);
+                for (var option in options) {
+                  var value = options[option];
+                  setOption(id, option, value);
+                }
+              }
+            }
+          }
+          console.log(optionChanges);
+        }
         $('#btn-add-chapter').removeAttr('disabled');
-        if (langSelect.val() !== 'en') return;
+        if (langSelect.val() !== 'en' || chapters) return;
         var intro = availTree.jstree().get_node('Intro');
         var glossary = availTree.jstree().get_node('Glossary');
         var biblio = availTree.jstree().get_node('Bibliography');
-        var preface = includedTree.jstree().get_node('Preface');
-        var appendix = includedTree.jstree().get_node('Appendix');
+        var preface = includedTree.jstree().get_node('chapter_Preface');
+        var appendix = includedTree.jstree().get_node('chapter_Appendix');
         addModule(intro, preface);
         addModule(glossary, appendix);
         addModule(biblio, appendix);
