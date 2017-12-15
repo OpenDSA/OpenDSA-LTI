@@ -248,7 +248,7 @@
       config.chapters = includedChapters();
 
       var dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, 2) + '\n');
-      var exportName = config.title.replace(' ', '_');
+      var exportName = config.title.replace(/ /g, '_');
       var downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute("href", dataStr);
       downloadAnchorNode.setAttribute("download", exportName + ".json");
