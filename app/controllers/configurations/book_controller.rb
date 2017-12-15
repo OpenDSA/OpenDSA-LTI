@@ -8,7 +8,7 @@ class RSTtoJSON
         json["type"] = "chapter"
         json["path"] = path
         json["text"] = File.basename(path)
-        json["id"] = path.sub(/public\/OpenDSA\/RST\/#{lang}\/?/, '')
+        json["id"] = File.basename(path)
         Dir.foreach(path) do |entry|
             child = {}
             if entry == '.' or entry == '..'
