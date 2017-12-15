@@ -82,16 +82,16 @@
   %h2
     Load Existing Configuration (Optional)
   .col-xs-12.row
-    %label.dialog-control-label.col-lg-3.col-md-4{for: 'upload-config-file'}
+    %label.dialog-control-label.col-lg-3.col-sm-4{for: 'upload-config-file'}
       Load Configuration File
     .col-xs-4
       %input.inline-input{type: 'file', id: 'upload-config-file', accept: '.json'}
     %input.btn.btn-primary{type: 'button', id: 'config-file-load', value: 'Load', disabled: true}
   .col-xs-12.row
-    .col-xs-offset-2
+    .col-xs-offset-3.col-lg-offset-2
       <b>- OR -</b>
   .col-xs-12.row
-    %label.dialog-control-label.col-lg-3.col-md-4{for: 'reference-config'}
+    %label.dialog-control-label.col-lg-3.col-sm-4{for: 'reference-config'}
       Select Reference Configuration
     .col-xs-4
       %select.form-control#reference-config
@@ -125,23 +125,24 @@
             %option{:value => lang_code}
               #{lang_name}
 
-    .form-group.border 
+    .form-group.border
       %label.control-label{for: "#code-langs"}
         Code Languages
-      .col-xs-6{id: "code-langs"}
+      .col-xs-9.col-md-6{id: "code-langs"}
         - @code_languages.each do |code_lang, code_info|
           .code-lang-opt.col-sm-6
             %input{type: "checkbox", name: "code-lang", id: "code-lang-#{code_lang}", value: code_lang}
             %label{for: "code-lang-#{code_lang}"}
               #{code_info[:label]}
-    
-    .form-group.border  
+
+    .form-group.border
       %label.control-label{for: "#glob-exer-options"}
         Global Exercise Options
-      .col-xs-6{id: "glob-exer-options"}
-        %input{type: "checkbox", name: "JXOP-debug", id: "JXOP-debug", value: 'JXOP-debug'}
-        %label{for: "JXOP-debug"}
-          JSAV Debug (for exercise developers)
+      .col-xs-9.col-md-6{id: "glob-exer-options"}
+        .col-xs-12
+          %input{type: "checkbox", name: "JXOP-debug", id: "JXOP-debug", value: 'JXOP-debug'}
+          %label{for: "JXOP-debug"}
+            JSAV Debug (for exercise developers)
 
     -# .form-group.border
     -#   %label.control-label{}
@@ -159,7 +160,7 @@
     .form-group.border
       %label.control-label{}
         Global Khan-Academy Exercise Options
-      .col-xs-6
+      .col-xs-6.col-md-5
         .form-group
           %label.control-label{for: "glob-ka-required"}
             Required:
@@ -179,7 +180,7 @@
     .form-group.border
       %label.control-label{}
         Global Proficiency Exercise Options
-      .col-xs-6
+      .col-xs-6.col-md-5
         .form-group
           %label.control-label{for: "glob-pe-required"}
             Required:
@@ -215,18 +216,18 @@
     .form-group.border
       %label.control-label{}
         Global External Tool Options
-      .col-xs-6
+      .col-xs-6.col-md-5
         .form-group
           %label.control-label{for: 'glob-extr-points'}
             Points:
           .col-xs-8
             %input{type: "number", min: 0, value: 1, id: "glob-extr-points"}
-        
+
     - @learning_tools.each do |tool|
       .form-group.border
         %label.control-label{}
           Global #{tool.name} Options
-        .col-xs-6
+        .col-xs-6.col-md-5
           .form-group
             %label.control-label{for: "glob-#{tool.name}-points"}
               Points:
@@ -236,7 +237,7 @@
     .form-group
       %label.control-label{for: "#other-options"}
         Other Options
-      .col-xs-6{id: "other-options"}
+      .col-xs-9.col-md-6{id: "other-options"}
         .col-sm-6
           %input{type: "checkbox", name: "build-jsav", id: "build-jsav"}
           %label{for: "build-jsav"}
@@ -249,9 +250,9 @@
           %input{type: "checkbox", name: "disp-mod-comp", id: "disp-mod-comp", checked: "checked"}
           %label{for: "disp-mod-comp"}
             Display Module Completion
-        
+
     %div{id: "book-content-container"}
-      %h2 
+      %h2
         Book Content
       %ul
         %li
@@ -267,22 +268,22 @@
           To <b>add a chapter</b> to your book, click the "+ Chapter" button and
           enter a name for the chapter.
         %li
-          To <b>remove a chapter</b> and all of its modules from your book, right click 
+          To <b>remove a chapter</b> and all of its modules from your book, right click
           on the <i class="fa fa-folder-o"></i>chapter and press "Delete".
         %li
-          To <b>add a module</b> to your book, click and drag a <i class="fa fa-files-o"></i>module from 
-          the Available pane and drop it in the Included pane in the 
+          To <b>add a module</b> to your book, click and drag a <i class="fa fa-files-o"></i>module from
+          the Available pane and drop it in the Included pane in the
           desired <i class="fa fa-folder-o"></i>chapter. You can select
           multiple modules by holding Ctrl (Mac: ⌘) and clicking on
           the desired modules. To select multiple sequentially listed modules,
           click on the first module, then hold Shift and click on the last
           module.
         %li
-          To <b>remove a module</b> from your book, right click on the <i class="fa fa-files-o"></i>module 
+          To <b>remove a module</b> from your book, right click on the <i class="fa fa-files-o"></i>module
           in the Included pane and press "Remove".
         %li
-          <b>Reorder chapters and modules</b> in your book using drag-and-drop. 
-          The order of the chapters and modules in the Included pane will be the 
+          <b>Reorder chapters and modules</b> in your book using drag-and-drop.
+          The order of the chapters and modules in the Included pane will be the
           order of the chapters and modules in your book.
         %li
           To <b>override the global settings for an individual exercise</b>,
@@ -311,9 +312,9 @@
             <b>ET</b> External Tool Exercise (CodeWorkout)
         .col-xs-12
           .col-xs-12
-            <b style='color: orange'>M</b> This item has been modified with settings different from the defaults
+            <b style='color: orange'>M</b> This item has been modified with settings different from the defaults/globals
           .col-xs-12
-            <b style='color: orange'>•</b> This item has children who have been modified with settings different from the defaults
+            <b style='color: orange'>•</b> This item has children who have been modified with settings different from the defaults/globals
 
       %div{id: "split-container"}
         %div.split.split-horizontal{id: "chosen-pane"}
@@ -332,5 +333,4 @@
 
     .form-group.col-xs-12{style: "margin-top: 15px;"}
       %button.btn.btn-primary.col-xs-offset-5{type: "submit"}
-        Download Configuration  
-          
+        Download Configuration

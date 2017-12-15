@@ -62,7 +62,7 @@
     var pane2 = document.querySelector('#available-pane');
     Split([pane1, pane2], {
       sizes: [50, 50],
-      minSize: 200
+      minSize: 280
     });
 
     langSelect = $('#book-lang');
@@ -440,7 +440,7 @@
   function addModule(node, parent) {
     if (node.original.included === true) return false;
     node.original.included = true;
-    includedTree.jstree().copy_node(node, parent);
+    includedTree.jstree().copy_node(node, parent, 'last');
     availTree.jstree().delete_node(node);
   }
 
@@ -717,7 +717,6 @@
   }
 
   function loadConfiguration(config) {
-    console.log(config);
     $('#book-config-form')[0].reset();
     for (var key in config) {
       switch(key) {
@@ -784,7 +783,7 @@
   function setGlobSsOptions(options) {
     // currently the interface does not support changing slideshow options
     // since Canvas limitations make giving points to slideshows
-    // infeasible
+    // infeasible (only one gradeable resource per assignment)
   }
 
   function setGlobKaOptions(options) {
@@ -959,7 +958,7 @@
             };
           }
           if (node.type === 'section') {
-            if (node.original.showsection) {
+            if (getOption(node.id, 'showsection') === false) {
               return {
                 'show': {
                   label: 'Show Section',
@@ -1194,7 +1193,6 @@
               }
             }
           }
-          console.log(optionChanges);
         }
         $('#btn-add-chapter').removeAttr('disabled');
         if (langSelect.val() !== 'en' || chapters) return;

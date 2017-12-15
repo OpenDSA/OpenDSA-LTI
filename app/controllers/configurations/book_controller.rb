@@ -53,7 +53,7 @@ class RSTtoJSON
             children: [],
             type: 'module'
         }
-        
+
         while i < lines.count
           line = lines[i]
           sline = line.strip()
@@ -64,25 +64,25 @@ class RSTtoJSON
           end
           i += 1
         end
-        
+
         if mod_lname == ""
           mod_lname = mod_sname
           i = 0
         end
 
         mod[:long_name] = mod_lname
-        mod[:text] = mod_sname == mod_lname ? mod_lname : "#{mod_lname} (#{mod_sname})"
+        mod[:text] = "#{mod_lname} (#{mod_path})"
 
         curr_section = mod
         while i < lines.count
           line = lines[i]
           sline = line.strip()
-    
+
           if sline == ""
             i += 1
             next
           end
-    
+
           if SECTION_RE.match(sline) != nil
             sectName = lines[i - 1].strip()
             curr_section = {
@@ -95,7 +95,7 @@ class RSTtoJSON
             i += 1
             next
           end
-    
+
           match_data = EX_RE.match(sline)
           if match_data != nil
             directive = match_data[2]
@@ -106,17 +106,17 @@ class RSTtoJSON
 
             i += 1
             i, options = parse_directive_options(i, lines)
-    
+
             if options.has_key?('long_name')
               ex_lname = options.delete('long_name')
             else
               ex_lname = ex_sname
             end
-    
+
             ex_text = ex_lname == ex_sname ? ex_lname : "#{ex_lname} (#{ex_sname})"
             curr_section[:children] << {
-                short_name: ex_sname, 
-                long_name: ex_lname, 
+                short_name: ex_sname,
+                long_name: ex_lname,
                 text: ex_text,
                 type: ex_type,
                 id: URI.escape("#{mod_path}||#{ex_sname}", URI_ESCAPE_RE).gsub(/[%']/, '')
@@ -128,14 +128,14 @@ class RSTtoJSON
 
                 i += 1
                 i, options = parse_directive_options(i, lines)
-                
+
                 learning_tool = options.fetch('learning_tool', 'code-workout')
 
                 curr_section[:children] << {
                     short_name: ex_name,
                     long_name: ex_name,
                     learning_tool: learning_tool,
-                    text: ex_name,
+                    text: "#{ex_name} (#{learning_tool})",
                     type: 'extr',
                     id: URI.escape("#{mod_path}||#{ex_name}", URI_ESCAPE_RE).gsub(/[%']/, '')
                 }
@@ -165,7 +165,7 @@ class RSTtoJSON
                     break
                 end
             end
-            
+
         end
         return i, options
     end
@@ -277,9 +277,9 @@ class Configurations::BookController < ApplicationController
     def show
         @availMods = {}
         @languages = {
-            "en": "English", 
-            "fr": "Français", 
-            "pt": "Português", 
+            "en": "English",
+            "fr": "Français",
+            "pt": "Português",
             "fi": "Suomi",
             "sv": "Svenska"
         }
@@ -290,37 +290,37 @@ class Configurations::BookController < ApplicationController
             "Java": {
                 "ext": [
                     "java"
-                ], 
-                "label": "Java", 
+                ],
+                "label": "Java",
                 "lang": "java"
             },
             "Processing": {
                 "ext": [
                     "pde"
-                ], 
-                "label": "Processing", 
+                ],
+                "label": "Processing",
                 "lang": "java"
-            }, 
+            },
             "Java_Generic": {
                 "ext": [
                     "java"
-                ], 
-                "label": "Java (Generic)", 
+                ],
+                "label": "Java (Generic)",
                 "lang": "java"
-            }, 
+            },
             "C++": {
                 "ext": [
-                    "cpp", 
+                    "cpp",
                     "h"
-                ], 
-                "label": "C++", 
+                ],
+                "label": "C++",
                 "lang": "C++"
             },
             "Pseudo": {
                 "ext": [
                     "txt"
-                ], 
-                "label": "Pseudo Code", 
+                ],
+                "label": "Pseudo Code",
                 "lang": "pseudo"
             },
             "C": {
@@ -334,8 +334,8 @@ class Configurations::BookController < ApplicationController
             "Python": {
                 "ext": [
                     "py"
-                ], 
-                "label": "Python", 
+                ],
+                "label": "Python",
                 "lang": "python"
             },
             "JavaScript": {
@@ -419,7 +419,7 @@ class Configurations::BookController < ApplicationController
             configs << {
                 title: title,
                 name: File.basename(entry, '.json'),
-                url: url 
+                url: url
             }
         end
         return configs.sort_by! { |x| x[:title] }

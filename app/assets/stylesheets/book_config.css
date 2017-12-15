@@ -38,8 +38,8 @@
   float: left;
 }
 .gutter.gutter-horizontal {
-  height: 92.8%;
-  margin-top: 3.2%;
+  height: 93%;
+  margin-top: 35px;
   float: left;
 }
 
@@ -126,6 +126,7 @@ input[type="checkbox"].align-checkbox {
 .dialog-control-label {
   padding-right: 0px;
   text-align: right;
+  float: left;
 }
 
 input.inline-input {
@@ -136,4 +137,25 @@ input.inline-input {
   padding-bottom: 6px;
   margin-bottom: 6px;
   border-bottom: 1px dashed #C0C0C0
+}
+
+.form-horizontal .form-group label.control-label {
+  width: 25%;
+}
+
+.container {
+  min-width: 750px;
+}
+
+@media screen and (max-width: 1369px) {
+  .container {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 1370px) {
+  #split-container {
+    width: 115%;
+    margin-left: -7.5%;
+  }
 }
