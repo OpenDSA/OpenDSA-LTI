@@ -8,7 +8,7 @@ class RSTtoJSON
         json["type"] = "chapter"
         json["path"] = path
         json["text"] = File.basename(path)
-        json["id"] = path.sub(/.\/RST\/#{lang}\/?/, '')
+        json["id"] = path.sub(/public\/OpenDSA\/RST\/#{lang}\/?/, '')
         Dir.foreach(path) do |entry|
             child = {}
             if entry == '.' or entry == '..'
@@ -18,6 +18,7 @@ class RSTtoJSON
             # Concatenate the subpath with the entry and path
             subpath = File.join(path, entry)
             if File.file?(subpath) and File.extname(subpath) == '.rst'
+                # found a module rst file
                 mod_info = self.extract_module_info(subpath, lang)
                 mod_info[:parent_id] = json["id"].blank? ? '#' : json["id"]
                 json["children"].push(mod_info)
@@ -34,19 +35,23 @@ class RSTtoJSON
 
     # use ||= to avoid "already intialized constant" warning
     # since rails will reload the class on every request during development
+
+    # regex to identify exercise/slideshow directives
     EX_RE ||= Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe)")
+    # regex to identify external tool directives
     EXTR_RE ||= Regexp.new("^(\.\. )(extrtoolembed:: '([^']+)')")
+    # regex to identify section titles
     SECTION_RE ||= Regexp.new('^-+$')
     URI_ESCAPE_RE ||= Regexp.new("[^#{URI::PATTERN::UNRESERVED}']")
 
     def self.extract_module_info(rst_path, lang)
-
         lines = File.readlines(rst_path)
         i = 0
         mod_lname = ""
         mod_sname = File.basename(rst_path, '.rst')
-        mod_path = rst_path.sub("./RST/#{lang}/", '').sub('.rst', '')
+        mod_path = rst_path.sub("public/OpenDSA/#{lang}/", '').sub('.rst', '')
         mod = {
+            # escape the id so it can be used as an HTML element id
             id: URI.escape(mod_path, URI_ESCAPE_RE).gsub(/[%']/, ''),
             path: mod_path,
             short_name: mod_sname,
@@ -54,6 +59,7 @@ class RSTtoJSON
             type: 'module'
         }
 
+        # find the module title
         while i < lines.count
           line = lines[i]
           sline = line.strip()
@@ -74,6 +80,7 @@ class RSTtoJSON
         mod[:text] = "#{mod_lname} (#{mod_path})"
 
         curr_section = mod
+        # extract info about the sections and exercises that are in the module
         while i < lines.count
           line = lines[i]
           sline = line.strip()
@@ -98,6 +105,7 @@ class RSTtoJSON
 
           match_data = EX_RE.match(sline)
           if match_data != nil
+            # found an exercise or slideshow
             directive = match_data[2]
             identifier = match_data[3]
             ex_type = match_data[7]
@@ -124,6 +132,8 @@ class RSTtoJSON
           else
             match_data = EXTR_RE.match(sline)
             if match_data != nil
+                # found an external tool exercise
+
                 ex_name = match_data[3]
 
                 i += 1
@@ -147,6 +157,9 @@ class RSTtoJSON
         return mod
     end
 
+    # parse the options for the directive that starts on line i
+    # returning the first line after the end of the directive options, 
+    # as well as the options themselves as a dictionary.
     def self.parse_directive_options(i, lines)
         options = {}
         if i < lines.count
@@ -175,6 +188,7 @@ end
 class Configurations::BookController < ApplicationController
 
     def show
+        # programming languages that OpenDSA has code examples for
         @code_languages = {
             "Java": {
                 "ext": [
@@ -236,6 +250,7 @@ class Configurations::BookController < ApplicationController
             }
         }
 
+        # languages that OpenDSA has content for
         @languages = {
             "en": "English",
             "fr": "Français",
@@ -244,10 +259,11 @@ class Configurations::BookController < ApplicationController
             "sv": "Svenska"
         }
 
+        # gets a list of available modules for each language
         @availMods = Rails.cache.fetch("odsa_available_modules", expires_in: 1.day) do
             availMods = {}
             @languages.each do |lang_code, lang_name|
-                availMods[lang_code] = RSTtoJSON.convert("./RST/#{lang_code}", lang_code)
+                availMods[lang_code] = RSTtoJSON.convert("public/OpenDSA/RST/#{lang_code}", lang_code)
             end
             availMods
         end
@@ -260,6 +276,8 @@ class Configurations::BookController < ApplicationController
 
     private
 
+    # Gets a list of book configurations hosted on the OpenDSA server
+    # Returns a dictionary containing the name, title, and url of each config file
     def reference_book_configurations()
         return Rails.cache.fetch("odsa_reference_book_configs", expires_in: 1.day) do
             config_dir = File.join("public", "OpenDSA", "config")

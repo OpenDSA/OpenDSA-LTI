@@ -1,3 +1,5 @@
+/* OpenDSA Book Configuration Interface */
+
 // allows us to customize node apperances when they are rendered
 // from https://github.com/vakata/jstree/blob/master/src/misc.js
 (function (factory) {
@@ -58,6 +60,7 @@
   var loadingConfig = false;
 
   $(document).ready(function () {
+    // setup the split pane used for book content selection
     var pane1 = document.querySelector('#chosen-pane');
     var pane2 = document.querySelector('#available-pane');
     Split([pane1, pane2], {
@@ -75,6 +78,7 @@
       }
     });
 
+    // dialog displayed when creating a new chapter
     addChapterDialog = $('#add-chapter-dialog').dialog({
       autoOpen: false,
       modal: true,
@@ -113,6 +117,7 @@
       }
     });
 
+    // dialog displayed when renaming a chapter
     renameChapterDialog = $('#rename-chapter-dialog').dialog({
       autoOpen: false,
       modal: true,
@@ -149,6 +154,7 @@
       }
     }
 
+    // dialog displayed when editing exercise settings
     exSettingsDialog = $('#exercise-settings-dialog').dialog({
       autoOpen: false,
       modal: true,
@@ -175,6 +181,8 @@
       exerciseSettingsHelper();
     });
 
+    // parse settings from the dialog and apply them to the
+    // target exercise
     function exerciseSettingsHelper() {
       var node = getIncludedNode(exSettingsDialog.dialog('option', 'nodeId'));
       var settings = {
@@ -242,6 +250,7 @@
       }
     });
 
+    // download book configuration as a json file
     $('#book-config-form').on('submit', function(event) {
       event.preventDefault();
       var config = allGlobalSettings();
@@ -266,6 +275,7 @@
       $('#config-file-load').removeAttr('disabled');
     }
 
+    // load a configuration from the file a user has chosen
     $('#config-file-load').on('click', function() {
       loadingConfig = true;
       $('#config-file-load').attr('disabled', true);
@@ -282,6 +292,8 @@
       reader.readAsText(file);
     });
 
+    // load a configuration from a reference configuration stored on the 
+    // OpenDSA server
     $('#reference-config-load').on('click', function(event) {
       loadingConfig = true;
       $('#config-file-load').attr('disabled', true);
@@ -314,6 +326,7 @@
   */
   var optionChanges = {};
 
+  /* mark a tree node as having settings different from the globals/defaults */
   function markModified(nodeId, elem) {
     var iconId = nodeId + '_modified';
     if (getOption(nodeId, 'showsection') === false) {
@@ -334,6 +347,8 @@
     }
   }
 
+  /* Mark a tree node as having children with settings different from
+     the global/default settings */
   function markModifiedChildren(nodeId, elem) {
     var iconId = nodeId + '_childmodified';
     if ($('#' + iconId).length === 0) {
@@ -348,6 +363,8 @@
     }
   }
 
+  /* Indicates if a tree node has children with settings different from
+     the global/default settings */
   function hasModifiedChildren(nodeId) {
     var node = getIncludedNode(nodeId);
     for (var i = 0; i < node.children.length; i++) {
@@ -360,11 +377,14 @@
     return false;
   }
 
+  /* Mark a tree node has not having any children with settings different from
+     the global/default settings */
   function markNotModifiedChildren(nodeId) {
     var iconId = nodeId + '_childmodified';
     $('#' + iconId).remove();
   }
 
+  /* mark a tree node as not having settings different from the globals/defaults */
   function markNotModified(nodeId) {
     var iconId = nodeId + '_modified';
     $('#' + iconId).remove();
@@ -378,6 +398,8 @@
     }
   }
 
+  /* Sets an option that is different from the default/global settings 
+     for a tree node */
   function setOption(nodeId, optionName, optionValue) {
     var opts = optionChanges[nodeId];
     if (typeof opts === 'undefined') {
@@ -389,6 +411,7 @@
     markModified(nodeId, anchor);
   }
 
+  /* Remove an option for a given node */
   function deleteOption(nodeId, optionName) {
     var opts = optionChanges[nodeId];
     if (typeof opts === 'undefined') return;
@@ -399,6 +422,8 @@
     }
   }
 
+  /* Get the value of an option that is different from the default/global settings 
+    for a given node */
   function getOption(nodeId, optionName) {
     var opts = optionChanges[nodeId];
     if (!$.isEmptyObject(opts)) {
@@ -407,6 +432,7 @@
     return undefined;
   }
 
+  /* Get all of the settings for a given node */
   function getOptions(node) {
     if (typeof node !== 'object') {
       node = getIncludedNode(node);
@@ -416,19 +442,24 @@
     return opts;
   }
 
+  /* Get all of the options that are different from the default/global
+     settings for a given node */
   function getOptionChanges(nodeId) {
     return optionChanges[nodeId];
   }
 
+  /* Indicates if a node has any options different from the default/global settings */
   function hasOptionChanges(nodeId) {
     return nodeId in optionChanges;
   }
 
+  /* Resets a node to the default/global settings */
   function deleteAllOptions(nodeId) {
     delete optionChanges[nodeId];
     markNotModified(nodeId);
   }
 
+  /* Remove a module from the included tree */
   function removeModule(node) {
     if (node.original.included === false) return false;
     node.original.included = false;
@@ -437,6 +468,7 @@
     includedTree.jstree(true).delete_node(node);
   }
 
+  /* Add a module to the included tree */
   function addModule(node, parent) {
     if (node.original.included === true) return false;
     node.original.included = true;
@@ -453,6 +485,7 @@
     return valid;
   }
 
+  /* Add a chapter to the included tree */
   function addChapter(name) {
     if (!name) {
       var elem = $('#chapter-name');
@@ -467,6 +500,7 @@
     return valid;
   }
 
+  /* Check that the chapter name is unique and meets other requirements */
   function validateChapterName(dialog, name, ignore) {
     var valid = !chapterExists(dialog, name, ignore);
     valid = valid && checkRegexp(dialog, name, /^[\w\s]{1,100}$/,
@@ -474,6 +508,8 @@
     return valid;
   }
 
+  /* Checks if a chapter with the specified name exists
+    and displays an error messages if it does */
   function chapterExists(dialog, name, ignore) {
     var treeNodes = includedTree.jstree(true).get_json();
     for (var i = 0; i < treeNodes.length; i++) {
@@ -487,6 +523,8 @@
     return false;
   }
 
+  /* Check if a value matches a regeular expression 
+    Displays an error if it doesn't*/
   function checkRegexp(dialog, value, regexp, error) {
     if (regexp.test(value)) {
       return true;
@@ -495,6 +533,7 @@
     return false;
   }
 
+  /* Sets the error message on the dialog */
   function updateDialogErrors(dialog, msg) {
     var errors = dialog.find('.dialog-errors');
     if (!msg) {
@@ -509,12 +548,14 @@
     }, 500);
   }
 
+  /* Gets the global exercise settings  (glob_exer_options) */
   function globalExerSettings() {
     return {
       'JXOP-debug': $('#JXOP-debug').is(':checked').toString()
     };
   }
 
+  /* Gets the global Khan-Academy Exercise settings (glob_ka_options) */
   function globalKaSettings() {
     return {
       required: $('#glob-ka-required').is(':checked'),
@@ -523,6 +564,7 @@
     };
   }
 
+  /* Gets the global Proficiency Exercise settings (glob_pe_options) */
   function globalPeSettings() {
     return {
       required: $('#glob-pe-required').is(':checked'),
@@ -531,14 +573,18 @@
     };
   }
 
+  /* Gets the global Slideshow settings (glob_ss_options) */
   function globalSsSettings() {
     return {
-      required: false,
-      points: 0,
+      required: $('#glob-ss-required').is(':checked'),
+      points: Number.parseFloat($('#glob-ss-points').val()),
       threshold: 1
     };
   }
 
+  /* Gets the global External Tool settings (glob_extr_options) 
+    If a tool name is provided, only the options for that tool
+    will be returned. */
   function globalExtrSettings(toolName) {
     if (toolName) {
       return {
@@ -558,12 +604,14 @@
     return settings;
   }
 
+  /* Gets the default settings for sections */
   function globalSectionSettings() {
     return {
       showsection: true
     };
   }
 
+  /* Gets the code languages the user has selected */
   function selectedCodeLanguages() {
     var checkboxes = $('input:checkbox[name=code-lang]:checked');
     var selected = {};
@@ -574,6 +622,7 @@
     return selected;
   }
 
+  /* Gets an object containing all the global book settings */
   function allGlobalSettings() {
     return {
       title: $('#book-title').val(),
@@ -594,6 +643,9 @@
     };
   }
 
+  /* Gets an object containing all the chapters in the book 
+    including the modules in the chapters, and any changes
+    made to options sections and/or exercises/visualizations */
   function includedChapters() {
     var tree = includedTree.jstree().get_json();
     var chapters = {};
@@ -636,14 +688,17 @@
     return chapters;
   }
 
+  /* Gets a node from the available tree */
   function getAvailNode(node) {
     return availTree.jstree().get_node(node);
   }
 
+  /* Gets a node from the included tree */
   function getIncludedNode(node) {
     return includedTree.jstree().get_node(node);
   }
 
+  /* Gets the global settings based on the nodes type */
   function globalTypeSettings(node) {
     var globals;
     switch (node.type) {
@@ -668,6 +723,7 @@
     return globals;
   }
 
+  /* Sets the exercise settings for the exercise represented by the node */
   function setExerciseSettings(node, settings) {
     var globalSettings = globalTypeSettings(node);
     var opts = getOptions(node);
@@ -689,9 +745,9 @@
     }
   }
 
+  /* Removes any exercise setting changes that are equal to the new
+    global settings*/
   function onGlobalExerciseSettingsUpdate(type, changes, toolName) {
-    // remove any exercise setting changes that are equal to
-    // the new global options
     for (var nodeId in optionChanges) {
       var node = getIncludedNode(nodeId);
       if (node.type !== type || (toolName && node.original.learning_tool !== toolName)) {
@@ -706,6 +762,8 @@
     }
   }
 
+  /* Remove any values from options that are the same as the global options 
+   of the node's type */
   function cleanOptions(node, options) {
     var globals = globalTypeSettings(node);
     for (var setting in globals) {
@@ -716,6 +774,7 @@
     return options;
   }
 
+  /* Loads the settings from the specified configuration */
   function loadConfiguration(config) {
     $('#book-config-form')[0].reset();
     for (var key in config) {
@@ -766,6 +825,7 @@
     initializeJsTree(ODSA.availableModules[config.lang].children, config.chapters);
   }
 
+  /* Sets the selected code languages */
   function setCodeLangs(langs) {
     for (var lang in ODSA.codeLanguages) {
       // jquery doesn't work when element id's contain '+' characters, e.g. C++
@@ -774,12 +834,14 @@
     }
   }
 
+  /* Sets the global exercise options */
   function setGlobExerOptions(options) {
     for (var option in options) {
       $('#' + option).prop('checked', options[option]);
     }
   }
 
+  /* Sets the global slideshow options */
   function setGlobSsOptions(options) {
     for (var option in options) {
       var value = options[option];
@@ -792,6 +854,7 @@
     }
   }
 
+  /* Sets the global Khan-Academy exercise options */
   function setGlobKaOptions(options) {
     for (var option in options) {
       var value = options[option];
@@ -804,6 +867,7 @@
     }
   }
 
+  /* Sets the global Proficiency Exercise Options */
   function setGlobPeOptions(options) {
     for (var option in options) {
       var value = options[option];
@@ -816,6 +880,7 @@
     }
   }
 
+  /* Sets the global external tool options */
   function setGlobExtrOptions(options) {
     for (var option in options) {
       var value = options[option];
@@ -836,33 +901,13 @@
     }
   }
 
-  function loadChapters(chapters, lang) {
-    var avail = ODSA.availableModules[langSelect.val()].children;
-    var included = [];
-    for (var chapter in chapters) {
-      var modules = chapters[chapter];
-      var node = {text: chapter, id: chapter, type: 'chapter'};
-      for (var mod in modules) {
-        var children = modules[mod];
-        var tokens = mod.split('/');
-        if (tokens.length > 1) {
-
-        }
-        else {
-          var folder = tokens[0];
-          var file = tokens[1];
-
-        }
-      }
-    }
-  }
-
+  /* Encodes the specified string for use as an html element id */
   function encodeId(id) {
     return encodeURIComponent(id).replace(/[%']/g, '');
   }
 
   /**
-   * Initialize the resource selection tree
+   * Initialize the book content selection trees
    */
   function initializeJsTree(availData, chapters) {
     if (availTree) {
@@ -873,6 +918,7 @@
     optionChanges = {};
     var includedData;
     if (langSelect.val() === 'en' && !chapters) {
+      // include some default chapters
       includedData = [
         {text: 'Preface', id: 'chapter_Preface', type: 'chapter'},
         {text: 'Appendix', id: 'chapter_Appendix', type: 'chapter'}
@@ -882,6 +928,7 @@
       includedData = [];
     }
 
+    // node types
     itemTypes = {
       'chapter': {
         icon: 'fa fa-folder-o'
@@ -911,16 +958,15 @@
     includedTree = includedTreeElem.jstree({
       'types': itemTypes,
       'dnd': {
+        // drag and drop settings
         copy: false,
         is_draggable: function (nodes) {
           return true;
         },
         inside_pos: 'last'
       },
-      'search': {
-        fuzzy: true
-      },
       'contextmenu': {
+        // menu displayed when right clicking on certain nodes
         items: function(node) {
           if (node.type === 'chapter') {
             return {
@@ -1064,6 +1110,7 @@
         }
       },
       'node_customize': {
+        // customize node appearances when they are rendered
         default: function(elem, node) {
           if (!node) return;
           var anchor = $(elem).find('#' + node.id + '_anchor');
@@ -1076,6 +1123,7 @@
         }
       },
       'core': {
+        // control which operations are allowed for each node type
         'check_callback': function (operation, node, node_parent, node_position, more) {
           if (node.type === 'chapter') {
             if (operation === 'delete_node') {
@@ -1107,7 +1155,7 @@
         },
         'data': includedData
       },
-      'plugins': ['search', 'dnd', 'types', 'wholerow', 'contextmenu', 'node_customize']
+      'plugins': ['dnd', 'types', 'wholerow', 'contextmenu', 'node_customize']
     });
 
     availTreeElem = $('#available-modules');
@@ -1115,6 +1163,7 @@
     availTree = availTreeElem.jstree({
         'types': itemTypes,
         'dnd': {
+          // drag and drop settings
           copy: false,
           is_draggable: function (nodes) {
             for (var i = 0; i < nodes.length; i++) {
@@ -1123,10 +1172,8 @@
             return true;
           }
         },
-        'search': {
-          fuzzy: true
-        },
         'conditionalselect': function(node, event) {
+          // only modules can be seelcted
           return node.type === 'module';
         },
         'contextmenu': {
@@ -1135,6 +1182,7 @@
           }
         },
         'sort': function(node1, node2) {
+          // sort nodes in alphabetical order
           var n1 = this.get_node(node1);
           var n2 = this.get_node(node2);
           if (n1.type === n2.type) {
@@ -1153,14 +1201,6 @@
         'plugins': ['search', 'dnd', 'types', 'wholerow', 'conditionalselect', 'sort', 'contextmenu']
       });
 
-      $("#included-modules").bind('copy_node.jstree', function(e, data) {
-        restoreData(includedTree, data.node, availTree, data.original);
-      });
-
-      $("#available-modules").bind('copy_node.jstree', function(e, data) {
-        restoreData(availTree, data.node, includedTree,data.original);
-      });
-
       // when nodes are moved to a different tree through drag and drop,
       // their original data is not copied by jsTree, so we have to copy
       // it over ourselves
@@ -1175,8 +1215,17 @@
         });
       }
 
+      $("#included-modules").bind('copy_node.jstree', function(e, data) {
+        restoreData(includedTree, data.node, availTree, data.original);
+      });
+
+      $("#available-modules").bind('copy_node.jstree', function(e, data) {
+        restoreData(availTree, data.node, includedTree,data.original);
+      });
+
       $("#available-modules").bind('ready.jstree', function() {
         if (chapters) {
+          // we are loading an existing configuration
           for (var chapter in chapters) {
             var modules = chapters[chapter];
             addChapter(chapter);
@@ -1206,8 +1255,11 @@
             }
           }
         }
+
         $('#btn-add-chapter').removeAttr('disabled');
         if (langSelect.val() !== 'en' || chapters) return;
+
+        // add some default modules
         var intro = availTree.jstree().get_node('Intro');
         var glossary = availTree.jstree().get_node('Glossary');
         var biblio = availTree.jstree().get_node('Bibliography');
