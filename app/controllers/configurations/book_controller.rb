@@ -8,7 +8,7 @@ class RSTtoJSON
         json["type"] = "chapter"
         json["path"] = path
         json["text"] = File.basename(path)
-        json["id"] = File.basename(path)
+        json["id"] = json["text"]
         Dir.foreach(path) do |entry|
             child = {}
             if entry == '.' or entry == '..'
@@ -49,7 +49,7 @@ class RSTtoJSON
         i = 0
         mod_lname = ""
         mod_sname = File.basename(rst_path, '.rst')
-        mod_path = rst_path.sub("public/OpenDSA/#{lang}/", '').sub('.rst', '')
+        mod_path = rst_path.sub("public/OpenDSA/RST/#{lang}/", '').sub('.rst', '')
         mod = {
             # escape the id so it can be used as an HTML element id
             id: URI.escape(mod_path, URI_ESCAPE_RE).gsub(/[%']/, ''),
@@ -158,7 +158,7 @@ class RSTtoJSON
     end
 
     # parse the options for the directive that starts on line i
-    # returning the first line after the end of the directive options, 
+    # returning the first line after the end of the directive options,
     # as well as the options themselves as a dictionary.
     def self.parse_directive_options(i, lines)
         options = {}

@@ -292,7 +292,7 @@
       reader.readAsText(file);
     });
 
-    // load a configuration from a reference configuration stored on the 
+    // load a configuration from a reference configuration stored on the
     // OpenDSA server
     $('#reference-config-load').on('click', function(event) {
       loadingConfig = true;
@@ -398,7 +398,7 @@
     }
   }
 
-  /* Sets an option that is different from the default/global settings 
+  /* Sets an option that is different from the default/global settings
      for a tree node */
   function setOption(nodeId, optionName, optionValue) {
     var opts = optionChanges[nodeId];
@@ -422,7 +422,7 @@
     }
   }
 
-  /* Get the value of an option that is different from the default/global settings 
+  /* Get the value of an option that is different from the default/global settings
     for a given node */
   function getOption(nodeId, optionName) {
     var opts = optionChanges[nodeId];
@@ -523,7 +523,7 @@
     return false;
   }
 
-  /* Check if a value matches a regeular expression 
+  /* Check if a value matches a regeular expression
     Displays an error if it doesn't*/
   function checkRegexp(dialog, value, regexp, error) {
     if (regexp.test(value)) {
@@ -582,7 +582,7 @@
     };
   }
 
-  /* Gets the global External Tool settings (glob_extr_options) 
+  /* Gets the global External Tool settings (glob_extr_options)
     If a tool name is provided, only the options for that tool
     will be returned. */
   function globalExtrSettings(toolName) {
@@ -643,7 +643,7 @@
     };
   }
 
-  /* Gets an object containing all the chapters in the book 
+  /* Gets an object containing all the chapters in the book
     including the modules in the chapters, and any changes
     made to options sections and/or exercises/visualizations */
   function includedChapters() {
@@ -762,7 +762,7 @@
     }
   }
 
-  /* Remove any values from options that are the same as the global options 
+  /* Remove any values from options that are the same as the global options
    of the node's type */
   function cleanOptions(node, options) {
     var globals = globalTypeSettings(node);
@@ -1054,9 +1054,9 @@
                       $('#exercise-settings-threshold-group').css('display', '');
                       break;
                     case 'pe':
-                      thresholdElem.attr('step', 1);
-                      thresholdElem.attr('min', 1);
-                      thresholdElem.removeAttr('max');
+                      thresholdElem.attr('step', 0.01);
+                      thresholdElem.attr('min', 0);
+                      thresholdElem.attr('max', 1);
                       $('#exercise-settings-pe').css('display', 'none');
                       $('#exercise-settings-required-group').css('display', '');
                       $('#exercise-settings-threshold-group').css('display', '');

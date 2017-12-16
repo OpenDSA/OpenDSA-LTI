@@ -43,12 +43,12 @@
         %label.dialog-control-label.col-xs-4{for: "exercise-settings-points"}
           Points:
         .col-xs-6
-          %input{type: "number", min: 0, value: 1, id: "exercise-settings-points"}
+          %input{type: "number", min: 0, value: 1, step: 0.01, id: "exercise-settings-points"}
       .form-group{id: 'exercise-settings-threshold-group'}
         %label.dialog-control-label.col-xs-4{for: "exercise-settings-threshold"}
           Threshold:
         .col-xs-6
-          %input{type: "number", min: 1, value: 5, id: "exercise-settings-threshold"}
+          %input{type: "number", min: 1, value: 5, step: 1, id: "exercise-settings-threshold"}
       %div{id: 'exercise-settings-pe', style: 'display: none'}
         .form-group
           %label.dialog-control-label.col-xs-4{for: "exercise-settings-feedback"}
