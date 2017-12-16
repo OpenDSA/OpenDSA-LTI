@@ -903,7 +903,7 @@
 
   /* Encodes the specified string for use as an html element id */
   function encodeId(id) {
-    return encodeURIComponent(id).replace(/[%']/g, '');
+    return encodeURIComponent(id).replace(/[%'()]/g, '');
   }
 
   /**
