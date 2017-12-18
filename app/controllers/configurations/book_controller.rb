@@ -8,7 +8,7 @@ class RSTtoJSON
         json["type"] = "chapter"
         json["path"] = path
         json["text"] = File.basename(path)
-        json["id"] = json["text"]
+        json["id"] = json["text"].downcase
         Dir.foreach(path) do |entry|
             child = {}
             if entry == '.' or entry == '..'
@@ -53,7 +53,7 @@ class RSTtoJSON
         mod_path = rst_path.sub("public/OpenDSA/RST/#{lang}/", '').sub('.rst', '')
         mod = {
             # escape the id so it can be used as an HTML element id
-            id: URI.escape(mod_path, URI_ESCAPE_RE).gsub(URI_REMOVE_RE, ''),
+            id: URI.escape(mod_path, URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '').downcase!,
             path: mod_path,
             short_name: mod_sname,
             children: [],
@@ -97,7 +97,7 @@ class RSTtoJSON
               text: sectName,
               children: [], # exercises
               type: 'section',
-              id: URI.escape("#{mod_path}|sect|#{sectName}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '')
+              id: URI.escape("#{mod_path}|sect|#{sectName}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '').downcase!
             }
             mod[:children] << curr_section
             i += 1
@@ -128,7 +128,7 @@ class RSTtoJSON
                 long_name: ex_lname,
                 text: ex_text,
                 type: ex_type,
-                id: URI.escape("#{mod_path}||#{ex_sname}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '')
+                id: URI.escape("#{mod_path}||#{ex_sname}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '').downcase!
             }
           else
             match_data = EXTR_RE.match(sline)
@@ -148,7 +148,7 @@ class RSTtoJSON
                     learning_tool: learning_tool,
                     text: "#{ex_name} (#{learning_tool})",
                     type: 'extr',
-                    id: URI.escape("#{mod_path}||#{ex_name}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '')
+                    id: URI.escape("#{mod_path}||#{ex_name}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '').downcase!
                 }
             else
                 i += 1

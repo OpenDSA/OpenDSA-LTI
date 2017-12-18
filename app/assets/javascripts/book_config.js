@@ -825,6 +825,28 @@
     initializeJsTree(ODSA.availableModules[config.lang].children, config.chapters);
   }
 
+  /* Loads a 'full' configuration file that includes the settings for 
+     all exercises, and no global exercise settings */
+  function loadFullConfiguration(config) {
+
+  }
+
+  /* Determines the best global defaults for each exercise type based on
+    the most frequently occuring settings */
+  function determineGlobalDefaults(config) {
+
+  }
+
+  /* Saves the current configuration to the OpenDSA database */
+  function saveCurrentConfiguration() {
+
+  }
+
+  /* Retrieves a configuration from the OpenDSA database */
+  function retrieveConfiguration() {
+
+  }
+
   /* Sets the selected code languages */
   function setCodeLangs(langs) {
     for (var lang in ODSA.codeLanguages) {
@@ -903,7 +925,7 @@
 
   /* Encodes the specified string for use as an html element id */
   function encodeId(id) {
-    return encodeURIComponent(id).replace(/[%'()]/g, '');
+    return encodeURIComponent(id).replace(/[%'()]/g, '').toLowerCase();
   }
 
   /**
@@ -1234,6 +1256,10 @@
               var children = modules[mod];
               var modId = encodeId(mod);
               var modNode = getAvailNode(modId);
+              if (modNode === false) {
+                console.log('Could not find module wtih node id"' + modId + '"');
+                continue;
+              }
               addModule(modNode, chapterNode);
               for (var child in children) {
                 var id = '|';
@@ -1246,6 +1272,10 @@
                 }
                 id = modNode.id + encodeId(id);
                 var childNode = getIncludedNode(id);
+                if (childNode === false) {
+                  console.log('Could not find item wtih node id"' + id + '"');
+                  continue;
+                }
                 options = cleanOptions(childNode, options);
                 for (var option in options) {
                   var value = options[option];
