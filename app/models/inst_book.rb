@@ -184,6 +184,10 @@ class InstBook < ActiveRecord::Base
     end
     return total_points
   end
+
+  def title_with_created_at
+    return "#{title} (created #{created_at})"
+  end
   #~ Private instance methods .................................................
 end
 

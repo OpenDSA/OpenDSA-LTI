@@ -194,9 +194,9 @@ class LtiController < ApplicationController
     @course_offering = CourseOffering.find_by(lms_instance_id: lms_instance.id, lms_course_num: @lms_course_num)
     if @course_offering.blank?
       if lms_instance.organization_id.blank?
-        @organizations = Organization.all
+        @organizations = Organization.all.order(:name)
       end
-      @terms = Term.on_or_future
+      @terms = Term.on_or_future.order(:starts_on)
     end
     
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"

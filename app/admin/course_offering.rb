@@ -64,8 +64,8 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
     #   f.input :lms_course_num
     # end
     f.inputs 'Course Offering Details:' do
-      f.input :course
-      f.input :term
+      f.input :course, collection: Course.all.order(:slug, :name)
+      f.input :term, collection: Term.order(:starts_on)
       f.input :label
       f.input :archived
       # f.input :late_policy
