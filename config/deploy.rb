@@ -161,7 +161,7 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; git checkout master; make pull; make rst2json;"
+      execute "cd ~/OpenDSA; git checkout master; make pull;" #make rst2json;"
       # upload _generated config files
     end
   end
