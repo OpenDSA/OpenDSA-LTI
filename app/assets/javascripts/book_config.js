@@ -310,6 +310,15 @@
     });
 
     function saveConfig(update) {
+      var overlayMsg;
+      if (update) {
+        overlayMsg = 'Updating';
+      }
+      else {
+        overlayMsg = 'Saving';
+      }
+      displayLoadingOverlay(overlayMsg);
+
       var config = allGlobalSettings();
       config.chapters = includedChapters();
 
@@ -317,21 +326,28 @@
         config.inst_book_id = bookId;
       }
 
-      url = '/inst_books/update';
-
-      // TODO post configuration
       $.ajax({
         type: 'POST',
-        url: url,
-        data: {inst_book: config},
+        url: '/inst_books/update',
+        data: JSON.stringify({ inst_book: config }),
+        contentType: 'application/json',
         success: function(data, txtStatus, xhr) {
-          alert(data);
+          hideLoadingOverlay();
+          if (update) {
+            alert('Your book configuration was updated successfully.');
+          }
+          else {
+            alert('Your book configuration was saved successfully.');
+          }
         },
         error: function(xhr, txtStatus, errorThrown) {
-          alert('Error saving configuration: ' + textStatus + ' ' + errorThrown);
-        },
-        complete: function(xhr, textStatus) {
-
+          hideLoadingOverlay();
+          if (txtStatus && errorThrown) {
+            alert('Error saving configuration: ' + textStatus + ' ' + errorThrown);
+          }
+          else {
+            alert('An error occured while saving the configuration');
+          }
         }
       });
     }
@@ -600,7 +616,11 @@
     }, 500);
   }
 
-  function displayLoadingOverlay() {
+  function displayLoadingOverlay(msg) {
+    if (typeof msg === 'undefined') {
+      msg = 'Loading';
+    }
+    $('#overlay-message').text(msg);
     $('#loading-container').css('display', '');
   }
 
