@@ -31,7 +31,7 @@ ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
     f.inputs do
       f.input :lms_instance
       if current_user.global_role.is_admin?
-        f.input :user
+        f.input :user, collection: User.all.order(:first_name, :last_name)
       end
       f.input :access_token
     end

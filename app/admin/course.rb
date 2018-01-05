@@ -25,9 +25,9 @@ ActiveAdmin.register Course, sort_order: :created_at_asc do
   form do |f|
     f.semantic_errors
     f.inputs do
-      f.input :organization
+      f.input :organization, collection: Organization.all.order(:name)
       if current_user.global_role.is_admin?
-        f.input :user
+        f.input :user, collection: User.all.order(:first_name, :last_name)
       end
       f.input :number
       f.input :name

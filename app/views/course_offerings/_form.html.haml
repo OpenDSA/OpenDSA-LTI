@@ -15,7 +15,7 @@
   .form-group
     = label_tag :organization_select, 'Organization:', class: 'control-label col-xs-1'
     .col-xs-3
-      = collection_select nil, nil, Organization.all, :id, :name, { prompt: 'Select', selected: nil },
+      = collection_select nil, nil, Organization.all.order(:name), :id, :name, { prompt: 'Select', selected: nil },
       { id: 'organization-select', class: 'form-control' }
     .col-xs-1
       = link_to admin_organizations_path, title: "Create new organization", class: 'btn btn-default', :target => "_blank" do
@@ -24,7 +24,7 @@
   .form-group
     = label_tag :course_select, 'Course:', class: 'control-label col-xs-1'
     .col-xs-3
-      = collection_select nil, nil, Course.all, :id, :display_name, { prompt: 'Select', selected: nil },
+      = collection_select nil, nil, Course.all.order(:slug, :name), :id, :display_name, { prompt: 'Select', selected: nil },
       { id: 'course-select', class: 'form-control' }
     .col-xs-1
       = link_to admin_courses_path, title: "Create new course", class: 'btn btn-default', :target => "_blank" do
@@ -35,7 +35,7 @@
   .form-group
     = label_tag :term_select, 'Term:', class: 'control-label col-xs-1'
     .col-xs-3
-      = collection_select nil, nil, Term.on_or_future, :id, :display_name, { prompt: 'Select', selected: nil },
+      = collection_select nil, nil, Term.on_or_future.order(:starts_on), :id, :display_name, { prompt: 'Select', selected: nil },
       { id: 'term-select', class: 'form-control' }
     .col-xs-1
       = link_to admin_terms_path, title: "Create new term", class: 'btn btn-default', :target => "_blank" do
@@ -65,7 +65,7 @@
   .form-group
     = label_tag :inst_book_select, 'Book Instance:', class: 'control-label col-xs-1'
     .col-xs-3
-      = collection_select nil, nil, InstBook.template, :id, :title, { prompt: 'Select', selected: nil },
+      = collection_select nil, nil, InstBook.template.order(:title, :created_at), :id, :title_with_created_at, { prompt: 'Select', selected: nil },
       { id: 'inst-book-select', class: 'form-control' }
     .col-xs-1
       = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default', :target => "_blank" do

@@ -18,9 +18,9 @@ ActiveAdmin.register LmsInstance do
   form do |f|
     f.semantic_errors
     f.inputs do
-      f.input :lms_type
+      f.input :lms_type, collection: LmsType.all.order(:name)
       f.input :url
-      f.input :organization
+      f.input :organization, collection: Organization.all.order(:name)
       # f.input :consumer_key
       # f.input :consumer_secret
     end
