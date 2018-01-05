@@ -27,7 +27,7 @@ class InstBooksController < ApplicationController
   # POST /inst_books/update
   def update
     inst_book = params['inst_book']
-
+    byebug
     InstBook.save_data_from_json(inst_book, current_user, inst_book['inst_book_id'])
 
     respond_to do |format|
@@ -35,6 +35,14 @@ class InstBooksController < ApplicationController
       format.json  { render :json => msg }
     end
 
+  end
+
+  def configuration
+    @inst_book = InstBook.find_by(id: params[:id])
+    render :json => @inst_book.to_builder.target!
+    #render :json => ApplicationController.new.render_to_string(
+    #  template: 'inst_books/show.json.jbuilder',
+    #  locals: {:@inst_book => @inst_book})
   end
 
   #~ Private instance methods .................................................

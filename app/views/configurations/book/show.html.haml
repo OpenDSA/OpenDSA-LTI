@@ -5,7 +5,8 @@
   window.ODSA.languages = #{@languages.to_json.html_safe};
   window.ODSA.codeLanguages = #{@code_languages.to_json.html_safe};
   window.ODSA.learningTools = #{@learning_tools.to_json.html_safe};
-  window.ODSA.availableModules = #{@availMods.to_json.html_safe};
+  window.ODSA.user_books = #{@book_metadata.to_json.html_safe};
+  window.ODSA.availableModules = #{@avail_mods.to_json.html_safe};
 
 = javascript_include_tag "split.min.js"
 = javascript_include_tag "book_config"
@@ -99,6 +100,21 @@
           %option{:value => config[:url]}
             #{config[:title]} (#{config[:name]})
     %input.btn.btn-primary{type: 'button', id: 'reference-config-load', value: 'Load'}
+  .col-xs-12.row
+    .col-xs-offset-3.col-lg-offset-2
+      <b>- OR -</b>
+  .col-xs-12.row
+    %label.dialog-control-label.col-lg-3.col-sm-4{for: 'user-config'}
+      Select Your Configuration
+    .col-xs-4
+      %select.form-control#user-config
+        - @book_metadata.each do |md|
+          %option{:value => md.id}
+            - if md.template
+              #{md.title} (template)
+            - else
+              #{md.title} (#{md.label}, #{md.course_number} #{md.term})
+    %input.btn.btn-primary{type: 'button', id: 'user-config-load', value: 'Load', disabled: @book_metadata.length == 0}
 
   %h2
     Book Settings
@@ -129,11 +145,14 @@
       %label.control-label{for: "#code-langs"}
         Code Languages
       .col-xs-9.col-md-6{id: "code-langs"}
-        - @code_languages.each do |code_lang, code_info|
-          .code-lang-opt.col-sm-6
-            %input{type: "checkbox", name: "code-lang", id: "code-lang-#{code_lang}", value: code_lang}
-            %label{for: "code-lang-#{code_lang}"}
-              #{code_info[:label]}
+        %p
+          *Drag and drop the languages to order them by priority
+        -# - @code_languages.each do |code_lang, code_info|
+        -#   .code-lang-opt.col-sm-6
+        -#     %input{type: "checkbox", name: "code-lang", id: "code-lang-#{code_lang}", value: code_lang}
+        -#     %label{for: "code-lang-#{code_lang}"}
+        -#       #{code_info[:label]}
+        .col-xs-4.checked-list-tree{id: 'code-langs-tree'}
 
     .form-group.border
       %label.control-label{for: "#glob-exer-options"}
@@ -223,7 +242,7 @@
           %label.control-label{for: 'glob-extr-points'}
             Points:
           .col-xs-8
-            %input{type: "number", min: 0, value: 1, id: "glob-extr-points", required: true}
+            %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-extr-points", required: true}
 
     - @learning_tools.each do |tool|
       .form-group.border
@@ -234,7 +253,7 @@
             %label.control-label{for: "glob-#{tool.name}-points"}
               Points:
             .col-xs-8
-              %input{type: "number", min: 0, value: 1, id: "glob-#{tool.name}-points", required: true}
+              %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-#{tool.name}-points", required: true}
 
     .form-group
       %label.control-label{for: "#other-options"}
@@ -336,5 +355,17 @@
               %div{id: "available-modules"}
 
     .form-group.col-xs-12{style: "margin-top: 15px;"}
-      %button.btn.btn-primary.col-xs-offset-5{type: "submit"}
-        Download Configuration
+      #submit-button-container
+        %button#btn-update-config.btn.btn-primary{type: 'submit', value: "update", style: 'display: none;'}
+          Update Configuration
+        %button#btn-save-config.btn.btn-primary{type: 'submit', value: "save"}
+          Save Configuration
+        %button#btn-download-config.btn.btn-primary{type: 'submit',value: "download"}
+          Download Configuration
+      
+
+#loading-container{style: "display: none;"}
+  #loading-overlay
+  #loading-icon
+    .fa.fa-spinner.fa-spin
+    Loading

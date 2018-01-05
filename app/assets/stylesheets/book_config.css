@@ -147,6 +147,36 @@ input.inline-input {
   min-width: 750px;
 }
 
+.checked-list-tree  > ul > li > i.jstree-icon.jstree-ocl,
+.checked-list-tree  > ul > li > a > i.jstree-icon.jstree-themeicon {
+  width: 0px;
+}
+
+#loading-overlay {
+  background: #000;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  opacity: 0.5;
+}
+
+#loading-icon {
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  position: fixed;
+  left: 0;
+  font-size: 50px;
+  color: #000;
+  text-align: center;
+}
+
+#submit-button-container {
+  text-align: center;
+}
+
 @media screen and (max-width: 1369px) {
   .container {
     width: 100%;

@@ -198,18 +198,18 @@ class Configurations::BookController < ApplicationController
                 "label": "Java",
                 "lang": "java"
             },
-            "Processing": {
-                "ext": [
-                    "pde"
-                ],
-                "label": "Processing",
-                "lang": "java"
-            },
             "Java_Generic": {
                 "ext": [
                     "java"
                 ],
                 "label": "Java (Generic)",
+                "lang": "java"
+            },
+            "Processing": {
+                "ext": [
+                    "pde"
+                ],
+                "label": "Processing",
                 "lang": "java"
             },
             "C++": {
@@ -220,13 +220,6 @@ class Configurations::BookController < ApplicationController
                 "label": "C++",
                 "lang": "C++"
             },
-            "Pseudo": {
-                "ext": [
-                    "txt"
-                ],
-                "label": "Pseudo Code",
-                "lang": "pseudo"
-            },
             "C": {
                 "ext": [
                     "c",
@@ -234,6 +227,13 @@ class Configurations::BookController < ApplicationController
                 ],
                 "label": "C",
                 "lang": "c"
+            },
+            "Pseudo": {
+                "ext": [
+                    "txt"
+                ],
+                "label": "Pseudo Code",
+                "lang": "pseudo"
             },
             "Python": {
                 "ext": [
@@ -261,17 +261,18 @@ class Configurations::BookController < ApplicationController
         }
 
         # gets a list of available modules for each language
-        @availMods = Rails.cache.fetch("odsa_available_modules1", expires_in: 1.second) do
-            availMods = {}
+        @avail_mods = Rails.cache.fetch("odsa_available_modules", expires_in: 6.hours) do
+            avail_mods = {}
             @languages.each do |lang_code, lang_name|
-                availMods[lang_code] = RSTtoJSON.convert("public/OpenDSA/RST/#{lang_code}", lang_code)
+                avail_mods[lang_code] = RSTtoJSON.convert("public/OpenDSA/RST/#{lang_code}", lang_code)
             end
-            availMods
+            avail_mods
         end
 
         @learning_tools = LearningTool.all.select("id, name")
         @reference_configs = reference_book_configurations()
-
+        @book_metadata = InstBook.get_metadata(current_user.id)
+        
         render
     end
 
@@ -280,7 +281,7 @@ class Configurations::BookController < ApplicationController
     # Gets a list of book configurations hosted on the OpenDSA server
     # Returns a dictionary containing the name, title, and url of each config file
     def reference_book_configurations()
-        return Rails.cache.fetch("odsa_reference_book_configs", expires_in: 1.day) do
+        return Rails.cache.fetch("odsa_reference_book_configs", expires_in: 6.hours) do
             config_dir = File.join("public", "OpenDSA", "config")
             base_url = request.protocol + request.host_with_port + "/OpenDSA/config/"
             configs = []
