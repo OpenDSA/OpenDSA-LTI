@@ -23,5 +23,8 @@ module ActiveAdmin
       end
       return message
     end
+
+    def course_offering_delete_msg(co)
+    end
   end
 end

@@ -1,7 +1,7 @@
 class InstSection < ActiveRecord::Base
   #~ Relationships ............................................................
   belongs_to :inst_chapter_module
-  has_many :inst_book_section_exercises, dependent: :destroy
+  has_many :inst_book_section_exercises
   has_many :odsa_student_extensions
   has_many :odsa_user_interactions
   has_many :odsa_exercise_attempts

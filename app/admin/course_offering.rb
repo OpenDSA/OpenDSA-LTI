@@ -4,6 +4,10 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
   remove_filter :users, :late_policy, :course_enrollments, :inst_books, :self_enrollment_allowed, :cutoff_date, :lms_course_code
   # filter :course_organization_name, :as => :string
 
+  before_build do |record|
+    record.user = current_user
+  end
+
   menu parent: 'University-oriented', priority: 40
   permit_params :course_id, :term_id, :label, :url,
                 :archived, :self_enrollment_allowed,
@@ -15,6 +19,7 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
       link_to "Delete", { action: :destroy }, method: :delete
     end
   end
+
 
   controller do
 
@@ -53,6 +58,10 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
     column :created_at
     # column :late_policy, sortable: 'late_policy.name'
     column :lms_instance, sortable: 'lms_instance.url'
+    if current_user.global_role.is_admin?
+      column :students_count, sortable: 'students count'
+    end
+
     actions
   end
 
