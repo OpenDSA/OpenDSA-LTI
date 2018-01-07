@@ -6,11 +6,14 @@ CodeWorkout::Application.routes.draw do
   get 'lti/xml_config', to: 'lti#xml_config', as: :xml_config
   get 'lti/resource_dev', to: 'lti#resource_dev', as: :lti_resource_dev
   post 'lti/resource', to: 'lti#resource', as: :lti_resource
+  post 'lti/course_offering', to: 'lti#create_course_offering', as: :lti_course_offering
 
   resources :odsa_user_interactions
   resources :odsa_exercise_attempts
   # resources :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
+  get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' => 'odsa_exercise_progresses#show_exercise',
+     constraints: { inst_course_offering_exercise_id: /\d+/}
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id' => 'odsa_exercise_progresses#show_section'
   get '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
@@ -51,7 +54,13 @@ CodeWorkout::Application.routes.draw do
   post 'inst_books/update' => 'inst_books#update', as: :book_update
   post 'inst_books/:id' => 'inst_books#compile', defaults: { format: 'js', data: {type: "script"} }, as: :compile
   get 'inst_books/configure/:id' => 'inst_books#configure', as: :book_configure
+  get 'inst_books/configurations/:id' => 'inst_books#configuration', as: :book_configuration
   resources :inst_books
+
+  # book configuration interface
+  namespace :configurations do
+    get 'book' => 'book#show'
+  end
 
   get 'sse/feedback_wait'
   get 'sse/feedback_poll'
@@ -60,10 +69,12 @@ CodeWorkout::Application.routes.draw do
   post '/course_offerings' => 'course_offerings#create', as: :create_course_offerings
   get '/course_offerings/:id' => 'course_offerings#show', as: :show_course_offerings
   get '/course_offerings/:user_id/:inst_section_id' => 'course_offerings#find_attempts', as: :find_attempts
+  get '/course_offerings/:user_id/:id/exercise_list' => 'course_offerings#get_individual_attempt', as: :get_individual_attempt
   get '/lms_accesses/:lms_instance_id/search' => 'lms_accesses#search', as: :lms_access_search
   get '/request_extension' => 'workout_offerings#request_extension'
   post '/add_extension' => 'workout_offerings#add_extension'
 
+  get '/course_offerings/indAssigment/assignmentList/student/exercise' => 'course_offerings#ind_assigment', as: :ind_assigment
 
   # All of the routes anchored at /gym
   scope :gym do
@@ -107,6 +118,7 @@ CodeWorkout::Application.routes.draw do
     get 'search' => 'courses#search', as: :courses_search
     post 'find' => 'courses#find', as: :course_find
     get 'new' => 'courses#new'
+    get 'list' => 'courses#list', as: :course_list
     get ':id/edit' => 'courses#edit', as: :course_edit
     get ':course_id/:term_id/:id/practice(/:exercise_id)' => 'workout_offerings#practice', as: :workout_offering_practice
     get ':course_id/:term_id/:workout_offering_id/:id' => 'exercises#practice', as: :workout_offering_exercise
@@ -117,6 +129,8 @@ CodeWorkout::Application.routes.draw do
     post ':id/:term_id/generate_gradebook/' => 'courses#generate_gradebook', as: :course_gradebook
     get ':id(/:term_id)' => 'courses#show', as: :course
   end
+  post 'organizations' => 'organizations#create', as: :organization_create
+  post 'courses' => 'courses#create'
 
   resources :course_offerings, only: [ :edit, :update ] do
     # post 'enroll' => :enroll, as: :enroll

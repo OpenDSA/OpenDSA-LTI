@@ -4,42 +4,68 @@ class OdsaExerciseProgressesController < ApplicationController
   #~ Action methods ...........................................................
   def update
     inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
-    inst_book_section_exercise = InstBookSectionExercise.where(
-                                  "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-                                  params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+    hasBook = params.key?(:inst_book_id)
+    if hasBook
+      inst_book_section_exercise = InstBookSectionExercise.where(
+                                    "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+                                    params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
 
-    unless exercise_progress = OdsaExerciseProgress.where("user_id=? and inst_book_section_exercise_id=?",
+      unless exercise_progress = OdsaExerciseProgress.where("user_id=? and inst_book_section_exercise_id=?",
+                                              current_user.id,
+                                              inst_book_section_exercise.id).first
+
+        exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                                                inst_book_section_exercise: inst_book_section_exercise)
+      end
+    else
+      unless exercise_progress = OdsaExerciseProgress.where("user_id=? and inst_course_offering_exercise_id=?",
                                                  current_user.id,
-                                                 inst_book_section_exercise.id).first
+                                                 params[:inst_course_offering_exercise_id]).first
 
-      exercise_progress = OdsaExerciseProgress.new(user: current_user,
-                                                    inst_book_section_exercise: inst_book_section_exercise)
+            exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                                        inst_course_offering_exercise_id: params[:inst_course_offering_exercise_id])
+      end
     end
     exercise_progress['current_exercise'] = params['current_exercise']
 
     respond_to do |format|
       if exercise_progress.save
         msg = { :status => "success", :message => "Success!" }
+        format.json  { render :json => msg }
       else
-        msg = { :status => "fail", :message => "Fail!" }
+        msg = { :status => "fail", :message => exercise_progress.errors.full_messages }
+        format.json { render :json => msg, :status => :bad_request }
+        error = Error.new(:class_name => 'exercise_progress_save_fail', 
+            :message => exercise_progress.errors.full_messages.inspect, 
+            :params => params.to_s)
+        error.save!
       end
-      format.json  { render :json => msg }
     end
   end
 
   def show_exercise
     inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
-    inst_book_section_exercise = InstBookSectionExercise.where(
-                                  "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-                                  params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
-    exercise_progress = OdsaExerciseProgress.where(
-                                  "inst_book_section_exercise_id=? and user_id=?",
-                                  inst_book_section_exercise.id, current_user.id).first
+    hasBook = params.key?(:inst_book_id)
+    if hasBook
+      inst_book_section_exercise = InstBookSectionExercise.where(
+                                    "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+                                    params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+      exercise_progress = OdsaExerciseProgress.where(
+                                    "inst_book_section_exercise_id=? and user_id=?",
+                                    inst_book_section_exercise.id, current_user.id).first
+      threshold = inst_book_section_exercise.threshold
+    else
+      inst_course_offering_exercise = InstCourseOfferingExercise.find_by(id: params[:inst_course_offering_exercise_id])
+      exercise_progress = OdsaExerciseProgress.find_by(
+        inst_course_offering_exercise_id: inst_course_offering_exercise.id,
+        user_id: current_user.id)
+      threshold = inst_course_offering_exercise.threshold
+    end
     # inst_book_section_exercise = InstBookSectionExercise.find_by(id: exercise_progress.inst_book_section_exercise_id)
     respond_to do |format|
       format.json  { render :json => {
                                       :exercise_progress => exercise_progress,
-                                      :threshold => inst_book_section_exercise.threshold}}
+                                      :threshold => threshold}}
     end
   end
 

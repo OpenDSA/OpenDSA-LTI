@@ -23,7 +23,6 @@
 //= require bootstrap-wysihtml5
 //= require cocoon
 //= require cm
-//= require book
 //= require counter.js
 //= require data-confirm-modal
 //= require moment

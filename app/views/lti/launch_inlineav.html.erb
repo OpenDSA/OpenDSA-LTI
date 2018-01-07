@@ -1,0 +1,27 @@
+<% @ex.links.each do |l| %>
+  <link rel="stylesheet" href="<%= l %>"/>
+<% end %>
+<% @ex.scripts.each do |s| %>
+  <script src="<%= s %>" type="text/javascript"></script>
+<% end %>
+<div class="section">
+  <div id="<%= @ex.short_name %>" class="ssAV" data-points="<%= @ex.points %>" 
+      data-threshold="<%= @course_off_ex.threshold %>" data-type="<%= @ex.type %>" 
+      data-required="<%= @ex.required %>" data-long-name="<%= @ex.long_name %>">
+    <span class="jsavcounter"></span>
+    <a class="jsavsettings" href="#">Settings</a>
+    <div class="jsavcontrols"></div>
+    <p class="jsavoutput jsavline"></p>
+    <div class="jsavcanvas"></div>
+    <div class="prof_indicators">
+      <img id="<%= @ex.short_name %>_check_mark" class="prof_check_mark" src="/OpenDSA/RST/_static/Images/green_check.png" alt="Proficient" />
+      <span id="<%= @ex.short_name %>_cm_saving_msg" class="cm_saving_msg">Saving...</span>
+      <span id="<%= @ex.short_name %>_cm_error_msg" class="cm_error_msg">
+        <img id="<%= @ex.short_name %>_cm_warning_icon" class="cm_warning_icon" src="/OpenDSA/RST/_static/Images/warning.png" alt="Error Saving"/>
+        <br />Server Error<br />
+        <a href="#" class="resubmit_link">Resubmit</a>
+      </span>
+    </div>
+  </div>
+  <p></p>
+</div>

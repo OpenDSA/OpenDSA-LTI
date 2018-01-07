@@ -56,6 +56,69 @@ class CourseOfferingsController < ApplicationController
     end
   end
 
+  # GET /course_offerings/indAssigment/assignmentList/student/exercise'
+  def ind_assigment
+    puts "show assignement"
+    render(:partial => 'lti/show_individual_exercise.html.haml') and return
+  end
+
+  # GET /course_offerings/:user_id/id/exercise_list
+  def get_individual_attempt
+    puts "trying to find individual attempt"
+    @user_id = User.find_by(id: params[:user_id])
+     @course_offering = CourseOffering.find_by(id: params[:id])
+    @url = url_for(organization_course_path(
+                  @course_offering.course.organization,
+                  @course_offering.course,
+                  @course_offering.term))
+
+    @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
+    @student_list = []
+    #puts @course_enrollment.inspect
+    @course_enrollment.each do |s|
+      q = User.where("id=?", s.user_id).select("id, first_name, last_name")
+      @student_list.push(q)
+    end
+    @instBook = @course_offering.odsa_books.first
+
+    @exercise_list = Hash.new{|hsh,key| hsh[key] = []}
+    chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
+    chapters.each do |chapter|
+      modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
+      modules.each do |inst_ch_module|
+        sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
+        section_item_position = 1
+        if !sections.empty?
+          sections.each do |section|
+            title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
+                    (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
+                    section_item_position.to_s.rjust(2, "0") + " - "
+            learning_tool = nil
+            if section
+              title = title + section.name
+              learning_tool = section.learning_tool
+              if !learning_tool
+                if section.gradable
+                  @inst_section_id = section.id
+                  attempted = OdsaExerciseAttempt.where("inst_section_id=? AND user_id=?", 
+                    @inst_section_id, @user_id)
+                  if attempted.empty?
+                    @exercise_list[@inst_section_id].push(title)
+                  else
+                    @exercise_list[@inst_section_id].push(title)
+                    @exercise_list[@inst_section_id].push('attemp_flag')
+                  end
+                end
+              end
+            end
+            section_item_position += 1
+          end
+        end
+      end
+    end
+  end
+
+
   # GET /course_offerings/:user_id/:inst_section_id
   def find_attempts
     @user_id = User.find_by(id: params[:user_id])
@@ -95,6 +158,10 @@ class CourseOfferingsController < ApplicationController
   # -------------------------------------------------------------
   # POST /course_offerings
   def create
+    unless params.key?(:inst_book_id)
+      create_lti_course_offering
+      return
+    end
     lms_instance = LmsInstance.find_by(id: params[:lms_instance_id])
     course = Course.find_by(id: params[:course_id])
     term = Term.find_by(id: params[:term_id])
@@ -212,7 +279,6 @@ class CourseOfferingsController < ApplicationController
   # TODO: Needs to be redone so that it will read an actual CSV
   #       file of student enrollment info and not just a list of
   #       e-mail addresses.
-
   def upload_roster
     form_contents = params[:form]
     puts form_contents.fetch(:rosterfile).path
@@ -256,7 +322,6 @@ class CourseOfferingsController < ApplicationController
       redirect_to path
     end
   end
-
 
   # -------------------------------------------------------------
   def generate_gradebook
@@ -307,6 +372,34 @@ class CourseOfferingsController < ApplicationController
 
   #~ Private instance methods .................................................
   private
+
+  def create_lti_course_offering
+    if not can? :create, CourseOffering
+      render :json => ['You are not authorized to create course offerings.'], :status => :forbidden
+      return
+    end
+    info = params[:course_offering]
+    course_offering = CourseOffering.new(
+      course_id: info[:course_id],
+      term_id: info[:term_id],
+      label: info[:label],
+      lms_instance_id: info[:lms_instance_id],
+      lms_course_code: info[:lms_course_code],
+      lms_course_num: info[:lms_course_num])
+    if course_offering.save
+      CourseEnrollment.create(
+        course_offering: course_offering,
+        user: current_user,
+        course_role: CourseRole.instructor)
+      render :json => course_offering, :status => :created
+    else
+      render :json => course_offering.errors.full_messages, :status => :bad_request 
+      error = Error.new(:class_name => 'course_offering_save_fail', 
+        :message => course_offering.errors.full_messages.inspect,
+        :params => params.to_s)
+      error.save!
+    end
+  end
 
     # -------------------------------------------------------------
     def rename_course_offering_id_param

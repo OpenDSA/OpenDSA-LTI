@@ -1,5 +1,19 @@
-= inside_layout 'header' do
-  .full-height.content#main
-    .below-nav
-      = render partial: 'layouts/flash'
+%html
+  %head
+    %title OpenDSA
+    %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1.0' }
+    = stylesheet_link_tag 'application', media: 'all'
+    = javascript_include_tag 'application', media: 'all'
+    = stylesheet_link_tag 'theme/warm/theme', media: 'all'
+    = stylesheet_link_tag 'lti_resource', media: 'all'
+    = javascript_include_tag 'theme/warm/theme'
+    = javascript_include_tag 'lti_resource'
+    = csrf_meta_tags
+    = favicon_link_tag 'favicon.ico'
+    /[if lt IE 9]
+      %script{ src: 'http://html5shim.googlecode.com/svn/trunk/html5.js' }
+
+  - classes = ["#{controller_name}", "#{action_name}", ("non-scrollable" if @lti_launch)]
+  %body
+    .full-height.content#main
       = yield

@@ -1,7 +1,7 @@
 class CoursesController < ApplicationController
   load_and_authorize_resource
+  skip_authorize_resource :only => :list
   respond_to :html, :js, :json
-
 
   #~ Action methods ...........................................................
 
@@ -38,6 +38,12 @@ class CoursesController < ApplicationController
     end
   end
 
+  # -------------------------------------------------------------
+  # GET /courses/1/list
+  def list
+    courses = Course.where(organization_id: params[:organization_id])
+    render :json => courses, :status => :ok
+  end
 
   # -------------------------------------------------------------
   # GET /courses/new
@@ -55,60 +61,31 @@ class CoursesController < ApplicationController
   # -------------------------------------------------------------
   # POST /courses
   def create
-    form = params[:course]
-    offering = form[:course_offering]
-    @course = Course.find_by(number: form[:number])
-
-    if @course.nil?
-      org = Organization.find_by(id: form[:organization_id])
-      if !org
-        flash[:error] = "Organization #{form[:organization_id]} " +
-          'could not be found.'
-        redirect_to root_path and return
-      end
-      @course = Course.new(
-        name: form[:name].to_s,
-        number: form[:number].to_s,
-        creator_id: current_user.id,
-        organization: org)
-        org.courses << @course
-        org.save
+    course_info = params[:course]
+    course = Course.new(
+      name: course_info[:name],
+      number: course_info[:number],
+      organization_id: course_info[:organization_id],
+      user_id: current_user.id,
+    )
+    if course.save
+      render :json => course, :status => :created
     else
-      @course.course_offerings do |c|
-        if c.term == offering[:term].to_s
-          redirect_to new_course_path,
-            alert: 'A course offering with this number for this ' +
-            'term already exists.' and return
-        end
-      end
-    end
-
-    tmp = CourseOffering.create(
-      label: offering[:label].andand.to_s,
-      url: offering[:url].andand.to_s,
-      self_enrollment_allowed:
-        offering[:self_enrollment_allowed].andand.to_i == '1',
-      term: Term.find_by(id: offering[:term].andand.to_i))
-    @course.course_offerings << tmp
-
-    if @course.save
-      redirect_to organization_course_path(
-        @course.organization,
-        @course,
-        tmp.term), notice: "#{tmp.display_name} was successfully created."
-    else
-      render action: 'new'
+      render :json => course.errors.full_messages, :status => :bad_request
+      error = Error.new(:class_name => 'course_save_fail', 
+        :message => course.errors.full_messages.inspect, 
+        :params => params.to_s)
+      error.save!
     end
   end
-
 
   # -------------------------------------------------------------
   # PATCH/PUT /courses/1
   def update
     if @course.update(course_params)
       redirect_to organization_courses_path(
-        @course.organization,
-        @course),
+        @course.organization.id,
+        @course.id),
         notice: "#{@course.display_name} was successfully updated."
     else
       render action: 'edit'
@@ -171,7 +148,7 @@ class CoursesController < ApplicationController
     # Only allow a trusted parameter "white list" through.
     def course_params
       params.require(:course).
-        permit(:name, :id, :number, :organization_id, :term_id)
+        permit(:name, :id, :number, :organization_id, :term_id, :lms_course_code)
     end
 
 end

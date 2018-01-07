@@ -5,6 +5,10 @@ class LtiController < ApplicationController
   # the consumer keys/secrets
 
   def launch
+    unless params.key?(:custom_inst_book_id)
+      launch_ex
+      return
+    end
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
@@ -14,23 +18,9 @@ class LtiController < ApplicationController
     render('error') and return unless lti_authorize!
     # TODO: get user info from @tp object
     # register the user if he is not yet registered.
-    email = params[:lis_person_contact_email_primary]
-    first_name = params[:lis_person_name_given]
-    last_name = params[:lis_person_name_family]
-    @user = User.where(email: email).first
-    if @user.blank?
-      # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
-      @user = User.new(:email => email,
-                       :password => email,
-                       :password_confirmation => email,
-                       :first_name => first_name,
-                       :last_name => last_name)
-      @user.save
-    end
-    sign_in @user
-    lti_enroll
+    ensure_user()
+    lti_enroll(@course_offering)
 
-    puts ('no key')
     # I change this to be custom intanbook id becuase it is not working on mine yet
     if params.has_key?(:custom_course_offering_id)
 
@@ -39,10 +29,15 @@ class LtiController < ApplicationController
       @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
       @student_list = []
       @course_enrollment.each do |s|
-        q = User.where("id=?", s.user_id).select("id, first_name, last_name")
+        q = User.where("id=?", s.user_id).select("id, first_name, last_name").first
         @student_list.push(q)
+      #puts "helloo"
+      @student_list = @student_list.sort_by &:first_name
       end
+      
+      @course_id =  @course_offering.id
       @instBook = @course_offering.odsa_books.first
+      
       @exercise_list = Hash.new{|hsh,key| hsh[key] = []}
 
       chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
@@ -69,8 +64,6 @@ class LtiController < ApplicationController
                       @exercise_list[section.id].push(title)
                       @exercise_list[section.id].push('attemp_flag')
                     end
-                      
-
                   end
                 end
               end
@@ -90,27 +83,29 @@ class LtiController < ApplicationController
 
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
-    @inst_book = InstBook.find_by(id: request_params['instBookId'])
-    @inst_section = InstSection.find_by(id: request_params['instSectionId'])
-    inst_book_sect_exe_id = request_params['instBookSectionExerciseId']
-    @inst_book_section_exercise_id = InstBookSectionExercise.find_by(id:inst_book_sect_exe_id)
+    hasBook = request_params.key?('instBookId')
 
-    @current_user = User.where("email=?", request_params['userEmail']).select("id")
-    @num = 0
-    @current_user.collect! do |d|
-      d.attributes.each do |x, y|
-        @num = y
-      end
+    if hasBook
+      inst_section = InstSection.find_by(id: request_params['instSectionId'])
+      
+      @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
+                                  request_params['instBookSectionExerciseId'], current_user.id).select(
+                                  "id, user_id, question_name, request_type,
+                                  correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
+                                  pe_score, pe_steps_fixed")
+      @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
+                                  request_params['instBookSectionExerciseId'], current_user.id).select("user_id, current_score, highest_score,
+                                  total_correct, proficient_date,first_done, last_done")
+    else
+      @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_course_offering_exercise_id=? AND user_id=?",
+                                  request_params['instCourseOfferingExerciseId'], current_user.id).select(
+                                  "id, user_id, question_name, request_type,
+                                  correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
+                                  pe_score, pe_steps_fixed")
+      @odsa_exercise_progress = OdsaExerciseProgress.where("inst_course_offering_exercise_id=? AND user_id=?",
+                                  request_params['instCourseOfferingExerciseId'], current_user.id).select("user_id, current_score, highest_score,
+                                  total_correct, proficient_date,first_done, last_done")
     end
-
-    @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
-                                 request_params['instBookSectionExerciseId'], @num).select(
-                                 "id, user_id, question_name, request_type,
-                                 correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
-                                 pe_score, pe_steps_fixed")
-    @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
-                                 request_params['instBookSectionExerciseId'], @num).select("user_id, current_score, highest_score,
-                                 total_correct, proficient_date,first_done, last_done")
 
     a = @odsa_exercise_attempts
     b = @odsa_exercise_progress
@@ -147,31 +142,63 @@ class LtiController < ApplicationController
     res = @tp.post_extended_replace_result!(score: score, text: f)
 
     if res.success?
-      @inst_section.lms_posted = true
-      @inst_section.time_posted = Time.now
+      if hasBook
+        inst_section.lms_posted = true
+        inst_section.time_posted = Time.now
+        inst_section.save!
+      end
       render :json => { :message => 'success', :res => res.to_json }.to_json
     else
-      @inst_section.lms_posted = false
-      render :json => { :message => 'failure', :res => res.to_json }.to_json
-      error = Error.new(:class_name => 'post_replace_result_fail', :message => res.inspect, :params => lti_param.to_s)
+      if hasBook
+        inst_section.lms_posted = false
+        inst_section.save!
+      end
+      render :json => { :message => 'failure', :res => res.to_json }.to_json, :status => :bad_request
+      error = Error.new(:class_name => 'post_replace_result_fail', 
+          :message => res.inspect, :params => lti_param.to_s)
       error.save!
     end
-    @inst_section.save!
   end
 
   def xml_config
     host = request.scheme + "://" + request.host_with_port
-    tc = IMS::LTI::ToolConfig.new(:title => "openDSA Tool Provider", :launch_url => host + '/lti/launch')
+    tc = IMS::LTI::ToolConfig.new(:title => "OpenDSA Tool Provider", :launch_url => host + '/lti/launch')
     tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
     tc.description = "OpenDSA LTI Tool Provider supports LIS Outcome pass-back."
     tc.canvas_privacy_public!
-    tc.canvas_resource_selection!({:url => host + '/lti/resource'})
+    tc.canvas_resource_selection!({
+      :url => host + '/lti/resource',
+      :selection_width => 800,
+      :selection_height => 600
+    })
+
+    tc.set_canvas_ext_param(:custom_fields, {
+      canvas_api_base_url: '$Canvas.api.baseUrl'
+    })
 
     render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
   end
 
   def resource
-    @inst_book = InstBook.where("book_type = ?", InstBook.book_types[:Exercises]).first
+    lms_type = params[:tool_consumer_info_product_family_code].downcase
+    unless lms_type == 'canvas'
+      @message = "#{lms_type} is not supported"
+      render('error') and return
+    end
+
+    lms_instance = ensure_lms_instance()
+    @lms_course_num = params[:custom_canvas_course_id]
+    @lms_course_code = params[:context_label]
+    @lms_instance_id = lms_instance.id
+    @organization_id = lms_instance.organization_id
+    @course_offering = CourseOffering.find_by(lms_instance_id: lms_instance.id, lms_course_num: @lms_course_num)
+    if @course_offering.blank?
+      if lms_instance.organization_id.blank?
+        @organizations = Organization.all.order(:name)
+      end
+      @terms = Term.on_or_future.order(:starts_on)
+    end
+    
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
     # must include the oauth proxy object
@@ -180,42 +207,64 @@ class LtiController < ApplicationController
 
     render('error') and return unless lti_authorize!
 
-    email = params[:lis_person_contact_email_primary]
-    first_name = params[:lis_person_name_given]
-    last_name = params[:lis_person_name_family]
-    @user = User.where(email: email).first
+    @user = User.where(email: params[:lis_person_contact_email_primary]).first
     sign_in @user
 
-    @inst_book_json = ApplicationController.new.render_to_string(
-        template: 'inst_books/show.json.jbuilder',
-        locals: {:@inst_book => @inst_book})
+    require 'RST/rst_parser'
+    exercises = RstParser.get_exercise_info()
 
-    render layout: 'lti_resource'
-  end
-
-  def resource_dev
-    @inst_book = InstBook.where("book_type = ?", InstBook.book_types[:Exercises]).first
-    @launch_url = request.protocol + request.host_with_port + "/lti/launch"
-    @inst_book_json = ApplicationController.new.render_to_string(
-        template: 'inst_books/show.json.jbuilder',
-        locals: {:@inst_book => @inst_book})
+    @json = exercises.to_json()
 
     render layout: 'lti_resource'
   end
 
   private
-    def lti_enroll
-      inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
-      course_offering = CourseOffering.find_by(id: inst_book.course_offering_id)
 
+    def launch_ex
+      require 'oauth/request_proxy/rack_request'
+      $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+      course_offering = CourseOffering.joins(:lms_instance).where(
+        lms_instances: {url: params[:custom_canvas_api_base_url]}, 
+        course_offerings: {lms_course_num: params[:custom_canvas_course_id]}
+      ).first
+
+      render('error') and return unless lti_authorize!
+      ensure_user()
+      lti_enroll(course_offering)
+
+      require 'RST/rst_parser'
+      @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
+      @course_off_ex = InstCourseOfferingExercise.find_by(
+        course_offering_id: course_offering.id, 
+        resource_link_id: params[:resource_link_id]
+      )
+      if @course_off_ex.blank?
+        @course_off_ex = InstCourseOfferingExercise.new(
+          course_offering: course_offering,
+          inst_exercise_id: @ex.id,
+          resource_link_id: params[:resource_link_id],
+          resource_link_title: params[:resource_link_title],
+          threshold: @ex.threshold
+        )
+        @course_off_ex.save
+      end
+
+      if @ex.instance_of?(AvEmbed)
+        render "launch_avembed", layout: 'lti_launch'
+      else
+        render 'launch_inlineav', layout: 'lti_launch'
+      end
+    end
+
+    def lti_enroll(course_offering, role = CourseRole.student)
       if course_offering &&
         course_offering.can_enroll? &&
         !course_offering.is_enrolled?(current_user)
 
         CourseEnrollment.create(
-        course_offering: course_offering,
-        user: current_user,
-        course_role: CourseRole.student)
+          course_offering: course_offering,
+          user: current_user,
+          course_role: role)
       end
     end
 
@@ -264,6 +313,63 @@ class LtiController < ApplicationController
     def was_nonce_used_in_last_x_minutes?(nonce, minutes=60)
       # some kind of caching solution or something to keep a short-term memory of used nonces
       false
+    end
+
+    def ensure_course_offering(lms_instance_id, organization_id, lms_course_num, lms_course_code, course_name)
+      course_offering = CourseOffering.find_by(lms_instance_id: lms_instance_id, 
+                                               lms_course_num: lms_course_num)
+      if course_offering.blank?
+        if organization_id.blank?
+          return nil
+        end
+        course = Course.where(number: lms_course_code, 
+          organization_id: organization_id).first
+        if course.blank?
+          course = Course.new(
+            name: course_name,
+            number: lms_course_code,
+            organization_id: organization_id,
+            user_id: current_user.id,
+          )
+          course.save
+        end
+        course_offering = CourseOffering.new(
+          course: course,
+          term: Term.current_or_next_term,
+          label: lms_course_code,
+          lms_instance_id: lms_instance_id,
+          lms_course_code: lms_course_code,
+          lms_course_num: lms_course_num)
+        course_offering.save
+      end
+      return course_offering
+    end
+
+    def ensure_lms_instance
+      lms_instance = LmsInstance.find_by(url: params[:custom_canvas_api_base_url])
+      if lms_instance.blank?
+        lms_instance = LmsInstance.new(
+          url: params[:custom_canvas_api_base_url],
+          lms_type: LmsType.find_by('lower(name) = :name', name: params[:tool_consumer_info_product_family_code]),
+        )
+        lms_instance.save
+      end
+      return lms_instance
+    end
+
+    def ensure_user
+      email = params[:lis_person_contact_email_primary]
+      @user = User.where(email: email).first
+      if @user.blank?
+        # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
+        @user = User.new(:email => email,
+                         :password => email,
+                         :password_confirmation => email,
+                         :first_name => params[:lis_person_name_given],
+                         :last_name => params[:lis_person_name_family])
+        @user.save
+      end
+      sign_in @user
     end
 
 end

@@ -5,7 +5,7 @@ set :application, 'OpenDSA-LTI'
 set :repo_url, 'git://github.com/OpenDSA/OpenDSA-LTI.git'
 
 # Default branch is :master
-# ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
+ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
 # Default deploy_to directory is /var/www/my_app
 set :deploy_to, '/home/deploy/OpenDSA-LTI'
@@ -115,20 +115,20 @@ set :delayed_job_workers, 2
 # default value: "#{Rails.root}/tmp/pids" or "#{Dir.pwd}/tmp/pids"
 # set :delayed_job_pid_dir, 'path_to_pid_dir'
 
-after 'deploy:pull_opendsa', 'db:delete_templates'
+# after 'deploy:pull_opendsa', 'db:delete_templates'
 
-namespace :db do
-  desc "remove template books"
-  task :delete_templates do
-    on roles(:all) do
-      within release_path do
-        with rails_env: fetch(:rails_env) do
-          execute :rake, 'db:delete_templates'
-        end
-      end
-    end
-  end
-end
+# namespace :db do
+#   desc "remove template books"
+#   task :delete_templates do
+#     on roles(:all) do
+#       within release_path do
+#         with rails_env: fetch(:rails_env) do
+#           execute :rake, 'db:delete_templates'
+#         end
+#       end
+#     end
+#   end
+# end
 
 namespace :deploy do
 
@@ -161,7 +161,7 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; git checkout master; make pull; make rst2json;"
+      execute "cd ~/OpenDSA; git checkout master; make pull;" #make rst2json;"
       # upload _generated config files
     end
   end
@@ -170,6 +170,21 @@ namespace :deploy do
   after :finishing, 'deploy:checkout_ka' do
     on roles :all do
       execute "cd ~/OpenDSA/khan-exercises; git checkout master; git pull;"
+    end
+  end
+
+  after 'deploy:pull_opendsa', 'deploy:clear_rails_cache' do
+    desc 'Clear the Rails Cache of specific entries'
+    task :clear_rails_cache do
+      on roles :all do
+        # used by lib/RST/rst_parser.rb
+        Rails.cache.delete('odsa_all_exercises')
+        Rails.cache.delete('odsa_all_exercises_map')
+
+        # used by app/controllers/configurations/book_controller.rb
+        Rails.cache.delete('odsa_reference_book_configs')
+        Rails.cache.delete('odsa_available_modules')
+      end
     end
   end
 

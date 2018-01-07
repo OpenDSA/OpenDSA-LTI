@@ -6,19 +6,27 @@ class OdsaUserInteractionsController < ApplicationController
   # -------------------------------------------------------------
   # POST /odsa_user_interactions/create
   def create
-    inst_book = InstBook.find_by(id: params[:inst_book_id])
-
     failed_to_save = false
+    errors = []
     params[:eventList].each do |event|
-      if event[:inst_section_id] !=""
-        inst_section = InstSection.find_by(id: event[:inst_section_id])
+      hasBook = event.key?(:inst_book_id)
+      if hasBook
+        inst_course_offering_exercise_id = nil
+        inst_book_id = params[:inst_book_id]
+        if event[:inst_section_id] !=""
+          inst_section_id = event[:inst_section_id]
+        end
+        if event[:av] != ""
+          inst_exercise = InstExercise.find_by(short_name: event[:av])
+          inst_book_section_exercise = InstBookSectionExercise.where(
+                                      "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+                                        inst_book_id, inst_section_id, inst_exercise.id).first
+        end
+      else
+        inst_course_offering_exercise_id = event[:inst_course_offering_exercise_id]
+        inst_book_id = nil
       end
-      if event[:av] != ""
-        inst_exercise = InstExercise.find_by(short_name: event[:av])
-        inst_book_section_exercise = InstBookSectionExercise.where(
-                                                  "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-                                                    params[:inst_book_id], inst_section.id, inst_exercise.id).first
-      end
+      
       # if browser.mobile?
       #   device = "Mobile"
       # elsif browser.tablet?
@@ -27,10 +35,11 @@ class OdsaUserInteractionsController < ApplicationController
       #   device = "PC"
       # end
       @user_interaction = OdsaUserInteraction.new(
-                                            inst_book: inst_book,
+                                            inst_book_id: inst_book_id,
                                             user: current_user,
-                                            inst_section: inst_section,
+                                            inst_section_id: inst_section_id,
                                             inst_book_section_exercise: inst_book_section_exercise,
+                                            inst_course_offering_exercise_id: inst_course_offering_exercise_id,
                                             name: event[:type],
                                             description: event[:desc],
                                             action_time: Time.at(event[:tstamp].to_f / 1000),
@@ -46,16 +55,22 @@ class OdsaUserInteractionsController < ApplicationController
         failed_to_save = false
       else
         failed_to_save = true
+        error_msgs << @user_interaction.errors.full_messages
       end
     end
 
     respond_to do |format|
       if !failed_to_save
         msg = { :status => "ok", :message => "Success!" }
+        status = :ok
       else
         msg = { :status => "fail", :message => "Fail!" }
+        status = :bad_request
+        error = Error.new(:class_name => 'user_interactions_save_fail', 
+          :message => error_msgs.inspect, :params => params.to_s)
+        error.save!
       end
-      format.json  { render :json => msg }
+      format.json  { render :json => msg, :status => status }
     end
   end
 

@@ -1,0 +1,18 @@
+<div
+    id="<%= @ex.short_name %>"
+    class="embedContainer"
+    data-exer-name="<%= @ex.short_name %>"
+    data-long-name="<%= @ex.long_name %>"
+    data-frame-src="<%= @ex.av_address %>"
+    data-frame-width="<%= @ex.width %>"
+    data-frame-height="<%= @ex.height %>"
+    data-external="<%= @ex.external %>"
+    data-points="<%= @ex.points %>"
+    data-required="<%= @ex.required %>"
+    data-showhide="<%= @ex.showhide %>"
+    data-threshold="<%= @course_off_ex.threshold %>"
+    data-type="<%= @ex.type %>">
+  <div class="center">
+    <div id="<%= @ex.short_name %>_iframe"></div>
+  </div>
+</div>
