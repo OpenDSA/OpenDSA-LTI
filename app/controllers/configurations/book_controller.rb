@@ -290,12 +290,18 @@ class Configurations::BookController < ApplicationController
                     next
                 end
                 url = base_url + File.basename(entry)
-                title = JSON.parse(File.read(File.join(config_dir, entry)))["title"]
-                configs << {
-                    title: title,
-                    name: File.basename(entry, '.json'),
-                    url: url
-                }
+                begin
+                    title = JSON.parse(File.read(File.join(config_dir, entry)))["title"]
+                    configs << {
+                        title: title,
+                        name: File.basename(entry, '.json'),
+                        url: url
+                    }
+                rescue
+                    error = Error.new(:class_name => 'book_config_parse_fail', 
+                        :message => "Failed to parse #{entry}")
+                    error.save!
+                end
             end
             configs.sort_by! { |x| x[:title] }
         end

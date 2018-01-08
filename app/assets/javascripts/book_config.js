@@ -915,7 +915,6 @@
      all exercises, and no global exercise settings */
   function loadFullConfiguration(config) {
     initializeJsTree(ODSA.availableModules[config.lang].children, {}, function() {
-      console.log(config);
       $('#book-config-form')[0].reset();
       for (var key in config) {
         switch(key) {
@@ -947,8 +946,7 @@
             config.chapters = convertChapters(config.chapters);
             break;
           default:
-            //
-            console.log(key + ' not supported by interface');
+            //console.log(key + ' not supported by interface');
         }
       }
       initializeJsTree(ODSA.availableModules[config.lang].children, config.chapters, function() {
@@ -1125,7 +1123,7 @@
   }
 
   function confirmLoad() {
-    return window.confirm('WARNING: any unsaved changes will be lost.');
+    return window.confirm('WARNING - any unsaved changes will be lost.');
   }
 
   function setBookId(id) {
@@ -1629,6 +1627,7 @@
       });
 
       $("#available-modules").bind('ready.jstree', function() {
+        var missingModules = [];
         if (chapters) {
           // we are loading an existing configuration
           for (var chapter in chapters) {
@@ -1641,6 +1640,7 @@
               var modNode = getAvailNode(modId);
               if (modNode === false) {
                 console.log('Could not find module with node id"' + modId + '"');
+                missingModules.push(mod);
                 continue;
               }
               addModule(modNode, chapterNode);
@@ -1656,7 +1656,7 @@
                 id = modNode.id + encodeId(id);
                 var childNode = getIncludedNode(id);
                 if (childNode === false) {
-                  console.log('Could not find item with node id"' + id + '"');
+                  //console.log('Could not find item with node id"' + id + '"');
                   continue;
                 }
                 options = cleanOptions(childNode, options);
@@ -1666,6 +1666,14 @@
                 }
               }
             }
+          }
+          if (missingModules.length > 0) {
+            var msg = 'WARNING - the following modules were listed in the configuration but do not exist on the OpenDSA server:\n';
+            for (var i = 0; i < missingModules.length; i++) {
+              msg += '\n\t- ' + missingModules[i];
+            }
+            msg += '\n\n These modules will be omitted.';
+            alert(msg);
           }
           if (callback) callback();
         }
