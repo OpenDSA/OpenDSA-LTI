@@ -310,6 +310,10 @@
     });
 
     function saveConfig(update) {
+      document.activeElement.blur();
+      $('#btn-save-config').attr('disabled', true);
+      $('#btn-update-config').attr('disabled', true);
+      $('#btn-download-config').attr('disabled', true);
       var overlayMsg;
       if (update) {
         overlayMsg = 'Updating';
@@ -348,6 +352,11 @@
           else {
             alert('An error occured while saving the configuration');
           }
+        },
+        complete: function() {
+          $('#btn-save-config').removeAttr('disabled', true);
+          $('#btn-update-config').removeAttr('disabled', true);
+          $('#btn-download-config').removeAttr('disabled', true);
         }
       });
     }
