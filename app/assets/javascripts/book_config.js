@@ -59,6 +59,8 @@
       langSelect, addChapterDialog, renameChapterDialog,
       exSettingsDialog;
 
+  var changesMade = false;
+
   // indicates if we are in the processing of loading an existing configuration
   var loadingConfig = false;
   
@@ -1132,6 +1134,7 @@
   }
 
   function confirmLoad() {
+    if (!changesMade) return true;
     return window.confirm('WARNING - any unsaved changes will be lost.');
   }
 
@@ -1605,6 +1608,7 @@
         'core': {
           'check_callback': function (operation, node, node_parent, node_position, more) {
             // only allow deleting of nodes that were moved to the Included tree
+            changesMade = true;
             return operation === 'copy_node' ||
               (operation === 'delete_node' && node.original.included);
           },
@@ -1699,6 +1703,7 @@
         addModule(intro, preface);
         addModule(glossary, appendix);
         addModule(biblio, appendix);
+        changesMade = false;
       });
   }
 })();
