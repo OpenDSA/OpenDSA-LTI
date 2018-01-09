@@ -731,6 +731,7 @@
       suppress_todo: $('#suppress-todo').is(':checked'),
       dispModComp: $('#disp-mod-comp').is(':checked'),
       tabbed_codeinc: $('#tabbed-codeinc').is(':checked'),
+      narration_enabled: $('#narration-enabled').is(':checked'),
       glob_exer_options: globalExerSettings(),
       glob_ss_options: globalSsSettings(),
       glob_ka_options: globalKaSettings(),
@@ -899,6 +900,9 @@
         case 'tabbed_codeinc':
           $('#tabbed-codeinc').prop('checked', config.tabbed_codeinc);
           break;
+        case 'narration_enabled':
+          $('#narration-enabled').prop('checked', config.narration_enabled);
+          break;
         case 'glob_exer_options':
           setGlobExerOptions(config.glob_exer_options);
           break;
@@ -956,6 +960,9 @@
             break;
           case 'tabbed_codeinc':
             $('#tabbed-codeinc').prop('checked', config.tabbed_codeinc);
+            break;
+          case 'narration_enabled':
+            $('#narration-enabled').prop('checked', config.narration_enabled);
             break;
           case 'glob_exer_options':
             setGlobExerOptions(config.glob_exer_options);
