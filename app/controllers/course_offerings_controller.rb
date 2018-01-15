@@ -394,6 +394,10 @@ class CourseOfferingsController < ApplicationController
       render :json => course_offering, :status => :created
     else
       render :json => course_offering.errors.full_messages, :status => :bad_request 
+      error = Error.new(:class_name => 'course_offering_save_fail', 
+        :message => course_offering.errors.full_messages.inspect,
+        :params => params.to_s)
+      error.save!
     end
   end
 

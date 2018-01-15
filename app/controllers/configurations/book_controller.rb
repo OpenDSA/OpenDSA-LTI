@@ -2,13 +2,13 @@ require 'json'
 
 # Helper classes
 class RSTtoJSON
-    @@searchDirs = ["en", "fi", "fr", "pt", "sv"]
-    def self.convert(path)
+    def self.convert(path, lang)
         json = {} # The json for this directory
         json["children"] = []
-        json["type"] = "category"
+        json["type"] = "chapter"
         json["path"] = path
         json["text"] = File.basename(path)
+        json["id"] = json["text"].downcase
         Dir.foreach(path) do |entry|
             child = {}
             if entry == '.' or entry == '..'
@@ -18,174 +18,292 @@ class RSTtoJSON
             # Concatenate the subpath with the entry and path
             subpath = File.join(path, entry)
             if File.file?(subpath) and File.extname(subpath) == '.rst'
-                # must be a legitimate module within RST
-                child["type"] = "module"
-                child["path"] = subpath
-                child["text"] = entry
-                json["children"].push(child)
+                # found a module rst file
+                mod_info = self.extract_module_info(subpath, lang)
+                mod_info[:parent_id] = json["id"].blank? ? '#' : json["id"]
+                json["children"].push(mod_info)
             elsif Dir.exists?(subpath)
                 # must be a directory so convert the subpath
-                child = self.convert(subpath)
+                child = self.convert(subpath, lang)
                 json["children"].push(child)
             end
         end
         return json
     end
-end
 
-# Class which represents a book configuration
-class BookConfiguration
-    @@requiredMembers = ["chapters", "title"]# Required members within the configuration
-    # Not sure if these are actually required so modify if needed
+    private
 
-    # Constructor
-    def initialize(configPath, fileName, json)
-        @json = json # The json in the form of a hash object
-        @configPath = configPath # The path to the configuration folder
-        @fullPath = File.join(configPath, fileName)
-    end
+    # use ||= to avoid "already intialized constant" warning
+    # since rails will reload the class on every request during development
 
-    # The path of this BookConfiguration
-    def path
-        return @fullPath
-    end
+    # regex to identify exercise/slideshow directives
+    EX_RE ||= Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe)")
+    # regex to identify external tool directives
+    EXTR_RE ||= Regexp.new("^(\.\. )(extrtoolembed:: '([^']+)')")
+    # regex to identify section titles
+    SECTION_RE ||= Regexp.new('^-+$')
+    URI_ESCAPE_RE ||= Regexp.new("[^#{URI::PATTERN::UNRESERVED}']")
+    URI_REMOVE_RE ||= /[%'()]/
 
-    def valid?() # Checks to see if the json is a valid configuration
-        # TODO Should use this method to check if JSON is valid
-        return true # Just returning true for now.
-        @@requiredMembers.each do |member|
-            if @json.key?(member) == false #If it is missing a member
-                return false
-            end
+    def self.extract_module_info(rst_path, lang)
+        lines = File.readlines(rst_path)
+        i = 0
+        mod_lname = ""
+        mod_sname = File.basename(rst_path, '.rst')
+        mod_path = rst_path.sub("public/OpenDSA/RST/#{lang}/", '').sub('.rst', '')
+        mod = {
+            # escape the id so it can be used as an HTML element id
+            id: URI.escape(mod_path, URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '').downcase!,
+            path: mod_path,
+            short_name: mod_sname,
+            children: [],
+            type: 'module'
+        }
+
+        # find the module title
+        while i < lines.count
+          line = lines[i]
+          sline = line.strip()
+          if sline.start_with?("==") and not lines[i - 1].strip().empty?
+            mod_lname = lines[i - 1].strip()
+            i += 1
+            break
+          end
+          i += 1
         end
-        # Should have returned false if there were required members missing from the configuration
-        # Now check if all of the modules are valid
 
-    end
-
-    # Checks to see if the module exists on the system. Should be used in the valid? method
-    def self.validModule(path)
-        return File.exists?(path)
-    end
-
-    # Saves this book configuration
-    def save(fileName="JSON.txt") #TODO remove default JSON.txt:
-        # It's purpose is just to keep old code from breaking
-
-        # Just open the file with write permissions
-        newConfigFile = File.open(fileName, "w")
-        # Write file and close it
-        # TODO make sure output is up to the OpenDSA standard
-        newConfigFile.write(JSON.pretty_generate(@json))
-        newConfigFile.close
-    end
-end
-
-# Class that manages book configurations
-class BookConfigurationManager
-    # Sets the path of the configuration folder that should be managed
-    def initialize(configPath)
-        @configPath = configPath
-    end
-
-    def configExists?(fileName)
-        return File.exists?(path(fileName))
-    end
-
-    def path(fileName)
-        return File.join(@configPath, fileName)
-    end
-
-    # Creates a new book configuration and saves it
-    # Returns true or false based on whether or not it was saved
-    def newBookConfig(fileName, json) # The file name and the json as a hash
-        newConfig = BookConfiguration.new(@configPath, fileName, json)
-        if newConfig.valid? && !configExists?(fileName)
-            # Check if the json is valid the config doesn't exist
-            newConfig.save(path(fileName))
-            return true
-        else
-            return false
+        if mod_lname == ""
+          mod_lname = mod_sname
+          i = 0
         end
-    end
 
-    def list
-        # Create the hash for the configuration files
-        files = Hash.new
-        # Iterate over all the entries within this directory
-        Dir.foreach(@configPath) do |entry|
-            if entry == '..' or entry == '.'
-                next # Obviously skip over these entries
+        mod[:long_name] = mod_lname
+        mod[:text] = "#{mod_lname} (#{mod_path})"
+
+        curr_section = mod
+        # extract info about the sections and exercises that are in the module
+        while i < lines.count
+          line = lines[i]
+          sline = line.strip()
+
+          if sline == ""
+            i += 1
+            next
+          end
+
+          if SECTION_RE.match(sline) != nil
+            sectName = lines[i - 1].strip()
+            curr_section = {
+              text: sectName,
+              children: [], # exercises
+              type: 'section',
+              id: URI.escape("#{mod_path}|sect|#{sectName}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '').downcase!
+            }
+            mod[:children] << curr_section
+            i += 1
+            next
+          end
+
+          match_data = EX_RE.match(sline)
+          if match_data != nil
+            # found an exercise or slideshow
+            directive = match_data[2]
+            identifier = match_data[3]
+            ex_type = match_data[7]
+            ex_sname = match_data[5]
+            ex_lname = ""
+
+            i += 1
+            i, options = parse_directive_options(i, lines)
+
+            if options.has_key?('long_name')
+              ex_lname = options.delete('long_name')
+            else
+              ex_lname = ex_sname
             end
-            # Subpath is just a simple concatenation
-            subpath = File.join(@configPath, entry)
-            # Only return files that are not LMSconfigurations and are folders
-            if File.file?(subpath) && !entry.include?("LMSconf")
-                files[entry] = nil # Just nil for right now but could be used
-                    # in the future to associate information with the files
+
+            ex_text = ex_lname == ex_sname ? ex_lname : "#{ex_lname} (#{ex_sname})"
+            curr_section[:children] << {
+                short_name: ex_sname,
+                long_name: ex_lname,
+                text: ex_text,
+                type: ex_type,
+                id: URI.escape("#{mod_path}||#{ex_sname}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '').downcase!
+            }
+          else
+            match_data = EXTR_RE.match(sline)
+            if match_data != nil
+                # found an external tool exercise
+
+                ex_name = match_data[3]
+
+                i += 1
+                i, options = parse_directive_options(i, lines)
+
+                learning_tool = options.fetch('learning_tool', 'code-workout')
+
+                curr_section[:children] << {
+                    short_name: ex_name,
+                    long_name: ex_name,
+                    learning_tool: learning_tool,
+                    text: "#{ex_name} (#{learning_tool})",
+                    type: 'extr',
+                    id: URI.escape("#{mod_path}||#{ex_name}", URI_ESCAPE_RE).gsub(URI_REMOVE_RE, '').downcase!
+                }
+            else
+                i += 1
             end
+          end
         end
-        return files
+        return mod
     end
 
-    def read(name)
-        return JSON.parse(File.read(File.join(@configPath, name)))
+    # parse the options for the directive that starts on line i
+    # returning the first line after the end of the directive options,
+    # as well as the options themselves as a dictionary.
+    def self.parse_directive_options(i, lines)
+        options = {}
+        if i < lines.count
+            line = lines[i]
+            sline = line.strip()
+
+            while sline.start_with?(":")
+                sline[0] = ''
+                tokens = sline.split(': ')
+                options[tokens[0]] = tokens[1]
+                i += 1
+                    if i < lines.count
+                    line = lines[i]
+                    sline = line.strip()
+                else
+                    break
+                end
+            end
+
+        end
+        return i, options
     end
 end
 
 # The actual rails controller
 class Configurations::BookController < ApplicationController
 
-    # This action should be deleted and configuraiton json file should be send directly to edit action for editing
-    def create_redirect
-        redirect_to :book_config_cerate
-    end
+    def show
+        # programming languages that OpenDSA has code examples for
+        @code_languages = {
+            "Java": {
+                "ext": [
+                    "java"
+                ],
+                "label": "Java",
+                "lang": "java"
+            },
+            "Java_Generic": {
+                "ext": [
+                    "java"
+                ],
+                "label": "Java (Generic)",
+                "lang": "java"
+            },
+            "Processing": {
+                "ext": [
+                    "pde"
+                ],
+                "label": "Processing",
+                "lang": "java"
+            },
+            "C++": {
+                "ext": [
+                    "cpp",
+                    "h"
+                ],
+                "label": "C++",
+                "lang": "C++"
+            },
+            "C": {
+                "ext": [
+                    "c",
+                    "h"
+                ],
+                "label": "C",
+                "lang": "c"
+            },
+            "Pseudo": {
+                "ext": [
+                    "txt"
+                ],
+                "label": "Pseudo Code",
+                "lang": "pseudo"
+            },
+            "Python": {
+                "ext": [
+                    "py"
+                ],
+                "label": "Python",
+                "lang": "python"
+            },
+            "JavaScript": {
+                "ext": [
+                    "js"
+                ],
+                "label": "JavaScript",
+                "lang": "javascript"
+            }
+        }
 
-    def create
-        # If this is a HTTP post request
-        if request.post?
-            # request.params will be the json object sent in the form of a Hash
-            json = request.POST
-            # Get the configuration
-            configuration = json["config"]
-            if !configuration
-                render json: {saved: false, message: "Did not give a configuration to save."}
+        # languages that OpenDSA has content for
+        @languages = {
+            "en": "English",
+            "fr": "Français",
+            "pt": "Português",
+            "fi": "Suomi",
+            "sv": "Svenska"
+        }
+
+        # gets a list of available modules for each language
+        @avail_mods = Rails.cache.fetch("odsa_available_modules", expires_in: 6.hours) do
+            avail_mods = {}
+            @languages.each do |lang_code, lang_name|
+                avail_mods[lang_code] = RSTtoJSON.convert("public/OpenDSA/RST/#{lang_code}", lang_code)
             end
-            # Get the name for the configuration
-            name = json["name"]
-            if !name
-                render json: {saved: false, message: "Did not give a name for the configuration."}
-            end
-            # Create a new manager to manage the config directory
-            manager = BookConfigurationManager.new("./Configuration")
-            # 'saved' will be true if the new book configuration is saved
-            render json: {saved: manager.newBookConfig(name+".txt", configuration)}
+            avail_mods
         end
 
-        # Rails makes GET the default for the template
+        @learning_tools = LearningTool.all.select("id, name")
+        @reference_configs = reference_book_configurations()
+        @book_metadata = InstBook.get_metadata(current_user.id)
+        
+        render
     end
 
-    def edit
-        if request.post?
+    private
 
+    # Gets a list of book configurations hosted on the OpenDSA server
+    # Returns a dictionary containing the name, title, and url of each config file
+    def reference_book_configurations()
+        return Rails.cache.fetch("odsa_reference_book_configs", expires_in: 6.hours) do
+            config_dir = File.join("public", "OpenDSA", "config")
+            base_url = request.protocol + request.host_with_port + "/OpenDSA/config/"
+            configs = []
+            Dir.foreach(config_dir) do |entry|
+                if entry.include?("_generated.json") or not File.extname(entry) == '.json'
+                    next
+                end
+                url = base_url + File.basename(entry)
+                begin
+                    title = JSON.parse(File.read(File.join(config_dir, entry)))["title"]
+                    configs << {
+                        title: title,
+                        name: File.basename(entry, '.json'),
+                        url: url
+                    }
+                rescue
+                    error = Error.new(:class_name => 'book_config_parse_fail', 
+                        :message => "Failed to parse #{entry}")
+                    error.save!
+                end
+            end
+            configs.sort_by! { |x| x[:title] }
         end
-
-        # Rails makes GET the default for the template
-    end
-
-    # Returns JSON which represents the folder structure within the RST directory
-    def modules
-        render json: RSTtoJSON.convert("./RST")
-    end
-
-    def load
-        manager = BookConfigurationManager.new("./Configuration")
-        render json: manager.read(params["name"])
-    end
-
-    # Returns JSON where each key is an existing configuration file name
-    def configs
-        manager = BookConfigurationManager.new("./Configuration")
-        render json: manager.list
     end
 end

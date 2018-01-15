@@ -1,0 +1,344 @@
+= stylesheet_link_tag "book_config", media: "all"
+
+:javascript
+  window.ODSA = window.ODSA || {};
+  window.ODSA.languages = #{@languages.to_json.html_safe};
+  window.ODSA.codeLanguages = #{@code_languages.to_json.html_safe};
+  window.ODSA.learningTools = #{@learning_tools.to_json.html_safe};
+  window.ODSA.user_books = #{@book_metadata.to_json.html_safe};
+  window.ODSA.availableModules = #{@avail_mods.to_json.html_safe};
+
+= javascript_include_tag "split.min.js"
+= javascript_include_tag "book_config"
+
+%div{id: "add-chapter-dialog", title: "Add Chapter"}
+  %p.dialog-errors
+  %form
+    %fieldset
+      %label{for: "chapter-name"}
+        Name:
+      %input.text.ui-widget-content.ui-corner-all{type: "text", name: "chapter-name", id: "chapter-name"}
+      -# Allow form submission using enter key
+      %input{id: "add-chapter-submit", type: "submit", tabindex: "-1", style: "position:absolute; top: -1000px;"}
+
+%div{id: "rename-chapter-dialog", title: "Rename Chapter"}
+  %p.dialog-errors
+  %form
+    %fieldset
+      %label{for: "chapter-newname"}
+        Name:
+      %input.text.ui-widget-content.ui-corner-all{type: "text", name: "chapter-newname", id: "chapter-newname"}
+      -# Allow form submission using enter key
+      %input{id: "rename-chapter-submit", type: "submit", tabindex: "-1", style: "position:absolute; top: -1000px;"}
+
+%div{id: "exercise-settings-dialog", title: "Exercise Settings"}
+  %p.dialog-errors
+  %form.form-horizontal
+    %fieldset.col-xs-12
+      .form-group{id: 'exercise-settings-required-group'}
+        %label.dialog-control-label.col-xs-4{for: "exercise-settings-required"}
+          Required:
+        .col-xs-6
+          %input{type: "checkbox", id: "exercise-settings-required", checked: "checked"}
+      .form-group
+        %label.dialog-control-label.col-xs-4{for: "exercise-settings-points"}
+          Points:
+        .col-xs-6
+          %input{type: "number", min: 0, value: 1, step: 0.01, id: "exercise-settings-points"}
+      .form-group{id: 'exercise-settings-threshold-group'}
+        %label.dialog-control-label.col-xs-4{for: "exercise-settings-threshold"}
+          Threshold:
+        .col-xs-6
+          %input{type: "number", min: 1, value: 5, step: 1, id: "exercise-settings-threshold"}
+      %div{id: 'exercise-settings-pe', style: 'display: none'}
+        .form-group
+          %label.dialog-control-label.col-xs-4{for: "exercise-settings-feedback"}
+            Feedback Mode:
+          .col-xs-6
+            %select{id: "exercise-settings-feedback"}
+              %option{value: 'atend'}
+                atend
+              %option{value: 'continuous'}
+                continuous
+        .form-group
+          %label.dialog-control-label.col-xs-4{for: "exercise-settings-fix"}
+            Fix Mode:
+          .col-xs-6
+            %select{id: "exercise-settings-fix", disabled: true}
+              %option{value: 'undo'}
+                undo
+              %option{value: 'fix'}
+                fix
+        .form-group
+          %label.dialog-control-label.col-xs-4{for: "exercise-settings-code"}
+            Hide Code:
+          .col-xs-6
+            %input{type: "checkbox", id: "exercise-settings-code"}
+      -# Allow form submission using enter key
+      %input{id: "exercise-settings-submit", type: "submit", tabindex: "-1", style: "position:absolute; top: -1000px;"}
+
+
+.container
+
+  #instructions-link-container
+    Instructions/documentation for this interface can be found 
+    <a target="_blank" href="https://opendsa.readthedocs.io/en/latest/Configuration.html#book-configuration-gui">here</a>.
+
+  %h2
+    Load Existing Configuration (Optional)
+  .col-xs-12.row
+    %label.dialog-control-label.col-lg-3.col-sm-4{for: 'reference-config'}
+      Select Reference Configuration
+    .col-xs-4
+      %select.form-control#reference-config
+        - @reference_configs.each do |config|
+          %option{:value => config[:url]}
+            #{config[:title]} (#{config[:name]})
+    %input.btn.btn-primary{type: 'button', id: 'reference-config-load', value: 'Load'}
+  .col-xs-12.row
+    .col-xs-offset-3.col-lg-offset-2
+      <b>- OR -</b>
+  .col-xs-12.row
+    %label.dialog-control-label.col-lg-3.col-sm-4{for: 'user-config'}
+      Select Your Configuration
+    .col-xs-4
+      %select.form-control#user-config
+        - @book_metadata.each do |md|
+          %option{:value => md.id}
+            - if md.template
+              #{md.title} (template)
+            - else
+              #{md.title} (#{md.label}, #{md.course_number} #{md.term})
+    %input.btn.btn-primary{type: 'button', id: 'user-config-load', value: 'Load', disabled: @book_metadata.length == 0}
+  .col-xs-12.row
+    .col-xs-offset-3.col-lg-offset-2
+      <b>- OR -</b>
+  .col-xs-12.row
+    %label.dialog-control-label.col-lg-3.col-sm-4{for: 'upload-config-file'}
+      Select Configuration File
+    .col-xs-4
+      %input.inline-input{type: 'file', id: 'upload-config-file', accept: '.json'}
+    %input.btn.btn-primary{type: 'button', id: 'config-file-load', value: 'Load', disabled: true}
+
+  %h2
+    Book Settings
+  %form.form-horizontal{method: "post", id: 'book-config-form'}
+    .form-group.border
+      %label.control-label{for: "#book-title"}
+        Title
+      .col-xs-6
+        %input.form-control#book-title{type: "text", required: true}
+
+    .form-group.border
+      %label.control-label{for: "#book-desc"}
+        Description
+      .col-xs-6
+        %textarea.form-control#book-desc{required: true}
+
+    .form-group.border
+      %label.control-label{for: "#book-lang"}
+        Language
+      .col-xs-6
+        %select.form-control#book-lang{required: true}
+          %option{:value => -1, disabled: true, selected: true}
+          - @languages.each do |lang_code, lang_name|
+            %option{:value => lang_code}
+              #{lang_name}
+
+    .form-group.border
+      %label.control-label{for: "#code-langs"}
+        Code Languages
+      .col-xs-9.col-md-6{id: "code-langs"}
+        %p
+          *Drag and drop the languages to order them by priority
+        -# - @code_languages.each do |code_lang, code_info|
+        -#   .code-lang-opt.col-sm-6
+        -#     %input{type: "checkbox", name: "code-lang", id: "code-lang-#{code_lang}", value: code_lang}
+        -#     %label{for: "code-lang-#{code_lang}"}
+        -#       #{code_info[:label]}
+        .col-xs-4.checked-list-tree{id: 'code-langs-tree'}
+
+    .form-group.border
+      %label.control-label{for: "#glob-exer-options"}
+        Global Exercise Options
+      .col-xs-9.col-md-6{id: "glob-exer-options"}
+        .col-xs-12
+          %input{type: "checkbox", name: "JXOP-debug", id: "JXOP-debug", value: 'JXOP-debug'}
+          %label{for: "JXOP-debug"}
+            JSAV Debug (for exercise developers)
+
+    .form-group.border
+      %label.control-label{}
+        Global Slideshow Options
+      .col-xs-6.col-md-5
+        .form-group
+          %label.control-label{for: "glob-ss-required"}
+            Required:
+          .col-xs-8
+            %input{type: "checkbox", id: "glob-ss-required"}
+        .form-group
+          %label.control-label{for: "glob-ss-points"}
+            Points:
+          .col-xs-8
+            %input{type: "number", min: 0, value: 0, step: 0.01, id: "glob-ss-points", required: true}
+
+    .form-group.border
+      %label.control-label{}
+        Global Khan-Academy Exercise Options
+      .col-xs-6.col-md-5
+        .form-group
+          %label.control-label{for: "glob-ka-required"}
+            Required:
+          .col-xs-8
+            %input.align-checkbox{type: "checkbox", id: "glob-ka-required", checked: "checked"}
+        .form-group
+          %label.control-label{for: "glob-ka-points"}
+            Points:
+          .col-xs-8
+            %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-ka-points", required: true}
+        .form-group
+          %label.control-label{for: "glob-ka-threshold"}
+            Threshold:
+          .col-xs-8
+            %input{type: "number", min: 1, value: 5, step: 1, id: "glob-ka-threshold", required: true}
+
+    .form-group.border
+      %label.control-label{}
+        Global Proficiency Exercise Options
+      .col-xs-6.col-md-5
+        .form-group
+          %label.control-label{for: "glob-pe-required"}
+            Required:
+          .col-xs-8
+            %input.align-checkbox{type: "checkbox", id: "glob-pe-required", checked: "checked"}
+        .form-group
+          %label.control-label{for: "glob-pe-points"}
+            Points:
+          .col-xs-8
+            %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-pe-points", required: true}
+        .form-group
+          %label.control-label{for: "glob-pe-threshold"}
+            Threshold:
+          .col-xs-8
+            %input{type: "number", min: 0.0, max: 1.0, value: 1.0, step: 0.01, id: "glob-pe-threshold", required: true}
+        -# .form-group
+        -#   %label.control-label{for: "glob-pe-feedback"}
+        -#     Feedback Mode:
+        -#   %select{id: "glob-pe-feedback"}
+        -#     %option{value: 'atend'}
+        -#       atend
+        -#     %option{value: 'continuous'}
+        -#       continuous
+        -# .form-group
+        -#   %label.control-label{for: "glob-pe-fix"}
+        -#     Fix Mode:
+        -#   %select{id: "glob-pe-fix", disabled: true}
+        -#     %option{value: 'undo'}
+        -#       undo
+        -#     %option{value: 'fix'}
+        -#       fix
+
+    .form-group.border
+      %label.control-label{}
+        Global External Tool Options
+      .col-xs-6.col-md-5
+        .form-group
+          %label.control-label{for: 'glob-extr-points'}
+            Points:
+          .col-xs-8
+            %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-extr-points", required: true}
+
+    - @learning_tools.each do |tool|
+      .form-group.border
+        %label.control-label{}
+          Global #{tool.name} Options
+        .col-xs-6.col-md-5
+          .form-group
+            %label.control-label{for: "glob-#{tool.name}-points"}
+              Points:
+            .col-xs-8
+              %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-#{tool.name}-points", required: true}
+
+    .form-group
+      %label.control-label{for: "#other-options"}
+        Other Options
+      .col-xs-9.col-md-6{id: "other-options"}
+        .col-sm-6
+          %input{type: "checkbox", name: "build-jsav", id: "build-jsav"}
+          %label{for: "build-jsav"}
+            Build JSAV
+        .col-sm-6
+          %input{type: "checkbox", name: "supress-todo", id: "suppress-todo", checked: "checked"}
+          %label{for: "suppress-todo"}
+            Suppress ToDo
+        .col-sm-6
+          %input{type: "checkbox", name: "disp-mod-comp", id: "disp-mod-comp", checked: "checked"}
+          %label{for: "disp-mod-comp"}
+            Display Module Completion
+        .col-sm-6
+          %input{type: "checkbox", name: "tabbed-codeinc", id: "tabbed-codeinc", checked: "checked"}
+          %label{for: "tabbed-codeinc"}
+            Tabbed Code-include
+        .col-sm-6
+          %input{type: "checkbox", name: "narration-enabled", id: "narration-enabled", checked: "checked"}
+          %label{for: "narration-enabled"}
+            Narration Enabled
+
+    %div{id: "book-content-container"}
+      %h2
+        Book Content
+      .col-xs-12.icon-legend
+        %div
+          <b>Icon Legend</b>
+        .col-lg-6.col-md-8.col-sm-10
+          %span.col-sm-4.col-xs-12
+            <i class="fa fa-folder-o"></i> Chapter
+          %span.col-sm-8.col-xs-12
+            <b>SS</b> Slideshow
+          %span.col-sm-4.col-xs-12
+            <i class="fa fa-files-o"></i> Module
+          %span.col-sm-8.col-xs-12
+            <b>KA</b> Khan-Academy Style Exercise
+          %span.col-sm-4.col-xs-12
+            <i class="fa fa-file-o"></i> Section
+          %span.col-sm-8.col-xs-12
+            <b>PE</b> Proficiency Exercise
+          %span.col-sm-8.col-sm-offset-4.col-xs-12
+            <b>ET</b> External Tool Exercise (CodeWorkout)
+        .col-xs-12
+          .col-xs-12
+            <b style='color: orange'>M</b> This item has been modified with settings different from the defaults/globals
+          .col-xs-12
+            <b style='color: orange'>•</b> This item has children who have been modified with settings different from the defaults/globals
+
+      %div{id: "split-container"}
+        %div.split.split-horizontal{id: "chosen-pane"}
+          %h3.split-pane-header
+            Included Modules
+          %input.btn.btn-success{id: "btn-add-chapter", type: "button", value: "+ Chapter", disabled: true}
+          .split-pane-content
+            .tree-container
+              %div{id: "included-modules"}
+        %div.split.split-horizontal{id: "available-pane"}
+          %h3.split-pane-header
+            Available Modules
+          .split-pane-content
+            .tree-container
+              %div{id: "available-modules"}
+
+    .form-group.col-xs-12{style: "margin-top: 15px;"}
+      #submit-button-container
+        %button#btn-update-config.btn.btn-primary{type: 'submit', value: "update", style: 'display: none;'}
+          Update Configuration
+        %button#btn-save-config.btn.btn-primary{type: 'submit', value: "save"}
+          Save New Configuration
+        %button#btn-download-config.btn.btn-primary{type: 'submit',value: "download"}
+          Download Configuration
+      
+
+#loading-container{style: "display: none;"}
+  #loading-overlay
+  #loading-icon
+    .fa.fa-spinner.fa-spin
+    %span#overlay-message
+      Loading

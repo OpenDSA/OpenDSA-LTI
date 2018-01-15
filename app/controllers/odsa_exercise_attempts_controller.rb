@@ -90,8 +90,12 @@ class OdsaExerciseAttemptsController < ApplicationController
                                         :exercise_progress => exercise_progress,
                                         :threshold => threshold}}
       else
-        msg = { :status => "fail", :message => "Fail!" }
-        format.json  { render :json => msg }
+        msg = { :status => "fail", :message => exercise_attempt.errors.full_messages }
+        format.json  { render :json => msg, :status => :bad_request }
+        error = Error.new(:class_name => 'exercise_attempt_save_fail', 
+            :message => exercise_attempt.errors.full_messages.inspect,
+            :params => params.to_s)
+        error.save!
       end
     end
   end
@@ -108,6 +112,13 @@ class OdsaExerciseAttemptsController < ApplicationController
       inst_book_section_exercise = InstBookSectionExercise.where(
                                     "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
                                     params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+      if inst_book_section_exercise == nil
+        respond_to do |format|
+          msg = { :status => "fail", :message => "Fail!" }
+          format.json  { render :json => msg }
+        end
+        return
+      end
       threshold = inst_book_section_exercise.threshold                                    
     else
       inst_course_offering_exercise = InstCourseOfferingExercise.find_by(

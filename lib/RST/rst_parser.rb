@@ -100,7 +100,7 @@ module RstParser
       full_dir = File.join(RST_DIR, short_name.to_s)
       Find.find(full_dir) do |path|
         if path.end_with?(".rst")
-          extract_exercises(path, exercises[long_name], short_name.to_s)
+          extract_exercises(path, exercises[long_name])
         end
       end
       if exercises[long_name].empty?
@@ -110,9 +110,7 @@ module RstParser
     return exercises
   end
 
-  private
-
-  def self.extract_exercises(rst_path, exercises, dir_name)
+  def self.extract_exercises(rst_path, exercises)
     lines = File.readlines(rst_path)
     i = 0
     mod_lname = ""
@@ -143,7 +141,7 @@ module RstParser
         next
       end
 
-      match_data = EX_RE.match(line)
+      match_data = EX_RE.match(sline)
       if match_data != nil
         directive = match_data[2]
         identifier = match_data[3]
@@ -215,6 +213,8 @@ module RstParser
     end
   end
 end
+
+private
 
 def find_av_dimensions(av_path)
   doc = File.open(av_path) do |f| 

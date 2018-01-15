@@ -161,7 +161,7 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; git checkout master; make pull; make rst2json;"
+      execute "cd ~/OpenDSA; git checkout master; make pull;" #make rst2json;"
       # upload _generated config files
     end
   end
@@ -180,6 +180,10 @@ namespace :deploy do
         # used by lib/RST/rst_parser.rb
         Rails.cache.delete('odsa_all_exercises')
         Rails.cache.delete('odsa_all_exercises_map')
+
+        # used by app/controllers/configurations/book_controller.rb
+        Rails.cache.delete('odsa_reference_book_configs')
+        Rails.cache.delete('odsa_available_modules')
       end
     end
   end
