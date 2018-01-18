@@ -1,13 +1,14 @@
 :javascript
   window.jsonFile = #{@json.html_safe};
-  window.return_url = "#{params[:content_item_return_url].html_safe}";
+  window.return_url = "#{params[:content_item_return_url] ? params[:content_item_return_url].html_safe : params[:launch_presentation_return_url].html_safe}";
   window.odsa_launch_url = "#{@launch_url}";
   window.odsa_organizations = #{@organizations.blank? ? 'undefined' : @organiations.to_json.html_safe};
   window.organization_id = #{@organization_id.blank? ? 'undefined' : @organization_id};
+  window.deepLinking = #{@deep_linking};
   window.odsa_course_info = {
     course_offering: {
       lms_instance_id: #{@lms_instance_id},
-      lms_course_num: #{@lms_course_num},
+      lms_course_num: "#{@lms_course_num}",
       lms_course_code: '#{@lms_course_code}',
       label: '#{@lms_course_code}'
     }
@@ -86,4 +87,18 @@
           = submit_tag 'Submit', class: 'btn btn-primary'
 
 #using_json
-  
+
+- if @deep_linking
+  %form{action: "#{params[:content_item_return_url]}", method: "post", encType: "application/x-www-form-urlencoded", id: "return_form"}
+    %input{type: "hidden", name: "lti_message_type", value: "ContentItemSelection"}
+    %input{type: "hidden", name: "lti_version", value: "#{params[:lti_version]}"}
+    %input{type: "hidden", name: "content_items", value: "", id: 'content_items'}
+    - if !params[:data].blank?
+      %input{type: "hidden", name: "data", value: "#{params[:data]}"}
+    %input{type: "hidden", name: "oauth_version", value: "#{params[:oauth_version]}"}
+    %input{type: "hidden", name: "oauth_nonce", value: "#{params[:oauth_nonce]}"}
+    %input{type: "hidden", name: "oauth_timestamp", value: "#{params[:oauth_timestamp]}"}
+    %input{type: "hidden", name: "oauth_consumer_key", value: "#{params[:oauth_consumer_key]}"}
+    %input{type: "hidden", name: "oauth_callback", value: "about:blank"}
+    %input{type: "hidden", name: "oauth_signature_method", value: "#{params[:oauth_signature_method]}"}
+    %input{type: "hidden", name: "oauth_signature", value: "#{params[:oauth_signature]}"}

@@ -266,7 +266,27 @@
         var selected = data.instance.get_node(data.selected);
         if (selected.original.type === 'section') {
           console.log(getResourceURL(selected.original.url_params));
-          window.location.href = getResourceURL(selected.original.url_params);
+          var url = getResourceURL(selected.original.url_params);
+          if (deepLinking) {
+            var contentItem = {
+              '@context': 'http://purl.imsglobal.org/ctx/lti/v1/ContentItem',
+              "@graph": [
+                {              
+                  '@type': 'ContentItem',
+                  'mediaType': 'text/html',
+                  'title': selected.text,
+                  'url': url
+                }
+              ]
+            };
+            var jsonStr = JSON.stringify(contentItem);
+            var encoded = encodeURIComponent(jsonStr);
+            $('#content_items').attr('value', encoded);
+            $('#return_form').submit();
+          }
+          else {
+            window.location.href = url;
+          }
         }
       })
 
