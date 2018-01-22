@@ -110,6 +110,12 @@ class CourseOffering < ActiveRecord::Base
     course_enrollments.where(course_role: CourseRole.student).map(&:user)
   end
 
+
+  def students_count
+    course_enrollments.where(course_role: CourseRole.student).count
+  end
+
+
   # -------------------------------------------------------------
   # Public: Gets all inst_books used in this CourseOffering.
   #

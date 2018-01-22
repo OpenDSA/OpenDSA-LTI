@@ -3,7 +3,7 @@ class InstChapterModule < ActiveRecord::Base
   belongs_to :inst_chapter
   belongs_to :inst_module
   has_many :inst_sections, dependent: :destroy
-  has_many :odsa_module_progresses, inverse_of: :inst_chapter_module
+  has_many :odsa_module_progresses, inverse_of: :inst_chapter_module, dependent: :destroy
 
   #~ Validation ...............................................................
   #~ Constants ................................................................

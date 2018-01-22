@@ -3,9 +3,9 @@ class InstBookSectionExercise < ActiveRecord::Base
   belongs_to :inst_book
   belongs_to :inst_section
   belongs_to :inst_exercise      # I define this relation
-  has_many :odsa_user_interactions
-  has_many :odsa_exercise_attempts
-  has_many :odsa_exercise_progresses
+  has_many :odsa_user_interactions, dependent: :destroy
+  has_many :odsa_exercise_attempts, dependent: :destroy
+  has_many :odsa_exercise_progresses, dependent: :destroy
   # has_many :users_by_odsa_exercise_attempts, :source => :user, :through => :odsa_exercise_attempts
   # has_many :users_by_odsa_exercise_progress, :source => :user, :through => :odsa_exercise_progresses
   # has_many :inst_books, :through => :odsa_user_interactions
