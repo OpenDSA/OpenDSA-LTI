@@ -14,12 +14,12 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
                 :lms_instance_id, :lms_course_code, :lms_course_num,
                 inst_books_attributes: [ :id, :course_offering_id, :user_id, :title, :desc, :template, :_destroy ]
 
-  action_item only: [:edit] do
+  action_item only: [:edit] do |course_offering|
     if current_user.global_role.is_admin?
-      link_to "Delete", { action: :destroy }, method: :delete
+      message = course_offering_delete_msg(course_offering, 2)
+      link_to "Delete", { action: :destroy }, method: :delete, data: {confirm: message}
     end
   end
-
 
   controller do
 
@@ -62,7 +62,24 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
       column :students_count, sortable: 'students count'
     end
 
-    actions
+    column "Actions" do |course_offering|
+      message = course_offering_delete_msg(course_offering, 2)
+      links = ''.html_safe
+      if authorized? :read, course_offering
+        links += link_to "View", admin_course_offering_path(course_offering)
+        links += ' '
+      end
+      if authorized? :update, course_offering
+        links += link_to "Edit", admin_course_offering_path(course_offering)
+        links += ' '
+      end
+      if authorized? :destroy, course_offering
+        links += link_to "Delete", admin_course_offering_path(course_offering), method: :delete, data: {confirm: message}
+        links += ' '
+      end
+
+      links
+    end
   end
 
   form do |f|
