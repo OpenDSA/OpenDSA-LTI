@@ -177,6 +177,12 @@ input.inline-input {
   text-align: center;
 }
 
+#instructions-link-container {
+  font-size: 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
 @media screen and (max-width: 1369px) {
   .container {
     width: 100%;

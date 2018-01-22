@@ -59,6 +59,8 @@
       langSelect, addChapterDialog, renameChapterDialog,
       exSettingsDialog;
 
+  var changesMade = false;
+
   // indicates if we are in the processing of loading an existing configuration
   var loadingConfig = false;
   
@@ -310,6 +312,10 @@
     });
 
     function saveConfig(update) {
+      document.activeElement.blur();
+      $('#btn-save-config').attr('disabled', true);
+      $('#btn-update-config').attr('disabled', true);
+      $('#btn-download-config').attr('disabled', true);
       var overlayMsg;
       if (update) {
         overlayMsg = 'Updating';
@@ -348,6 +354,11 @@
           else {
             alert('An error occured while saving the configuration');
           }
+        },
+        complete: function() {
+          $('#btn-save-config').removeAttr('disabled', true);
+          $('#btn-update-config').removeAttr('disabled', true);
+          $('#btn-download-config').removeAttr('disabled', true);
         }
       });
     }
@@ -719,6 +730,8 @@
       build_cmap: false,
       suppress_todo: $('#suppress-todo').is(':checked'),
       dispModComp: $('#disp-mod-comp').is(':checked'),
+      tabbed_codeinc: $('#tabbed-codeinc').is(':checked'),
+      narration_enabled: $('#narration-enabled').is(':checked'),
       glob_exer_options: globalExerSettings(),
       glob_ss_options: globalSsSettings(),
       glob_ka_options: globalKaSettings(),
@@ -884,6 +897,12 @@
         case 'dispModComp':
           $('#disp-mod-comp').prop('checked', config.dispModComp);
           break;
+        case 'tabbed_codeinc':
+          $('#tabbed-codeinc').prop('checked', config.tabbed_codeinc);
+          break;
+        case 'narration_enabled':
+          $('#narration-enabled').prop('checked', config.narration_enabled);
+          break;
         case 'glob_exer_options':
           setGlobExerOptions(config.glob_exer_options);
           break;
@@ -915,7 +934,6 @@
      all exercises, and no global exercise settings */
   function loadFullConfiguration(config) {
     initializeJsTree(ODSA.availableModules[config.lang].children, {}, function() {
-      console.log(config);
       $('#book-config-form')[0].reset();
       for (var key in config) {
         switch(key) {
@@ -940,6 +958,12 @@
           case 'dispModComp':
             $('#disp-mod-comp').prop('checked', config.dispModComp);
             break;
+          case 'tabbed_codeinc':
+            $('#tabbed-codeinc').prop('checked', config.tabbed_codeinc);
+            break;
+          case 'narration_enabled':
+            $('#narration-enabled').prop('checked', config.narration_enabled);
+            break;
           case 'glob_exer_options':
             setGlobExerOptions(config.glob_exer_options);
             break;
@@ -947,8 +971,7 @@
             config.chapters = convertChapters(config.chapters);
             break;
           default:
-            //
-            console.log(key + ' not supported by interface');
+            //console.log(key + ' not supported by interface');
         }
       }
       initializeJsTree(ODSA.availableModules[config.lang].children, config.chapters, function() {
@@ -1125,7 +1148,8 @@
   }
 
   function confirmLoad() {
-    return window.confirm('WARNING: any unsaved changes will be lost.');
+    if (!changesMade) return true;
+    return window.confirm('WARNING - any unsaved changes will be lost.');
   }
 
   function setBookId(id) {
@@ -1598,6 +1622,7 @@
         'core': {
           'check_callback': function (operation, node, node_parent, node_position, more) {
             // only allow deleting of nodes that were moved to the Included tree
+            changesMade = true;
             return operation === 'copy_node' ||
               (operation === 'delete_node' && node.original.included);
           },
@@ -1629,6 +1654,7 @@
       });
 
       $("#available-modules").bind('ready.jstree', function() {
+        var missingModules = [];
         if (chapters) {
           // we are loading an existing configuration
           for (var chapter in chapters) {
@@ -1641,6 +1667,7 @@
               var modNode = getAvailNode(modId);
               if (modNode === false) {
                 console.log('Could not find module with node id"' + modId + '"');
+                missingModules.push(mod);
                 continue;
               }
               addModule(modNode, chapterNode);
@@ -1656,7 +1683,7 @@
                 id = modNode.id + encodeId(id);
                 var childNode = getIncludedNode(id);
                 if (childNode === false) {
-                  console.log('Could not find item with node id"' + id + '"');
+                  //console.log('Could not find item with node id"' + id + '"');
                   continue;
                 }
                 options = cleanOptions(childNode, options);
@@ -1666,6 +1693,14 @@
                 }
               }
             }
+          }
+          if (missingModules.length > 0) {
+            var msg = 'WARNING - the following modules were listed in the configuration but do not exist on the OpenDSA server:\n';
+            for (var i = 0; i < missingModules.length; i++) {
+              msg += '\n\t- ' + missingModules[i];
+            }
+            msg += '\n\n These modules will be omitted.';
+            alert(msg);
           }
           if (callback) callback();
         }
@@ -1682,6 +1717,7 @@
         addModule(intro, preface);
         addModule(glossary, appendix);
         addModule(biblio, appendix);
+        changesMade = false;
       });
   }
 })();

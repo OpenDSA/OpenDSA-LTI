@@ -80,17 +80,12 @@
 
 .container
 
+  #instructions-link-container
+    Instructions/documentation for this interface can be found 
+    <a target="_blank" href="https://opendsa.readthedocs.io/en/latest/Configuration.html#book-configuration-gui">here</a>.
+
   %h2
     Load Existing Configuration (Optional)
-  .col-xs-12.row
-    %label.dialog-control-label.col-lg-3.col-sm-4{for: 'upload-config-file'}
-      Load Configuration File
-    .col-xs-4
-      %input.inline-input{type: 'file', id: 'upload-config-file', accept: '.json'}
-    %input.btn.btn-primary{type: 'button', id: 'config-file-load', value: 'Load', disabled: true}
-  .col-xs-12.row
-    .col-xs-offset-3.col-lg-offset-2
-      <b>- OR -</b>
   .col-xs-12.row
     %label.dialog-control-label.col-lg-3.col-sm-4{for: 'reference-config'}
       Select Reference Configuration
@@ -115,6 +110,15 @@
             - else
               #{md.title} (#{md.label}, #{md.course_number} #{md.term})
     %input.btn.btn-primary{type: 'button', id: 'user-config-load', value: 'Load', disabled: @book_metadata.length == 0}
+  .col-xs-12.row
+    .col-xs-offset-3.col-lg-offset-2
+      <b>- OR -</b>
+  .col-xs-12.row
+    %label.dialog-control-label.col-lg-3.col-sm-4{for: 'upload-config-file'}
+      Select Configuration File
+    .col-xs-4
+      %input.inline-input{type: 'file', id: 'upload-config-file', accept: '.json'}
+    %input.btn.btn-primary{type: 'button', id: 'config-file-load', value: 'Load', disabled: true}
 
   %h2
     Book Settings
@@ -271,60 +275,18 @@
           %input{type: "checkbox", name: "disp-mod-comp", id: "disp-mod-comp", checked: "checked"}
           %label{for: "disp-mod-comp"}
             Display Module Completion
+        .col-sm-6
+          %input{type: "checkbox", name: "tabbed-codeinc", id: "tabbed-codeinc", checked: "checked"}
+          %label{for: "tabbed-codeinc"}
+            Tabbed Code-include
+        .col-sm-6
+          %input{type: "checkbox", name: "narration-enabled", id: "narration-enabled", checked: "checked"}
+          %label{for: "narration-enabled"}
+            Narration Enabled
 
     %div{id: "book-content-container"}
       %h2
         Book Content
-      %ul
-        %li
-          First, select your language or load a configuration above.
-        %li
-          Books are organized into <i class="fa fa-folder-o"></i><i>chapters</i>, with each chapter containing
-          one or more <i class="fa fa-files-o"></i><i>modules</i>. You choose how to organize your desired
-          modules into chapters.
-        %li
-          A module may contain zero or more <i class="fa fa-file-o"></i><i>sections</i>, and
-          a section may contain zero or more <i>exercises</i> and/or <i>slideshows</i>.
-        %li
-          To <b>add a chapter</b> to your book, click the "+ Chapter" button and
-          enter a name for the chapter.
-        %li
-          To <b>remove a chapter</b> and all of its modules from your book, right click
-          on the <i class="fa fa-folder-o"></i>chapter, then click "Delete".
-        %li
-          To <b>add a module</b> to your book, click and drag a <i class="fa fa-files-o"></i>module from
-          the Available pane and drop it in the Included pane in the
-          desired <i class="fa fa-folder-o"></i>chapter. You can select
-          multiple modules by holding Ctrl (Mac: ⌘) and clicking on
-          the desired modules. To select multiple sequentially listed modules,
-          click on the first module, then hold Shift and click on the last
-          module.
-        %li
-          To <b>remove a module</b> from your book, right click on the <i class="fa fa-files-o"></i>module
-          in the Included pane, then click "Remove".
-        %li
-          <b>Reorder chapters and modules</b> in your book using drag-and-drop.
-          The order of the chapters and modules in the Included pane will be the
-          order of the chapters and modules in your book.
-        %li
-          To <b>override the global settings for an individual exercise</b>,
-          right click on the exercise, then click "Edit Settings".
-        %li
-          To <b>hide a <i class="fa fa-file-o"></i>section</b> in the book, right click on the section,
-          then click "Hide Section".
-        %li
-          When you are finished, you can:
-          %ol
-            %li 
-              Click "Save New Configuration" to save the configuration as a template book to the OpenDSA database. 
-              The book will then show up in the list of available books when creating a new course.
-            %li
-              If you have loaded one of your existing configurations you can click "Update Configuration".
-              You can then update your Canvas course by regenerating it. Note that using this option you should
-              only update the point values for exercises; adding and removing content is not supported.
-            %li
-              Click "Download Configuration" to download a json file containing the configuration.
-
       .col-xs-12.icon-legend
         %div
           <b>Icon Legend</b>
