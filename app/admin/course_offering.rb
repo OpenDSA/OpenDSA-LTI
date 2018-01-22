@@ -63,7 +63,7 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
     end
 
     column "Actions" do |course_offering|
-      message = course_offering_delete_msg(course_offering, 2)
+      message = course_offering_delete_msg(course_offering)
       links = ''.html_safe
       if authorized? :read, course_offering
         links += link_to "View", admin_course_offering_path(course_offering)

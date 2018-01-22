@@ -25,8 +25,9 @@ module ActiveAdmin
     end
 
 
-    def course_offering_delete_msg(course_offering, students_count)
+    def course_offering_delete_msg(course_offering)
       course_offering_name = course_offering.display_name
+      students_count = course_offering.students_count
       inst_book = InstBook.where(:course_offering_id => course_offering.id)
       lms_url = LmsInstance.where(:id => course_offering.lms_instance_id).first.url
 
@@ -36,7 +37,7 @@ module ActiveAdmin
         book_title = inst_book.title
         message2 = "The course contains '#{book_title}' book"
       end
-      message1 = "*** READ CAREFULLY ***\n\nYou are about to delete #{course_offering_name} course. The course is linked to '#{lms_url}' instance, it also has **#{students_count}** subscribed students!."
+      message1 = "*** READ CAREFULLY ***\n\nYou are about to delete #{course_offering_name} course. The course is linked to '#{lms_url}' instance, it also has ** #{students_count} ** subscribed students!."
       message3 = "\n\nAlso notice that deleting this course will erase **ALL** students interactions data and exercises progress information.\n\nAre you sure you want to proceed with the delete?"
       return message1 + message2 + message3
     end
