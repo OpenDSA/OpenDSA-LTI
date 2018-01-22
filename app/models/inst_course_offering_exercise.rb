@@ -3,6 +3,9 @@ class InstCourseOfferingExercise < ActiveRecord::Base
   #~ Relationships ............................................................
   belongs_to :course_offering, inverse_of: :inst_course_offering_exercises
   belongs_to :inst_exercise
+  has_many :odsa_user_interactions, dependent: :destroy
+  has_many :odsa_exercise_attempts, dependent: :destroy
+  has_many :odsa_exercise_progresses, dependent: :destroy
 
   #~ Validation ...............................................................
   #~ Constants ................................................................
