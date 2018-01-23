@@ -4,15 +4,20 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
   remove_filter :users, :late_policy, :course_enrollments, :inst_books, :self_enrollment_allowed, :cutoff_date, :lms_course_code
   # filter :course_organization_name, :as => :string
 
+  before_build do |record|
+    record.user = current_user
+  end
+
   menu parent: 'University-oriented', priority: 40
   permit_params :course_id, :term_id, :label, :url,
                 :archived, :self_enrollment_allowed,
                 :lms_instance_id, :lms_course_code, :lms_course_num,
                 inst_books_attributes: [ :id, :course_offering_id, :user_id, :title, :desc, :template, :_destroy ]
 
-  action_item only: [:edit] do
+  action_item only: [:edit] do |course_offering|
     if current_user.global_role.is_admin?
-      link_to "Delete", { action: :destroy }, method: :delete
+      message = course_offering_delete_msg(course_offering, 2)
+      link_to "Delete", { action: :destroy }, method: :delete, data: {confirm: message}
     end
   end
 
@@ -53,7 +58,28 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
     column :created_at
     # column :late_policy, sortable: 'late_policy.name'
     column :lms_instance, sortable: 'lms_instance.url'
-    actions
+    if current_user.global_role.is_admin?
+      column :students_count, sortable: 'students count'
+    end
+
+    column "Actions" do |course_offering|
+      message = course_offering_delete_msg(course_offering)
+      links = ''.html_safe
+      if authorized? :read, course_offering
+        links += link_to "View", admin_course_offering_path(course_offering)
+        links += ' '
+      end
+      if authorized? :update, course_offering
+        links += link_to "Edit", admin_course_offering_path(course_offering)
+        links += ' '
+      end
+      if authorized? :destroy, course_offering
+        links += link_to "Delete", admin_course_offering_path(course_offering), method: :delete, data: {confirm: message}
+        links += ' '
+      end
+
+      links
+    end
   end
 
   form do |f|

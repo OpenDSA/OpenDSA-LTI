@@ -14,10 +14,10 @@ class InstBook < ActiveRecord::Base
   belongs_to :user, inverse_of: :inst_books
   has_many :inst_chapters, dependent: :destroy
   has_many :inst_book_section_exercises, dependent: :destroy
-  has_many :odsa_user_interactions
-  has_many :odsa_book_progresses
-  has_many :odsa_module_progresses
-  has_many :odsa_exercise_attempts
+  has_many :odsa_user_interactions, dependent: :destroy
+  has_many :odsa_book_progresses, dependent: :destroy
+  has_many :odsa_module_progresses, dependent: :destroy
+  has_many :odsa_exercise_attempts, dependent: :destroy
 
   paginates_per 100
 
@@ -73,8 +73,8 @@ class InstBook < ActiveRecord::Base
       .joins("LEFT JOIN course_offerings ON course_offering_id = course_offerings.id")
       .joins("LEFT JOIN terms ON term_id = terms.id")
       .joins("LEFT JOIN courses ON course_id = courses.id")
-      .select('inst_books.id, inst_books.title, inst_books.created_at, 
-                inst_books.updated_at, inst_books.template, inst_books.desc, 
+      .select('inst_books.id, inst_books.title, inst_books.created_at,
+                inst_books.updated_at, inst_books.template, inst_books.desc,
                 inst_books.last_compiled, course_offering_id, label, courses.name AS course_name,
                 courses.number AS course_number, terms.slug AS term')
       .order('inst_books.template DESC, inst_books.title ASC, terms.starts_on ASC')
@@ -95,18 +95,18 @@ class InstBook < ActiveRecord::Base
           json.set! key, value
         end
       end
-      
+
       # chapters
       json.chapters do
         for inst_chapter in self.inst_chapters.order('position')
           chapter_name = inst_chapter.name
           # chapter object
-          json.set! chapter_name do      
+          json.set! chapter_name do
             for inst_chapter_module in inst_chapter.inst_chapter_modules.order('module_position')
               module_path = InstModule.where(:id => inst_chapter_module.inst_module_id).first.path
-      
+
               # module Object
-              json.set! module_path do      
+              json.set! module_path do
                 # sections
                 json.sections do
                   sections = inst_chapter_module.inst_sections
@@ -115,7 +115,7 @@ class InstBook < ActiveRecord::Base
                   else
                     for inst_section in inst_chapter_module.inst_sections
                       section_name = inst_section.name
-      
+
                      # section object
                       json.set! section_name do
                         json.set! :showsection, inst_section.show

@@ -106,7 +106,7 @@ class Ability
       can :manage, Course, user_id: user.id
       can :manage, CourseEnrollment, user_id: user.id
       # Everyone can upload and compile his book
-      can [:compile, :configure], InstBook
+      can [:compile, :configure, :configuration], InstBook
     end
 
   end
