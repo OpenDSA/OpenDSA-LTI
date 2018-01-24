@@ -26,10 +26,10 @@
   %td
     - if inst_book.last_compiled == nil
       - btn_label = "Generate Canvas Course"
-      - confirm_msg = "This process will generate OpenDSA contents in the Canvas course. Do you want to continue?"
+      - confirm_msg = "This process will use your book configuration to generate assignments and modules in your Canvas course. Do you want to continue?"
     - else
       - btn_label = "Re-generate Canvas Course"
-      - confirm_msg = 'Re-generating Canvas course will override due dates and number of points of all the assignments. Do you want to continue?'
+      - confirm_msg = 'Re-generating the Canvas course will override due dates and number of points for all the assignments. If you have updated the book configuration for your course offering to include additional chapters and modules, these will be added to your Canvas course. Do you want to continue?'
 
     - form_name = 'generate_course_' + inst_book.id.to_s
     = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=generate_course', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'generate_course'; return true;" do
@@ -43,13 +43,13 @@
               %p.lead Generate Canvas Course
             .modal-body
               %p
-                When you click this button OpenDSA book will be compiled into Canvas course.
-                If this is the first time to generate the course, all OpenDSA chapters and modules
-                will be created in the course. In case OpenDSA was already compiled, this process
-                will only update the assignments points and due dates.
-  - if inst_book.last_compiled != nil and current_user.global_role.is_admin?
+                When you click this button the OpenDSA book will be used to genrate assignments and modules in your Canvas course.
+                If this is the first time the course is being generated, all OpenDSA chapters and modules
+                will be created in the course. If you are re-generating the Canvas course, this process
+                will update the assignments points and due dates as well as create new Canvas assignments
+                and modules for any new chapters and modules added to your course offering's OpenDSA book configuration.
+  - if inst_book.last_compiled != nil and (current_user.global_role.is_admin? || current_user.id == inst_book.user_id)
     %td
       - form_name = 'compile_book_' + inst_book.id.to_s
       = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=compile_book', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
-        = submit_tag "Compile Book", name: form_name, class: "btn btn-primary", title: 'Compile book confirmation.', data: {confirm: "Book compilaiton process will recreate the book pages on OpenDSA server. Assignments due dates and points in Canvas course won't be affected by this action. Do you want to continue?"}
-
+        = submit_tag "Compile Book", name: form_name, class: "btn btn-primary", title: 'Compile book confirmation.', data: {confirm: "The book compilation process will regenerate the book pages on the OpenDSA server. Assignments due dates and points in Canvas course won't be affected by this action. Do you want to continue?"}
