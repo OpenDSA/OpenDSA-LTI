@@ -155,7 +155,7 @@ class LtiController < ApplicationController
       end
       render :json => { :message => 'failure', :res => res.to_json }.to_json, :status => :bad_request
       error = Error.new(:class_name => 'post_replace_result_fail', 
-          :message => res.inspect, :params => lti_param.to_s)
+          :message => res.inspect, :params => request_params.to_s)
       error.save!
     end
   end
