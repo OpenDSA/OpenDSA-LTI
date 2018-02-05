@@ -180,12 +180,21 @@ class LtiController < ApplicationController
   end
 
   def resource
-    lms_type = params[:tool_consumer_info_product_family_code].downcase
-    unless lms_type == 'canvas'
-      @message = "#{lms_type} is not supported"
-      render('error') and return
-    end
+    # must include the oauth proxy object
+    require 'oauth/request_proxy/rack_request'
+    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
 
+    render('error') and return unless lti_authorize!
+
+    @user = User.where(email: params[:lis_person_contact_email_primary]).first
+    if @user.blank? || !@user.global_role.is_instructor_or_admin?
+      @message = 'The email of your LMS account does not match an OpenDSA instructor account.'
+      render 'error', layout: 'lti_resource'
+      return   
+    end
+    sign_in @user
+
+    lms_type = params[:tool_consumer_info_product_family_code].downcase
     lms_instance = ensure_lms_instance()
     @lms_course_num = params[:custom_canvas_course_id]
     @lms_course_code = params[:context_label]
@@ -200,15 +209,6 @@ class LtiController < ApplicationController
     end
     
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
-
-    # must include the oauth proxy object
-    require 'oauth/request_proxy/rack_request'
-    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
-
-    render('error') and return unless lti_authorize!
-
-    @user = User.where(email: params[:lis_person_contact_email_primary]).first
-    sign_in @user
 
     require 'RST/rst_parser'
     exercises = RstParser.get_exercise_info()
@@ -269,7 +269,10 @@ class LtiController < ApplicationController
     end
 
     def lti_authorize!
-      if key = params['oauth_consumer_key']
+      if $oauth_creds.blank?
+        render("No OAuth credentials found")
+        return false
+      elsif key = params['oauth_consumer_key']
         if secret = $oauth_creds[key]
           @tp = IMS::LTI::ToolProvider.new(key, secret, params)
         else

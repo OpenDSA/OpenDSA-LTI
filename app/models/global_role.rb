@@ -85,4 +85,8 @@ class GlobalRole < ActiveRecord::Base
     id == REGULAR_USER_ID
   end
 
+  def is_instructor_or_admin?
+    return id == ADMINISTRATOR_ID || id == INSTRUCTOR_ID
+  end
+
 end
