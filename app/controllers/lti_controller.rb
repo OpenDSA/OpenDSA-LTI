@@ -16,9 +16,8 @@ class LtiController < ApplicationController
     $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
-    # TODO: get user info from @tp object
-    # register the user if he is not yet registered.
-    ensure_user()
+    render('error') and return unless ensure_user()
+
     lti_enroll(@course_offering)
 
     # I change this to be custom intanbook id becuase it is not working on mine yet
@@ -180,6 +179,20 @@ class LtiController < ApplicationController
   end
 
   def resource
+    # must include the oauth proxy object
+    require 'oauth/request_proxy/rack_request'
+    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+
+    render('error') and return unless lti_authorize!
+
+    @user = User.where(email: params[:lis_person_contact_email_primary]).first
+    if @user.blank? || !@user.global_role.is_instructor_or_admin?
+      @message = 'The email of your LMS account does not match an OpenDSA instructor account.'
+      render 'error', layout: 'lti_resource'
+      return
+    end
+    sign_in @user
+
     lms_type = ensure_lms_type(params[:tool_consumer_info_product_family_code])
     @deep_linking = lms_type.name.downcase != 'canvas'
     lms_instance = ensure_lms_instance()
@@ -200,15 +213,6 @@ class LtiController < ApplicationController
     
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
-    # must include the oauth proxy object
-    require 'oauth/request_proxy/rack_request'
-    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
-
-    render('error') and return unless lti_authorize!
-
-    @user = User.where(email: params[:oauth_consumer_key]).first
-    sign_in @user
-
     require 'RST/rst_parser'
     exercises = RstParser.get_exercise_info()
 
@@ -228,7 +232,7 @@ class LtiController < ApplicationController
       ).first
 
       render('error') and return unless lti_authorize!
-      ensure_user()
+      render('error') and return unless ensure_user()
       lti_enroll(course_offering)
 
       require 'RST/rst_parser'
@@ -268,7 +272,10 @@ class LtiController < ApplicationController
     end
 
     def lti_authorize!
-      if key = params['oauth_consumer_key']
+      if $oauth_creds.blank?
+        @message = "No OAuth credentials found"
+        return false
+      elsif key = params['oauth_consumer_key']
         if secret = $oauth_creds[key]
           @tp = IMS::LTI::ToolProvider.new(key, secret, params)
         else
@@ -279,7 +286,7 @@ class LtiController < ApplicationController
           return false
         end
       else
-        render("No consumer key")
+        @message = "No consumer key"
         return false
       end
 
@@ -370,6 +377,10 @@ class LtiController < ApplicationController
 
     def ensure_user
       email = params[:lis_person_contact_email_primary]
+      if email.blank?
+        @message = 'The launch request must include an email address.'
+        return false
+      end
       @user = User.where(email: email).first
       if @user.blank?
         # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
@@ -380,7 +391,14 @@ class LtiController < ApplicationController
                          :last_name => params[:lis_person_name_family])
         @user.save
       end
-      sign_in @user
+      successful = sign_in @user
+      unless successful
+        @message = 'OpenDSA sign-in failed'
+        error = Error.new(:class_name => 'user_sign_in_fail', 
+          :message => "Failed to sign in user #{email}", :params => params.to_s)
+        error.save!
+      end
+      return successful
     end
 
     def get_lms_course_num(lms_type)
