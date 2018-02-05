@@ -16,9 +16,8 @@ class LtiController < ApplicationController
     $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
-    # TODO: get user info from @tp object
-    # register the user if he is not yet registered.
-    ensure_user()
+    render('error') and return unless ensure_user()
+
     lti_enroll(@course_offering)
 
     # I change this to be custom intanbook id becuase it is not working on mine yet
@@ -229,7 +228,7 @@ class LtiController < ApplicationController
       ).first
 
       render('error') and return unless lti_authorize!
-      ensure_user()
+      render('error') and return unless ensure_user()
       lti_enroll(course_offering)
 
       require 'RST/rst_parser'
@@ -270,7 +269,7 @@ class LtiController < ApplicationController
 
     def lti_authorize!
       if $oauth_creds.blank?
-        render("No OAuth credentials found")
+        @message = "No OAuth credentials found"
         return false
       elsif key = params['oauth_consumer_key']
         if secret = $oauth_creds[key]
@@ -283,7 +282,7 @@ class LtiController < ApplicationController
           return false
         end
       else
-        render("No consumer key")
+        @message = "No consumer key"
         return false
       end
 
@@ -362,6 +361,10 @@ class LtiController < ApplicationController
 
     def ensure_user
       email = params[:lis_person_contact_email_primary]
+      if email.blank?
+        @message = 'The launch request must include an email address.'
+        return false
+      end
       @user = User.where(email: email).first
       if @user.blank?
         # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
@@ -372,7 +375,14 @@ class LtiController < ApplicationController
                          :last_name => params[:lis_person_name_family])
         @user.save
       end
-      sign_in @user
+      successful = sign_in @user
+      unless successful
+        @message = 'OpenDSA sign-in failed'
+        error = Error.new(:class_name => 'user_sign_in_fail', 
+          :message => "Failed to sign in user #{email}", :params => params.to_s)
+        error.save!
+      end
+      return successful
     end
 
 end
