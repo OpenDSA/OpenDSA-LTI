@@ -33,10 +33,10 @@ class LtiController < ApplicationController
       #puts "helloo"
       @student_list = @student_list.sort_by &:first_name
       end
-      
+
       @course_id =  @course_offering.id
       @instBook = @course_offering.odsa_books.first
-      
+
       @exercise_list = Hash.new{|hsh,key| hsh[key] = []}
 
       chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
@@ -86,7 +86,7 @@ class LtiController < ApplicationController
 
     if hasBook
       inst_section = InstSection.find_by(id: request_params['instSectionId'])
-      
+
       @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
                                   request_params['instBookSectionExerciseId'], current_user.id).select(
                                   "id, user_id, question_name, request_type,
@@ -153,7 +153,7 @@ class LtiController < ApplicationController
         inst_section.save!
       end
       render :json => { :message => 'failure', :res => res.to_json }.to_json, :status => :bad_request
-      error = Error.new(:class_name => 'post_replace_result_fail', 
+      error = Error.new(:class_name => 'post_replace_result_fail',
           :message => res.inspect, :params => request_params.to_s)
       error.save!
     end
@@ -189,7 +189,7 @@ class LtiController < ApplicationController
     if @user.blank? || !@user.global_role.is_instructor_or_admin?
       @message = 'The email of your LMS account does not match an OpenDSA instructor account.'
       render 'error', layout: 'lti_resource'
-      return   
+      return
     end
     sign_in @user
 
@@ -206,7 +206,7 @@ class LtiController < ApplicationController
       end
       @terms = Term.on_or_future.order(:starts_on)
     end
-    
+
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
     require 'RST/rst_parser'
@@ -223,7 +223,7 @@ class LtiController < ApplicationController
       require 'oauth/request_proxy/rack_request'
       $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
       course_offering = CourseOffering.joins(:lms_instance).where(
-        lms_instances: {url: params[:custom_canvas_api_base_url]}, 
+        lms_instances: {url: params[:custom_canvas_api_base_url]},
         course_offerings: {lms_course_num: params[:custom_canvas_course_id]}
       ).first
 
@@ -234,7 +234,7 @@ class LtiController < ApplicationController
       require 'RST/rst_parser'
       @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
       @course_off_ex = InstCourseOfferingExercise.find_by(
-        course_offering_id: course_offering.id, 
+        course_offering_id: course_offering.id,
         resource_link_id: params[:resource_link_id]
       )
       if @course_off_ex.blank?
@@ -318,13 +318,13 @@ class LtiController < ApplicationController
     end
 
     def ensure_course_offering(lms_instance_id, organization_id, lms_course_num, lms_course_code, course_name)
-      course_offering = CourseOffering.find_by(lms_instance_id: lms_instance_id, 
+      course_offering = CourseOffering.find_by(lms_instance_id: lms_instance_id,
                                                lms_course_num: lms_course_num)
       if course_offering.blank?
         if organization_id.blank?
           return nil
         end
-        course = Course.where(number: lms_course_code, 
+        course = Course.where(number: lms_course_code,
           organization_id: organization_id).first
         if course.blank?
           course = Course.new(
@@ -363,7 +363,10 @@ class LtiController < ApplicationController
       email = params[:lis_person_contact_email_primary]
       if email.blank?
         @message = 'The launch request must include an email address.'
-        return false
+        error = Error.new(:class_name => 'lti_launch_email_missing',
+          :message => "LTI launch request missing email parameter", :params => params.to_s)
+        error.save!
+        #return false
       end
       @user = User.where(email: email).first
       if @user.blank?
@@ -378,11 +381,11 @@ class LtiController < ApplicationController
       successful = sign_in @user
       unless successful
         @message = 'OpenDSA sign-in failed'
-        error = Error.new(:class_name => 'user_sign_in_fail', 
+        error = Error.new(:class_name => 'user_sign_in_fail',
           :message => "Failed to sign in user #{email}", :params => params.to_s)
         error.save!
       end
-      return successful
+      return true #successful
     end
 
 end
