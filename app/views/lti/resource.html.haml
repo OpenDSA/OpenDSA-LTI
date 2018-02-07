@@ -14,6 +14,10 @@
     }
   };
   window.course_offering_id = #{@course_offering.blank? ? 'undefined' : @course_offering.id};
+  window.content_item_params = {
+    oauth_consumer_key: "#{params[:oauth_consumer_key]}",
+    content_item_return_url: "#{params[:content_item_return_url]}"
+  };
 
 .row
   .col-xs-9.alert-msg#alert-box{style: 'display: none;'}
@@ -90,15 +94,14 @@
 
 - if @deep_linking
   %form{action: "#{params[:content_item_return_url]}", method: "post", encType: "application/x-www-form-urlencoded", id: "return_form"}
-    %input{type: "hidden", name: "lti_message_type", value: "ContentItemSelection"}
-    %input{type: "hidden", name: "lti_version", value: "#{params[:lti_version]}"}
+    %input{type: "hidden", name: "lti_message_type", value: ""}
+    %input{type: "hidden", name: "lti_version", value: ""}
     %input{type: "hidden", name: "content_items", value: "", id: 'content_items'}
     - if !params[:data].blank?
       %input{type: "hidden", name: "data", value: "#{params[:data]}"}
-    %input{type: "hidden", name: "oauth_version", value: "#{params[:oauth_version]}"}
-    %input{type: "hidden", name: "oauth_nonce", value: "#{params[:oauth_nonce]}"}
-    %input{type: "hidden", name: "oauth_timestamp", value: "#{params[:oauth_timestamp]}"}
-    %input{type: "hidden", name: "oauth_consumer_key", value: "#{params[:oauth_consumer_key]}"}
-    %input{type: "hidden", name: "oauth_callback", value: "about:blank"}
-    %input{type: "hidden", name: "oauth_signature_method", value: "#{params[:oauth_signature_method]}"}
-    %input{type: "hidden", name: "oauth_signature", value: "#{params[:oauth_signature]}"}
+    %input{type: "hidden", name: "oauth_version", value: ""}
+    %input{type: "hidden", name: "oauth_nonce", value: ""}
+    %input{type: "hidden", name: "oauth_timestamp", value: ""}
+    %input{type: "hidden", name: "oauth_consumer_key", value: ""}
+    %input{type: "hidden", name: "oauth_signature_method", value: ""}
+    %input{type: "hidden", name: "oauth_signature", value: ""}

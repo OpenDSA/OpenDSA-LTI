@@ -185,18 +185,24 @@ class LtiController < ApplicationController
 
     render('error') and return unless lti_authorize!
 
-    @user = User.where(email: params[:lis_person_contact_email_primary]).first
+    lms_type = ensure_lms_type(params[:tool_consumer_info_product_family_code])
+    if lms_type.blank?
+      @message = 'OpenDSA requires that the request include the "tool_consumer_info_product_family_code" parameter'
+      render 'error'
+      return
+    end
+
+    @user = User.where(email: get_email(lms_type.name)).first
     if @user.blank? || !@user.global_role.is_instructor_or_admin?
       @message = 'The email of your LMS account does not match an OpenDSA instructor account.'
-      render 'error', layout: 'lti_resource'
+      render 'error'
       return
     end
     sign_in @user
 
-    lms_type = ensure_lms_type(params[:tool_consumer_info_product_family_code])
     @deep_linking = lms_type.name.downcase != 'canvas'
     lms_instance = ensure_lms_instance()
-    @lms_course_num = get_lms_course_num(lms_type.name)
+    @lms_course_num = get_lms_course_num(lms_type.name, lms_instance)
     @lms_course_code = params[:context_label]
     @lms_instance_id = lms_instance.id
     @organization_id = lms_instance.organization_id
@@ -213,7 +219,7 @@ class LtiController < ApplicationController
 
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
 
-    require 'RST/rst_parser'
+    require 'rst/rst_parser'
     exercises = RstParser.get_exercise_info()
 
     @json = exercises.to_json()
@@ -221,21 +227,46 @@ class LtiController < ApplicationController
     render layout: 'lti_resource'
   end
 
+  def content_item_selection
+    if !user_signed_in? || !current_user.global_role.is_instructor_or_admin?
+      render :json => { :status => 'fail', :message => 'You must be signed in as an instructor.' }.to_json, 
+        :status => :unauthorized
+      return
+    end
+
+    consumer_key = params['oauth_consumer_key']
+    $oauth_creds = LmsAccess.get_oauth_creds(consumer_key)
+    consumer_secret = $oauth_creds[consumer_key]
+    return_url = params[:content_item_return_url]
+
+    content_item_params = {}
+    content_item_params["lti_message_type"] = 'ContentItemSelection'
+    content_item_params["lti_version"] = "LTI-1p0"
+    content_item_params["content_items"] = params[:content_items]
+
+    require 'lti/oauth'
+    oauth_info = OAuth.generate_oauth_params(consumer_key, consumer_secret, return_url,
+      content_item_params)
+
+    render :json => oauth_info.to_json, :status => :ok
+  end
+
   private
 
     def launch_ex
       require 'oauth/request_proxy/rack_request'
       $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
-      course_offering = CourseOffering.joins(:lms_instance).where(
-        lms_instances: {url: params[:custom_canvas_api_base_url]},
-        course_offerings: {lms_course_num: params[:custom_canvas_course_id]}
-      ).first
+      lms_instance = ensure_lms_instance()
+      lms_type_name = params[:tool_consumer_info_product_family_code].downcase
+      lms_course_num = get_lms_course_num(lms_type_name, lms_instance)
+      course_offering = CourseOffering.where(lms_course_num: lms_course_num,
+        lms_instance_id: lms_instance.id).first
 
       render('error') and return unless lti_authorize!
       render('error') and return unless ensure_user()
       lti_enroll(course_offering)
 
-      require 'RST/rst_parser'
+      require 'rst/rst_parser'
       @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
       @course_off_ex = InstCourseOfferingExercise.find_by(
         course_offering_id: course_offering.id,
@@ -404,11 +435,20 @@ class LtiController < ApplicationController
       return true #successful
     end
 
-    def get_lms_course_num(lms_type)
-      if (lms_type.downcase == 'canvas')
+    def get_lms_course_num(lms_type_name, lms_instance)
+      if (lms_type_name.downcase == 'canvas')
         return params[:custom_canvas_course_id]
       else
-        return "#{lms_type}_#{params[:context_label]}_#{params[:oauth_consumer_key]}"
+        # generate a somewhat unique string to use as the course id
+        return "#{lms_type_name}_#{lms_instance.id}_#{params[:context_label]}_#{params[:oauth_consumer_key]}"
+      end
+    end
+
+    def get_email(lms_type)
+      if params.key?(:lis_person_contact_email_primary)
+        return params[:lis_person_contact_email_primary]
+      else
+        return params[:oauth_consumer_key]
       end
     end
 
