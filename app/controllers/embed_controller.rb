@@ -17,7 +17,7 @@ class EmbedController < ApplicationController
             render 'lti/error' and return
         end
         if @ex.instance_of?(AvEmbed)
-            redirect_to "#{request.protocol}#{request.host_with_port}#{ex.av_address}"
+            redirect_to "#{request.protocol}#{request.host_with_port}#{@ex.av_address}"
         else
             render 'embed_inlineav', layout: 'embed_inlineav'
         end
