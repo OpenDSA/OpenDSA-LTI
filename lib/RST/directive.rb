@@ -12,6 +12,13 @@ class Directive
     @mod_name = mod_name
   end
 
+  def display_name
+    if @long_name == @short_name
+      return @long_name
+    end
+    return "#{@long_name} (#{@short_name})"
+  end
+
   def to_json(arg)
     return %{"short_name": "#{@short_name}","long_name": "#{@long_name}"}
   end

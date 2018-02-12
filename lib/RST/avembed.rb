@@ -25,4 +25,12 @@ class AvEmbed < Directive
       @threshold = 1
     end
   end
+
+  def embed_url(host)
+    return "#{host}#{@av_address}"
+  end
+
+  def embed_code(host)
+    return "<iframe src=\"#{embed_url(host)}\" height=\"#{@height}\" width=\"#{@width}\"></iframe>"
+  end
 end

@@ -1,0 +1,22 @@
+.panel-group{id: "accordion"}
+    - i = 0
+    - j = 0
+    - @folders.each do |fname, mods|
+        - i += 1
+        .panel.panel-default
+            .panel-heading
+                .panel-title
+                    %a{"data-toggle": "collapse", "data-parent": "#accordion", href: "##{i}_collapse"}
+                        #{fname}
+        .panel-collapse.collapse{id: "#{i}_collapse"}
+            .panel-body
+                - mods.each do |mod_name, exs|
+                    - exs.each do |ex|
+                        - j += 1
+                        %div
+                            %a{href: ex.embed_url(@host_url), target: "_blank"}
+                                #{ex.long_name}
+                        .col-xs-6
+                            %input.form-control{:type => "text", :value => ex.embed_code(@host_url), :readonly => "readonly", id: "embedcode_#{j}"}
+                        %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{j}", :type => "button"}
+                            = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")

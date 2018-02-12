@@ -150,6 +150,9 @@ CodeWorkout::Application.routes.draw do
     # get 'performance' => :calc_performance, as: :calc_performance
   end
 
+  get '/embed' => 'embed#index', as: :embed_index
+  get '/embed/:ex_short_name' => 'embed#show', as: :show_exercise
+
   devise_for :users,
     controllers: {omniauth_callbacks: 'users/omniauth_callbacks', registrations: "registrations" },
     skip: [:registrations, :sessions]

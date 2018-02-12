@@ -19,4 +19,13 @@ class InlineAv < Directive
     @required = true
     @output = 'show'
   end
+
+  def embed_url(host)
+    return "#{host}/embed/#{@short_name}"
+  end
+
+  def embed_code(host)
+    url = "#{host}/embed/#{@short_name}"
+    return "<iframe src=\"#{url}\" height=\"600\" width=\"100%\"></iframe>"
+  end
 end
