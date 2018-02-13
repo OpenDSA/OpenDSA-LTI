@@ -151,7 +151,8 @@ CodeWorkout::Application.routes.draw do
   end
 
   get '/embed' => 'embed#index', as: :embed_index
-  get '/embed/:ex_short_name' => 'embed#show', as: :show_exercise
+  get '/embed/:ex_short_name' => 'embed#show', as: :embed_show
+  get '/SourceCode/*all' => 'embed#source_code_redirect'
 
   devise_for :users,
     controllers: {omniauth_callbacks: 'users/omniauth_callbacks', registrations: "registrations" },
