@@ -40,6 +40,41 @@ https://github.com/OpenDSA/OpenDSA-DevStack</a>.
     You will use this ID later.
 
   %li
+    Next you will need to generate a Canvas API access token. OpenDSA will 
+    need this token to access the Canvas API through your account in order to add the 
+    materials for your book to your Canvas course.
+    %ol{type: "a"}
+      %li 
+        On your institution's Canvas site, click "Account" on the left-hand sidebar,
+        then click "Settings". 
+      %li 
+        Scroll down to "Approved Integrations" and click
+        "New Access Token". 
+      %li
+        For purpose, enter "OpenDSA". You can enter an
+        expiration date for the token, or leave it blank so the token never
+        expires. 
+      %li 
+        Click "Generate Token", then copy the entire token string.
+
+  %li
+    Now you need to save your Canvas access token in OpenDSA.
+    %ol{type: "a"}
+      %li 
+        On the OpenDSA website, click the wrench icon in the top right
+        to go to the administrative dashboard.
+      %li 
+        Click the "LMS config" dropdown menu at the top, then click "LMS Accesses".
+      %li  
+        If you already see a record for your LMS instance listed, click its edit link.
+        Otherwise, click "New Lms Access" in the top right. 
+      %li 
+        Select your LMS instance, then paste your Canvas Access Token in the field
+        labeled "Access Token".
+      %li
+        Click "Create Lms Access" or "Update Lms Access".
+
+  %li
     Click the "Course" button at the top of this page,
     then click "Create new course".
     This will take you to a simple form that asks for the necessary
