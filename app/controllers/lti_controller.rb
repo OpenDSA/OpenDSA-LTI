@@ -233,7 +233,7 @@ class LtiController < ApplicationController
 
     host = request.scheme + "://" + request.host_with_port
 
-    @launch_url = 'https://codeworkout.cs.vt.edu/lti/launch?custom_course_name=My test course&custom_course_number=CSTest&custom_label=cse test 3&custom_term=spring-2018'
+    @launch_url = 'https://ltitest.cs.vt.edu:9200/lti/launch?custom_course_name=My test course&custom_course_number=CSTest&custom_label=cse test 3&custom_term=spring-2018'
     launch_params = {}
     launch_params["launch_url"] = @launch_url
     launch_params["context_label"] = "OpenDSA-LTI"
@@ -244,12 +244,13 @@ class LtiController < ApplicationController
     launch_params["lti_message_type"] = "basic-lti-launch-request"
     launch_params["lti_version"] = "LTI-1p0"
     launch_params["resource_link_id"] = "4a67f91a7137b4db3edc1af746302016786123e6"
-    launch_params["resource_link_title"] = "07.06.02+-+Binary+Tree+Set+Depth+Exercise"
+    launch_params["resource_link_title"] = "Factorial 1"
     launch_params["tool_consumer_info_product_family_code"] = "opendsa"
     launch_params["user_id"] = "133859a0c48cc4f33a5ae38cae2bfc930c643113"
     launch_params["lis_person_name_given"] = current_user.first_name
     launch_params["lis_person_name_family"] = current_user.last_name
     launch_params["lis_person_contact_email_primary"] = current_user.email
+    launch_params["ext_lti_assignment_id"] = "df82b5a5-6cfb-4617-ac67-0d1324e7cb85"
     #launch_params["roles"] = "Instructor"
 
     @tc = IMS::LTI::ToolConsumer.new(tool.key, tool.secret, launch_params)
