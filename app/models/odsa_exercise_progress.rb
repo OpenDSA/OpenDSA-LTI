@@ -8,12 +8,12 @@ class OdsaExerciseProgress < ActiveRecord::Base
   validate :required_fields
 
   def required_fields
-    if not (inst_book_section_exercise_id.present? or inst_course_offering_exercise_id.present?)
+    if not(inst_book_section_exercise_id.present? or inst_course_offering_exercise_id.present?)
       errors.add(:inst_book_section_exercise_id, "or inst_course_offering_exercise_id must be present")
       errors.add(:inst_course_offering_exercise_id, "or inst_book_section_exercise_id must be present")
     end
   end
-  
+
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   after_initialize :set_defaults, unless: :persisted?
@@ -25,7 +25,25 @@ class OdsaExerciseProgress < ActiveRecord::Base
     self.total_correct ||= 0
     self.total_worth_credit ||= 0
   end
+
+  # update the current_score and highest_score
+  def update_score(new_score)
+    self.current_score = score
+    now = DateTime.now
+    if score > self.highest_score
+      self.highest_score = score
+      if score == 100
+        self.proficient_date = now
+      end
+    end
+    self.first_done ||= now
+    self.last_done = now
+  end
+
+  def proficient?
+    return self.proficient_date.year > 0
+  end
+
   #~ Private instance methods .................................................
 
 end
-

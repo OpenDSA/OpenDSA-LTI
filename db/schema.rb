@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027162724) do
+ActiveRecord::Schema.define(version: 20180321170745) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -51,13 +51,13 @@ ActiveRecord::Schema.define(version: 20171027162724) do
     t.integer  "late_policy_id"
     t.integer  "lms_instance_id",                         null: false
     t.string   "lms_course_code"
-    t.integer  "lms_course_num",                          null: false
+    t.string   "lms_course_num",                          null: false
     t.boolean  "archived",                default: false
   end
 
   add_index "course_offerings", ["course_id"], name: "index_course_offerings_on_course_id", using: :btree
   add_index "course_offerings", ["late_policy_id"], name: "course_offerings_late_policy_id_fk", using: :btree
-  add_index "course_offerings", ["lms_instance_id"], name: "course_offerings_lms_instance_id_fk", using: :btree
+  add_index "course_offerings", ["lms_instance_id", "lms_course_num"], name: "index_course_offerings_on_lms_instance_id_and_lms_course_num", using: :btree
   add_index "course_offerings", ["term_id"], name: "index_course_offerings_on_term_id", using: :btree
 
   create_table "course_roles", force: true do |t|
@@ -224,11 +224,12 @@ ActiveRecord::Schema.define(version: 20171027162724) do
 
   create_table "inst_exercises", force: true do |t|
     t.string   "name"
-    t.string   "short_name",             null: false
-    t.string   "ex_type",     limit: 50
+    t.string   "short_name",               null: false
+    t.string   "ex_type",       limit: 50
     t.string   "description"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "learning_tool"
   end
 
   add_index "inst_exercises", ["short_name"], name: "index_inst_exercises_on_short_name", unique: true, using: :btree
@@ -405,19 +406,25 @@ ActiveRecord::Schema.define(version: 20171027162724) do
   add_index "odsa_exercise_progresses", ["user_id", "inst_book_section_exercise_id"], name: "index_odsa_ex_prog_on_user_id_and_inst_bk_sec_ex_id", unique: true, using: :btree
 
   create_table "odsa_module_progresses", force: true do |t|
-    t.integer  "user_id",                null: false
-    t.integer  "inst_book_id",           null: false
-    t.datetime "first_done",             null: false
-    t.datetime "last_done",              null: false
-    t.datetime "proficient_date",        null: false
+    t.integer  "user_id",                            null: false
+    t.integer  "inst_book_id",                       null: false
+    t.datetime "first_done",                         null: false
+    t.datetime "last_done",                          null: false
+    t.datetime "proficient_date",                    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "inst_chapter_module_id"
+    t.string   "lis_outcome_service_url"
+    t.string   "lis_result_sourcedid"
+    t.float    "current_score",           limit: 24, null: false
+    t.float    "highest_score",           limit: 24, null: false
+    t.integer  "lms_access_id"
   end
 
   add_index "odsa_module_progresses", ["inst_book_id"], name: "odsa_module_progresses_inst_book_id_fk", using: :btree
   add_index "odsa_module_progresses", ["inst_chapter_module_id"], name: "odsa_module_progresses_inst_chapter_module_id_fk", using: :btree
-  add_index "odsa_module_progresses", ["user_id"], name: "odsa_module_progresses_user_id_fk", using: :btree
+  add_index "odsa_module_progresses", ["lms_access_id"], name: "odsa_module_progresses_lms_access_id_fk", using: :btree
+  add_index "odsa_module_progresses", ["user_id", "inst_chapter_module_id"], name: "index_odsa_module_progress_on_user_and_module", unique: true, using: :btree
 
   create_table "odsa_student_extensions", force: true do |t|
     t.integer  "user_id"
@@ -575,6 +582,7 @@ ActiveRecord::Schema.define(version: 20171027162724) do
 
   add_foreign_key "odsa_module_progresses", "inst_books", name: "odsa_module_progresses_inst_book_id_fk"
   add_foreign_key "odsa_module_progresses", "inst_chapter_modules", name: "odsa_module_progresses_inst_chapter_module_id_fk"
+  add_foreign_key "odsa_module_progresses", "lms_accesses", name: "odsa_module_progresses_lms_access_id_fk"
   add_foreign_key "odsa_module_progresses", "users", name: "odsa_module_progresses_user_id_fk"
 
   add_foreign_key "odsa_student_extensions", "inst_sections", name: "odsa_student_extensions_inst_section_id_fk"

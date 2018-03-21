@@ -9,7 +9,7 @@ CodeWorkout::Application.routes.draw do
   post 'lti/course_offering', to: 'lti#create_course_offering', as: :lti_course_offering
   get 'lti/extrtool_launch_test', to: 'lti#extrtool_launch_test', as: :lti_launch_extrtool_test
   get 'lti/extrtool_launch', to: 'lti#extrtool_launch', as: :lti_launch_extrtool
-  post 'lti/grade_passback', to: 'lti#grade_passback', as: :lti_grade_passback
+  post 'lti/outcomes', to: 'lti#grade_passback', as: :lti_grade_passback
 
   resources :odsa_user_interactions
   resources :odsa_exercise_attempts

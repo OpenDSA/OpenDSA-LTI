@@ -37,6 +37,19 @@ class InstChapterModule < ActiveRecord::Base
     return exercises_list
   end
 
+  # get all of the inst_book_section_exercise instances associated with this module
+  def get_bk_sec_exercises()
+    InstBookSectionExercise.includes(:inst_exercise)
+      .joins(:inst_section)
+      .where(inst_section: {inst_chapter_module_id: self.id})
+  end
+
+  # get all exercise progresses for the exercises in this module for the specified user
+  def get_exercise_progresses(user_id)
+    OdsaExerciseProgress.joins(inst_book_section_exercise: [:inst_section])
+      .where(inst_sections: {inst_chapter_module_id: self.id}, user_id: user_id)
+  end
+
   def total_points
     total_points = 0
     inst_sections.each do |inst_section|
@@ -48,7 +61,6 @@ class InstChapterModule < ActiveRecord::Base
     end
     return total_points
   end
-
 
   #~ Private instance methods .................................................
 end

@@ -55,5 +55,13 @@ class OdsaBookProgress < ActiveRecord::Base
     return self.proficient_exercises.split(',')
   end
 
+  def self.get_progress(user_id, inst_book_id)
+    unless book_progress = OdsaBookProgress.find_by(user_id: user_id, inst_book_id: inst_book_id)
+      book_progress = OdsaBookProgress.new(user_id: user_id, inst_book_id: inst_book_id)
+      book_progress.save!
+    end
+    book_progress
+  end
+
   #~ Private instance methods .................................................
 end

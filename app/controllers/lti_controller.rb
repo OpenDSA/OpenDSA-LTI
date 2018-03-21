@@ -1,13 +1,16 @@
 class LtiController < ApplicationController
   layout 'lti', only: [:launch]
 
-  after_action :allow_iframe, only: [:launch, :resource]
+  after_action :allow_iframe, only: [:launch, :resource, :extrtool_launch]
   # the consumer keys/secrets
 
   def launch
     unless params.key?(:custom_inst_book_id)
       launch_ex
       return
+    end
+    if params.key?(:custom_inst_chapter_module_id)
+      # launch module
     end
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
@@ -138,7 +141,7 @@ class LtiController < ApplicationController
 
     # post the given score to the TC
     score = (request_params['toParams']['score'] != '' ? request_params['toParams']['score'] : nil)
-    #res = @tp.post_replace_result!(score)
+    #res = @tp.post_replace_exercise_progressresult!(score)
     res = @tp.post_extended_replace_result!(score: score, text: f)
 
     if res.success?
@@ -218,40 +221,60 @@ class LtiController < ApplicationController
     render layout: 'lti_resource'
   end
 
-  def grade_passback
-    byebug
-    render :json => {:message => 'success'}.to_json
-  end
-
   def extrtool_launch_test
     render 'launch_extrtool_test', layout: 'header_minimal'
   end
 
   def extrtool_launch
-    require 'oauth/request_proxy/rack_request'
-    tool = LearningTool.find_by(name: 'code-workout')
+    if current_user.blank?
+      @message = "Error: current user could not be identified"
+      render :error
+      return
+    end
 
+    exercise = InstBookSectionExercise.includes(:inst_exercise, :inst_book, inst_book: [{course_offering: [:term, :course]}])
+      .find_by(id: params[:inst_book_section_exercise_id])
+
+    if exercise.blank?
+      @message = "Error: could not locate exercise with id '#{params[:inst_book_section_exercise_id]}'"
+      render :error
+      return
+    end
+
+    course_offering = exercise.inst_book.course_offering
+
+    unless course_offering.is_enrolled?(current_user)
+      @message = 'Error: you are not enrolled in this course'
+      render :error
+      return
+    end
+
+    tool = LearningTool.find_by(name: exercise.inst_exercise.learning_tool)
     host = request.scheme + "://" + request.host_with_port
 
-    @launch_url = 'https://ltitest.cs.vt.edu:9200/lti/launch?custom_course_name=My test course&custom_course_number=CSTest&custom_label=cse test 3&custom_term=spring-2018'
+    @launch_url = tool.launch_url
     launch_params = {}
     launch_params["launch_url"] = @launch_url
-    launch_params["context_label"] = "OpenDSA-LTI"
-    launch_params["context_title"] = "OpenDSA-LTI"
-    launch_params["context_id"] = "0595e22d0c26edaf4d0c37dd7da43cf8fc719e6d"
+    launch_params["context_label"] = course_offering.name
+    launch_params["context_title"] = course_offering.name
+    launch_params["context_id"] = "#{exercise.id}"
     launch_params["lis_outcome_service_url"] = "#{host}#{lti_grade_passback_path}"
-    launch_params["lis_result_sourcedid"] = "mysourcedid"
+    launch_params["lis_result_sourcedid"] = "#{current_user.id}_#{exercise.id}"
     launch_params["lti_message_type"] = "basic-lti-launch-request"
     launch_params["lti_version"] = "LTI-1p0"
-    launch_params["resource_link_id"] = "4a67f91a7137b4db3edc1af746302016786123e6"
-    launch_params["resource_link_title"] = "Factorial 1"
+    launch_params["resource_link_id"] = "#{exercise.id}"
+    launch_params["resource_link_title"] = "#{exercise.inst_exercise.short_name}"
     launch_params["tool_consumer_info_product_family_code"] = "opendsa"
-    launch_params["user_id"] = "133859a0c48cc4f33a5ae38cae2bfc930c643113"
+    launch_params["user_id"] = "#{current_user.id}"
     launch_params["lis_person_name_given"] = current_user.first_name
     launch_params["lis_person_name_family"] = current_user.last_name
     launch_params["lis_person_contact_email_primary"] = current_user.email
-    launch_params["ext_lti_assignment_id"] = "df82b5a5-6cfb-4617-ac67-0d1324e7cb85"
-    #launch_params["roles"] = "Instructor"
+    launch_params["ext_lti_assignment_id"] = "#{exercise.id}"
+    launch_params["roles"] = get_user_lti_role(course_offering)
+    launch_params["custom_course_name"] = course_offering.course.name
+    launch_params["custom_course_number"] = course_offering.course.number
+    launch_params["custom_label"] = course_offering.label
+    launch_params["custom_term"] = course_offering.term.slug
 
     @tc = IMS::LTI::ToolConsumer.new(tool.key, tool.secret, launch_params)
     @launch_data = @tc.generate_launch_data()
@@ -259,7 +282,84 @@ class LtiController < ApplicationController
     render 'launch_extrtool', layout: 'header_minimal'
   end
 
+  def grade_passback
+    req = IMS::LTI::OutcomeRequest.from_post_request(request)
+    res = IMS::LTI::OutcomeResponse.new
+    res.message_ref_identifier = req.message_identifier
+    res.operation = req.operation
+    res.severity = 'status'
+
+    if req.replace_request?
+      # set a new score for the user
+
+      # lis_result_sourcedid is in format {user_id}_{inst_book_section_exercise_id}
+      # (because that is how we sent it in the original launch request)
+      tokens = req.lis_result_sourcedid.split("_")
+      user_id = tokens[0]
+      inst_book_section_exercise_id = tokens[1]
+      score = Float(req.score.to_s)
+
+      if score < 0.0 || score > 1.0
+        res.description = "The score must be between 0.0 and 1.0"
+        res.code_major = 'failure'
+      else
+        # we store exercise scores in the database as an integer
+        score = Integer(score * 100)
+        ex_progress = OdsaExerciseProgress.find_by(user_id: tokens[0],
+                                                   inst_book_section_exercise_id: inst_book_section_exercise_id)
+        if ex_progress.blank?
+          ex_progress = OdsaExerciseProgress.new(user_id: tokens[0],
+                                                 inst_book_section_exercise_id: inst_book_section_exercise_id)
+        end
+        old_score = ex_progress.current_score
+        ex_progress.update_score(score)
+        ex_progress.save!
+
+        bk_sec_ex = InstBookSectionExercise.includes(:inst_exercise, inst_section: [:inst_chapter_module])
+          .find_by(id: inst_book_section_exercise_id)
+        inst_chapter_module = bk_sec_ex.inst_section.inst_chapter_module
+
+        # update the score for the module containing the exercise
+        mod_prog = OdsaModuleProgress.get_progress(user_id, inst_chapter_module.id, bk_sec_ex.inst_book_id)
+        mod_prog.update_proficiency(bk_sec_ex.inst_exercise)
+        post_module_score(mod_prog)
+
+        res.description = "Your old score of #{old_score} has been replaced with #{score}"
+        res.code_major = 'success'
+      end
+    elsif req.read_request?
+      # return the score for the user
+      tokens = req.lis_result_sourcedid.split("_")
+      user_id = tokens[0]
+      inst_book_section_exercise_id = tokens[1]
+      progress = OdsaExerciseProgress.find_by(user_id: user_id,
+                                              inst_book_section_exercise_id: inst_book_section_exercise_id)
+
+      res.description = progress.blank? ? "Your score is 0" : "Your score is #{progress.current_score}"
+      res.score = progress.current_score
+      res.code_major = 'success'
+    elsif req.delete_request?
+      res.code_major = 'unsupported'
+      res.description = "#{req.operation} is not supported"
+    else
+      res.severity = 'error'
+      res.code_major = 'unsupported'
+      res.description = "#{req.operation} is not supported"
+    end
+
+    xml = res.generate_response_xml
+    render xml: xml
+  end
+
   private
+
+  def get_user_lti_role(course_offering)
+    if course_offering.is_instructor?(current_user)
+      return "Instructor"
+    else
+      return "Student"
+    end
+  end
 
   def launch_ex
     require 'oauth/request_proxy/rack_request'
@@ -429,5 +529,27 @@ class LtiController < ApplicationController
       error.save!
     end
     return true #successful
+  end
+
+  # send the module score to tool consumer if they exist
+  def post_module_score(module_progress)
+    if mod_prog.lis_outcome_service_url
+      lti_param = {
+        "lis_outcome_service_url" => module_progress.lis_outcome_service_url,
+        "lis_result_sourcedid" => module_progress.lis_result_sourcedid,
+      }
+      tp = IMS::LTI::ToolProvider.new(module_progress.lms_access.consumer_key,
+                                      module_progress.lms_access.consumer_secret,
+                                      lti_param)
+      tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
+
+      res = tp.post_extended_replace_result!(score: module_progress.score)
+      unless res.success?
+        error = Error.new(:class_name => 'post_replace_result_fail',
+                          :message => res.inspect,
+                          :params => module_progress.to_json.to_s)
+        error.save!
+      end
+    end
   end
 end

@@ -1,22 +1,22 @@
-  # create_table "odsa_exercise_attempts", force: true do |t|
-  #   t.integer  "user_id",                                                          null: false
-  #   t.integer  "inst_book_id",                                                     null: false
-  #   t.integer  "inst_section_id",                                                  null: false
-  #   t.integer  "inst_book_section_exercise_id",                                    null: false
-  #   t.boolean  "worth_credit",                                                          null: false
-  #   t.datetime "time_done",                                                        null: false
-  #   t.integer  "time_taken",                                                       null: false
-  #   t.integer  "count_hints",                                                      null: false
-  #   t.boolean  "hint_used",                                                        null: false
-  #   t.decimal  "points_earned",                            precision: 5, scale: 2, null: false
-  #   t.boolean  "earned_proficiency",                                               null: false
-  #   t.integer  "count_attempts",                limit: 8,                          null: false
-  #   t.string   "ip_address",                    limit: 20,                         null: false
-  #   t.string   "question_name",                 limit: 50,                         null: false
-  #   t.string   "request_type",                  limit: 50
-  #   t.datetime "created_at"
-  #   t.datetime "updated_at"
-  # end
+# create_table "odsa_exercise_attempts", force: true do |t|
+#   t.integer  "user_id",                                                          null: false
+#   t.integer  "inst_book_id",                                                     null: false
+#   t.integer  "inst_section_id",                                                  null: false
+#   t.integer  "inst_book_section_exercise_id",                                    null: false
+#   t.boolean  "worth_credit",                                                          null: false
+#   t.datetime "time_done",                                                        null: false
+#   t.integer  "time_taken",                                                       null: false
+#   t.integer  "count_hints",                                                      null: false
+#   t.boolean  "hint_used",                                                        null: false
+#   t.decimal  "points_earned",                            precision: 5, scale: 2, null: false
+#   t.boolean  "earned_proficiency",                                               null: false
+#   t.integer  "count_attempts",                limit: 8,                          null: false
+#   t.string   "ip_address",                    limit: 20,                         null: false
+#   t.string   "question_name",                 limit: 50,                         null: false
+#   t.string   "request_type",                  limit: 50
+#   t.datetime "created_at"
+#   t.datetime "updated_at"
+# end
 
 class OdsaExerciseAttempt < ActiveRecord::Base
   #~ Relationships ............................................................
@@ -28,9 +28,9 @@ class OdsaExerciseAttempt < ActiveRecord::Base
 
   #~ Validation ...............................................................
   validate :required_fields
-  
+
   def required_fields
-    if not (inst_book_section_exercise_id.present? or inst_course_offering_exercise_id.present?)
+    if not(inst_book_section_exercise_id.present? or inst_course_offering_exercise_id.present?)
       errors.add(:inst_book_section_exercise_id, "or inst_course_offering_exercise_id must be present")
       errors.add(:inst_course_offering_exercise_id, "or inst_book_section_exercise_id must be present")
     end
@@ -54,8 +54,8 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     if hasBook
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
-      book_progress = self.get_book_progress
-      module_progress = self.get_module_progress
+      book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
+      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
     else
       inst_exercise = InstExercise.find_by(id: inst_course_offering_exercise.inst_exercise_id)
     end
@@ -68,22 +68,19 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     if hasBook
       book_progress.update_started(inst_exercise)
     end
+    proficient = false
     if self.correct
       exercise_progress['total_correct'] += 1
       if self.worth_credit
         exercise_progress['total_worth_credit'] += 1
         exercise_progress['current_score'] += 1
         exercise_progress['highest_score'] = [exercise_progress['highest_score'], exercise_progress['current_score']].max
-        proficient = hasBook ? book_progress.update_proficiency(exercise_progress)
-                             : exercise_progress.highest_score >= 5
+        proficient = hasBook ? book_progress.update_proficiency(exercise_progress) : exercise_progress.highest_score >= inst_course_offering_exercise.threshold
         if proficient
           self.earned_proficiency = true
           self.points_earned = hasBook ? inst_book_section_exercise.points : 1
           self.save!
           exercise_progress.proficient_date ||= DateTime.now
-          if hasBook
-            module_progress.update_proficiency(inst_exercise)
-          end
         end
         if exercise_progress['correct_exercises'].to_s.strip.length == 0
           exercise_progress['correct_exercises'] = self['question_name']
@@ -110,6 +107,9 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       exercise_progress['hinted_exercise'] = self['question_name']
     end
     exercise_progress.save!
+    if hasBook and proficient
+      module_progress.update_proficiency(inst_exercise)
+    end
   end
 
   def update_pe_exercise_progress
@@ -117,8 +117,8 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     if hasBook
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
-      book_progress = self.get_book_progress
-      module_progress = self.get_module_progress
+      book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
+      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
     else
       inst_exercise = InstExercise.find_by(id: inst_course_offering_exercise.inst_exercise_id)
     end
@@ -138,43 +138,27 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       exercise_progress['current_score'] = self.points_earned
       exercise_progress['highest_score'] = self.points_earned
       exercise_progress.proficient_date ||= DateTime.now
+      exercise_progress.save!
       if hasBook
         module_progress.update_proficiency(inst_exercise)
         book_progress.update_proficiency(exercise_progress)
       end
+    else
+      exercise_progress.save!
     end
-    exercise_progress.save!
   end
 
   def get_exercise_progress
     if inst_book_section_exercise_id.blank?
       return OdsaExerciseProgress.find_by(user_id: user_id,
-          inst_course_offering_exercise_id: inst_course_offering_exercise_id)
+                                          inst_course_offering_exercise_id: inst_course_offering_exercise_id)
     else
       return OdsaExerciseProgress.where("user_id=? and inst_book_section_exercise_id=?",
-                                                  user.id,
-                                                  inst_book_section_exercise.id).first
+                                        user.id,
+                                        inst_book_section_exercise.id).first
     end
   end
-
-  def get_book_progress
-    unless book_progress = OdsaBookProgress.where("user_id=? and inst_book_id=?",
-                                                  user.id, inst_book.id).first
-      book_progress = OdsaBookProgress.create(user: user,inst_book: inst_book)
-      book_progress.save!
-    end
-    book_progress
-  end
-
-  def get_module_progress
-    unless module_progress = OdsaModuleProgress.where(user: user,inst_book: inst_book,inst_chapter_module: @inst_chapter_module).first
-      module_progress = OdsaModuleProgress.create(user: user,inst_book: inst_book,inst_chapter_module: @inst_chapter_module)
-      module_progress.save!
-    end
-    module_progress
-  end
-
 
   #~ Private instance methods .................................................
 
- end
+end

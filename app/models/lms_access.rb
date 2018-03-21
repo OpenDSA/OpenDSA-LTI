@@ -12,4 +12,8 @@ class LmsAccess < ActiveRecord::Base
     consumer_secret = lms_access.consumer_secret
     {consumer_key => consumer_secret}
   end
+
+  def self.get_consumer_secret(key)
+    LmsAccess.where(consumer_key: key).pluck(:consumer_secret)
+  end
 end
