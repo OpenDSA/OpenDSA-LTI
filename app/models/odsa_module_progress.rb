@@ -10,10 +10,14 @@ class OdsaModuleProgress < ActiveRecord::Base
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
 
-  def self.get_progress(user_id, inst_chapter_module_id, inst_book_id)
+  def self.get_progress(user_id, inst_chapter_module_id, inst_book_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil)
     unless module_progress = OdsaModuleProgress.find_by(user_id: user_id, inst_chapter_module_id: inst_chapter_module_id)
-      module_progress = OdsaModuleProgress.create(user_id: user_id, inst_book_id: inst_book_id,
-                                                  inst_chapter_module_id: inst_chapter_module_id)
+      module_progress = OdsaModuleProgress.new(user_id: user_id, inst_book_id: inst_book_id,
+                                               inst_chapter_module_id: inst_chapter_module_id)
+      unless lis_outcome_service_url == nil or lis_result_sourcedid == nil
+        module_progress.lis_outcome_service_url = lis_outcome_service_url
+        module_progress.lis_result_sourcedid = lis_result_sourcedid
+      end
       module_progress.save!
     end
     module_progress
@@ -65,12 +69,10 @@ class OdsaModuleProgress < ActiveRecord::Base
     score = 0
     total_points = 0
     bk_sec_exs.each do |ex|
-      if ex.required
-        total_points += ex.points
-        prog = exercise_progresses.detect { |p| p.inst_book_section_exercise_id == ex.id }
-        if !prog.blank? and prog.proficient?
-          score += ex.points
-        end
+      total_points += ex.points
+      prog = exercise_progresses.detect { |p| p.inst_book_section_exercise_id == ex.id }
+      if !prog.blank? and prog.proficient?
+        score += ex.points
       end
     end
     self.current_score = score / total_points

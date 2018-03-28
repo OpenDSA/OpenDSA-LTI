@@ -33,10 +33,14 @@ class InstExercise < ActiveRecord::Base
       ex.save
     end
 
-    book_sec_ex = InstBookSectionExercise.where(
-      "inst_book_id = ? AND inst_section_id = ? AND inst_exercise_id = ?",
-      book.id, inst_section.id, ex.id
-    ).first
+    if exercise_obj.is_a?(Hash) and exercise_obj['learning_tool']
+      book_sec_ex = InstBookSectionExercise.find_by(inst_book_id: book.id,
+                                                    inst_section_id: inst_section.id)
+    else
+      book_sec_ex = InstBookSectionExercise.find_by(inst_book_id: book.id,
+                                                    inst_section_id: inst_section.id,
+                                                    inst_exercise_id: ex.id)
+    end
 
     if !update_mode or (update_mode and !book_sec_ex)
       book_sec_ex = InstBookSectionExercise.new

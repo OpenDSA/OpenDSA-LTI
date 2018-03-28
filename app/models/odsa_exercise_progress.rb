@@ -26,13 +26,13 @@ class OdsaExerciseProgress < ActiveRecord::Base
     self.total_worth_credit ||= 0
   end
 
-  # update the current_score and highest_score
+  # update the current_score, highest_score, and proficient date
   def update_score(new_score)
-    self.current_score = score
+    self.current_score = new_score
     now = DateTime.now
-    if score > self.highest_score
-      self.highest_score = score
-      if score == 100
+    if new_score > self.highest_score
+      self.highest_score = new_score
+      if new_score == 100
         self.proficient_date = now
       end
     end

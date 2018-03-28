@@ -7,8 +7,7 @@ CodeWorkout::Application.routes.draw do
   get 'lti/resource_dev', to: 'lti#resource_dev', as: :lti_resource_dev
   post 'lti/resource', to: 'lti#resource', as: :lti_resource
   post 'lti/course_offering', to: 'lti#create_course_offering', as: :lti_course_offering
-  get 'lti/extrtool_launch_test', to: 'lti#extrtool_launch_test', as: :lti_launch_extrtool_test
-  get 'lti/extrtool_launch', to: 'lti#extrtool_launch', as: :lti_launch_extrtool
+  get 'lti/launch_extrtool/:inst_book_section_exercise_id', to: 'lti#launch_extrtool', as: :lti_launch_extrtool
   post 'lti/outcomes', to: 'lti#grade_passback', as: :lti_grade_passback
 
   resources :odsa_user_interactions

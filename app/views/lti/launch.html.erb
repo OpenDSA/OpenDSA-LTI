@@ -16,9 +16,14 @@
       TP.toParams.launch_params.<%= key %> = "<%= value %>";
     <% end%>
     TP.userEmail = "<%= @user.email %>";
-    TP.sectionTitle = "<%= params[:custom_section_title] %>";
+    <% if params.key?(:custom_inst_chapter_module_id) %>
+      TP.sectionTitle = "<%= params[:custom_module_title] %>";
+      TP.instSectionId = "<%= params[:custom_inst_chapter_module_id] %>";
+    <% else %>
+      TP.sectionTitle = "<%= params[:custom_section_title] %>";
+      TP.instSectionId = "<%= params[:custom_inst_section_id] %>";
+    <% end %>
     TP.instBookId = "<%= params[:custom_inst_book_id] %>";
-    TP.instSectionId = "<%= params[:custom_inst_section_id] %>";
 
     window.ODSA = window.ODSA || {};
     window.ODSA.TP = TP;

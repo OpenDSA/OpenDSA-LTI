@@ -1,16 +1,13 @@
 class LtiController < ApplicationController
   layout 'lti', only: [:launch]
 
-  after_action :allow_iframe, only: [:launch, :resource, :extrtool_launch]
+  after_action :allow_iframe, only: [:launch, :resource, :launch_extrtool]
   # the consumer keys/secrets
 
   def launch
     unless params.key?(:custom_inst_book_id)
       launch_ex
       return
-    end
-    if params.key?(:custom_inst_chapter_module_id)
-      # launch module
     end
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
@@ -25,61 +22,20 @@ class LtiController < ApplicationController
 
     # I change this to be custom intanbook id becuase it is not working on mine yet
     if params.has_key?(:custom_course_offering_id)
-      puts ('param have key')
-
-      @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
-      @student_list = []
-      @course_enrollment.each do |s|
-        q = User.where("id=?", s.user_id).select("id, first_name, last_name").first
-        @student_list.push(q)
-        #puts "helloo"
-        @student_list = @student_list.sort_by &:first_name
-      end
-
-      @course_id = @course_offering.id
-      @instBook = @course_offering.odsa_books.first
-
-      @exercise_list = Hash.new { |hsh, key| hsh[key] = [] }
-
-      chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
-      chapters.each do |chapter|
-        modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
-        modules.each do |inst_ch_module|
-          sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
-          section_item_position = 1
-          if !sections.empty?
-            sections.each do |section|
-              title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
-                      (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + "." +
-                      section_item_position.to_s.rjust(2, "0") + " - "
-              learning_tool = nil
-              if section
-                title = title + section.name
-                learning_tool = section.learning_tool
-                if !learning_tool
-                  if section.gradable
-                    attempted = OdsaExerciseAttempt.where(inst_section_id: section.id)
-                    if attempted.empty?
-                      @exercise_list[section.id].push(title)
-                    else
-                      @exercise_list[section.id].push(title)
-                      @exercise_list[section.id].push('attemp_flag')
-                    end
-                  end
-                end
-              end
-              section_item_position += 1
-            end
-          end
-        end
-      end
-      render 'show_table.html.haml' and return
+      launch_instructor_tool()
     end
 
+    file_name = nil
+    if params.key?(:custom_module_file_name)
+      ensure_module_progress()
+      file_name = params[:custom_module_file_name]
+    else
+      file_name = params[:custom_section_file_name]
+    end
     @section_html = File.read(File.join('public/OpenDSA/Books',
                                         params[:custom_book_path],
                                         '/lti_html/',
-                                        "#{params[:custom_section_file_name].to_s}.html")) and return
+                                        "#{file_name.to_s}.html")) and return
   end
 
   def assessment
@@ -221,11 +177,7 @@ class LtiController < ApplicationController
     render layout: 'lti_resource'
   end
 
-  def extrtool_launch_test
-    render 'launch_extrtool_test', layout: 'header_minimal'
-  end
-
-  def extrtool_launch
+  def launch_extrtool
     if current_user.blank?
       @message = "Error: current user could not be identified"
       render :error
@@ -397,6 +349,58 @@ class LtiController < ApplicationController
     end
   end
 
+  def launch_instructor_tool
+    puts ('param have key')
+
+    @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
+    @student_list = []
+    @course_enrollment.each do |s|
+      q = User.where("id=?", s.user_id).select("id, first_name, last_name").first
+      @student_list.push(q)
+      #puts "helloo"
+      @student_list = @student_list.sort_by &:first_name
+    end
+
+    @course_id = @course_offering.id
+    @instBook = @course_offering.odsa_books.first
+
+    @exercise_list = Hash.new { |hsh, key| hsh[key] = [] }
+
+    chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
+    chapters.each do |chapter|
+      modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
+      modules.each do |inst_ch_module|
+        sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
+        section_item_position = 1
+        if !sections.empty?
+          sections.each do |section|
+            title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
+                    (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + "." +
+                    section_item_position.to_s.rjust(2, "0") + " - "
+            learning_tool = nil
+            if section
+              title = title + section.name
+              learning_tool = section.learning_tool
+              if !learning_tool
+                if section.gradable
+                  attempted = OdsaExerciseAttempt.where(inst_section_id: section.id)
+                  if attempted.empty?
+                    @exercise_list[section.id].push(title)
+                  else
+                    @exercise_list[section.id].push(title)
+                    @exercise_list[section.id].push('attemp_flag')
+                  end
+                end
+              end
+            end
+            section_item_position += 1
+          end
+        end
+      end
+    end
+    render 'show_table.html.haml' and return
+  end
+
   def lti_enroll(course_offering, role = CourseRole.student)
     if course_offering &&
        course_offering.can_enroll? &&
@@ -531,9 +535,17 @@ class LtiController < ApplicationController
     return true #successful
   end
 
+  def ensure_module_progress
+    book_id = params[:custom_inst_book_id]
+    chpt_mod_id = params[:custom_inst_chapter_module_id]
+    OdsaModuleProgress.get_progress(current_user.id, chpt_mod_id, book_id,
+                                    params[:lis_outcome_service_url],
+                                    params[:lis_result_sourcedid])
+  end
+
   # send the module score to tool consumer if they exist
   def post_module_score(module_progress)
-    if mod_prog.lis_outcome_service_url
+    if module_progress.lis_outcome_service_url and module_progress.lis_result_sourcedid
       lti_param = {
         "lis_outcome_service_url" => module_progress.lis_outcome_service_url,
         "lis_result_sourcedid" => module_progress.lis_result_sourcedid,

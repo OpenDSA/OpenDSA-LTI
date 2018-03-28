@@ -1,10 +1,11 @@
 class GenerateCourseJob < ProgressJob::Base
-  def initialize(inst_book_id, launch_url, resource_selection_url, user_id)
+  def initialize(inst_book_id, launch_url, resource_selection_url, extrtool_launch_base_url, user_id)
     @user_id = user_id
     @user = User.find_by(id: user_id)
     @inst_book = InstBook.find_by(id: inst_book_id)
     @odsa_launch_url = launch_url
     @odsa_resource_selection_url = resource_selection_url
+    @extrtool_launch_base_url = extrtool_launch_base_url
     @course_offering = CourseOffering.where(:id => @inst_book.course_offering_id).first
     @term = Term.where(:id => @course_offering.term_id).first
     @course = Course.where(:id => @course_offering.course_id).first
@@ -17,15 +18,15 @@ class GenerateCourseJob < ProgressJob::Base
     chapters = InstChapter.where(inst_book_id: @inst_book.id)
     update_progress_max(chapters.count + 1)
     inst_book_compile
-
     update_stage('Compiling OpenDSA book')
     inst_book_json = ApplicationController.new.render_to_string(
-                      template: 'inst_books/show.json.jbuilder',
-                      locals: {:@inst_book => @inst_book})
+      template: 'inst_books/show.json.jbuilder',
+      locals: {:@inst_book => @inst_book, :@extrtool_launch_base_url => @extrtool_launch_base_url},
+    )
     require 'json'
     config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
     config_file_path = "public/OpenDSA/config/temp/#{config_file}"
-    File.open(config_file_path,"w") do |f|
+    File.open(config_file_path, "w") do |f|
       f.write(inst_book_json)
     end
 
@@ -42,21 +43,22 @@ class GenerateCourseJob < ProgressJob::Base
     require 'pandarus'
     client = Pandarus::Client.new(
       prefix: @inst_book.course_offering.lms_instance.url + '/api',
-      token: user_lms_access.access_token)
+      token: user_lms_access.access_token,
+    )
     lms_course_id = @inst_book.course_offering.lms_course_num
 
     canvas_course = client.get_single_course_courses(lms_course_id)
-    @inst_book.course_offering.lms_course_code =  canvas_course.course_code
+    @inst_book.course_offering.lms_course_code = canvas_course.course_code
     @inst_book.course_offering.save!
     consumer_key, consumer_secret = @user.get_lms_creds.first
 
-    tool_data ={
+    tool_data = {
       "tool_name" => "OpenDSA-LTI",
       "privacy_level" => "public",
       "consumer_key" => consumer_key,
       "consumer_secret" => consumer_secret,
       "launch_url" => @odsa_launch_url,
-      "resource_selection_url" => @odsa_resource_selection_url
+      "resource_selection_url" => @odsa_resource_selection_url,
     }
 
     save_lti_app(client, lms_course_id, tool_data)
@@ -96,7 +98,7 @@ class GenerateCourseJob < ProgressJob::Base
     if tool_name == "OpenDSA-LTI"
       odsa_url_opts = {
         :custom_inst_book_id => @inst_book.id,
-        :custom_course_offering_id => @course_offering.id
+        :custom_course_offering_id => @course_offering.id,
       }
       require "addressable/uri"
       uri = Addressable::URI.new
@@ -109,27 +111,25 @@ class GenerateCourseJob < ProgressJob::Base
       opts[:course_navigation__visibility__] = "admins"
       opts[:course_navigation__default__] = true
       opts[:custom_fields] = {
-        'canvas_api_base_url': '$Canvas.api.baseUrl'
+        'canvas_api_base_url': '$Canvas.api.baseUrl',
       }
     end
 
     if !tool_exists and !@created_LTI_tools.include? tool_name
       res = client.create_external_tool_courses(lms_course_id, tool_name,
-      privacy_level, consumer_key, consumer_secret, opts)
+                                                privacy_level, consumer_key, consumer_secret, opts)
       @created_LTI_tools.push(tool_name)
     end
-
   end
 
   # -------------------------------------------------------------
   # Create canvas modules that maps to OpenDSA chapters
   def save_lms_course(client, lms_course_id)
-
     chapters = InstChapter.where(inst_book_id: @inst_book.id).order('position')
 
     chapters.each do |chapter|
-      opts = {:module__name__ => 'Chapter '+ chapter.position.to_s + ' ' + chapter.name,
-                   :module__position__ => chapter.position}
+      opts = {:module__name__ => 'Chapter ' + chapter.position.to_s + ' ' + chapter.name,
+              :module__position__ => chapter.position}
 
       update_stage('Generating: ' + opts[:module__name__])
 
@@ -149,7 +149,7 @@ class GenerateCourseJob < ProgressJob::Base
       end
 
       save_lms_chapter(client, lms_course_id, chapter)
-      # Publish the module and its all sections
+      # Publish the module
       if publish_chapter
         opts = {}
         opts[:module__published__] = true
@@ -162,234 +162,81 @@ class GenerateCourseJob < ProgressJob::Base
   # -------------------------------------------------------------
   # For each canvas module, create text items (just a label) that maps to OpenDSA modules
   def save_lms_chapter(client, lms_course_id, chapter)
-
     modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
 
     module_item_position = 1
     modules.each do |inst_ch_module|
-      title = (chapter.position.to_s||"")+"."+
-               (inst_ch_module.module_position.to_s||"")+"."+
-               InstModule.where(:id => inst_ch_module.inst_module_id).first.name
+      title = (chapter.position.to_s || "") + "." +
+              (inst_ch_module.module_position.to_s || "") + "." +
+              InstModule.where(:id => inst_ch_module.inst_module_id).first.name
 
-      opts = {:module_item__title__ => title,
-              :module_item__type__ => 'SubHeader',
-              :module_item__position__ => module_item_position}
-
-      # if inst_ch_module.lms_module_item_id
-      #   res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_module_item_id, opts)
-      # else
-      if !inst_ch_module.lms_module_item_id
-        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'SubHeader', '', opts)
-        inst_ch_module.lms_module_item_id = res['id']
-        inst_ch_module.save!
-      end
-
-      module_item_position = save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_item_position)
+      save_module_as_external_tool(client, lms_course_id, chapter, inst_ch_module, module_item_position)
       module_item_position += 1
     end
   end
 
   # -------------------------------------------------------------
-  # Under each text item in canvas create external links the maps to OpenDSA sections
-  # Section can be non-gradable as:
-  # 1- OpenDSA module that doesn't contain any sections, the entire module will be considered as one non-gradable section
-  # 2- section contains one or more exercsies which all of them have 0 points
-  # in canvas, module item that has external link will map OpenDSA non-gradable section
-  def save_lms_section(client, lms_course_id, chapter, inst_ch_module, module_item_position)
-
-    sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
-
-    section_item_position = 1
-    section_file_name_seq = 1
-    hidden_sections = 0
-
-    if !sections.empty?
-      sections.each do |section|
-        if !section.show
-          hidden_sections += 1
-          next
-        end
-        save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                      section, module_item_position, section_item_position, section_file_name_seq)
-        section_item_position += 1
-        learning_tool = nil
-        learning_tool = section.learning_tool
-        section_file_name_seq += 1
-        # if !learning_tool
-        #   section_file_name_seq += 1
-        # end
-      end
-    else
-      save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                    nil, module_item_position, section_item_position, section_file_name_seq)
-    end
-
-    module_item_position + section_item_position + hidden_sections
-
-  end
-
-  # -------------------------------------------------------------
-  # in canvas, module item that has external link will map OpenDSA non-gradable section
-  def save_section_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
-                                    section, module_item_position, section_item_position, section_file_name_seq)
+  # in canvas, module item that has external link will map OpenDSA non-gradable module
+  def save_module_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
+                                   module_item_position)
     module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
     if module_name.include? '/'
       module_name = module_name.split('/')[1]
     end
-    title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
-            (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
-            section_item_position.to_s.rjust(2, "0") + " - "
-    learning_tool = nil
-    if section
-      section_file_name = module_name + "-" + section_file_name_seq.to_s.rjust(2, "0")
-      title = title + section.name
+    title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
+            (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + " "
 
-      learning_tool = section.learning_tool
-      if learning_tool
-        learning_tool_obj = LearningTool.where(:name => learning_tool).first
-        launch_url = learning_tool_obj.launch_url
-        tool_data ={
-          "tool_name" => learning_tool_obj['name'],
-          "privacy_level" => "public",
-          "consumer_key" => learning_tool_obj['key'],
-          "consumer_secret" => learning_tool_obj['secret'],
-          "launch_url" => launch_url
-        }
-        save_lti_app(client, lms_course_id, tool_data)
+    module_file_name = module_name
+    title = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
 
-        learning_tool_url_opts = {
-          :custom_term => @term.slug,
-          :custom_label => @course_offering.label,
-          :custom_course_number => @course.number,
-          :custom_course_name => @course.name
-          }
-        require "addressable/uri"
-        uri = Addressable::URI.new
-        uri.query_values = learning_tool_url_opts
-        launch_url = launch_url + '?' + uri.query
-      end
-    else
-      section_file_name = module_name
-      title = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
-    end
+    odsa_url_opts = {
+      :custom_inst_book_id => @inst_book.id,
+      :custom_inst_chapter_module_id => (inst_ch_module.id),
+      :custom_book_path => book_path(@inst_book),
+      :custom_module_file_name => module_file_name,
+      :custom_module_title => title,
+    }
+    require "addressable/uri"
+    uri = Addressable::URI.new
+    uri.query_values = odsa_url_opts
+    launch_url = @odsa_launch_url + '?' + uri.query
 
-    if !learning_tool
-      odsa_url_opts = {
-        :custom_inst_book_id => @inst_book.id,
-        :custom_inst_section_id => (section.id if section),
-        :custom_book_path => book_path(@inst_book),
-        :custom_section_file_name => section_file_name,
-        :custom_section_title => title
-      }
-      require "addressable/uri"
-      uri = Addressable::URI.new
-      uri.query_values = odsa_url_opts
-      launch_url = @odsa_launch_url + '?' + uri.query
-    end
     opts = {:module_item__title__ => title,
             :module_item__type__ => 'ExternalTool',
-            :module_item__position__ => module_item_position + section_item_position,
+            :module_item__position__ => module_item_position,
             :module_item__external_url__ => launch_url,
-            :module_item__indent__ => 1
-            }
-    if learning_tool
-      save_learning_tool(client, lms_course_id, chapter, section, title, opts)
-    else
-      if section
-        save_section_as_assignment(client, lms_course_id, chapter, section, title, opts, odsa_url_opts)
-      else
-        # if inst_ch_module.lms_section_item_id
-        #   res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, inst_ch_module.lms_section_item_id, opts)
-        # else
-        if !inst_ch_module.lms_section_item_id
-          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
-          inst_ch_module.lms_section_item_id = res['id']
-          inst_ch_module.save!
-        end
-      end
-    end
+            :module_item__indent__ => 0}
+
+    save_module_as_assignment(client, lms_course_id, chapter, inst_ch_module, title, opts, odsa_url_opts)
   end
-
-  def save_learning_tool(client, lms_course_id, chapter, section, title, opts)
-
-    assignment_opts = {
-      :assignment__submission_types__ => "external_tool",
-      :assignment__external_tool_tag_attributes__ => {:url => opts[:module_item__external_url__] }
-      }
-
-    if section.gradable
-      assignment_opts[:assignment__points_possible__] = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", section.id).first.points
-      if section.soft_deadline
-        assignment_opts[:assignment__due_at__] = section.soft_deadline.try(:strftime, "%Y-%m-%dT%H:%m:%S%:z")
-      end
-
-      opts[:module_item__type__] = 'Assignment'
-      if section.lms_item_id && section.lms_assignment_id
-        opts[:module_item__content_id__] = section.lms_assignment_id
-        assignment_res = client.edit_assignment(lms_course_id, section.lms_assignment_id, assignment_opts )
-        update_opts = opts
-        update_opts.delete(:module_item__title__)
-        update_opts.delete(:module_item__indent__)
-        res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, update_opts)
-      else
-        assignment_opts[:assignment__name__] = title
-        assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
-        assignment_opts[:assignment__description__] = title
-        assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
-        opts[:module_item__content_id__] = assignment_res['id']
-        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
-        section.lms_assignment_id = assignment_res['id']
-        section.lms_item_id = res['id']
-        section.save!
-      end
-    else
-      # if section.lms_item_id
-      #   res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
-      # else
-      if !section.lms_item_id
-        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
-        section.lms_item_id = res['id']
-        section.save!
-      end
-    end
-  end
-
 
   # -------------------------------------------------------------
-  # If OpenDSA section is gradable, it has only one exercises with points greater than zero.
-  # in canvas, module item that refer to an assignment will map OpenDSA gradable section
-  def save_section_as_assignment(client, lms_course_id, chapter, section, title, opts, url_opts)
-
-    if section.gradable
-      gradable_ex = section.get_gradable_ex
-      url_opts[:custom_ex_name] = gradable_ex['ex_name']
-      url_opts[:custom_inst_bk_sec_ex] = gradable_ex['inst_bk_sec_ex']
-      url_opts[:custom_section_title] = title
-    end
-
+  # If OpenDSA module is gradable, it has at least one exercise with points greater than zero.
+  # in canvas, module item that refer to an assignment will map OpenDSA gradable module
+  def save_module_as_assignment(client, lms_course_id, chapter, chapt_module, title, opts, url_opts)
     uri = Addressable::URI.new
     uri.query_values = url_opts
 
     assignment_opts = {
       :assignment__submission_types__ => "external_tool",
-      :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query }
+      :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query},
     }
 
     opts[:module_item__title__] = title
-    if section.gradable
-      assignment_opts[:assignment__points_possible__] = InstBookSectionExercise.where("inst_section_id = ? AND points > 0", section.id).first.points
-      if section.soft_deadline
-        assignment_opts[:assignment__due_at__] = section.soft_deadline.try(:strftime, "%Y-%m-%dT%H:%m:%S%:z")
-      end
+    if chapt_module.gradable?
+      assignment_opts[:assignment__points_possible__] = chapt_module.total_points
+      # if section.soft_deadline
+      #   assignment_opts[:assignment__due_at__] = section.soft_deadline.try(:strftime, "%Y-%m-%dT%H:%m:%S%:z")
+      # end
 
       opts[:module_item__type__] = 'Assignment'
-      if section.lms_item_id && section.lms_assignment_id
-        opts[:module_item__content_id__] = section.lms_assignment_id
-        assignment_res = client.edit_assignment(lms_course_id, section.lms_assignment_id, assignment_opts )
+      if chapt_module.lms_module_item_id && chapt_module.lms_assignment_id
+        opts[:module_item__content_id__] = chapt_module.lms_assignment_id
+        assignment_res = client.edit_assignment(lms_course_id, chapt_module.lms_assignment_id, assignment_opts)
         update_opts = opts
         update_opts.delete(:module_item__title__)
         update_opts.delete(:module_item__indent__)
-        res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, update_opts)
+        res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, chapt_module.lms_module_item_id, update_opts)
       else
         assignment_opts[:assignment__name__] = title
         assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
@@ -397,27 +244,27 @@ class GenerateCourseJob < ProgressJob::Base
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
-        section.lms_assignment_id = assignment_res['id']
-        section.lms_item_id = res['id']
-        section.save!
+        chapt_module.lms_assignment_id = assignment_res['id']
+        chapt_module.lms_module_item_id = res['id']
+        chapt_module.save!
       end
     else
       # if section.lms_item_id
       #   res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
       # else
-      if !section.lms_item_id
+      if !chapt_module.lms_module_item_id
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
-        section.lms_item_id = res['id']
-        section.save!
+        chapt_module.lms_module_item_id = res['id']
+        chapt_module.save!
       end
     end
   end
 
   # -------------------------------------------------------------
   def sanitize_filename(filename)
-      filename.gsub(/[^\w\s_-]+/, '')
-                    .gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2')
-                    .gsub(/\s+/, '_')
+    filename.gsub(/[^\w\s_-]+/, '')
+      .gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2')
+      .gsub(/\s+/, '_')
   end
 
   # -------------------------------------------------------------
@@ -427,11 +274,9 @@ class GenerateCourseJob < ProgressJob::Base
     course = Course.where(:id => course_offering.course_id).first
     organization = Organization.where(:id => course.organization_id).first
 
-
-    sanitize_filename(organization.slug)+"/"+
-    sanitize_filename(course.slug)+"/"+
-    sanitize_filename(term.slug)+"/"+
+    sanitize_filename(organization.slug) + "/" +
+    sanitize_filename(course.slug) + "/" +
+    sanitize_filename(term.slug) + "/" +
     sanitize_filename(course_offering.label)
   end
-
 end

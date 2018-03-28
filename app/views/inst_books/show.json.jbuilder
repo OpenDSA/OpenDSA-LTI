@@ -13,9 +13,7 @@ end
 
 # chapters
 json.chapters do
-
   for inst_chapter in @inst_book.inst_chapters.order('position')
-
     chapter_name = inst_chapter.name
     # chapter object
     json.set! chapter_name do
@@ -29,17 +27,17 @@ json.chapters do
         json.set! module_path do
           json.set! :lms_module_item_id, inst_chapter_module.lms_module_item_id
           json.set! :lms_section_item_id, inst_chapter_module.lms_section_item_id
+          json.set! :lms_assignment_id, inst_chapter_module.lms_assignment_id
           json.set! :long_name, InstModule.where(:id => inst_chapter_module.inst_module_id).first.name
 
           # sections
           json.sections do
             sections = inst_chapter_module.inst_sections
             if !sections.empty?
-
               for inst_section in inst_chapter_module.inst_sections
                 section_name = inst_section.name
 
-               # section object
+                # section object
                 json.set! section_name do
                   json.set! :id, inst_section.id
                   json.set! :soft_deadline, inst_section.soft_deadline.try(:strftime, "%Y-%m-%d %H:%m:%S")
@@ -55,6 +53,7 @@ json.chapters do
                     json.set! :resource_name, inst_section.resource_name
                     exercise = inst_section.inst_book_section_exercises.first
                     json.set! :points, exercise.points.to_f
+                    json.set! :launch_url, "#{@extrtool_launch_base_url}/#{exercise.id}"
                   else
                     exercises = inst_section.inst_book_section_exercises
                     if !exercises.empty?
@@ -82,13 +81,9 @@ json.chapters do
             end
           end
         end
-
       end
-
     end
-
   end
-
 end
 course_offering = CourseOffering.where(:id => @inst_book.course_offering_id).first
 

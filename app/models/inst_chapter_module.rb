@@ -50,16 +50,13 @@ class InstChapterModule < ActiveRecord::Base
       .where(inst_sections: {inst_chapter_module_id: self.id}, user_id: user_id)
   end
 
+  def gradable?
+    InstSection.where(inst_chapter_module_id: self.id, gradable: true).exists?
+  end
+
   def total_points
-    total_points = 0
-    inst_sections.each do |inst_section|
-      inst_section_points = inst_section.total_points
-      if inst_section_points == nil
-        inst_section_points = 0
-      end
-      total_points = total_points + inst_section_points
-    end
-    return total_points
+    return InstBookSectionExercise.joins(inst_section: [:inst_chapter_module])
+             .where(inst_section: {inst_chapter_module_id: self.id}).sum(:points)
   end
 
   #~ Private instance methods .................................................
