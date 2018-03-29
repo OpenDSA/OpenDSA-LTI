@@ -17,8 +17,8 @@
     <% end%>
     TP.userEmail = "<%= @user.email %>";
     <% if params.key?(:custom_inst_chapter_module_id) %>
-      TP.sectionTitle = "<%= params[:custom_module_title] %>";
-      TP.instSectionId = "<%= params[:custom_inst_chapter_module_id] %>";
+      TP.moduleTitle = "<%= params[:custom_module_title] %>";
+      TP.instChapterModuleId = "<%= params[:custom_inst_chapter_module_id] %>";
     <% else %>
       TP.sectionTitle = "<%= params[:custom_section_title] %>";
       TP.instSectionId = "<%= params[:custom_inst_section_id] %>";

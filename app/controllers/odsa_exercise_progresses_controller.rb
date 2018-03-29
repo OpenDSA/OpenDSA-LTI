@@ -6,10 +6,15 @@ class OdsaExerciseProgressesController < ApplicationController
     inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
     hasBook = params.key?(:inst_book_id)
     if hasBook
-      inst_book_section_exercise = InstBookSectionExercise.where(
-        "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-        params[:inst_book_id], params[:inst_section_id], inst_exercise.id
-      ).first
+      inst_book_section_exercise = nil
+      if params.key?(:inst_book_section_exercise_id)
+        inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
+      else
+        inst_book_section_exercise = InstBookSectionExercise.where(
+          "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+          params[:inst_book_id], params[:inst_section_id], inst_exercise.id
+        ).first
+      end
 
       unless exercise_progress = OdsaExerciseProgress.where("user_id=? and inst_book_section_exercise_id=?",
                                                             current_user.id,
@@ -43,27 +48,37 @@ class OdsaExerciseProgressesController < ApplicationController
   end
 
   def show_exercise
+    if params.key?(:inst_chapter_module_id)
+      show_section()
+      return
+    end
     inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
-    hasBook = params.key?(:inst_book_id)
+    hasBook = (params.key?(:inst_book_id) or params.key?(:inst_book_section_exercise_id))
     if hasBook
-      inst_book_section_exercise = InstBookSectionExercise.where(
-        "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-        params[:inst_book_id], params[:inst_section_id], inst_exercise.id
-      ).first
-      exercise_progress = OdsaExerciseProgress.where(
-        "inst_book_section_exercise_id=? and user_id=?",
-        inst_book_section_exercise.id, current_user.id
-      ).first
+      inst_book_section_exercise = nil
+      if params.key?(:inst_book_section_exercise_id)
+        inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
+      else
+        inst_book_section_exercise = InstBookSectionExercise.find_by(
+          inst_book_id: params[:inst_book_id],
+          inst_section_id: params[:inst_section_id],
+          inst_exercise_id: inst_exercise.id,
+        )
+      end
+
+      exercise_progress = OdsaExerciseProgress.find_by(
+        inst_book_section_exercise_id: inst_book_section_exercise.id,
+        user_id: current_user.id,
+      )
       threshold = inst_book_section_exercise.threshold
     else
-      inst_course_offering_exercise = InstCourseOfferingExercise.find_by(id: params[:inst_course_offering_exercise_id])
+      inst_course_offering_exercise = InstCourseOfferingExercise.find(params[:inst_course_offering_exercise_id])
       exercise_progress = OdsaExerciseProgress.find_by(
         inst_course_offering_exercise_id: inst_course_offering_exercise.id,
         user_id: current_user.id,
       )
       threshold = inst_course_offering_exercise.threshold
     end
-    # inst_book_section_exercise = InstBookSectionExercise.find_by(id: exercise_progress.inst_book_section_exercise_id)
     respond_to do |format|
       format.json {
         render :json => {
@@ -77,9 +92,11 @@ class OdsaExerciseProgressesController < ApplicationController
   # Retrieves proficiency status of all exercises
   def show_section
     book_progress = OdsaBookProgress.get_progress(current_user.id, params[:inst_book_id])
-    proficient_exercises = []
+    proficient_exercises = nil
     if book_progress
       proficient_exercises = book_progress.get_proficient_exercises
+    else
+      proficient_exercises = []
     end
 
     respond_to do |format|

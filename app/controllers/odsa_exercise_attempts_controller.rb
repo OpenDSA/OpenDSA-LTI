@@ -12,29 +12,28 @@ class OdsaExerciseAttemptsController < ApplicationController
       inst_book = InstBook.find_by(id: params[:inst_book_id])
       inst_section = InstSection.find_by(id: params[:inst_section_id])
       inst_book_section_exercise = InstBookSectionExercise.where(
-                                    "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-                                    params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+        "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+        params[:inst_book_id], params[:inst_section_id], inst_exercise.id
+      ).first
       threshold = inst_book_section_exercise.threshold
-  
+
       unless exercise_progress = OdsaExerciseProgress.where("user_id=? and inst_book_section_exercise_id=?",
-                                                   current_user.id,
-                                                   inst_book_section_exercise.id).first
-  
+                                                            current_user.id,
+                                                            inst_book_section_exercise.id).first
         exercise_progress = OdsaExerciseProgress.new(user: current_user,
-                                                      inst_book_section_exercise: inst_book_section_exercise)
+                                                     inst_book_section_exercise: inst_book_section_exercise)
         exercise_progress.save
       end
     else
       inst_course_offering_exercise = InstCourseOfferingExercise.find_by(
-        id: params[:inst_course_offering_exercise_id]
+        id: params[:inst_course_offering_exercise_id],
       )
       threshold = inst_course_offering_exercise.threshold
-      
-      unless exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
-        inst_course_offering_exercise_id: inst_course_offering_exercise.id)
 
+      unless exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
+                                                              inst_course_offering_exercise_id: inst_course_offering_exercise.id)
         exercise_progress = OdsaExerciseProgress.new(user: current_user,
-          inst_course_offering_exercise: inst_course_offering_exercise)
+                                                     inst_course_offering_exercise: inst_course_offering_exercise)
         exercise_progress.save
       end
     end
@@ -58,43 +57,48 @@ class OdsaExerciseAttemptsController < ApplicationController
     end
 
     exercise_attempt = OdsaExerciseAttempt.new(
-                                              inst_book: inst_book,
-                                              user: current_user,
-                                              inst_section: inst_section,
-                                              inst_book_section_exercise: inst_book_section_exercise,
-                                              inst_course_offering_exercise: inst_course_offering_exercise,
-                                              worth_credit: worth_credit,
-                                              correct: params[:complete],
-                                              time_done: Time.now,
-                                              time_taken: params[:time_taken],
-                                              count_hints: params[:count_hints],
-                                              count_attempts: params[:attempt_number],
-                                              hint_used: params[:count_hints].to_i > 0,
-                                              question_name: question_name,
-                                              request_type: request_type ,
-                                              ip_address: request.ip)
+      inst_book: inst_book,
+      user: current_user,
+      inst_section: inst_section,
+      inst_book_section_exercise: inst_book_section_exercise,
+      inst_course_offering_exercise: inst_course_offering_exercise,
+      worth_credit: worth_credit,
+      correct: params[:complete],
+      time_done: Time.now,
+      time_taken: params[:time_taken],
+      count_hints: params[:count_hints],
+      count_attempts: params[:attempt_number],
+      hint_used: params[:count_hints].to_i > 0,
+      question_name: question_name,
+      request_type: request_type,
+      ip_address: request.ip,
+    )
 
     respond_to do |format|
       if exercise_attempt.save
         if hasBook
           exercise_progress = OdsaExerciseProgress.where(
-                                                    "user_id=? and inst_book_section_exercise_id=?",
-                                                    current_user.id,
-                                                    inst_book_section_exercise.id).first
+            "user_id=? and inst_book_section_exercise_id=?",
+            current_user.id,
+            inst_book_section_exercise.id
+          ).first
         else
           exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
-            inst_course_offering_exercise_id: inst_course_offering_exercise.id)
+                                                           inst_course_offering_exercise_id: inst_course_offering_exercise.id)
         end
 
-        format.json  { render :json => {
-                                        :exercise_progress => exercise_progress,
-                                        :threshold => threshold}}
+        format.json {
+          render :json => {
+                   :exercise_progress => exercise_progress,
+                   :threshold => threshold,
+                 }
+        }
       else
-        msg = { :status => "fail", :message => exercise_attempt.errors.full_messages }
-        format.json  { render :json => msg, :status => :bad_request }
-        error = Error.new(:class_name => 'exercise_attempt_save_fail', 
-            :message => exercise_attempt.errors.full_messages.inspect,
-            :params => params.to_s)
+        msg = {:status => "fail", :message => exercise_attempt.errors.full_messages}
+        format.json { render :json => msg, :status => :bad_request }
+        error = Error.new(:class_name => 'exercise_attempt_save_fail',
+                          :message => exercise_attempt.errors.full_messages.inspect,
+                          :params => params.to_s)
         error.save!
       end
     end
@@ -110,19 +114,20 @@ class OdsaExerciseAttemptsController < ApplicationController
       inst_book = InstBook.find_by(id: params[:inst_book_id])
       inst_section = InstSection.find_by(id: params[:inst_section_id])
       inst_book_section_exercise = InstBookSectionExercise.where(
-                                    "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-                                    params[:inst_book_id], params[:inst_section_id], inst_exercise.id).first
+        "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+        params[:inst_book_id], params[:inst_section_id], inst_exercise.id
+      ).first
       if inst_book_section_exercise == nil
         respond_to do |format|
-          msg = { :status => "fail", :message => "Fail!" }
-          format.json  { render :json => msg }
+          msg = {:status => "fail", :message => "Fail!"}
+          format.json { render :json => msg }
         end
         return
       end
-      threshold = inst_book_section_exercise.threshold                                    
+      threshold = inst_book_section_exercise.threshold
     else
       inst_course_offering_exercise = InstCourseOfferingExercise.find_by(
-        id: params[:inst_course_offering_exercise_id]
+        id: params[:inst_course_offering_exercise_id],
       )
       threshold = inst_course_offering_exercise.threshold
     end
@@ -131,21 +136,19 @@ class OdsaExerciseAttemptsController < ApplicationController
       if hasBook
         unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
                                                     inst_book_section_exercise_id=?",
-                                                    current_user.id,
-                                                    inst_book_section_exercise.id).first
-
+                                                              current_user.id,
+                                                              inst_book_section_exercise.id).first
           exercise_progress = OdsaExerciseProgress.new(user: current_user,
-                                                        inst_book_section_exercise: inst_book_section_exercise)
+                                                       inst_book_section_exercise: inst_book_section_exercise)
           exercise_progress.save
         end
       else
         unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
                                                     inst_course_offering_exercise_id=?",
-                                                    current_user.id,
-                                                    inst_course_offering_exercise.id).first
-
+                                                              current_user.id,
+                                                              inst_course_offering_exercise.id).first
           exercise_progress = OdsaExerciseProgress.new(user: current_user,
-                      inst_course_offering_exercise: inst_course_offering_exercise)
+                                                       inst_course_offering_exercise: inst_course_offering_exercise)
           exercise_progress.save
         end
       end
@@ -153,48 +156,54 @@ class OdsaExerciseAttemptsController < ApplicationController
       correct = params[:score].to_f >= params[:threshold].to_f
 
       exercise_attempt = OdsaExerciseAttempt.new(
-                                                inst_book: inst_book,
-                                                user: current_user,
-                                                inst_section: inst_section,
-                                                inst_book_section_exercise: inst_book_section_exercise,
-                                                inst_course_offering_exercise: inst_course_offering_exercise,
-                                                worth_credit: correct,
-                                                correct: correct,
-                                                time_done: Time.now,
-                                                time_taken: (params[:total_time].to_f/1000).round,
-                                                count_hints: 0,
-                                                count_attempts: params[:uiid],
-                                                hint_used: 0,
-                                                question_name: params[:exercise],
-                                                request_type: "PE" ,
-                                                ip_address: request.ip,
-                                                pe_score: params[:score],
-                                                pe_steps_fixed: params[:steps_fixed])
+        inst_book: inst_book,
+        user: current_user,
+        inst_section: inst_section,
+        inst_book_section_exercise: inst_book_section_exercise,
+        inst_course_offering_exercise: inst_course_offering_exercise,
+        worth_credit: correct,
+        correct: correct,
+        time_done: Time.now,
+        time_taken: (params[:total_time].to_f / 1000).round,
+        count_hints: 0,
+        count_attempts: params[:uiid],
+        hint_used: 0,
+        question_name: params[:exercise],
+        request_type: "PE",
+        ip_address: request.ip,
+        pe_score: params[:score],
+        pe_steps_fixed: params[:steps_fixed],
+      )
 
       respond_to do |format|
         if exercise_attempt.save
           if hasBook
             exercise_progress = OdsaExerciseProgress.where(
-                                "user_id=? and inst_book_section_exercise_id=?",
-                                current_user.id,
-                                inst_book_section_exercise.id).first
+              "user_id=? and inst_book_section_exercise_id=?",
+              current_user.id,
+              inst_book_section_exercise.id
+            ).first
           else
             exercise_progress = OdsaExerciseProgress.find_by(
-              inst_course_offering_exercise_id: inst_course_offering_exercise.id)
+              inst_course_offering_exercise_id: inst_course_offering_exercise.id,
+            )
           end
-          
-          format.json  { render :json => {
-                                          :exercise_progress => exercise_progress,
-                                          :threshold => threshold}}
+
+          format.json {
+            render :json => {
+                     :exercise_progress => exercise_progress,
+                     :threshold => threshold,
+                   }
+          }
         else
-          msg = { :status => "fail", :message => "Fail!" }
-          format.json  { render :json => msg }
+          msg = {:status => "fail", :message => "Fail!"}
+          format.json { render :json => msg }
         end
       end
     else
       respond_to do |format|
-        msg = { :status => "fail", :message => "Fail!" }
-        format.json  { render :json => msg }
+        msg = {:status => "fail", :message => "Fail!"}
+        format.json { render :json => msg }
       end
     end
   end
@@ -203,7 +212,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     practiced_ex = OdsaExerciseAttempt.count(:conditions => "request_type <> 'hint'") + CodeWorkout::EXERCISES_SOLVED
 
     respond_to do |format|
-      format.json  { render :json => {:practiced_ex => practiced_ex}}
+      format.json { render :json => {:practiced_ex => practiced_ex} }
     end
   end
 
