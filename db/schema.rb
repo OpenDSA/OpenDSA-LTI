@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180326192339) do
+ActiveRecord::Schema.define(version: 20180403181426) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -459,6 +459,7 @@ ActiveRecord::Schema.define(version: 20180326192339) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "inst_course_offering_exercise_id"
+    t.integer  "inst_chapter_module_id"
   end
 
   add_index "odsa_user_interactions", ["inst_book_id"], name: "odsa_user_interactions_inst_book_id_fk", using: :btree

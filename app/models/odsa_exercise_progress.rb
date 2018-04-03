@@ -41,7 +41,8 @@ class OdsaExerciseProgress < ActiveRecord::Base
   end
 
   def proficient?
-    return self.proficient_date.year > 0
+    byebug
+    return ((self.proficient_date != nil) and self.proficient_date.year > 0)
   end
 
   #~ Private instance methods .................................................

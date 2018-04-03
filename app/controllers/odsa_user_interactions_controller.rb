@@ -11,10 +11,12 @@ class OdsaUserInteractionsController < ApplicationController
     params[:eventList].each do |event|
       hasBook = event.key?(:inst_book_id)
       if hasBook
-        inst_course_offering_exercise_id = nil
         inst_book_id = params[:inst_book_id]
         if event[:inst_section_id] != ""
           inst_section_id = event[:inst_section_id]
+        end
+        if event[:inst_chapter_module_id] != ""
+          inst_chapter_module_id = event[:inst_chapter_module_id]
         end
         if event[:av] != ""
           inst_exercise = InstExercise.find_by(short_name: event[:av])
@@ -25,7 +27,6 @@ class OdsaUserInteractionsController < ApplicationController
         end
       else
         inst_course_offering_exercise_id = event[:inst_course_offering_exercise_id]
-        inst_book_id = nil
       end
 
       # if browser.mobile?
@@ -39,6 +40,7 @@ class OdsaUserInteractionsController < ApplicationController
         inst_book_id: inst_book_id,
         user: current_user,
         inst_section_id: inst_section_id,
+        inst_chapter_module_id: inst_chapter_module_id,
         inst_book_section_exercise: inst_book_section_exercise,
         inst_course_offering_exercise_id: inst_course_offering_exercise_id,
         name: event[:type],

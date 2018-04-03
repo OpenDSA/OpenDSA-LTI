@@ -27,7 +27,8 @@ class LtiController < ApplicationController
 
     file_name = nil
     if params.key?(:custom_module_file_name)
-      ensure_module_progress()
+      lms_access_id = LmsAccess.where(consumer_key: params[:oauth_consumer_key]).pluck(:id).first
+      ensure_module_progress(lms_access_id)
       file_name = params[:custom_module_file_name]
     else
       file_name = params[:custom_section_file_name]
@@ -40,6 +41,20 @@ class LtiController < ApplicationController
 
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
+    isFullModule = request_params.key?('instChapterModuleId')
+
+    if isFullModule
+      mod_prog = OdsaModuleProgress.includes(:lms_access).find_by(inst_chapter_module_id: request_params['instChapterModuleId'],
+                                                                  user_id: current_user.id)
+      res = post_module_score(mod_prog)
+      if res.success?
+        render :json => {:message => 'success', :res => res.to_json}.to_json
+      else
+        render :json => {:message => 'failure', :res => res.to_json}.to_json, :status => :bad_request
+      end
+      return
+    end
+
     hasBook = request_params.key?('instBookId')
 
     if hasBook
@@ -101,14 +116,14 @@ class LtiController < ApplicationController
     res = @tp.post_extended_replace_result!(score: score, text: f)
 
     if res.success?
-      if hasBook
+      if hasBook and inst_section
         inst_section.lms_posted = true
         inst_section.time_posted = Time.now
         inst_section.save!
       end
       render :json => {:message => 'success', :res => res.to_json}.to_json
     else
-      if hasBook
+      if hasBook and inst_section
         inst_section.lms_posted = false
         inst_section.save!
       end
@@ -535,12 +550,13 @@ class LtiController < ApplicationController
     return true #successful
   end
 
-  def ensure_module_progress
+  def ensure_module_progress(lms_access_id)
     book_id = params[:custom_inst_book_id]
     chpt_mod_id = params[:custom_inst_chapter_module_id]
     OdsaModuleProgress.get_progress(current_user.id, chpt_mod_id, book_id,
                                     params[:lis_outcome_service_url],
-                                    params[:lis_result_sourcedid])
+                                    params[:lis_result_sourcedid],
+                                    lms_access_id)
   end
 
   # send the module score to tool consumer if they exist
@@ -555,13 +571,14 @@ class LtiController < ApplicationController
                                       lti_param)
       tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
 
-      res = tp.post_extended_replace_result!(score: module_progress.score)
+      res = tp.post_extended_replace_result!(score: module_progress.highest_score)
       unless res.success?
         error = Error.new(:class_name => 'post_replace_result_fail',
                           :message => res.inspect,
                           :params => module_progress.to_json.to_s)
         error.save!
       end
+      return res
     end
   end
 end

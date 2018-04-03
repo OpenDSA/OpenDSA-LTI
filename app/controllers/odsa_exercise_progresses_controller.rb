@@ -3,13 +3,13 @@ class OdsaExerciseProgressesController < ApplicationController
 
   #~ Action methods ...........................................................
   def update
-    inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
     hasBook = params.key?(:inst_book_id)
     if hasBook
       inst_book_section_exercise = nil
       if params.key?(:inst_book_section_exercise_id)
         inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
       else
+        inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
         inst_book_section_exercise = InstBookSectionExercise.where(
           "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
           params[:inst_book_id], params[:inst_section_id], inst_exercise.id

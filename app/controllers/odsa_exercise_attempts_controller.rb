@@ -7,14 +7,25 @@ class OdsaExerciseAttemptsController < ApplicationController
   # POST /odsa_exercise_attempts
   def create
     hasBook = params.key?(:inst_book_id)
-    inst_exercise = InstExercise.find_by(short_name: params[:sha1])
+    inst_exercise = nil
+    if params.key(:sha1)
+      inst_exercise = InstExercise.find_by(short_name: params[:sha1])
+    end
     if hasBook
       inst_book = InstBook.find_by(id: params[:inst_book_id])
-      inst_section = InstSection.find_by(id: params[:inst_section_id])
-      inst_book_section_exercise = InstBookSectionExercise.where(
-        "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-        params[:inst_book_id], params[:inst_section_id], inst_exercise.id
-      ).first
+      inst_section = nil
+      inst_book_section_exercise = nil
+      if params.key?(:inst_book_section_exercise_id)
+        inst_book_section_exercise = InstBookSectionExercise.includes(:inst_exercise, :inst_section).find(params[:inst_book_section_exercise_id])
+        inst_section = inst_book_section_exercise.inst_section
+        inst_exercise = inst_book_section_exercise.inst_exercise
+      else
+        inst_section = InstSection.find_by(id: params[:inst_section_id])
+        inst_book_section_exercise = InstBookSectionExercise.where(
+          "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
+          params[:inst_book_id], params[:inst_section_id], inst_exercise.id
+        ).first
+      end
       threshold = inst_book_section_exercise.threshold
 
       unless exercise_progress = OdsaExerciseProgress.where("user_id=? and inst_book_section_exercise_id=?",
@@ -108,10 +119,13 @@ class OdsaExerciseAttemptsController < ApplicationController
   # POST /odsa_exercise_attempts/pe
   def create_pe
     hasBook = params.key?(:inst_book_id)
-    inst_exercise = InstExercise.find_by(short_name: params[:exercise])
 
-    if hasBook
+    if params.key?(:inst_book_section_exercise_id)
+      inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
+      threshold = inst_book_section_exercise.threshold
+    elsif hasBook
       inst_book = InstBook.find_by(id: params[:inst_book_id])
+      inst_exercise = InstExercise.find_by(short_name: params[:exercise])
       inst_section = InstSection.find_by(id: params[:inst_section_id])
       inst_book_section_exercise = InstBookSectionExercise.where(
         "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
@@ -156,7 +170,7 @@ class OdsaExerciseAttemptsController < ApplicationController
       correct = params[:score].to_f >= params[:threshold].to_f
 
       exercise_attempt = OdsaExerciseAttempt.new(
-        inst_book: inst_book,
+        inst_book_id: params[:inst_book_id],
         user: current_user,
         inst_section: inst_section,
         inst_book_section_exercise: inst_book_section_exercise,
