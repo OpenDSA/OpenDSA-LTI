@@ -214,6 +214,9 @@
   var getResourceURL = function (obj) {
     if (!$.isEmptyObject(obj)) {
       var odsa_url = odsa_launch_url + '?' + $.param(obj);
+      if (deepLinking) {
+        return odsa_url;
+      }
       var urlParams = {
         'embed_type': 'basic_lti',
         'url': odsa_url
@@ -266,7 +269,46 @@
         var selected = data.instance.get_node(data.selected);
         if (selected.original.type === 'section') {
           console.log(getResourceURL(selected.original.url_params));
-          window.location.href = getResourceURL(selected.original.url_params);
+          var url = getResourceURL(selected.original.url_params);
+          if (deepLinking) {
+            var contentItem = {
+              '@context': 'http://purl.imsglobal.org/ctx/lti/v1/ContentItem',
+              '@graph': [
+                {              
+                  '@type': 'ContentItem',
+                  'mediaType': 'text/html',
+                  'title': selected.text,
+                  'url': url,
+                  'placementAdvice': {
+                    'displayWidth': 800,
+                    'displayHeight': 1000,
+                    'presentationDocumentTarget': 'iframe'
+                  }
+                }
+              ]
+            };
+            var jsonStr = JSON.stringify(contentItem);
+            //jsonStr = jsonStr.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+            //jsonStr = JSON.encode(jsonStr)
+            window.content_item_params.content_items = jsonStr;
+            $('#content_items').attr('value', jsonStr);
+            $.ajax({
+              url: '/lti/content_item_selection',
+              type: 'post',
+              data: JSON.stringify(content_item_params),
+              contentType: 'application/json'
+            }).done(function (data) {
+              for (var key in data) {
+                $('input[name="' + key + '"]').attr('value', data[key]);
+              }
+              $('#return_form').submit();
+            }).fail(function (data) {
+              displayErrors(data.responseJSON);
+            });
+          }
+          else {
+            window.location.href = url;
+          }
         }
       })
 

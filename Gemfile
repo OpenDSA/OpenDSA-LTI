@@ -138,7 +138,7 @@ gem 'capistrano-rake', require: false
 gem 'css3-progress-bar-rails'
 
 gem 'immigrant'
-gem 'ims-lti', '~> 1.1.8'
+gem 'ims-lti', '~> 1.2'
 gem 'json'
 gem "browser"
 gem "figaro"
