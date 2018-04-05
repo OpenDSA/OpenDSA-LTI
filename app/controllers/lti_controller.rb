@@ -193,7 +193,10 @@ class LtiController < ApplicationController
       return
     end
 
-    @user = User.where(email: get_email(lms_type.name)).first
+    email = params.key?(:lis_person_contact_email_primary) ?
+      params[:lis_person_contact_email_primary] :
+      params[:oauth_consumer_key]
+    @user = User.where(email: email).first
     if @user.blank? || !@user.global_role.is_instructor_or_admin?
       @message = 'The email of your LMS account does not match an OpenDSA instructor account.'
       render 'error'
@@ -446,7 +449,7 @@ class LtiController < ApplicationController
     end
   end
 
-  def get_email(lms_type)
+  def get_email()
     if params.key?(:lis_person_contact_email_primary)
       return params[:lis_person_contact_email_primary]
     else
