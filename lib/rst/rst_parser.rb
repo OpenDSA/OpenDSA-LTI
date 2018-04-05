@@ -17,6 +17,7 @@ module RstParser
       "Biography": "Biographies",
       "Bounds": "Lower Bounds",
       "BTRecurTutor": "Binary Trees Recursion",
+      "CT": "Computational Thinking",
       "Design": "Design I and II",
       "Files": "File Processing",
       "FormalLang": "Formal Languages",
