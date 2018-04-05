@@ -16,7 +16,8 @@ class LtiController < ApplicationController
     $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
-    render('error') and return unless ensure_user()
+    lms_instance = ensure_lms_instance()
+    render('error') and return unless ensure_user(lms_instance.id)
 
     lti_enroll(@course_offering)
 
@@ -116,14 +117,14 @@ class LtiController < ApplicationController
     res = @tp.post_extended_replace_result!(score: score, text: f)
 
     if res.success?
-      if hasBook and inst_section
+      if hasBook
         inst_section.lms_posted = true
         inst_section.time_posted = Time.now
         inst_section.save!
       end
       render :json => {:message => 'success', :res => res.to_json}.to_json
     else
-      if hasBook and inst_section
+      if hasBook
         inst_section.lms_posted = false
         inst_section.save!
       end
@@ -230,43 +231,6 @@ class LtiController < ApplicationController
   end
 
   private
-
-  def launch_ex
-    require 'oauth/request_proxy/rack_request'
-    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
-    lms_instance = ensure_lms_instance()
-    lms_type_name = params[:tool_consumer_info_product_family_code].downcase
-    lms_course_num = get_lms_course_num(lms_type_name, lms_instance)
-    course_offering = CourseOffering.where(lms_course_num: lms_course_num,
-                                           lms_instance_id: lms_instance.id).first
-
-    render('error') and return unless lti_authorize!
-    render('error') and return unless ensure_user()
-    lti_enroll(course_offering)
-
-    require 'rst/rst_parser'
-    @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
-    @course_off_ex = InstCourseOfferingExercise.find_by(
-      course_offering_id: course_offering.id,
-      resource_link_id: params[:resource_link_id],
-    )
-    if @course_off_ex.blank?
-      @course_off_ex = InstCourseOfferingExercise.new(
-        course_offering: course_offering,
-        inst_exercise_id: @ex.id,
-        resource_link_id: params[:resource_link_id],
-        resource_link_title: params[:resource_link_title],
-        threshold: @ex.threshold,
-      )
-      @course_off_ex.save
-    end
-
-    if @ex.instance_of?(AvEmbed)
-      render "launch_avembed", layout: 'lti_launch'
-    else
-      render 'launch_inlineav', layout: 'lti_launch'
-    end
-  end
 
   def launch_extrtool
     if current_user.blank?
@@ -407,16 +371,17 @@ class LtiController < ApplicationController
   def launch_ex
     require 'oauth/request_proxy/rack_request'
     $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
-    course_offering = CourseOffering.joins(:lms_instance).where(
-      lms_instances: {url: params[:custom_canvas_api_base_url]},
-      course_offerings: {lms_course_num: params[:custom_canvas_course_id]},
-    ).first
+    lms_instance = ensure_lms_instance()
+    lms_type_name = params[:tool_consumer_info_product_family_code].downcase
+    lms_course_num = get_lms_course_num(lms_type_name, lms_instance)
+    course_offering = CourseOffering.where(lms_course_num: lms_course_num,
+                                           lms_instance_id: lms_instance.id).first
 
     render('error') and return unless lti_authorize!
-    render('error') and return unless ensure_user()
+    render('error') and return unless ensure_user(lms_instance.id)
     lti_enroll(course_offering)
 
-    require 'RST/rst_parser'
+    require 'rst/rst_parser'
     @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
     @course_off_ex = InstCourseOfferingExercise.find_by(
       course_offering_id: course_offering.id,
@@ -440,99 +405,6 @@ class LtiController < ApplicationController
     end
   end
 
-  def lti_enroll(course_offering, role = CourseRole.student)
-    if course_offering &&
-       course_offering.can_enroll? &&
-       !course_offering.is_enrolled?(current_user)
-      CourseEnrollment.create(
-        course_offering: course_offering,
-        user: current_user,
-        course_role: role,
-      )
-    end
-  end
-
-  def lti_authorize!
-    if $oauth_creds.blank?
-      @message = "No OAuth credentials found"
-      return false
-    elsif key = params['oauth_consumer_key']
-      if secret = $oauth_creds[key]
-        @tp = IMS::LTI::ToolProvider.new(key, secret, params)
-      else
-        @tp = IMS::LTI::ToolProvider.new(nil, nil, params)
-        @tp.lti_msg = "Your consumer didn't use a recognized key."
-        @tp.lti_errorlog = "You did it wrong!"
-        @message = "Consumer key wasn't recognized"
-        return false
-      end
-    else
-      @message = "No consumer key"
-      return false
-    end
-
-    if !params.has_key?(:selection_directive)
-      if !@tp.valid_request?(request)
-        @message = "The OAuth signature was invalid"
-        return false
-      end
-
-      if Time.now.utc.to_i - @tp.request_oauth_timestamp.to_i > 60 * 60
-        @message = "Your request is too old."
-        return false
-      end
-
-      # this isn't actually checking anything like it should, just want people
-      # implementing real tools to be aware they need to check the nonce
-      if was_nonce_used_in_last_x_minutes?(@tp.request_oauth_nonce, 60)
-        @message = "Why are you reusing the nonce?"
-        return false
-      end
-    end
-
-    return true
-  end
-
-  def allow_iframe
-    response.headers.except! 'X-Frame-Options'
-  end
-
-  def was_nonce_used_in_last_x_minutes?(nonce, minutes = 60)
-    # some kind of caching solution or something to keep a short-term memory of used nonces
-    false
-  end
-
-  def ensure_course_offering(lms_instance_id, organization_id, lms_course_num, lms_course_code, course_name)
-    course_offering = CourseOffering.find_by(lms_instance_id: lms_instance_id,
-                                             lms_course_num: lms_course_num)
-    if course_offering.blank?
-      if organization_id.blank?
-        return nil
-      end
-      course = Course.where(number: lms_course_code,
-                            organization_id: organization_id).first
-      if course.blank?
-        course = Course.new(
-          name: course_name,
-          number: lms_course_code,
-          organization_id: organization_id,
-          user_id: current_user.id,
-        )
-        course.save
-      end
-      course_offering = CourseOffering.new(
-        course: course,
-        term: Term.current_or_next_term,
-        label: lms_course_code,
-        lms_instance_id: lms_instance_id,
-        lms_course_code: lms_course_code,
-        lms_course_num: lms_course_num,
-      )
-      course_offering.save
-    end
-    return course_offering
-  end
-
   def ensure_lms_type(type_name)
     type_name.downcase!
     lms_type = LmsType.find_by('lower(name) = :name', name: type_name)
@@ -544,8 +416,6 @@ class LtiController < ApplicationController
   end
 
   def launch_instructor_tool
-    puts ('param have key')
-
     @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
     @student_list = []
     @course_enrollment.each do |s|
@@ -621,14 +491,16 @@ class LtiController < ApplicationController
     return lms_instance
   end
 
-  def ensure_user
+  def ensure_user(lms_instance_id)
+    byebug
     email = params[:lis_person_contact_email_primary]
     if email.blank?
-      @message = 'The launch request must include an email address.'
-      error = Error.new(:class_name => 'lti_launch_email_missing',
-                        :message => "LTI launch request missing email parameter", :params => params.to_s)
-      error.save!
-      #return false
+      # try to uniquely identify user some other way
+      if params[:user_id].blank?
+        @message = 'OpenDSA: Unable to uniquely identify user'
+        return false
+      end
+      email = "#{lms_instance_id}_#{params[:user_id]}"
     end
     @user = User.where(email: email).first
     if @user.blank?
@@ -638,21 +510,28 @@ class LtiController < ApplicationController
                        :password_confirmation => email,
                        :first_name => params[:lis_person_name_given],
                        :last_name => params[:lis_person_name_family])
-      @user.save
+      unless @user.save
+        @message = "OpenDSA: Failed to create user"
+        error = Error.new(:class_name => 'user_create_fail',
+                          :message => "Failed to create user #{email}", :params => params.to_s)
+        error.save!
+        return false
+      end
     end
     successful = sign_in @user
     unless successful
-      @message = 'OpenDSA sign-in failed'
+      @message = 'OpenDSA: sign-in failed'
       error = Error.new(:class_name => 'user_sign_in_fail',
                         :message => "Failed to sign in user #{email}", :params => params.to_s)
       error.save!
+      return false
     end
     return true #successful
   end
 
   def lti_authorize!
     if $oauth_creds.blank?
-      @message = "No OAuth credentials found"
+      @message = "OpenDSA: No OAuth credentials found"
       return false
     elsif key = params['oauth_consumer_key']
       if secret = $oauth_creds[key]
@@ -661,7 +540,7 @@ class LtiController < ApplicationController
         @tp = IMS::LTI::ToolProvider.new(nil, nil, params)
         @tp.lti_msg = "Your consumer didn't use a recognized key."
         @tp.lti_errorlog = "You did it wrong!"
-        @message = "Consumer key wasn't recognized"
+        @message = "OpenDSA: Consumer key wasn't recognized"
         return false
       end
     else
@@ -671,19 +550,19 @@ class LtiController < ApplicationController
 
     if !params.has_key?(:selection_directive)
       if !@tp.valid_request?(request)
-        @message = "The OAuth signature was invalid"
+        @message = "OpenDSA: The OAuth signature was invalid"
         return false
       end
 
       if Time.now.utc.to_i - @tp.request_oauth_timestamp.to_i > 60 * 60
-        @message = "Your request is too old."
+        @message = "OpenDSA: Your request is too old."
         return false
       end
 
       # this isn't actually checking anything like it should, just want people
       # implementing real tools to be aware they need to check the nonce
       if was_nonce_used_in_last_x_minutes?(@tp.request_oauth_nonce, 60)
-        @message = "Why are you reusing the nonce?"
+        @message = "OpenDSA: Why are you reusing the nonce?"
         return false
       end
     end
@@ -715,8 +594,8 @@ class LtiController < ApplicationController
       if organization_id.blank?
         return nil
       end
-      course = Course.where(number: lms_course_code,
-                            organization_id: organization_id).first
+      course = Course.find_by(number: lms_course_code,
+                              organization_id: organization_id)
       if course.blank?
         course = Course.new(
           name: course_name,
@@ -737,47 +616,6 @@ class LtiController < ApplicationController
       course_offering.save
     end
     return course_offering
-  end
-
-  def ensure_lms_instance
-    lms_instance = LmsInstance.find_by(url: params[:custom_canvas_api_base_url])
-    if lms_instance.blank?
-      lms_instance = LmsInstance.new(
-        url: params[:custom_canvas_api_base_url],
-        lms_type: LmsType.find_by('lower(name) = :name', name: params[:tool_consumer_info_product_family_code]),
-      )
-      lms_instance.save
-    end
-    return lms_instance
-  end
-
-  def ensure_user
-    email = params[:lis_person_contact_email_primary]
-    if email.blank?
-      @message = 'The launch request must include an email address.'
-      error = Error.new(:class_name => 'lti_launch_email_missing',
-                        :message => "LTI launch request missing email parameter", :params => params.to_s)
-      error.save!
-      #return false
-    end
-    @user = User.where(email: email).first
-    if @user.blank?
-      # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
-      @user = User.new(:email => email,
-                       :password => email,
-                       :password_confirmation => email,
-                       :first_name => params[:lis_person_name_given],
-                       :last_name => params[:lis_person_name_family])
-      @user.save
-    end
-    successful = sign_in @user
-    unless successful
-      @message = 'OpenDSA sign-in failed'
-      error = Error.new(:class_name => 'user_sign_in_fail',
-                        :message => "Failed to sign in user #{email}", :params => params.to_s)
-      error.save!
-    end
-    return true #successful
   end
 
   def ensure_module_progress(lms_access_id)
