@@ -1,44 +1,43 @@
 class EmbedController < ApplicationController
+  after_action :allow_iframe, only: [:show]
 
-    after_action :allow_iframe, only: [:show]
+  # GET /embed
+  # gives a list of embeddable slideshows and exercises
+  # with links to the exercises and the html required to include
+  # the resource in an iframe
+  def index
+    require 'rst/rst_parser'
+    @folders = RstParser.get_exercise_info()
+    @host_url = request.protocol + request.host_with_port
+    render
+  end
 
-    # GET /embed
-    # gives a list of embeddable slideshows and exercises
-    # with links to the exercises and the html required to include
-    # the resource in an iframe
-    def index
-        require 'rst/rst_parser'
-        @folders = RstParser.get_exercise_info()
-        @host_url = request.protocol + request.host_with_port
-        render
+  # GET /embed/:ex_short_name
+  # Displays an exercise
+  def show
+    require 'rst/rst_parser'
+    @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
+    if @ex.blank?
+      @message = "No resource found with the name \"#{params[:ex_short_name]}\""
+      render 'lti/error' and return
     end
-
-    # GET /embed/:ex_short_name
-    # Displays an exercise
-    def show
-        require 'rst/rst_parser'
-        @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
-        if @ex.blank?
-            @message = "No resource found with the name \"#{params[:ex_short_name]}\""
-            render 'lti/error' and return
-        end
-        if @ex.instance_of?(AvEmbed)
-            redirect_to "#{request.protocol}#{request.host_with_port}#{@ex.av_address}"
-        else
-            render 'embed_inlineav', layout: 'embed_inlineav'
-        end
+    if @ex.instance_of?(AvEmbed)
+      @ex_url = "#{request.protocol}#{request.host_with_port}#{@ex.av_address}"
+      render 'embed_av', layout: 'embed_inlineav'
+    else
+      render 'embed_inlineav', layout: 'embed_inlineav'
     end
+  end
 
-    # GET /SourceCode/*
-    # redirects to the static source code file
-    def source_code_redirect
-        redirect_to "#{request.protocol}#{request.host_with_port}/OpenDSA#{request.path}"
-    end
+  # GET /SourceCode/*
+  # redirects to the static source code file
+  def source_code_redirect
+    redirect_to "#{request.protocol}#{request.host_with_port}/OpenDSA#{request.path}"
+  end
 
-    private
+  private
 
-    def allow_iframe
-        response.headers.except! 'X-Frame-Options'
-    end
-
+  def allow_iframe
+    response.headers.except! 'X-Frame-Options'
+  end
 end
