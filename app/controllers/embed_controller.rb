@@ -7,7 +7,7 @@ class EmbedController < ApplicationController
     # with links to the exercises and the html required to include
     # the resource in an iframe
     def index
-        require 'RST/rst_parser'
+        require 'rst/rst_parser'
         @folders = RstParser.get_exercise_info()
         @host_url = request.protocol + request.host_with_port
         render
@@ -16,7 +16,7 @@ class EmbedController < ApplicationController
     # GET /embed/:ex_short_name
     # Displays an exercise
     def show
-        require 'RST/rst_parser'
+        require 'rst/rst_parser'
         @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
         if @ex.blank?
             @message = "No resource found with the name \"#{params[:ex_short_name]}\""
