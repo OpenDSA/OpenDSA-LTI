@@ -1,0 +1,185 @@
+<div class="row" style="margin:50px">
+  <span class="span12">
+    <div class="text-center">
+      <h1>Add an OpenDSA Exercise or Visualization to a Moodle Course</h1>
+    </div>
+    <br>
+    <p>
+      OpenDSA is an eTextbook project developed at Virginia Tech. OpenDSA
+      materials include many visualizations and interactive exercises that
+      support courses in a wide variety of Computer Science-related topics such
+      as Data Structures and Algorithms (DSA), Formal and Programming Languages.
+    </p>
+    <p>
+      OpenDSA has hundreds of visualizations and exercises.
+      Most algorithms and data structures are illustrated by interactive
+      algorithm visualizations. Students could enter their own test cases to see
+      how the algorithm or data structure works on that input, and they can
+      control the pacing of the visualization.
+    </p>
+    <p>
+      A course instructor who is using the Moodle LMS can add individual
+      OpenDSA materials directly into their Moodle courses. Below are detailed
+      instructions on how to do this. Gradable exercises will report scores to
+      your Moodle's gradebook.
+    </p>
+
+    <p>
+      To add one or more OpenDSA exercises in your Moodle course, follow the
+      following steps:
+    </p>
+    <p>
+      <strong>Step 1:</strong> Go to
+      <a href="http://opendsa.org" target="_blank"> OpenDSA.org </a>
+      and create an account.
+    </p>
+    <p>
+      <strong>Step 2:</strong> Send an email to
+      <a href="mailto:opendsa@cs.vt.edu"> opendsa@cs.vt.edu </a>
+      and ask for instructor access.
+    </p>
+    <p>
+      <strong>Step 3:</strong> Once you are provided with the instructor
+      access, you need to click on your email address at the top right corner
+      of the page and you will be redirected to a page from where you can copy
+      your consumer key and a shared secret as shown in the image below:
+      <div class="text-center">
+        <%= image_tag "guides/keysecret.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 4:</strong>
+      Next, navigate to your course in Moodle and click on <em>"Add an
+      activity or resource"</em>.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle1.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 5:</strong>
+      Select <em>"External Tool"</em> from the list and click <em>"Add"</em>.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle2.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 6:</strong>
+      Click on the <em>"+"</em> icon on the right of <em>Preconfigured
+        tool</em> to add a new Tool Provider.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle3.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 7:</strong>
+      Paste your consumer key and the shared secret that you copied in
+      <em>Step 3</em>. Add
+      <a href="#">
+        https://opendsa-server.cs.vt.edu/lti/resource</a> under
+        <em>"Tool URL"</em>. This is the URL to which OpenDSA will send an LTI
+        request.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle4.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 8:</strong> Under <em>"Privacy"</em> settings, select
+      <em>"Always"</em> for all three dropdowns.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle5.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 9:</strong> Click on <em>"Show more..."</em> and check
+      <em>"Content-Item Message"</em>. This enables instructors to select
+      content (i.e. exercises) to be added to their courses.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle6.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 10:</strong> Once the above steps are completed, click "Save
+      Changes" to add OpenDSA as a Tool Provider.
+    </p>
+    <p>
+      <strong>Step 11:</strong> Now you should be back on a previous page.
+      Select <em>OpenDSA</em> from <em>Preconfigured tool</em> dropdown and
+      click on <em>"Select content"</em>.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle7.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 12:</strong>
+      If this is your first time going through this process for your course,
+      you will be asked to provide some information that OpenDSA can use to
+      identify your course offering. Fill out the required fields and click
+      "Submit".
+      <div class="text-center">
+        <%= image_tag "guides/Moodle8.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 13:</strong>
+      Once you do that, a tree view will be displayed listing the topics
+      for visualizations and exercises that are available. To expand one of the
+      categories, either double click on it, or click the arrow to the left of
+      the folder icon. You will then see sub-categories that you can expand.
+      Expanding a sub-category will display the names of the exercises and
+      visualizations contained within it. Once you find the resource you want
+      to add, simply click on it.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle9.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 14:</strong>
+      The <em>Activity name</em> and the <em>Tool URL</em> text fields will be
+      automatically filled with the name and the URL that will be used to
+      launch the resource. Finally, click <em>"Save and return to course"</em>.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle10.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 15:</strong>
+      Select if you want this OpenDSA exercise or visualization as a
+      <strong>graded</strong> or <strong>ungraded</strong> content by going to
+      the <em>"Grade"</em> section. Select the <em>type</em> of the
+      exercise from the <em>"Type"</em> dropdown.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle11.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 16:</strong>
+      The selected exercise should be now added to your course.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle12.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 17:</strong>
+      The selected exercise should be now added to your course.
+      <div class="text-center">
+        <%= image_tag "guides/Moodle12.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 18:</strong>
+      The students will be able to view the OpenDSA exercise or visualization
+      by clicking on it from the list of topics as shown above. One example
+      of OpenDSA exercise is shown here:
+      <div class="text-center">
+        <%= image_tag "guides/Moodle13.png", style:'width:50%' %>
+      </div>
+      <br>
+      If you added a graded content, in that case, once a student completes an
+      assignment, his/her grade will be submitted to Moodle's gradebook as
+      shown below:<br><br>
+      <div class="text-center">
+        <%= image_tag "guides/Moodle14.png", style:'width:50%' %>
+      </div>
+    </p>
+  </span>
+</div>

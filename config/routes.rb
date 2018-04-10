@@ -14,7 +14,7 @@ CodeWorkout::Application.routes.draw do
   # resources :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' => 'odsa_exercise_progresses#show_exercise',
-     constraints: { inst_course_offering_exercise_id: /\d+/}
+      constraints: {inst_course_offering_exercise_id: /\d+/}
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id' => 'odsa_exercise_progresses#show_section'
   get '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
@@ -41,19 +41,26 @@ CodeWorkout::Application.routes.draw do
   get 'home/support'
   get 'home/new_course_modal', as: :new_course_modal
 
+  scope :guides do
+    get 'opendsa-bookinstance' => 'guides#opendsa-bookinstance', as: :guide_bookinstance
+    get 'opendsa-canvas' => 'guides#opendsa-canvas', as: :guide_canvas
+    get 'opendsa-moodle' => 'guides#opendsa-moodle', as: :guide_moodle
+    get 'opendsa-book-configuration' => 'guides#opendsa-book-configuration', as: :guide_book_configuration
+  end
+
   # routes anchored at /admin
   # First, we have to override some of the ActiveAdmin auto-generated
   # routes, since our user ids and file ids use restricted characters
-  get '/admin/users/:id/edit(.:format)' => 'admin/users#edit', constraints: { id: /[^\/]+/ }
-  get '/admin/users/:id/edit_access(.:format)' => 'admin/users#edit_access', constraints: { id: /[^\/]+/ }
-  get '/admin/users/:id' => 'admin/users#show', constraints: { id: /[^\/]+/ }
-  patch '/admin/users/:id' => 'admin/users#update', constraints: { id: /[^\/]+/ }
-  put '/admin/users/:id' => 'admin/users#update', constraints: { id: /[^\/]+/ }
-  delete '/admin/users/:id' => 'admin/users#destroy', constraints: { id: /[^\/]+/ }
+  get '/admin/users/:id/edit(.:format)' => 'admin/users#edit', constraints: {id: /[^\/]+/}
+  get '/admin/users/:id/edit_access(.:format)' => 'admin/users#edit_access', constraints: {id: /[^\/]+/}
+  get '/admin/users/:id' => 'admin/users#show', constraints: {id: /[^\/]+/}
+  patch '/admin/users/:id' => 'admin/users#update', constraints: {id: /[^\/]+/}
+  put '/admin/users/:id' => 'admin/users#update', constraints: {id: /[^\/]+/}
+  delete '/admin/users/:id' => 'admin/users#destroy', constraints: {id: /[^\/]+/}
   ActiveAdmin.routes(self)
 
   post 'inst_books/update' => 'inst_books#update', as: :book_update
-  post 'inst_books/:id' => 'inst_books#compile', defaults: { format: 'js', data: {type: "script"} }, as: :compile
+  post 'inst_books/:id' => 'inst_books#compile', defaults: {format: 'js', data: {type: "script"}}, as: :compile
   get 'inst_books/configure/:id' => 'inst_books#configure', as: :book_configure
   get 'inst_books/configurations/:id' => 'inst_books#configuration', as: :book_configuration
   resources :inst_books
@@ -83,14 +90,14 @@ CodeWorkout::Application.routes.draw do
     get '/' => 'workouts#gym', as: :gym
 
     # /gym/exercises ...
-    get  'exercises_import' => 'exercises#upload_yaml'
-    post  'exercises_yaml_create' => 'exercises#yaml_create'
-    get  'exercises/upload' => 'exercises#upload', as: :exercises_upload
-    get  'exercises/download' => 'exercises#download', as: :exercises_download
+    get 'exercises_import' => 'exercises#upload_yaml'
+    post 'exercises_yaml_create' => 'exercises#yaml_create'
+    get 'exercises/upload' => 'exercises#upload', as: :exercises_upload
+    get 'exercises/download' => 'exercises#download', as: :exercises_download
     post 'exercises/upload_create' => 'exercises#upload_create'
-    get  'exercises/upload_mcqs' => 'exercises#upload_mcqs', as: :exercises_upload_mcqs
+    get 'exercises/upload_mcqs' => 'exercises#upload_mcqs', as: :exercises_upload_mcqs
     post 'exercises/create_mcqs' => 'exercises#create_mcqs'
-    get  '/exercises/any' => 'exercises#random_exercise', as: :random_exercise
+    get '/exercises/any' => 'exercises#random_exercise', as: :random_exercise
     get 'exercises/:id/practice' => 'exercises#practice', as: :exercise_practice
     patch 'exercises/:id/practice' => 'exercises#evaluate', as: :exercise_evaluate
     post 'exercises/search' => 'exercises#search', as: :search
@@ -99,23 +106,23 @@ CodeWorkout::Application.routes.draw do
     resources :exercises
 
     # /gym/workouts ...
-    get  'workouts/download' => 'workouts#download'
-    get  'workouts/:id/add_exercises' => 'workouts#add_exercises'
-    post 'workouts/link_exercises'  => 'workouts#link_exercises'
-    get  'workouts/new_with_search/:searchkey'  => 'workouts#new_with_search', as: :workouts_with_search
-    post 'workouts/new_with_search'  => 'workouts#new_with_search', as: :workouts_exercise_search
-    get  'workouts/:id/practice' => 'workouts#practice', as: :practice_workout
-    get  'workouts/:id/evaluate' => 'workouts#evaluate', as: :workout_evaluate
-    get  'workouts_dummy' => 'workouts#dummy'
-    get  'workouts_import' => 'workouts#upload_yaml'
-    post  'workouts_yaml_create' => 'workouts#yaml_create'
+    get 'workouts/download' => 'workouts#download'
+    get 'workouts/:id/add_exercises' => 'workouts#add_exercises'
+    post 'workouts/link_exercises' => 'workouts#link_exercises'
+    get 'workouts/new_with_search/:searchkey' => 'workouts#new_with_search', as: :workouts_with_search
+    post 'workouts/new_with_search' => 'workouts#new_with_search', as: :workouts_exercise_search
+    get 'workouts/:id/practice' => 'workouts#practice', as: :practice_workout
+    get 'workouts/:id/evaluate' => 'workouts#evaluate', as: :workout_evaluate
+    get 'workouts_dummy' => 'workouts#dummy'
+    get 'workouts_import' => 'workouts#upload_yaml'
+    post 'workouts_yaml_create' => 'workouts#yaml_create'
 
     # At the bottom, so the routes above take precedence over existing ids
     resources :workouts
   end
 
   # All of the routes anchored at /courses
-  resources :organizations, only: [ :index, :show ], path: '/courses' do
+  resources :organizations, only: [:index, :show], path: '/courses' do
     get 'search' => 'courses#search', as: :courses_search
     post 'find' => 'courses#find', as: :course_find
     get 'new' => 'courses#new'
@@ -133,7 +140,7 @@ CodeWorkout::Application.routes.draw do
   post 'organizations' => 'organizations#create', as: :organization_create
   post 'courses' => 'courses#create'
 
-  resources :course_offerings, only: [ :edit, :update ] do
+  resources :course_offerings, only: [:edit, :update] do
     # post 'enroll' => :enroll, as: :enroll
     # delete 'unenroll' => :unenroll, as: :unenroll
     match 'upload_roster/:action', controller: 'upload_roster', as: :upload_roster, via: [:get, :post]
@@ -143,9 +150,9 @@ CodeWorkout::Application.routes.draw do
   end
 
   # All of the routes anchored at /users
-  resources :users, constraints: { id: /[^\/]+/ } do
+  resources :users, constraints: {id: /[^\/]+/} do
     resources :resource_files, path: 'media',
-      constraints: { id: /[^\/]+/ }
+                               constraints: {id: /[^\/]+/}
     # This route is broken, since there is no such method
     # post 'resource_files/uploadFile' => 'resource_files#uploadFile'
     # get 'performance' => :calc_performance, as: :calc_performance
@@ -156,7 +163,7 @@ CodeWorkout::Application.routes.draw do
   get '/SourceCode/*all' => 'embed#source_code_redirect'
 
   devise_for :users,
-    controllers: {omniauth_callbacks: 'users/omniauth_callbacks', registrations: "registrations" },
+    controllers: {omniauth_callbacks: 'users/omniauth_callbacks', registrations: "registrations"},
     skip: [:registrations, :sessions]
   as :user do
     get '/new_password' => 'devise/passwords#new', as: :new_password
