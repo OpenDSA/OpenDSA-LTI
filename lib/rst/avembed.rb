@@ -27,10 +27,11 @@ class AvEmbed < Directive
   end
 
   def embed_url(host)
-    return "#{host}#{@av_address}"
+    #return "#{host}#{@av_address}"
+    return "#{host}/embed/#{@short_name}"
   end
 
   def embed_code(host)
-    return "<iframe src=\"#{embed_url(host)}\" height=\"#{@height}\" width=\"#{@width}\"></iframe>"
+    return "<iframe src=\"#{embed_url(host)}\" height=\"#{@height}\" width=\"100%\" scrolling=\"no\"></iframe>"
   end
 end

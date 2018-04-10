@@ -1,0 +1,236 @@
+<div class="row" style="margin:50px">
+  <span class="span12">
+    <div class="text-center">
+      <h1>Add an OpenDSA Exercise or Visualization to a Canvas Course</h1>
+    </div>
+    <br>
+    <p>
+      OpenDSA is an eTextbook project developed at Virginia Tech. OpenDSA
+      materials include many visualizations and interactive exercises that
+      support courses in a wide variety of Computer Science-related topics such
+      as Data Structures and Algorithms (DSA), Formal and Programming Languages.
+    </p>
+    <p>
+      OpenDSA has hundreds of visualizations and exercises.
+      Most algorithms and data structures are illustrated by interactive
+      algorithm visualizations. Students could enter their own test cases to see
+      how the algorithm or data structure works on that input, and they can
+      control the pacing of the visualization.
+    </p>
+    <p>
+      A course instructor who is using the Canvas LMS can add individual
+      OpenDSA materials directly into their Canvas courses. Below are detailed
+      instructions on how to do this. Gradable exercises will report scores to
+      your Canvas' gradebook.
+    </p>
+
+    <p>
+      To add one or more OpenDSA exercises in your Canvas' course, follow the
+      following steps:
+    </p>
+    <p>
+      <strong>Step 1:</strong> Go to
+      <a href="http://opendsa.org" target="_blank"> OpenDSA.org </a>
+      and create an account.
+    </p>
+    <p>
+      <strong>Step 2:</strong> Send an email to
+      <a href="mailto:opendsa@cs.vt.edu"> opendsa@cs.vt.edu </a>
+      and ask for instructor access.
+    </p>
+    <p>
+      <strong>Step 3:</strong> Once you are provided with the instructor
+      access, you need to click on your email address at the top right corner
+      of the page and you will be redirected to a page from where you can copy
+      your consumer key and a shared secret as shown in the image below:
+      <div class="text-center">
+        <%= image_tag "guides/keysecret.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 4:</strong>
+      Next, navigate to your course in Canvas and click the <em>"Settings"</em>
+      link in the left sidebar.
+      <div class="text-center">
+        <%= image_tag "guides/Canvas1.png", style:'width:40%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 5:</strong>
+      Go to <em>"Apps"</em> and click on <em>"View App Configurations"</em>.
+      Note that your institution's version of Canvas might display differently.
+      <div class="text-center">
+        <%= image_tag "guides/Canvas2.png", style:'width:40%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 6:</strong>
+      Click on the <em>"+App"</em> button.
+      <div class="text-center">
+        <%= image_tag "guides/Canvas3.png", style:'width:40%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 7:</strong>
+      Paste your consumer key and the shared secret that you copied in
+      <em>Step 3</em>. After that, paste
+      <a href="https://opendsa-server.cs.vt.edu/lti/xml_config">
+        https://opendsa-server.cs.vt.edu/lti/xml_config</a> under
+        <em>"Config URL"</em>. This is the URL to the XML configuration for
+        OpenDSA.
+      <div class="text-center">
+        <%= image_tag "guides/Canvas4.png", style:'width:40%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 8:</strong> The final configuration for OpenDSA should look
+      like the image below. Press <em>"Submit"</em> to add OpenDSA
+      as a Tool Provider to Canvas.
+      <div class="text-center">
+        <%= image_tag "guides/Canvas5.png", style:'width:30%' %>
+      </div>
+    </p>
+    <br>
+    <strong>Now you can insert OpenDSA stand-alone visualization and exercises
+      as either graded or ungraded content.</strong> To insert as ungraded
+    content follow these steps:<br><br>
+    <p>
+      <strong>Step 1:</strong>
+      Navigate to the Module in your Canvas course where you would like to
+      insert the OpenDSA content and click the "+" button to the far right of
+      the module's name.
+      <div class="text-center">
+        <%= image_tag "guides/module.png", style:'width:40%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 2:</strong>
+      In the dropdown box at the top of the pop-up window, select "External
+      Tool". You will see a list of the external tools that are configured for
+      your course. Click on the tool labeled <em>OpenDSA</em>.
+      <div class="text-center">
+        <%= image_tag "guides/externaltool.png", style:'width:40%' %>
+      </div>
+    </p><br>
+    <p>
+      <strong>Step 3:</strong>
+      If this is your first time going through this process for your course,
+      you will be asked to provide some information that OpenDSA can use to
+      identify your course offering. Fill out the required fields and click
+      "Submit".
+      <div class="text-center">
+        <%= image_tag "guides/info.png", style:'width:30%' %>
+      </div>
+    </p><br>
+    <p>
+      <strong>Step 4:</strong>
+       Once you do that, a tree view will be displayed listing the topics for
+       visualizations and exercises that are available. To expand one of the
+       categories, either double click on it, or click the arrow to the left of
+       the folder icon. You will then see sub-categories that you can expand.
+       Expanding a sub-category will display the names of the exercises and
+       visualizations contained within it. Once you find the resource you want
+       to add, simply click on it. The "URL" textbox in the Add Module window
+       will then be automatically filled in with the URL that will be used to
+       launch the resource.
+       <div class="text-center">
+         <%= image_tag "guides/exercises.png", style:'width:40%' %>
+       </div>
+    </p><br>
+    <p>
+      <strong>Step 5:</strong>
+      The new module item will appear under the module name. To make the module
+      item viewable by students, click the publish button to the far right of
+      the module name (to the immediate left of the gear icon).
+      <div class="text-center">
+        <%= image_tag "guides/ungradedmodule.png", style:'width:40%' %>
+      </div>
+    </p>
+    <br><br>
+
+    To insert an OpenDSA exercise as <strong>graded</strong> content follow
+    these steps:<br><br>
+    <p>
+      <strong>Step 1:</strong>
+      Navigate to the <em>"Assignments"</em> page in your Canvas course and
+      create a new assignment by clicking on <em>"+Assignment"</em> button.
+      <div class="text-center">
+        <%= image_tag "guides/assignments.png", style:'width:40%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 2:</strong>
+      Find the input field labeled <em>"Submission Type"</em>. In the dropdown
+      box select <em>"External Tool"</em>, then click the button labeled
+      <em>"Find"</em> to view the list of available tools.
+      <div class="text-center">
+        <%= image_tag "guides/submission_assignment.png", style:'width:30%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 3:</strong>
+      A list of the external tools configured for your course will be
+      displayed. Find the tool named <em>"OpenDSA"</em> and click on it to open
+      the resource selection window.
+      <div class="text-center">
+        <%= image_tag "guides/graded_tools.png", style:'width:30%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 4:</strong>
+      If this is your first time going through this process for your course,
+      you will be asked to provide some information that OpenDSA can use to
+      identify your course offering. Fill out the required fields and click
+      "Submit".
+      <div class="text-center">
+        <%= image_tag "guides/info.png", style:'width:30%' %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 5:</strong>
+       Once you do that, a tree view will be displayed listing the topics
+       for visualizations and exercises that are available. To expand one of the
+       categories, either double click on it, or click the arrow to the left of
+       the folder icon. You will then see sub-categories that you can expand.
+       Expanding a sub-category will display the names of the exercises and
+       visualizations contained within it. Once you find the resource you want
+       to add, simply click on it.
+       <div class="text-center">
+         <%= image_tag "guides/exercises.png", style:'width:40%' %>
+       </div>
+    </p>
+
+    <p>
+      <strong>Step 6:</strong>
+       The URL textbox on the assignment creation page will then be
+       automatically filled in with the URL that will be used to launch the
+       resource you selected.
+       <div class="text-center">
+         <%= image_tag "guides/graded_url.png", style:'width:40%' %>
+       </div>
+    </p>
+
+    <p>
+      <strong>Step 7:</strong>
+      On the Canvas assignment creation page, specify the number of points the
+      assignment will be worth, choose the assignment group, specify a due
+      date, and then click <em>"Save and Publish"</em> to make the assignment
+      immediately visible to students. Students will be able to see the newly
+      created assignment in the list of assignments as shown here:
+      <div class="text-center">
+        <%= image_tag "guides/assignmentlist.png", style:'width:40%' %>
+      </div>
+      The students will be able to complete the assignment by clicking on any
+      assignment from the list. One example of OpenDSA assignment is shown
+      here:
+      <div class="text-center">
+        <%= image_tag "guides/assignment.png", style:'width:40%' %>
+      </div>
+      Once a student completes an assignment, his/her grade will be submitted
+      to Canvas' gradebook as shown below:
+      <div class="text-center">
+        <%= image_tag "guides/gradebook.png", style:'width:40%' %>
+      </div>
+    </p>
+  </span>
+</div>

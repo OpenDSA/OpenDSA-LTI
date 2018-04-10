@@ -1,0 +1,283 @@
+<div class="row" style="margin:50px">
+  <span class="span12">
+    <div class="text-center">
+      <h1>Configure an OpenDSA eTextbook</h1>
+    </div>
+    <br>
+    <p>
+      OpenDSA is an eTextbook project developed at Virginia Tech. OpenDSA
+      materials include many visualizations and interactive exercises that
+      support courses in a wide variety of Computer Science-related topics such
+      as Data Structures and Algorithms (DSA), Formal and Programming Languages.
+    </p>
+    <p>
+      OpenDSA has hundreds of visualizations and exercises.
+      Most algorithms and data structures are illustrated by interactive
+      algorithm visualizations. Students could enter their own test cases to see
+      how the algorithm or data structure works on that input, and they can
+      control the pacing of the visualization.
+    </p>
+    <p>
+      A course instructor who is using the Canvas LMS can add OpenDSA materials
+      directly into their Canvas courses appearing as Modules and Assignments
+      in Canvas. Below are the detailed instructions for how to configure an
+      OpenDSA eTextbook.
+    </p>
+
+
+     <p>
+      <strong>Before you begin:</strong> If you have not already done so, 
+      create an OpenDSA account  and send an email to
+      <a href="mailto:opendsa@cs.vt.edu"> opendsa@cs.vt.edu </a>
+      asking for instructor access.
+    </p>
+
+    <p>
+      Once you are provided with instructor
+      access, click on the <em>Create
+      Book</em> menu item located at the top of the page 
+      to configure a new eTextbook.
+      <div class="text-center">
+        <%= image_tag "guides/BookInstance14-1.png", style:'width:60%' %>
+      </div>
+      <br>
+      You will be taken to a new page (shown below) where you can create your
+      own Book Instance.
+      <div class="text-center">
+        <%= image_tag "guides/BookInstance14-2.png", style:'width:30%' %>
+      </div>
+      <br>
+      Following is the explanation of each field:<br>
+      <h3>Load Existing Configuration (Optional)</h3>
+      <p>1. <strong>Select Reference Configuration:</strong> You may select
+        from a number of configuration files that are stored on the OpenDSA
+        server. These can be useful as a starting point for creating your own
+        configuration.</p>
+      <p>2. <strong>Select Your Configuration:</strong> If you have
+        created/uploaded a configuration to the OpenDSA server in the past, you
+        may load it and make modifications to it. If you only wish to change
+        the point values of the exercises in the book, you may update the
+        existing configuration directly. If you wish to modify the content of
+        the book (e.g. add or remove modules), you must save your configuration
+        as a new template book.</p>
+      <p>3. <strong>Select Configuration File:</strong> If you have a book
+        configuration file (.json), you may load it using this option.</p>
+
+      <h3>Book settings</h3>
+      <p>These are global settings that describe or apply to the entire book.
+      </p>
+      <ul>
+        <li><strong>Title:</strong> This will be the title of the book</li>
+        <li><strong>Description:</strong> A short description of the book</li>
+        <li><strong>Language:</strong> The language of the content in the book.
+          This will determine which modules are available for you to choose
+          from. The vast majority of OpenDSA content is currently only
+          available in English.</li>
+        <li><strong>Code Languages:</strong> OpenDSA modules sometimes contain
+          sample code. You may select which languages you wish for these code
+          samples to appear in. If you select multiple languages, the code
+          sample container will have a tab for each language (unless you
+          disable Tabbed Code-include), with the tabs ordered based on how you
+          order the languages in the interface. You may reorder the languages
+          using drag-and-drop. It is important to note that code samples are
+          usually not available in every language, but most code samples are
+          available in Java.</li>
+        <li><strong>Global Exercise Options:</strong> These are options that
+          will apply to every exercise.
+          <ul>
+            <li>JSAV Debug: This option can be useful for developers of OpenDSA
+              exercises. It enables the debug flag for JSAV exercises, which
+              results in some debugging information being printed to the
+              browser console.
+            </li>
+          </ul>
+        </li>
+        <li><strong>Global Slideshow Options:</strong> These options will apply
+          to all slideshows, unless explicitly overridden for individual
+          slideshows. Note that these generally should not be changed from Not
+          Required and 0 Points if you are planning to use the configuration
+          for a Canvas course. This is due to current limitations preventing
+          multiple gradable items per Canvas assignment.
+          <ul>
+            <li>
+              Required: Whether the completion of the slideshow is required for
+              module proficiency.
+            </li>
+            <li>
+              Points: The number of points completion of the slideshow is
+              worth.
+            </li>
+          </ul>
+        </li>
+        <li><strong>Global Khan-Academy Exercise Options:</strong> These are
+          options that will apply to all Khan-Academy style exercises, unless
+          explicitly overridden for individual exercises.
+          <ul>
+            <li>
+              Required: Whether the completion of the exercise is required for
+              module proficiency.
+            </li>
+            <li>
+              Points: The number of points the exercise is worth.
+            </li>
+            <li>
+              Threshold: The number of questions the student must get correct
+              to achieve proficiency.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Global Proficiency Exercise Options:</strong> These are
+          options that will apply to all proficiency style exercises, unless
+          explicitly overridden for individual exercises.
+          <ul>
+            <li>
+              Required: Whether the completion of the exercise is required for
+              module proficiency.
+            </li>
+            <li>
+              Points: The number of points the exercise is worth.
+            </li>
+            <li>
+              Threshold: The proportion of steps the student must get correct to
+              achieve proficiency. Must be between 0 and 1, where 1 means the
+              student must get all steps correct to achieve proficiency.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Global External Tool Options:</strong> These are options that
+          will apply to all external tool exercises unless the same settings
+          are specified for the specific external tool, or overridden for a
+          specific external tool exercise.
+          <ul>
+            <li>
+              Points: The number of points the exercise is worth.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Global Code-Workout Options:</strong> These are options that
+          will apply to all Code-Workout exercises, unless explicitly overridden
+          for individual exercises.
+          <ul>
+            <li>
+              Points: The number of points the exercise is worth.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Other Options:</strong> These are simple options that are
+          either enabled or disabled.
+          <ul>
+            <li>
+              Build JSAV: Controls whether or not the JSAV library should be
+              rebuilt whenever the book is compiled.
+            </li>
+            <li>
+              Display Module Completion: If enabled, will force the "Module
+              Complete" message to appear even if the module contains no
+              required exercises. If disabled, the "Module Complete" message
+              will not appear, even if the module DOES contain required
+              exercises.
+            </li>
+            <li>
+              Narration Enabled: This controls whether or not a button should
+              be shown for each slideshow that will turn on text-to-speech
+              narration for that slideshow.</li>
+              <li>
+                Suppress ToDo: Controls whether or not TODO messages are
+                displayed. This should generally be enabled.
+              </li>
+              <li>
+                Tabbed Code-include: Controls whether or not code samples are
+                displayed in a tabbed interface. If enabled, it will display
+                code samples in each of the languages selected in Code
+                Languages section (if the code exists) in a tabbed container.
+                If disabled, it will display the code in a single language (the
+                first language for which the code exists with the order of
+                precedence determined by the order specified in the Code
+                Languages section).
+              </li>
+            </ul>
+          </li>
+      </ul>
+      <h3>Book Content</h3>
+      <p>This two-pane drag-and-drop interface allows you to specify the content
+        that should be in your book. Before you can select the content in your
+        book, you must first either 1) select the book language, or 2) load an
+        existing configuration.
+      </p>
+      <ul>
+        <li>
+          The left pane (Included Modules) lists the content that is included
+          in your book.
+        </li>
+        <li>
+          The right pane (Available Modules) lists content that is available to
+          be included in your book.
+        </li>
+        <li>
+          Books are organized into chapters, with each chapter containing one
+          or more modules. You choose the names of chapters, as well as which
+          modules should be included in each chapter.git status.
+        </li>
+        <li>
+          A module may contain zero or more sections, and a section may contain
+          zero or more exercises and/or slideshows.
+        </li>
+        <li>
+          To <strong>add a chapter</strong> to your book, click the "+ Chapter"
+          button and enter a name for the chapter.
+        </li>
+        <li>
+          To <strong>remove a chapter</strong> and all of its modules from your
+          book, right click on the chapter, and then click "Delete".
+        </li>
+        <li>
+          To <strong>add a module</strong> to your book, left-click and hold
+          and drag a module from the Available pane and drop it (release your
+          left mouse button) in the Included pane in the desired chapter. You
+          can select multiple modules by holding Ctrl (Mac: ⌘) and clicking on
+          the desired modules. To select multiple sequentially listed modules,
+          click on the first module, then hold Shift and click on the last
+          module.
+        </li>
+        <li>
+          To <strong>remove a module</strong> from your book, right click on
+          the module in the Included pane, and then click "Remove".
+        </li>
+        <li>
+          <strong>Reorder chapters and modules</strong> in your book using
+          drag-and-drop. The order of the chapters and modules in the Included
+          pane will be the order of the chapters and modules in your book.</li>
+        <li>
+          To <strong>override the global settings for an individual
+            exercise</strong>, right click on the exercise, and then click "Edit
+          Settings".
+        </li>
+        <li>
+          To <strong>hide a section in the book</strong>, right click on the
+          section, and then click "Hide Section".
+        </li>
+      </ul>
+      <h3>Saving Your Configuration</h3>
+      <p>Once you are finished configuring your book you can:</p>
+      <p>
+        1. Click "Save New Configuration" to save the configuration as a
+        template book to the OpenDSA database. The book will then show up
+        in the list of available books when creating a new course.
+      </p>
+      <p>
+        2. If you have loaded one of your existing configurations you can
+        click "Update Configuration". You can then update your Canvas
+        course by regenerating it. Note that this option does not support
+        removing chapters and/or modules.
+      </p>
+      <p>
+        3. Click "Download Configuration" to download a JSON file
+        containing the configuration.
+      </p>
+    </p>
+  </span>
+</div>

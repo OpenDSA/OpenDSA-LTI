@@ -1,12 +1,13 @@
 %ol.breadcrumb
   %li= link_to 'Home', root_path
-  %li.active Instructor Guide
+  %li.active Instructor Guides
 
-%h1 Instructor Guide
+%h1 Instructor Guides
 
 <p>
-This guide will help instructors to set up an OpenDSA eTextbook
-instance for use within a Canvas course.
+These guides will help instructors to set up an OpenDSA eTextbook
+instance for use within a Canvas course, and/or add individual exercises
+and visualizations to their Canvas or Moodle course.
 If your institution has its own Canvas installation, then you can
 attach an OpenDSA eTextbook to any course where you have instructor
 permissions.
@@ -35,194 +36,18 @@ the directions here to create the new eTextbook materials in the new
 course shell.
 </p>
 
-%ol
+%h3 Available Guides
+%ul
   %li
-    Get access to an OpenDSA instructor account.
-    Click "Sign Up" in the upper-right corner of this page to create a
-    new account, and then send email to
-    %a{ href: 'mailto:opendsa@cs.vt.edu' }
-      opendsa@cs.vt.edu
-    asking for instructor access.
-
+    %a{href: guide_book_configuration_path}
+      Configuring an OpenDSA eTextbook
   %li
-    Go to your institution's Canvas site, or create an account at the public site
-    at <a href="https://canvas.instructure.com">https://canvas.instructure.com</a>.
-    Once there, create a course.
-    Give it a name, and copy the course ID (the number that you will find at the
-    end of the course URL).
-    You will use this ID later.
-
+    %a{href: guide_bookinstance_path}
+      Adding an OpenDSA eTextbook to a Canvas course
   %li
-    Next you will need to generate a Canvas API access token. OpenDSA will 
-    need this token to access the Canvas API through your account in order to add the 
-    materials for your book to your Canvas course.
-    %ol{type: "a"}
-      %li 
-        On your institution's Canvas site, click "Account" on the left-hand sidebar,
-        then click "Settings". 
-      %li 
-        Scroll down to "Approved Integrations" and click
-        "New Access Token". 
-      %li
-        For purpose, enter "OpenDSA". You can enter an
-        expiration date for the token, or leave it blank so the token never
-        expires. 
-      %li 
-        Click "Generate Token", then copy the entire token string.
-
+    %a{href: guide_canvas_path}
+      Adding an OpenDSA exercise or visualization to a Canvas course
   %li
-    Now you need to save your Canvas access token in OpenDSA.
-    %ol{type: "a"}
-      %li 
-        On the OpenDSA website, click the wrench icon in the top right
-        to go to the administrative dashboard.
-      %li 
-        Click the "LMS config" dropdown menu at the top, then click "LMS Accesses".
-      %li  
-        If you already see a record for your LMS instance listed, click its edit link.
-        Otherwise, click "New Lms Access" in the top right. 
-      %li 
-        Select your LMS instance, then paste your Canvas Access Token in the field
-        labeled "Access Token".
-      %li
-        Click "Create Lms Access" or "Update Lms Access".
-
-  %li
-    Click the "Course" button at the top of this page,
-    then click "Create new course".
-    This will take you to a simple form that asks for the necessary
-    information to define your course instance.
-    Fill in all of the fields, and then click "Submit".
-
-  %li
-    Once you have created your course offering, you will be redirected
-    to the page where you can configure your eTextbook, and then
-    generate the course in Canvas. Click the "Generate Course" button,
-    and this process will take care of generating
-    modules, assignments, and assignments groups in your Canvas course.
-
-<p>
-If you only want to include your choice of OpenDSA visualizations and exercises without compiling the entire book, please follow these steps.
-</p>
-%ol
-  %li
-    Get access to an OpenDSA instructor account.
-    Click "Sign Up" in the upper-right corner of this page to create a
-    new account, and then send email to
-    %a{ href: 'mailto:opendsa@cs.vt.edu' }
-      opendsa@cs.vt.edu
-    asking for instructor access. Please note that the email of your OpenDSA 
-    account <i>must</i> match the email of your account in your Learning Management System.
-
-  %li
-    Login using your instructor account and click on your email address at the upper right corner of the home page. Copy the
-    %code Consumer Key
-    and the
-    %code Shared Secret
-    to use them later.
-
-  %li
-    Go to your Canvas course and click the "Settings" link in the left sidebar. Click the "Apps" tab and then click "View App Configurations".
-
-  %li
-    Click "+ App" to add a new LTI application. Select "By URL" under the "Configuration Type" dropdown menu. Write "OpenDSA" in the name field. Paste in the
-    %code Consumer Key
-    and the
-    %code Shared Secret that
-    you copied in the earlier step. Finally, add the OpenDSA LTI configuration URL
-    %code #{@config_url}
-    to the "Config URL" field and click "Submit".
-  %li
-    To insert OpenDSA content that will be <b>ungraded</b> into your Canvas
-    course, follow these steps:
-    %ol
-      %li
-        Navigate to the "Modules" page in your Canvas course
-      %li
-        If you do not have any modules, or would like to create a new
-        module to hold the OpenDSA content, click the "+ Module" button 
-        in the top right. Provide a name for the module and click 
-        "Add Module". The module will then show up in the module list.
-        To make the module viewable by students, click the publish button to the 
-        far right of the module name, immediately to the left of the "+" button.
-      %li
-        Find the module that you would like to insert the OpenDSA content into
-        then click the "+" button to the far right of the module's name.
-      %li
-        In the dropdown box at the top of the pop-up window, 
-        select "External Tool". You will see a list of the external tools
-        that are configured for your course. Click on the tool labeled "OpenDSA"
-        or "OpenDSA-LTI".
-      %li
-        If this is your first time going through this process for your course,
-        you will be asked to provide some information that OpenDSA can use
-        to identify your course offering. Fill out the required fields
-        and click "Submit".
-      %li
-        A tree view will be displayed listing the categories of visualizations
-        and exercises that are available. To expand one of the categories, 
-        either double click on it, or click the arrow to the left of the 
-        folder icon. You will then see sub-categories that you can expand.
-        Expanding a sub-category will display the names of the 
-        exercises and visualizations contained within it.
-      %li
-        Once you find the resource you want to add, simply
-        click on it. The "URL" textbox in the Add Module window will then be 
-        automatically filled in with the url that will be used to launch
-        the resource. Change the "Page Name" textbox to use a more descriptive 
-        name for the new module item, then click "Add Item".
-      %li
-        The new module item will appear under the module name. To make the
-        module item viewable by students, click the publish button to the 
-        far right of the module name (to the immediate left of the gear icon).
-      %li
-        Click on the newly added module item to view the OpenDSA content.
-
-  %li
-    To insert OpenDSA content that will be <b>graded</b> into your Canvas 
-    course, follow these steps:
-    %ol
-      %li
-        Navigate to the "Assignments" page in your Canvas course
-      %li
-        To add a new assignment group, click the "+ Group" button in the top
-        right.
-      %li
-        Click the "+ Assignment" button in the top right to be taken to the
-        assignment creation page.
-      %li
-        Find the input field labeled "Submission Type". In the 
-        dropdown box select "External Tool", then click the button
-        labeled "Find". A list of the external tools configured for your
-        course will be displayed. Find the tool named "OpenDSA" or 
-        "OpenDSA-LTI" and click on it to open the resource selection window.
-      %li
-        If this is your first time going through this process for your course,
-        you will be asked to provide some information that OpenDSA can use
-        to identify your course offering. Fill out the required fields
-        and click "Submit".
-      %li
-        A tree view will be displayed listing the categories of visualizations
-        and exercises that are available. To expand one of the categories, 
-        either double click on it, or click the arrow to the left of the 
-        folder icon. You will then see sub-categories that you can expand.
-        Expanding a sub-category will display the names of the 
-        exercises and visualizations contained within it.
-      %li
-        Once you find the resource you want to add, simply
-        click on it. The url textbox on the assignment creation page will 
-        then be automatically filled in with the url that will be used to launch
-        the resource you selected.
-      %li
-        Still on the Canvas assignment creation page, specify the number of
-        points the assignment will be worth, choose the assignment group, and
-        specify a due date. At the top of the page, give the assignment a 
-        descriptive name.
-      %li
-        Once you are satisfied with the assignmnent settings, either click
-        "Save and Publish" to make the assignment immediately visible to 
-        students, or click "Save" to add the assignment without making
-        it visible to students.
-      %li
-        After clicking "Save" or "Save and Publish", you will automatically
-        be taken to the page for the newly created assignment.
+    %a{href: guide_moodle_path}
+      Adding an OpenDSA exercise or visualization to a Moodle course
+      
