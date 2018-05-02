@@ -18,12 +18,14 @@ class OdsaUserInteractionsController < ApplicationController
         if event[:inst_chapter_module_id] != ""
           inst_chapter_module_id = event[:inst_chapter_module_id]
         end
-        if event[:av] != ""
+        if event.key?(:inst_book_section_exercise_id)
+          inst_book_section_exercise_id = event[:inst_book_section_exercise_id]
+        elsif event[:av] != ""
           inst_exercise = InstExercise.find_by(short_name: event[:av])
-          inst_book_section_exercise = InstBookSectionExercise.where(
+          inst_book_section_exercise_id = InstBookSectionExercise.where(
             "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
             inst_book_id, inst_section_id, inst_exercise.id
-          ).first
+          ).pluck(:id).first
         end
       else
         inst_course_offering_exercise_id = event[:inst_course_offering_exercise_id]
@@ -41,7 +43,7 @@ class OdsaUserInteractionsController < ApplicationController
         user: current_user,
         inst_section_id: inst_section_id,
         inst_chapter_module_id: inst_chapter_module_id,
-        inst_book_section_exercise: inst_book_section_exercise,
+        inst_book_section_exercise: inst_book_section_exercise_id,
         inst_course_offering_exercise_id: inst_course_offering_exercise_id,
         name: event[:type],
         description: event[:desc],
