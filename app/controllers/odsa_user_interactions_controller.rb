@@ -43,7 +43,7 @@ class OdsaUserInteractionsController < ApplicationController
         user: current_user,
         inst_section_id: inst_section_id,
         inst_chapter_module_id: inst_chapter_module_id,
-        inst_book_section_exercise: inst_book_section_exercise_id,
+        inst_book_section_exercise_id: inst_book_section_exercise_id,
         inst_course_offering_exercise_id: inst_course_offering_exercise_id,
         name: event[:type],
         description: event[:desc],
