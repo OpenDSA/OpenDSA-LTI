@@ -281,6 +281,10 @@ class LtiController < ApplicationController
     launch_params["custom_label"] = course_offering.label
     launch_params["custom_term"] = course_offering.term.slug
 
+    if (tool.name == 'code-workout')
+      launch_params['from_collection'] = 'true'
+    end
+
     @tc = IMS::LTI::ToolConsumer.new(tool.key, tool.secret, launch_params)
     @launch_data = @tc.generate_launch_data()
 
