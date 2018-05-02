@@ -61,6 +61,28 @@ class OdsaModuleProgress < ActiveRecord::Base
     end
   end
 
+  def post_score_to_lms()
+    if self.lis_outcome_service_url and self.lis_result_sourcedid
+      lti_param = {
+        "lis_outcome_service_url" => self.lis_outcome_service_url,
+        "lis_result_sourcedid" => self.lis_result_sourcedid,
+      }
+      tp = IMS::LTI::ToolProvider.new(self.lms_access.consumer_key,
+                                      self.lms_access.consumer_secret,
+                                      lti_param)
+      tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
+
+      res = tp.post_extended_replace_result!(score: self.highest_score)
+      unless res.success?
+        error = Error.new(:class_name => 'post_replace_result_fail',
+                          :message => res.inspect,
+                          :params => self.to_json.to_s)
+        error.save!
+      end
+      return res
+    end
+  end
+
   #~ Private instance methods .................................................
   private
 
@@ -77,6 +99,9 @@ class OdsaModuleProgress < ActiveRecord::Base
       end
     end
     self.current_score = score / total_points
+    if self.highest_score.nil?
+      self.highest_score = 0
+    end
     if self.current_score > self.highest_score
       self.highest_score = self.current_score
     end

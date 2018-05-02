@@ -47,7 +47,7 @@ class LtiController < ApplicationController
     if isFullModule
       mod_prog = OdsaModuleProgress.includes(:lms_access).find_by(inst_chapter_module_id: request_params['instChapterModuleId'],
                                                                   user_id: current_user.id)
-      res = post_module_score(mod_prog)
+      res = mod_prog.post_score_to_lms()
       if res.success?
         render :json => {:message => 'success', :res => res.to_json}.to_json
       else
@@ -98,7 +98,7 @@ class LtiController < ApplicationController
 
     lti_param = {
       "lis_outcome_service_url" => "#{launch_params['lis_outcome_service_url']}",
-      "lis_result_sourcedid" => "#{CGI.unescapeHTML(launch_params['lis_result_sourcedid'])}",
+      "lis_result_sourcedid" => "#{CGI.unescapeHTML(launch_params['lis_result_sourcedid'] || '')}",
     }
 
     # @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
@@ -230,8 +230,6 @@ class LtiController < ApplicationController
     render :json => oauth_info.to_json, :status => :ok
   end
 
-  private
-
   def launch_extrtool
     if current_user.blank?
       @message = "Error: current user could not be identified"
@@ -329,7 +327,7 @@ class LtiController < ApplicationController
         # update the score for the module containing the exercise
         mod_prog = OdsaModuleProgress.get_progress(user_id, inst_chapter_module.id, bk_sec_ex.inst_book_id)
         mod_prog.update_proficiency(bk_sec_ex.inst_exercise)
-        post_module_score(mod_prog)
+        mod_prog.post_score_to_lms()
 
         res.description = "Your old score of #{old_score} has been replaced with #{score}"
         res.code_major = 'success'
@@ -624,28 +622,5 @@ class LtiController < ApplicationController
                                     params[:lis_outcome_service_url],
                                     params[:lis_result_sourcedid],
                                     lms_access_id)
-  end
-
-  # send the module score to tool consumer if they exist
-  def post_module_score(module_progress)
-    if module_progress.lis_outcome_service_url and module_progress.lis_result_sourcedid
-      lti_param = {
-        "lis_outcome_service_url" => module_progress.lis_outcome_service_url,
-        "lis_result_sourcedid" => module_progress.lis_result_sourcedid,
-      }
-      tp = IMS::LTI::ToolProvider.new(module_progress.lms_access.consumer_key,
-                                      module_progress.lms_access.consumer_secret,
-                                      lti_param)
-      tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
-
-      res = tp.post_extended_replace_result!(score: module_progress.highest_score)
-      unless res.success?
-        error = Error.new(:class_name => 'post_replace_result_fail',
-                          :message => res.inspect,
-                          :params => module_progress.to_json.to_s)
-        error.save!
-      end
-      return res
-    end
   end
 end

@@ -8,7 +8,7 @@ class OdsaExerciseAttemptsController < ApplicationController
   def create
     hasBook = params.key?(:inst_book_id)
     inst_exercise = nil
-    if params.key(:sha1)
+    if params.key?(:sha1)
       inst_exercise = InstExercise.find_by(short_name: params[:sha1])
     end
     if hasBook
