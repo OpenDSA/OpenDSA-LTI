@@ -492,7 +492,6 @@ class LtiController < ApplicationController
   end
 
   def ensure_user(lms_instance_id)
-    byebug
     email = params[:lis_person_contact_email_primary]
     if email.blank?
       # try to uniquely identify user some other way
