@@ -268,7 +268,10 @@ class LtiController < ApplicationController
     launch_params["lti_message_type"] = "basic-lti-launch-request"
     launch_params["lti_version"] = "LTI-1p0"
     launch_params["resource_link_id"] = "#{exercise.id}"
-    launch_params["resource_link_title"] = "#{exercise.inst_exercise.short_name}"
+    # TODO: Remove "00.00.00" once CodeWorkout update is deployed.
+    # This is only included as a temporary workaround to get CodeWorkout
+    # to recognize that the workout we are requesting is "from a collection"
+    launch_params["resource_link_title"] = "00.00.00 - #{exercise.inst_exercise.short_name}"
     launch_params["tool_consumer_info_product_family_code"] = "opendsa"
     launch_params["user_id"] = "#{current_user.id}"
     launch_params["lis_person_name_given"] = current_user.first_name
@@ -280,10 +283,6 @@ class LtiController < ApplicationController
     launch_params["custom_course_number"] = course_offering.course.number
     launch_params["custom_label"] = course_offering.label
     launch_params["custom_term"] = course_offering.term.slug
-
-    if (tool.name == 'code-workout')
-      launch_params['from_collection'] = 'true'
-    end
 
     @tc = IMS::LTI::ToolConsumer.new(tool.key, tool.secret, launch_params)
     @launch_data = @tc.generate_launch_data()
