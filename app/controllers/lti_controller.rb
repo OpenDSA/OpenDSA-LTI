@@ -264,7 +264,10 @@ class LtiController < ApplicationController
     launch_params["context_title"] = course_offering.name
     launch_params["context_id"] = "#{exercise.id}"
     launch_params["lis_outcome_service_url"] = "#{host}#{lti_grade_passback_path}"
-    launch_params["lis_result_sourcedid"] = "#{current_user.id}_#{exercise.id}"
+    # we don't need/want scores for instructors
+    unless course_offering.is_instructor?(current_user)
+      launch_params["lis_result_sourcedid"] = "#{current_user.id}_#{exercise.id}"
+    end
     launch_params["lti_message_type"] = "basic-lti-launch-request"
     launch_params["lti_version"] = "LTI-1p0"
     launch_params["resource_link_id"] = "#{exercise.id}"
