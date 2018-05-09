@@ -134,6 +134,8 @@ gem 'capistrano-rails'
 gem 'capistrano-rbenv', github: "capistrano/rbenv"
 gem 'capistrano-passenger'
 gem 'capistrano-rake', require: false
+gem 'net-ssh', :github => 'net-ssh/net-ssh'
+
 #for multi-color progress bar
 gem 'css3-progress-bar-rails'
 
