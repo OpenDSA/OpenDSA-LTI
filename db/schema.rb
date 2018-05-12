@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180403181426) do
+ActiveRecord::Schema.define(version: 20180512144017) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -464,6 +464,7 @@ ActiveRecord::Schema.define(version: 20180403181426) do
 
   add_index "odsa_user_interactions", ["inst_book_id"], name: "odsa_user_interactions_inst_book_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_book_section_exercise_id"], name: "odsa_user_interactions_inst_book_section_exercise_id_fk", using: :btree
+  add_index "odsa_user_interactions", ["inst_chapter_module_id"], name: "index_odsa_user_interactions_on_inst_chapter_module", using: :btree
   add_index "odsa_user_interactions", ["inst_course_offering_exercise_id"], name: "odsa_user_interactions_inst_course_offering_exercise_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_section_id"], name: "odsa_user_interactions_inst_section_id_fk", using: :btree
   add_index "odsa_user_interactions", ["user_id"], name: "odsa_user_interactions_user_id_fk", using: :btree
