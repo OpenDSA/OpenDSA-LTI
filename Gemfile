@@ -31,7 +31,7 @@ gem 'representable'
 gem 'redcarpet'
 gem 'loofah'
 gem 'truncate_html'
-gem 'puma'
+gem 'puma', '~> 3.11.4'
 gem 'tzinfo' # For timezone support
 
 # Bootstrap Datepicker
@@ -60,7 +60,7 @@ end
 
 group :development, :test do
   gem 'sqlite3'
-  gem 'mysql2'
+  gem 'mysql2', '= 0.3.15'
   gem 'rspec-rails', '>=3.4.2'
   gem 'annotate'
   gem 'rails-erd', github: 'voormedia/rails-erd'
@@ -83,7 +83,7 @@ group :test do
 end
 
 group :production, :staging do
-  gem 'mysql2'
+  gem 'mysql2', '= 0.3.15'
   gem 'faker'
 end
 
