@@ -10,13 +10,16 @@
                         #{fname}
         .panel-collapse.collapse{id: "#{i}_collapse"}
             .panel-body
+                - ex_hash = {}
                 - mods.each do |mod_name, exs|
                     - exs.each do |ex|
-                        - j += 1
-                        %div
-                            %a{href: ex.embed_url(@host_url), target: "_blank"}
-                                #{ex.long_name}
-                        .col-xs-6
-                            %input.form-control{:type => "text", :value => ex.embed_code(@host_url), :readonly => "readonly", id: "embedcode_#{j}"}
-                        %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{j}", :type => "button"}
-                            = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")
+                        - unless ex_hash.key?(ex.short_name)
+                            - ex_hash[ex.short_name] = ex
+                            - j += 1
+                            %div
+                                %a{href: ex.embed_url(@host_url), target: "_blank"}
+                                    #{ex.long_name}
+                            .col-xs-6
+                                %input.form-control{:type => "text", :value => ex.embed_code(@host_url), :readonly => "readonly", id: "embedcode_#{j}"}
+                            %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{j}", :type => "button"}
+                                = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")
