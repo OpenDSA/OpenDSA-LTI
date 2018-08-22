@@ -503,7 +503,7 @@ class LtiController < ApplicationController
         @message = 'OpenDSA: Unable to uniquely identify user'
         return false
       end
-      email = "#{lms_instance_id}_#{params[:user_id]}@StudentView.com"
+      email = "student_view@example.com"
     end
     @user = User.where(email: email).first
     if @user.blank?
