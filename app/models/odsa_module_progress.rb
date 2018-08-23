@@ -98,7 +98,11 @@ class OdsaModuleProgress < ActiveRecord::Base
         score += ex.points
       end
     end
-    self.current_score = score / total_points
+    if (total_points == 0)
+      self.current_score = 0
+    else
+      self.current_score = score / total_points
+    end
     if self.highest_score.nil?
       self.highest_score = 0
     end
