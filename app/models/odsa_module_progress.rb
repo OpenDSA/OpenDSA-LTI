@@ -11,7 +11,8 @@ class OdsaModuleProgress < ActiveRecord::Base
   #~ Class methods ............................................................
 
   def self.get_progress(user_id, inst_chapter_module_id, inst_book_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil)
-    unless module_progress = OdsaModuleProgress.find_by(user_id: user_id, inst_chapter_module_id: inst_chapter_module_id)
+    module_progress = OdsaModuleProgress.find_by(user_id: user_id, inst_chapter_module_id: inst_chapter_module_id)
+    if module_progress == nil
       module_progress = OdsaModuleProgress.new(user_id: user_id, inst_book_id: inst_book_id,
                                                inst_chapter_module_id: inst_chapter_module_id)
       unless lis_outcome_service_url == nil or lis_result_sourcedid == nil or lms_access_id == nil
@@ -19,6 +20,11 @@ class OdsaModuleProgress < ActiveRecord::Base
         module_progress.lis_result_sourcedid = lis_result_sourcedid
         module_progress.lms_access_id = lms_access_id
       end
+      module_progress.save!
+    elsif (lis_outcome_service_url != nil and module_progress.lis_outcome_service_url == nil) or (lis_result_sourcedid != nil and module_progress.lis_result_sourcedid == nil) or (lms_access_id != nil and module_progress.lms_access_id == nil)
+      module_progress.lis_outcome_service_url = lis_outcome_service_url
+      module_progress.lis_result_sourcedid = lis_result_sourcedid
+      module_progress.lms_access_id = lms_access_id
       module_progress.save!
     end
     module_progress
