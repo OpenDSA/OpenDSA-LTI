@@ -255,6 +255,15 @@
       });
     }
 
+    var ffOptionList = ['required', 'points'];
+    for (var i = 0; i < ffOptionList.length; i++) {
+      var ffOption = ffOptionList[i];
+      var elem = $('#glob-ff-' + ffOption);
+      elem.on('change', function() {
+        onGlobalExerciseSettingsUpdate('ff', globalFfSettings());
+      });
+    }
+
     var peOptionList = ['required', 'points', 'threshold', 'feedback', 'fix'];
     for (var i = 0; i < peOptionList.length; i++) {
       var peOption = peOptionList[i];
@@ -655,6 +664,15 @@
     };
   }
 
+  /* Gets the global Frame settings (glob_ff_options) */
+  function globalFfSettings() {
+    return {
+      required: $('#glob-ff-required').is(':checked'),
+      points: Number.parseFloat($('#glob-ff-points').val()),
+      threshold: 1
+    };
+  }
+
   /* Gets the global Proficiency Exercise settings (glob_pe_options) */
   function globalPeSettings() {
     return {
@@ -736,6 +754,7 @@
       glob_ss_options: globalSsSettings(),
       glob_ka_options: globalKaSettings(),
       glob_pe_options: globalPeSettings(),
+      glob_ff_options: globalFfSettings(),
       glob_extr_options: globalExtrSettings()
     };
   }
@@ -807,6 +826,9 @@
         break;
       case 'pe':
         globals = globalPeSettings();
+        break;
+      case 'ff':
+        globals = globalFfSettings();
         break;
       case 'extr':
         globals = globalExtrSettings(node.original.learning_tool);
@@ -915,6 +937,9 @@
         case 'glob_pe_options':
           setGlobPeOptions(config.glob_pe_options);
           break;
+        case 'glob_ff_options':
+          setGlobFfOptions(config.glob_ff_options);
+          break;
         case 'glob_extr_options':
           setGlobExtrOptions(config.glob_extr_options);
           break;
@@ -985,6 +1010,7 @@
     setGlobSsOptions(defaults.glob_ss_options);
     setGlobKaOptions(defaults.glob_ka_options);
     setGlobPeOptions(defaults.glob_pe_options);
+    setGlobFfOptions(defaults.glob_ff_options);
     setGlobExtrOptions(defaults.glob_extr_options);
 
     var result = {};
@@ -1046,6 +1072,11 @@
         required: { true: 0 }
       },
       'glob_pe_options': {
+        points: { 1: 0 },
+        threshold: { 1: 0 },
+        required: { true: 0 }
+      },
+      'glob_ff_options': {
         points: { 1: 0 },
         threshold: { 1: 0 },
         required: { true: 0 }
@@ -1297,6 +1328,18 @@
     }
   }
 
+  function setGlobFfOptions(options) {
+    for (var option in options) {
+      var value = options[option];
+      if (typeof value === 'boolean') {
+        $('#glob-ff-' + option).prop('checked', value);
+      }
+      else {
+        $('#glob-ff-' + option).val(value);
+      }
+    }
+  }
+
   /* Sets the global external tool options */
   function setGlobExtrOptions(options) {
     for (var option in options) {
@@ -1376,6 +1419,9 @@
       },
       'pe': {
         icon: 'pe-icon'
+      },
+      'ff': {
+        icon: 'ff-icon'
       },
       'extr': {
         icon: 'et-icon'
@@ -1465,7 +1511,7 @@
               };
             }
           }
-          if ($.inArray(node.type, ['ka', 'pe', 'extr', 'ss']) >= 0) {
+          if ($.inArray(node.type, ['ka', 'pe', 'extr', 'ss', 'ff']) >= 0) {
             return {
               'settings': {
                 label: 'Edit Exercise Settings',
@@ -1496,6 +1542,11 @@
                       $('#exercise-settings-threshold-group').css('display', 'none');
                       break;
                     case 'ss':
+                      $('#exercise-settings-pe').css('display', 'none');
+                      $('#exercise-settings-required-group').css('display', '');
+                      $('#exercise-settings-threshold-group').css('display', 'none');
+                      break;
+                    case 'ff':
                       $('#exercise-settings-pe').css('display', 'none');
                       $('#exercise-settings-required-group').css('display', '');
                       $('#exercise-settings-threshold-group').css('display', 'none');

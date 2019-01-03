@@ -36,8 +36,8 @@ class RSTtoJSON
     # use ||= to avoid "already intialized constant" warning
     # since rails will reload the class on every request during development
 
-    # regex to identify exercise/slideshow directives
-    EX_RE ||= Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe)")
+    # regex to identify exercise/slideshow/frame directives
+    EX_RE ||= Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe|ff)")
     # regex to identify external tool directives
     EXTR_RE ||= Regexp.new("^(\.\. )(extrtoolembed:: '([^']+)')")
     # regex to identify section titles

@@ -240,6 +240,21 @@
 
     .form-group.border
       %label.control-label{}
+        Global Frame Options
+      .col-xs-6.col-md-5
+        .form-group
+          %label.control-label{for: "glob-ff-required"}
+            Required:
+          .col-xs-8
+            %input.align-checkbox{type: "checkbox", id: "glob-ff-required"}
+        .form-group
+          %label.control-label{for: "glob-ff-points"}
+            Points:
+          .col-xs-8
+            %input{type: "number", min: 0, value: 0, step: 0.01, id: "glob-ff-points", required: true}
+
+    .form-group.border
+      %label.control-label{}
         Global External Tool Options
       .col-xs-6.col-md-5
         .form-group
@@ -303,6 +318,8 @@
             <i class="fa fa-file-o"></i> Section
           %span.col-sm-8.col-xs-12
             <b>PE</b> Proficiency Exercise
+          %span.col-sm-8.col-sm-offset-4.col-xs-12
+            <b>FF</b> Frame
           %span.col-sm-8.col-sm-offset-4.col-xs-12
             <b>ET</b> External Tool Exercise (CodeWorkout)
         .col-xs-12
