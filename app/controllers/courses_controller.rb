@@ -1,5 +1,6 @@
 class CoursesController < ApplicationController
   load_and_authorize_resource
+  skip_load_resource :only => :show
   skip_authorize_resource :only => :list
   respond_to :html, :js, :json
 
@@ -10,13 +11,13 @@ class CoursesController < ApplicationController
   def index
   end
 
-
   # -------------------------------------------------------------
   # GET /courses/1
   def show
     if params[:organization_id]
-        @organization = Organization.find(params[:organization_id])
+      @organization = Organization.find(params[:organization_id])
     end
+    @course = Course.find_by(organization: @organization, slug: params[:id])
     if !@course
       flash[:warning] = 'Course not found.'
       redirect_to organizations_path
@@ -28,12 +29,12 @@ class CoursesController < ApplicationController
       @course_offerings =
         current_user.andand.course_offerings_for_term(@term, @course)
       @is_student = !user_signed_in? ||
-        !current_user.global_role.is_admin? &&
-        (@course_offerings.any? {|co| co.is_student? current_user } ||
-        !@course_offerings.any? {|co| co.is_staff? current_user })
+                    !current_user.global_role.is_admin? &&
+                    (@course_offerings.any? { |co| co.is_student? current_user } ||
+                     !@course_offerings.any? { |co| co.is_staff? current_user })
       # respond_to do |format|
-       # format.js
-       # format.html
+      # format.js
+      # format.html
       # end
     end
   end
@@ -51,12 +52,10 @@ class CoursesController < ApplicationController
     @course = Course.new
   end
 
-
   # -------------------------------------------------------------
   # GET /courses/1/edit
   def edit
   end
-
 
   # -------------------------------------------------------------
   # POST /courses
@@ -72,9 +71,9 @@ class CoursesController < ApplicationController
       render :json => course, :status => :created
     else
       render :json => course.errors.full_messages, :status => :bad_request
-      error = Error.new(:class_name => 'course_save_fail', 
-        :message => course.errors.full_messages.inspect, 
-        :params => params.to_s)
+      error = Error.new(:class_name => 'course_save_fail',
+                        :message => course.errors.full_messages.inspect,
+                        :params => params.to_s)
       error.save!
     end
   end
@@ -84,14 +83,14 @@ class CoursesController < ApplicationController
   def update
     if @course.update(course_params)
       redirect_to organization_courses_path(
-        @course.organization.id,
-        @course.id),
-        notice: "#{@course.display_name} was successfully updated."
+                    @course.organization.id,
+                    @course.id
+                  ),
+                  notice: "#{@course.display_name} was successfully updated."
     else
       render action: 'edit'
     end
   end
-
 
   # -------------------------------------------------------------
   # DELETE /courses/1
@@ -106,18 +105,16 @@ class CoursesController < ApplicationController
     end
   end
 
-
   # -------------------------------------------------------------
   def search
-     courses = Course.where("organization_id = ?", params['organization_id']).as_json
+    courses = Course.where("organization_id = ?", params['organization_id']).as_json
 
-     respond_to do |format|
-          format.json {
-              render json: courses
-          }
+    respond_to do |format|
+      format.json {
+        render json: courses
+      }
     end
   end
-
 
   # -------------------------------------------------------------
   def find
@@ -125,7 +122,6 @@ class CoursesController < ApplicationController
     redirect_to courses_search_path(courses: @courses, listing: true),
       format: :js, remote: true
   end
-
 
   # -------------------------------------------------------------
   # POST /courses/:id/generate_gradebook
@@ -140,15 +136,13 @@ class CoursesController < ApplicationController
     end
   end
 
-
   #~ Private instance methods .................................................
   private
 
-    # -------------------------------------------------------------
-    # Only allow a trusted parameter "white list" through.
-    def course_params
-      params.require(:course).
-        permit(:name, :id, :number, :organization_id, :term_id, :lms_course_code)
-    end
-
+  # -------------------------------------------------------------
+  # Only allow a trusted parameter "white list" through.
+  def course_params
+    params.require(:course).
+      permit(:name, :id, :number, :organization_id, :term_id, :lms_course_code)
+  end
 end
