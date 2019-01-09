@@ -469,7 +469,8 @@ class LtiController < ApplicationController
     render 'show_table.html.haml' and return
   end
 
-  def lti_enroll(course_offering, role = CourseRole.student)
+  def lti_enroll(course_offering)
+    role = @tp.context_instructor? ? CourseRole.instructor : CourseRole.student
     if course_offering &&
        course_offering.can_enroll? &&
        !course_offering.is_enrolled?(current_user)
@@ -478,6 +479,15 @@ class LtiController < ApplicationController
         user: current_user,
         course_role: role,
       )
+    elsif course_offering.is_enrolled?(current_user)
+      # check if the user's course role has changed
+      ce = CourseEnrollment.find_by(course_offering_id: course_offering.id,
+                                    user_id: current_user.id)
+      if ce.course_role != role
+        # update user's course role
+        ce.course_role = role
+        ce.save!
+      end
     end
   end
 
