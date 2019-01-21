@@ -25,7 +25,7 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :attempt do
     user 1
     exercise 1

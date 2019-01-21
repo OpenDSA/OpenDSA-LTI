@@ -12,16 +12,23 @@ module ApplicationHelper
   # -------------------------------------------------------------
   def controller_stylesheet_link_tag
     c = params[:controller] || controller_name
-    stylesheet_link_tag c if Rails.application.assets.find_asset("#{c}.css")
+    stylesheet_link_tag c if asset_exists("#{c}.css")
   end
 
 
   # -------------------------------------------------------------
   def controller_javascript_include_tag
     c = params[:controller] || controller_name
-    javascript_include_tag c if Rails.application.assets.find_asset("#{c}.js")
+    javascript_include_tag c if asset_exists("#{c}.js")
   end
 
+  def asset_exists(asset_name)
+    if Rails.env == 'development'
+      return Rails.application.assets_manifest.find(asset_name).first.present?
+    else
+      return Rails.application.assets_manifest.assets[asset_name].present?
+    end
+  end
 
   # -------------------------------------------------------------
   def sanitize_filename(filename)

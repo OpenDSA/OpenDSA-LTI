@@ -11,7 +11,7 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :global_role_admin do
     name "Administrator"
     can_manage_all_courses true

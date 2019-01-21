@@ -23,6 +23,9 @@ require 'capistrano/rbenv'
 require 'capistrano/delayed_job'
 require 'whenever/capistrano'
 
+require "capistrano/scm/git"
+install_plugin Capistrano::SCM::Git
+
 set :rbenv_type, :user
 set :rbenv_ruby, '2.3.1'
 

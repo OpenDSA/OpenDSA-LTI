@@ -241,7 +241,7 @@
     if (textFile != null) {
       window.URL.revokeObjectURL(textFile);
     }
-    const data = new Blob([textArray], {
+    var data = new Blob([textArray], {
       type: 'text/plain'
     });
     textFile = window.URL.createObjectURL(data);

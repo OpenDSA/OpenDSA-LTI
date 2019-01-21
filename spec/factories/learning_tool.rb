@@ -14,7 +14,7 @@
 #  index_organizations_on_slug  (slug) UNIQUE
 #
 
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :learning_tool do
     name "code-workout"

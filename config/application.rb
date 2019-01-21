@@ -26,5 +26,13 @@ module CodeWorkout
 
     # Custom directories with classes and modules you want to be autoloadable.
     # config.autoload_paths += %W(#{config.root}/extras)
+
+    # Exception handler
+    config.exception_handler = {
+      db: true
+    }
+
+    # configure delayed job system
+    config.active_job.queue_adapter = :delayed_job
   end
 end

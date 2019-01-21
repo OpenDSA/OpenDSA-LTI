@@ -10,10 +10,18 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   member_action :update_configuration, method: :get do
   end
 
-  member_action :clone, method: :get do
+  member_action :clone_book, method: :get do
+    inst_book = InstBook.find(params[:id])
+    title = inst_book.title
+    cloned_inst_book = inst_book.clone(current_user)
+    redirect_to admin_inst_books_path, notice: "Book instance ID:'#{inst_book.id}' title:'#{title}' was cloned successfully!. The new Book Instance ID is '#{cloned_inst_book.id}'"
   end
 
-  member_action :destroy, method: :delete do
+  member_action :destroy_book, method: :delete do
+    inst_book = InstBook.find(params[:id])
+    title = inst_book.title
+    inst_book.destroy
+    redirect_to admin_inst_books_path, notice: "Book configuration '#{title}' was deleted successfully!"
   end
 
   collection_action :upload_books, method: :get do
@@ -39,13 +47,6 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     def scoped_collection
       InstBook.joins(:course_offering).where('course_offerings.archived = false').
       union(InstBook.where("template = ? or course_offering_id is null", 1))
-    end
-
-    def clone
-      inst_book = InstBook.find(params[:id])
-      title = inst_book.title
-      cloned_inst_book = inst_book.clone(current_user)
-      redirect_to admin_inst_books_path, notice: "Book instance ID:'#{inst_book.id}' title:'#{title}' was cloned successfully!. The new Book Instance ID is '#{cloned_inst_book.id}'"
     end
 
     def update_configuration
@@ -88,13 +89,6 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       end
     end
 
-    def destroy
-      inst_book = InstBook.find(params[:id])
-      title = inst_book.title
-      inst_book.destroy
-      redirect_to admin_inst_books_path, notice: "Book configuration '#{title}' was deleted successfully!"
-    end
-
     def sanitize_filename(filename)
       filename.gsub(/[^\w\s_-]+/, '')
                     .gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2')
@@ -122,10 +116,10 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
         links += ' '
       end
       if authorized? :destroy, inst_book
-        links += link_to "Delete", admin_inst_book_path(inst_book), method: :delete, data: {confirm: message}
+        links += link_to "Delete", destroy_book_admin_inst_book_path(inst_book), method: :delete, data: {confirm: message}
         links += ' '
       end
-      links += link_to "Clone", clone_admin_inst_book_path(inst_book)
+      links += link_to "Clone", clone_book_admin_inst_book_path(inst_book)
       if authorized? :update_configuration, inst_book
         links += link_to "Update Configuration", update_configuration_admin_inst_book_path(inst_book)
         links += ' '

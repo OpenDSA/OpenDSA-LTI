@@ -21,8 +21,8 @@ gem 'test-unit', '~> 3.0.9'
 gem 'nokogiri'
 gem 'csv_shaper'
 gem 'andand', github: 'raganwald/andand'
-gem 'foreigner'
-gem 'responders', '~> 1.1' # Can't move above 1.1 until migrating to rails 4.2+
+#gem 'foreigner'
+gem 'responders'
 gem 'friendly_id', '~> 5'
 gem 'active_record-acts_as'
 gem 'acts_as_list'
@@ -75,7 +75,7 @@ group :development, :test do
   gem 'byebug'
 end
 gem 'faker'
-gem 'factory_girl_rails'
+gem 'factory_bot_rails'
 gem 'log_file'
 
 group :test do
@@ -99,10 +99,9 @@ gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-cas'
 gem 'cancancan'
-gem 'activeadmin', github: 'activeadmin'
-gem "active_admin_import" , github: 'activeadmin-plugins/active_admin_import'
+gem 'activeadmin', github: 'activeadmin', tag: 'v1.1.0'
 gem 'active_skin', github: 'rstgroup/active_skin'
-gem 'exception_handler'
+gem 'exception_handler', '~> 0.6.5'
 
 gem 'kaminari'        # Auto-paginated views
 gem 'remotipart'      # Adds support for remote mulitpart forms (file uploads)

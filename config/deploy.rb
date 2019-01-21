@@ -1,5 +1,5 @@
-# config valid only for Capistrano 3.1
-lock '3.2.1'
+# config valid only for Capistrano 3.10.1
+lock '3.10.1'
 
 set :application, 'OpenDSA-LTI'
 set :repo_url, 'git://github.com/OpenDSA/OpenDSA-LTI.git'

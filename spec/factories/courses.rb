@@ -17,7 +17,7 @@
 #  index_courses_on_slug             (slug)
 #
 
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :course do
     name "Introduction to Software Design"
