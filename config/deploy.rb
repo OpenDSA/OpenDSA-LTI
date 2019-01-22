@@ -1,5 +1,5 @@
 # config valid only for Capistrano 3.10.1
-lock '3.10.1'
+lock '3.11.0'
 
 set :application, 'OpenDSA-LTI'
 set :repo_url, 'git://github.com/OpenDSA/OpenDSA-LTI.git'
@@ -50,7 +50,6 @@ set :passenger_restart_with_touch, true
 # Number of delayed_job workers
 # default value: 1
 set :delayed_job_workers, 2
-
 
 # String to be prefixed to worker process names
 # This feature allows a prefix name to be placed in front of the process.
@@ -131,7 +130,6 @@ set :delayed_job_workers, 2
 # end
 
 namespace :deploy do
-
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
@@ -187,5 +185,4 @@ namespace :deploy do
       end
     end
   end
-
 end
