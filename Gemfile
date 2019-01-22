@@ -18,7 +18,7 @@ gem 'haml-rails'
 gem 'coffee-rails', '~> 4.0.0'
 gem 'coffee-script-source'
 gem 'test-unit', '~> 3.0.9'
-gem 'nokogiri'
+gem 'nokogiri', ">= 1.8.5"
 gem 'csv_shaper'
 gem 'andand', github: 'raganwald/andand'
 #gem 'foreigner'

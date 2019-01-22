@@ -571,7 +571,7 @@ DEPENDENCIES
   mustache (~> 1.0)
   mysql2 (= 0.3.15)
   net-ssh!
-  nokogiri
+  nokogiri (>= 1.8.5)
   oj
   oj_mimic_json
   omniauth

@@ -1,10 +1,9 @@
 # config/initializers/assets.rb
 Rails.application.config.assets.precompile << Proc.new do |path|
   if path =~ /\.(css|js)\z/ && path !~ /bootstrap-social/
-    full_path = Rails.application.assets.resolve(path)
-    app_assets_path = Rails.root.join('app', 'assets').to_path
-    if full_path.starts_with? app_assets_path
-      # logger.info "including asset: " + full_path
+    if Rails.env == "development" && Rails.application.assets.find_asset(path)
+      true
+    elsif (Rails.env == "production" || Rails.env = "staging") && Rails.application.assets_manifest.assets[path]
       true
     else
       # logger.info "excluding asset: " + full_path
