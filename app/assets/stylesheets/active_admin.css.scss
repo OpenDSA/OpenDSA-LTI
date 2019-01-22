@@ -8,6 +8,7 @@
 // $sidebar-width: 242px;
 
 // Active Admin's got SASS!
+@import "active_admin/mixins/_variables";
 @import "active_admin/mixins";
 @import "active_admin/base";
 
@@ -22,8 +23,6 @@ $skinHeaderBck: #40312a;
 
 // Applied to the header of AA filters.
 $panelHeaderBck: #40312a;
-
-@import "active_skin";
 
 // Overriding any non-variable SASS must be done after the fact.
 // For example, to change the default status-tag color:
