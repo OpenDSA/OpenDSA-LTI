@@ -99,7 +99,7 @@ gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-cas'
 gem 'cancancan'
-gem 'activeadmin', github: 'activeadmin', tag: 'v1.0.0'
+gem 'activeadmin'
 gem 'exception_handler', '~> 0.6.5'
 
 gem 'kaminari'        # Auto-paginated views
