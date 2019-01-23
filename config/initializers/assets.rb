@@ -18,7 +18,7 @@ Rails.application.config.assets.paths << Rails.root.join('public')
 
 Rails.application.config.assets.precompile = [
   Proc.new { |filename, path|
-    path =~ /app\/assets/ &&
+    (path =~ /app\/assets/ || path =~ /vendor\/assets/) &&
       path !~ /bootstrap-social/ &&
       path !~ /active_admin/ &&
       %w(.js .css).include?(File.extname(filename))
