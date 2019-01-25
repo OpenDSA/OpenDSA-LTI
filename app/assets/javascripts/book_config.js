@@ -591,7 +591,7 @@
   /* Check that the chapter name is unique and meets other requirements */
   function validateChapterName(dialog, name, ignore) {
     var valid = !chapterExists(dialog, name, ignore);
-    valid = valid && checkRegexp(dialog, name, /^[\w\s]{1,100}$/,
+    valid = valid && checkRegexp(dialog, name, /^.{1,100}$/,
       'Name must be between 1 and 100 characters long.');
     return valid;
   }
