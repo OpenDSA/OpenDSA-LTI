@@ -16,6 +16,10 @@ class InstModule < ActiveRecord::Base
       mod.path = module_path
       mod.name = module_obj['long_name']
       mod.save
+    elsif mod.name != module_obj['long_name']
+      # update module name
+      mod.name = module_obj['long_name']
+      mod.save
     end
 
     ch_mod = InstChapterModule.where("inst_chapter_id = ? AND inst_module_id = ?", chapter.id, mod.id).first
