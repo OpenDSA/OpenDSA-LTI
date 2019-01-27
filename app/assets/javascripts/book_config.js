@@ -395,14 +395,14 @@
       $('#config-file-load').removeAttr('disabled');
     }
 
-    // load a configuration from the file a user has chosen
+    // load a configuration from the file on the user's computer
     $('#config-file-load').on('click', loadFileConfiguration);
 
     // load a configuration from a reference configuration stored on the
     // OpenDSA server
     $('#reference-config-load').on('click', loadReferenceConfiguration);
 
-    // load one of the user's configurations from the OpenDSA database
+    // load one of the user's configurations stored in the OpenDSA database
     $('#user-config-load').on('click', loadUserConfiguration);
   });
 
@@ -591,7 +591,7 @@
   /* Check that the chapter name is unique and meets other requirements */
   function validateChapterName(dialog, name, ignore) {
     var valid = !chapterExists(dialog, name, ignore);
-    valid = valid && checkRegexp(dialog, name, /^[\w\s]{1,100}$/,
+    valid = valid && checkRegexp(dialog, name, /^.{1,100}$/,
       'Name must be between 1 and 100 characters long.');
     return valid;
   }
@@ -636,6 +636,8 @@
     }, 500);
   }
 
+  /* Display a semi-transparent overlay, a loading indicator,
+   and a short message */
   function displayLoadingOverlay(msg) {
     if (typeof msg === 'undefined') {
       msg = 'Loading';
@@ -745,7 +747,7 @@
       lang: $('#book-lang').val(),
       code_lang: selectedCodeLanguages(),
       build_JSAV: $('#build-jsav').is(':checked'),
-      build_cmap: false,
+      build_cmap: $('#build-cmap').is(':checked'),
       suppress_todo: $('#suppress-todo').is(':checked'),
       dispModComp: $('#disp-mod-comp').is(':checked'),
       tabbed_codeinc: $('#tabbed-codeinc').is(':checked'),
@@ -893,7 +895,8 @@
     return options;
   }
 
-  /* Loads the settings from the specified configuration */
+  /* Loads the settings from the specified configuration. Used to load
+  minimal configurations, such as  */
   function loadConfiguration(config) {
     $('#book-config-form')[0].reset();
     for (var key in config) {
@@ -912,6 +915,9 @@
           break;
         case 'build_JSAV':
           $('#build-jsav').prop('checked', config.build_JSAV);
+          break;
+        case 'build_cmap':
+          $('#build-cmap').prop('checked', config.build_cmap);
           break;
         case 'suppress_todo':
           $('#suppress-todo').prop('checked', true); //config.suppress_todo);
@@ -956,7 +962,8 @@
   }
 
   /* Loads a 'full' configuration file that includes the settings for 
-     all exercises, and no global exercise settings */
+     all exercises, and no global exercise settings. An example
+     of this is a configuration pulled from the database. */
   function loadFullConfiguration(config) {
     initializeJsTree(ODSA.availableModules[config.lang].children, {}, function() {
       $('#book-config-form')[0].reset();
@@ -976,6 +983,9 @@
             break;
           case 'build_JSAV':
             $('#build-jsav').prop('checked', config.build_JSAV);
+            break;
+          case 'build_cmap':
+            $('#build-cmap').prop('checked', config.build_cmap);
             break;
           case 'suppress_todo':
             $('#suppress-todo').prop('checked', true); //config.suppress_todo);
@@ -1005,6 +1015,7 @@
     });
   }
 
+  /* Convert a 'full' configuration to a 'minimal' configuration */
   function convertChapters(chapters) {
     var defaults = determineGlobalDefaults(chapters);
     setGlobSsOptions(defaults.glob_ss_options);
@@ -1032,6 +1043,11 @@
               };
             }
             if ('exercises' in section) {
+              // Go through each exercise and check whether each setting matches
+              // the global default setting. If it does, remove that setting. 
+              // If all of the settings for an exercise match the global 
+              // default settings, then there is no need to include that 
+              // exercise in the config.
               for (var exName in section.exercises) {
                 var exercise = section.exercises[exName];
                 var nodeId = encodeExerciseId(key, exName);
@@ -1193,6 +1209,7 @@
     $('#btn-update-config').css('display', 'none');
   }
 
+  /* Load a configuration from the user's computer */
   function loadFileConfiguration() {
     if (!confirmLoad()) return;
     clearBookId();
@@ -1212,6 +1229,7 @@
     reader.readAsText(file);
   }
 
+  /* Load a configuration from the OpenDSA/config directory */
   function loadReferenceConfiguration() {
     if (!confirmLoad()) return;
     clearBookId();
@@ -1328,6 +1346,7 @@
     }
   }
 
+  /* Sets the global Frame Options */
   function setGlobFfOptions(options) {
     for (var option in options) {
       var value = options[option];
