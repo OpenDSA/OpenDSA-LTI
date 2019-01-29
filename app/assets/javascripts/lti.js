@@ -223,8 +223,8 @@
         elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Proficient Date </th>';
         elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> First Done </th>';
         elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th>';
-        elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Posted to Canvas </th>';
-        elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Posted </th> </tr>';
+        //elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Posted to Canvas </th>';
+        //elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Posted </th> </tr>';
         return elem
     }
     getAttemptHeader = function() {

@@ -24,6 +24,7 @@ class LtiController < ApplicationController
     # I change this to be custom intanbook id becuase it is not working on mine yet
     if params.has_key?(:custom_course_offering_id)
       launch_instructor_tool()
+      return
     end
 
     file_name = nil

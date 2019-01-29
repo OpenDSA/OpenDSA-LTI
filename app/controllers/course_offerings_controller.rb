@@ -2,21 +2,20 @@ class CourseOfferingsController < ApplicationController
   before_filter :rename_course_offering_id_param
   # load_and_authorize_resource
 
-
   # -------------------------------------------------------------
   # GET /course_offerings
   def index
   end
-
 
   # -------------------------------------------------------------
   # GET /course_offerings/1
   def show
     @course_offering = CourseOffering.find_by(id: params[:id])
     @url = url_for(organization_course_path(
-                  @course_offering.course.organization,
-                  @course_offering.course,
-                  @course_offering.term))
+      @course_offering.course.organization,
+      @course_offering.course,
+      @course_offering.term
+    ))
 
     @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
     @student_list = []
@@ -36,8 +35,8 @@ class CourseOfferingsController < ApplicationController
         section_item_position = 1
         if !sections.empty?
           sections.each do |section|
-            title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
-                    (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
+            title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
+                    (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + "." +
                     section_item_position.to_s.rjust(2, "0") + " - "
             learning_tool = nil
             if section
@@ -66,11 +65,12 @@ class CourseOfferingsController < ApplicationController
   def get_individual_attempt
     puts "trying to find individual attempt"
     @user_id = User.find_by(id: params[:user_id])
-     @course_offering = CourseOffering.find_by(id: params[:id])
+    @course_offering = CourseOffering.find_by(id: params[:id])
     @url = url_for(organization_course_path(
-                  @course_offering.course.organization,
-                  @course_offering.course,
-                  @course_offering.term))
+      @course_offering.course.organization,
+      @course_offering.course,
+      @course_offering.term
+    ))
 
     @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
     @student_list = []
@@ -81,7 +81,7 @@ class CourseOfferingsController < ApplicationController
     end
     @instBook = @course_offering.odsa_books.first
 
-    @exercise_list = Hash.new{|hsh,key| hsh[key] = []}
+    @exercise_list = Hash.new { |hsh, key| hsh[key] = [] }
     chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
     chapters.each do |chapter|
       modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
@@ -90,8 +90,8 @@ class CourseOfferingsController < ApplicationController
         section_item_position = 1
         if !sections.empty?
           sections.each do |section|
-            title = (chapter.position.to_s.rjust(2, "0")||"") + "." +
-                    (inst_ch_module.module_position.to_s.rjust(2, "0")||"") + "." +
+            title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
+                    (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + "." +
                     section_item_position.to_s.rjust(2, "0") + " - "
             learning_tool = nil
             if section
@@ -100,8 +100,8 @@ class CourseOfferingsController < ApplicationController
               if !learning_tool
                 if section.gradable
                   @inst_section_id = section.id
-                  attempted = OdsaExerciseAttempt.where("inst_section_id=? AND user_id=?", 
-                    @inst_section_id, @user_id)
+                  attempted = OdsaExerciseAttempt.where("inst_section_id=? AND user_id=?",
+                                                        @inst_section_id, @user_id)
                   if attempted.empty?
                     @exercise_list[@inst_section_id].push(title)
                   else
@@ -118,28 +118,29 @@ class CourseOfferingsController < ApplicationController
     end
   end
 
-
   # GET /course_offerings/:user_id/:inst_section_id
   def find_attempts
     @user_id = User.find_by(id: params[:user_id])
     @inst_section = InstSection.find_by(id: params[:inst_section_id])
-    @inst_book_section_exercise = InstBookSectionExercise.where(inst_section_id: @inst_section.id).first #not sure about the first
+    @inst_book_section_exercise = InstBookSectionExercise.where(inst_section_id: @inst_section.id, required: true).first #not sure about the first
     @inst_book_section_exercise_id = @inst_book_section_exercise.id
 
     @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
-                                 @inst_book_section_exercise_id, @user_id).select(
-                                 "id, user_id, question_name, request_type,
+                                                        @inst_book_section_exercise_id, @user_id).select(
+      "id, user_id, question_name, request_type,
                                  correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
-                                 pe_score, pe_steps_fixed")
+                                 pe_score, pe_steps_fixed"
+    )
     @odsa_exercise_progress = OdsaExerciseProgress.where("inst_book_section_exercise_id=? AND user_id=?",
-                                 @inst_book_section_exercise_id, @user_id).select("user_id, current_score, highest_score,
+                                                         @inst_book_section_exercise_id, @user_id).select("user_id, current_score, highest_score,
                                  total_correct, proficient_date,first_done, last_done")
 
     @attempts_json = ApplicationController.new.render_to_string(
-        template: 'course_offerings/find_attempts.json.jbuilder',
-        locals: {:@odsa_exercise_attempts => @odsa_exercise_attempts,
-                 :@odsa_exercise_progress => @odsa_exercise_progress,
-                 :@inst_section => @inst_section})
+      template: 'course_offerings/find_attempts.json.jbuilder',
+      locals: {:@odsa_exercise_attempts => @odsa_exercise_attempts,
+               :@odsa_exercise_progress => @odsa_exercise_progress,
+               :@inst_section => @inst_section},
+    )
   end
 
   # -------------------------------------------------------------
@@ -147,13 +148,11 @@ class CourseOfferingsController < ApplicationController
   def new
   end
 
-
   # -------------------------------------------------------------
   # GET /course_offerings/1/edit
   def edit
     @uploaded_roster = UploadedRoster.new
   end
-
 
   # -------------------------------------------------------------
   # POST /course_offerings
@@ -169,18 +168,20 @@ class CourseOfferingsController < ApplicationController
     inst_book = InstBook.find_by(id: params[:inst_book_id])
 
     course_offering = CourseOffering.where(
-                                  "course_id=? and term_id=? and label=? and lms_instance_id=?",
-                                  params[:course_id], params[:term_id], params[:label], params[:lms_instance_id]).first
+      "course_id=? and term_id=? and label=? and lms_instance_id=?",
+      params[:course_id], params[:term_id], params[:label], params[:lms_instance_id]
+    ).first
 
     if course_offering.blank?
       course_offering = CourseOffering.new(
-                                   course: course,
-                                   term: term,
-                                   label: params[:label],
-                                   # late_policy: late_policy || nil,
-                                   lms_instance: lms_instance,
-                                   lms_course_code: params[:lms_course_code],
-                                   lms_course_num: params[:lms_course_num])
+        course: course,
+        term: term,
+        label: params[:label],
+        # late_policy: late_policy || nil,
+        lms_instance: lms_instance,
+        lms_course_code: params[:lms_course_code],
+        lms_course_num: params[:lms_course_num],
+      )
 
       cloned_book = inst_book.clone(current_user)
 
@@ -193,9 +194,10 @@ class CourseOfferingsController < ApplicationController
           lms_access = LmsAccess.where("user_id = ?", current_user.id).first
           if !lms_access
             lms_access = LmsAccess.new(
-                                   lms_instance: lms_instance,
-                                   user: current_user,
-                                   access_token: params[:lms_access_token])
+              lms_instance: lms_instance,
+              user: current_user,
+              access_token: params[:lms_access_token],
+            )
             lms_access.save!
           end
           lms_access.access_token = params[:lms_access_token]
@@ -216,16 +218,16 @@ class CourseOfferingsController < ApplicationController
 
     if !url
       url = url_for(organization_course_path(
-          course_offering.course.organization,
-          course_offering.course,
-          course_offering.term))
+        course_offering.course.organization,
+        course_offering.course,
+        course_offering.term
+      ))
     end
 
     respond_to do |format|
-      format.json { render json: { url: url } }
+      format.json { render json: {url: url} }
     end
   end
-
 
   # -------------------------------------------------------------
   # POST /course_enrollments
@@ -251,7 +253,6 @@ class CourseOfferingsController < ApplicationController
   #     redirect_to root_path
   #   end
   # end
-
 
   # -------------------------------------------------------------
   # DELETE /unenroll
@@ -290,21 +291,20 @@ class CourseOfferingsController < ApplicationController
     redirect_to root_path
   end
 
-
   # -------------------------------------------------------------
   # PATCH/PUT /course_offerings/1
   def update
     if @course_offering.update(course_offering_params)
       redirect_to organization_course_path(
-        @course_offering.course.organization,
-        @course_offering.course,
-        @course_offering.term),
-        notice: "#{@course_offering.display_name} was successfully updated."
+                    @course_offering.course.organization,
+                    @course_offering.course,
+                    @course_offering.term
+                  ),
+                  notice: "#{@course_offering.display_name} was successfully updated."
     else
       render action: 'edit'
     end
   end
-
 
   # -------------------------------------------------------------
   # DELETE /course_offerings/1
@@ -313,7 +313,8 @@ class CourseOfferingsController < ApplicationController
     path = organization_course_path(
       @course_offering.course.organization,
       @course_offering.course,
-      @course_offering.term)
+      @course_offering.term
+    )
     if @course_offering.destroy
       redirect_to path,
         notice: "#{description} was successfully destroyed."
@@ -326,7 +327,7 @@ class CourseOfferingsController < ApplicationController
   # -------------------------------------------------------------
   def generate_gradebook
     @course_enrolled = CourseEnrollment.where(course_offering: @course_offering).
-                         sort_by{|ce| [ce.user.last_name.to_s.downcase, ce.user.first_name.to_s.downcase, ce.user.email]}
+      sort_by { |ce| [ce.user.last_name.to_s.downcase, ce.user.first_name.to_s.downcase, ce.user.email] }
     respond_to do |format|
       format.csv do
         headers['Content-Disposition'] =
@@ -336,7 +337,6 @@ class CourseOfferingsController < ApplicationController
       end
     end
   end
-
 
   # -------------------------------------------------------------
   # GET /course_offerings/:id/add_workout
@@ -349,7 +349,6 @@ class CourseOfferingsController < ApplicationController
     @workouts = @workouts - @wkts
     @course_offering
   end
-
 
   # -------------------------------------------------------------
   # POST /course_offerings/store_workout/:id
@@ -369,7 +368,6 @@ class CourseOfferingsController < ApplicationController
       notice: 'Workouts added to course offering!'
   end
 
-
   #~ Private instance methods .................................................
   private
 
@@ -385,34 +383,35 @@ class CourseOfferingsController < ApplicationController
       label: info[:label],
       lms_instance_id: info[:lms_instance_id],
       lms_course_code: info[:lms_course_code],
-      lms_course_num: info[:lms_course_num])
+      lms_course_num: info[:lms_course_num],
+    )
     if course_offering.save
       CourseEnrollment.create(
         course_offering: course_offering,
         user: current_user,
-        course_role: CourseRole.instructor)
+        course_role: CourseRole.instructor,
+      )
       render :json => course_offering, :status => :created
     else
-      render :json => course_offering.errors.full_messages, :status => :bad_request 
-      error = Error.new(:class_name => 'course_offering_save_fail', 
-        :message => course_offering.errors.full_messages.inspect,
-        :params => params.to_s)
+      render :json => course_offering.errors.full_messages, :status => :bad_request
+      error = Error.new(:class_name => 'course_offering_save_fail',
+                        :message => course_offering.errors.full_messages.inspect,
+                        :params => params.to_s)
       error.save!
     end
   end
 
-    # -------------------------------------------------------------
-    def rename_course_offering_id_param
-      if params[:course_offering_id] && !params[:id]
-        params[:id] = params[:course_offering_id]
-      end
+  # -------------------------------------------------------------
+  def rename_course_offering_id_param
+    if params[:course_offering_id] && !params[:id]
+      params[:id] = params[:course_offering_id]
     end
+  end
 
-
-    # -------------------------------------------------------------
-    # Only allow a trusted parameter "white list" through.
-    def course_offering_params
-      params.require(:course_offering).permit(:course_id, :term_id,
-        :label, :url, :self_enrollment_allowed)
-    end
+  # -------------------------------------------------------------
+  # Only allow a trusted parameter "white list" through.
+  def course_offering_params
+    params.require(:course_offering).permit(:course_id, :term_id,
+                                            :label, :url, :self_enrollment_allowed)
+  end
 end

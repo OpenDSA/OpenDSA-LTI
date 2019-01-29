@@ -174,7 +174,6 @@ $(function() {
       $('#display_table').html('');
       return;
     }
-    debugger;
     //GET /course_offerings/:user_id/:inst_section_id
     var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('#comb').find('option:selected').val();
 
@@ -270,8 +269,8 @@ $(function() {
     }
     member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.first_done.substring(0, 10) + " " + pData.first_done.substring(11, 16) + '</th>';
     member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.last_done.substring(0, 10) + " " + pData.last_done.substring(11, 16) + '</th>';
-    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + sData.lms_posted + '</th>';
-    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + sData.time_posted + '</th>';
+    //member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + sData.lms_posted + '</th>';
+    //member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + sData.time_posted + '</th>';
     return member;
   }
 
@@ -286,8 +285,8 @@ $(function() {
     elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Proficient Date </th>';
     elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> First Done </th>';
     elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th>';
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Posted to Canvas? </th>';
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Posted </th> </tr>';
+    //elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Posted to Canvas? </th>';
+    //elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Posted </th> </tr>';
 
     return elem
   }
