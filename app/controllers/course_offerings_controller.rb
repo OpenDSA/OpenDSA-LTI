@@ -139,6 +139,7 @@ class CourseOfferingsController < ApplicationController
       template: 'course_offerings/find_attempts.json.jbuilder',
       locals: {:@odsa_exercise_attempts => @odsa_exercise_attempts,
                :@odsa_exercise_progress => @odsa_exercise_progress,
+               :@inst_book_section_exercise => @inst_book_section_exercise,
                :@inst_section => @inst_section},
     )
   end

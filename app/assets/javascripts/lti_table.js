@@ -189,13 +189,13 @@ $(function() {
 
         var khan_ac_exercise = true;
         var header = '<p style="font-size:24px; align=center;"> OpenDSA Progress Table<p>';
-        header += '<table>';
+        header += '<table style="border-spacing: 0;">';
         header += '<tr>';
         var elem = '<tr>';
         header += buildProgressHeader(khan_ac_exercise);
-        elem += getFieldMember(data.inst_section, data.odsa_exercise_progress[0], data.odsa_exercise_attempts, khan_ac_exercise);
+        elem += getFieldMember(data.inst_section, data.odsa_exercise_progress[0], data.odsa_exercise_attempts, data.inst_book_section_exercise, khan_ac_exercise);
         var header1 = '<p style="font-size:24px; align=center;"> OpenDSA Attempt Table' + data.odsa_exercise_attempts[0].question_name + '<p>';
-        header1 += '<table>';
+        header1 += '<table style="border-spacing: 0;">';
         header1 += '<tr>';
         var elem1 = '<tr>';
         header1 += getAttemptHeader(khan_ac_exercise);
@@ -218,13 +218,13 @@ $(function() {
       } else {
 
         var header = '<p style="font-size:24px; align=center;"> OpenDSA Progress Table<p>';
-        header += '<table>';
+        header += '<table style="border-spacing: 0;">';
         header += '<tr>';
         var elem = '<tr>';
         header += buildProgressHeader();
-        elem += getFieldMember(data.inst_section, data.odsa_exercise_progress[0], data.odsa_exercise_attempts);
+        elem += getFieldMember(data.inst_section, data.odsa_exercise_progress[0], data.odsa_exercise_attempts, data.inst_book_section_exercise);
         var header1 = '<p style="font-size:24px; align=center;"> OpenDSA Attempt Table <p>';
-        header1 += '<table>';
+        header1 += '<table style="border-spacing: 0;">';
         header1 += '<tr>';
         var elem1 = '<tr>';
         header1 += getAttemptHeader();
@@ -253,15 +253,18 @@ $(function() {
     });
   };
 
-  getFieldMember = function(sData, pData, attempts, kahn_ex) {
+  getFieldMember = function(sData, pData, attempts, instBookSecEx, kahn_ex) {
     // console.dir(pData)
     var member = '<tr>';
+    var pointsEarned = pData.proficient_date ? instBookSecEx.points : 0;
     if (kahn_ex == null || kahn_ex == false) {
       member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.current_score + '</th>';
       member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.highest_score + '</th>';
     }
     member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.total_correct + '</th>';
     member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + attempts.length + '</th>';
+    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pointsEarned + '</th>';
+    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + instBookSecEx.points + '</th>';
     if (pData.proficient_date != null) {
       member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.proficient_date.substring(0, 10) + " " + pData.proficient_date.substring(11, 16) + '</th>';
     } else {
@@ -282,6 +285,8 @@ $(function() {
     }
     elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Total Correct </th>';
     elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Total Attempts </th>';
+    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Points Earned </th>';
+    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Points Possible </th>';
     elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Proficient Date </th>';
     elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> First Done </th>';
     elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th>';
