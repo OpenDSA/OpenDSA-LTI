@@ -40,8 +40,22 @@ class OdsaModuleProgress < ActiveRecord::Base
 
     self.first_done ||= DateTime.now
     self.last_done = DateTime.now
+    old_score = self.highest_score
     update_score(bk_sec_exs)
-    self.save!
+
+    # comparing two floats
+    if (self.highest_score - old_score).abs > 0.001
+      res = post_score_to_lms()
+      if res.success?
+        self.save!
+      else
+        # Failed to post score to LMS.
+        # Keep old score so that if the student attempts the exercise again
+        # we will try to send the new score again.
+        self.highest_score = old_score
+        self.save!
+      end
+    end
 
     last_exercise = false
     if self.proficient_date.nil?

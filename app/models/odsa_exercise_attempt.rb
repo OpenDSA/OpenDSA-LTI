@@ -142,7 +142,6 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       if hasBook
         module_progress.update_proficiency(inst_exercise)
         book_progress.update_proficiency(exercise_progress)
-        module_progress.post_score_to_lms()
       end
     else
       exercise_progress.save!

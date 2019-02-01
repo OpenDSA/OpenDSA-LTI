@@ -46,14 +46,9 @@ class LtiController < ApplicationController
     isFullModule = request_params.key?('instChapterModuleId')
 
     if isFullModule
-      mod_prog = OdsaModuleProgress.includes(:lms_access).find_by(inst_chapter_module_id: request_params['instChapterModuleId'],
-                                                                  user_id: current_user.id)
-      res = mod_prog.post_score_to_lms()
-      if res.success?
-        render :json => {:message => 'success', :res => res.to_json}.to_json
-      else
-        render :json => {:message => 'failure', :res => res.to_json}.to_json, :status => :bad_request
-      end
+      # we check if the module score needs to be sent to the LMS whenever
+      # an exercise attempt is recorded. See odsa_module_progress.rb
+      render :json => {:message => 'deprecated endpoint'}.to_json
       return
     end
 
@@ -334,7 +329,6 @@ class LtiController < ApplicationController
         # update the score for the module containing the exercise
         mod_prog = OdsaModuleProgress.get_progress(user_id, inst_chapter_module.id, bk_sec_ex.inst_book_id)
         mod_prog.update_proficiency(bk_sec_ex.inst_exercise)
-        mod_prog.post_score_to_lms()
 
         res.description = "Your old score of #{old_score} has been replaced with #{score}"
         res.code_major = 'success'
