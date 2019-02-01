@@ -100,7 +100,7 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-cas'
 gem 'cancancan'
 gem 'activeadmin'
-gem 'exception_handler', '~> 0.6.5'
+gem 'exception_handler', '~> 0.3.45'
 
 gem 'kaminari'        # Auto-paginated views
 gem 'remotipart'      # Adds support for remote mulitpart forms (file uploads)
