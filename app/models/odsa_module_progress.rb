@@ -46,14 +46,16 @@ class OdsaModuleProgress < ActiveRecord::Base
     # comparing two floats
     if (self.highest_score - old_score).abs > 0.001
       res = post_score_to_lms()
-      if res.success?
-        self.save!
-      else
-        # Failed to post score to LMS.
-        # Keep old score so that if the student attempts the exercise again
-        # we will try to send the new score again.
-        self.highest_score = old_score
-        self.save!
+      unless res.blank?
+        if res.success?
+          self.save!
+        else
+          # Failed to post score to LMS.
+          # Keep old score so that if the student attempts the exercise again
+          # we will try to send the new score again.
+          self.highest_score = old_score
+          self.save!
+        end
       end
     end
 
