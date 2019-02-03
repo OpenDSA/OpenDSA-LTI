@@ -303,6 +303,7 @@ $(function() {
           var mp = student.odsa_module_progresses[0];
           var latest_proficiency = new Date(0);
           var exhtml = '';
+          // match up exercises and exercise progresses
           for (var j = 0; j < data.exercises.length; j++) {
             var found = false;
             var ex = data.exercises[j];
@@ -310,7 +311,7 @@ $(function() {
               if (ex.id === eps[k].inst_book_section_exercise_id) {
                 if (eps[k].highest_score >= ex.threshold) {
                   exhtml += '<td class="success">' + ex.points + '</td>';
-                  var pdate = new Date(eps[j].proficient_date);
+                  var pdate = new Date(eps[k].proficient_date);
                   if (pdate > latest_proficiency) {
                     latest_proficiency = pdate;
                   }
