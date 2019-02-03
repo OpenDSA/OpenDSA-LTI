@@ -271,12 +271,10 @@ $(function() {
       headers.children().slice(exInfoColStartIdx).remove();
       tbody.empty();
       
-      // create a hash to lookup exercise index by id, for later use.
-      var exIdx = {};
+      // create a column for each exercise
       var points_possible = 0;
       for (var i = 0; i < data.exercises.length; i++) {
         var ex = data.exercises[i];
-        exIdx[ex.id] = i;
         ex.points = parseFloat(ex.points);
         points_possible += ex.points;
         headers.append('<th>' + ex.inst_exercise.name + ' (' + ex.points + 'pts)</th>');
@@ -289,6 +287,7 @@ $(function() {
         enrollments[enrollment.user_id] = enrollment;
       }
 
+      // create a row for each student
       var html = '';
       for (i = 0; i < data.students.length; i++) {
         var student = data.students[i];
@@ -327,7 +326,7 @@ $(function() {
               exhtml += '<td>0</td>';
             }
           }
-          html += '<td>' + (mp.highest_score * points_possible) + '</td>';
+          html += '<td>' + parseFloat((mp.highest_score * points_possible).toFixed(2)) + '</td>';
           html += '<td>' + points_possible + '</td>';
           html += '<td>' + (mp.created_at ? new Date(mp.created_at).toLocaleString() : 'N/A') + '</td>';
           html += '<td>' + (mp.proficient_date ? new Date(mp.proficient_date).toLocaleString() : 'N/A') + '</td>';
