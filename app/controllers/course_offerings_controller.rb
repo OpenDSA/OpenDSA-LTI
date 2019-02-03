@@ -153,7 +153,7 @@ class CourseOfferingsController < ApplicationController
 
     # only includes students who have attempted at least one exercise in the module
     # but also includes exercise attempt and progress data
-    enrollments = CourseEnrollment.joins(:user).includes(user: [:odsa_module_progresses, :odsa_exercise_progresses]).where("course_enrollments.course_offering_id = ? AND course_enrollments.course_role_id = ? AND (odsa_module_progresses.inst_chapter_module_id = ? OR odsa_module_progresses.inst_chapter_module_id IS NULL) AND (odsa_exercise_progresses.inst_book_section_exercise_id IN (?) OR  odsa_exercise_progresses.inst_book_section_exercise_id IS NULL)", params[:id], CourseRole::STUDENT_ID, params[:inst_chapter_module_id], ex_ids).references(:course_enrollments, :odsa_module_progresses, :odsa_exercise_progresses)
+    enrollments = CourseEnrollment.joins(:user).includes(user: [:odsa_module_progresses, :odsa_exercise_progresses]).where("course_enrollments.course_offering_id = ? AND course_enrollments.course_role_id = ? AND odsa_module_progresses.inst_chapter_module_id = ? AND odsa_exercise_progresses.inst_book_section_exercise_id IN (?)", params[:id], CourseRole::STUDENT_ID, params[:inst_chapter_module_id], ex_ids).references(:course_enrollments, :odsa_module_progresses, :odsa_exercise_progresses)
 
     render :json => {
       exercises: exercises.as_json(include: :inst_exercise),
