@@ -259,6 +259,7 @@ $(function() {
       return;
     }
 
+    $('#spinner').css('display', '');
     $.ajax({
       url: "/course_offerings/" + ODSA_DATA.course_offering_id + "/modules/" + $('#select-module').val() + "/progresses",
       type: 'get'
@@ -348,6 +349,8 @@ $(function() {
     }).fail(function(error) {
       console.log(error);
       alert("Failed to retrieve module progress data.");
+    }).always(function() {
+      $('#spinner').css('display', 'none');
     });
   };
 
@@ -360,7 +363,7 @@ $(function() {
     }
     //GET /course_offerings/:user_id/:inst_section_id
     var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('#comb').find('option:selected').val();
-
+    $('#spinner').css('display', '');
     var aj = $.ajax({
       url: request,
       type: 'get',
@@ -430,6 +433,8 @@ $(function() {
     }).fail(function(data) {
       alert("failure");
       console.log('AJAX request has FAILED');
+    }).always(function() {
+      $('#spinner').css('display', 'none');
     });
   };
 
@@ -524,6 +529,7 @@ $(function() {
         //GET /course_offerings/:user_id/course_offering_id/exercise_list
         var al = $('#combobox').find('option:selected').val();
         var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + document.getElementById('select').name + "/exercise_list";
+        $('#spinner').css('display', '');
         var aj = $.ajax({
             url: request,
             type: 'get',
@@ -568,9 +574,11 @@ $(function() {
         }
         //change_courses(data);
         }).fail(function(data) {
-            alert("failure")
+            alert("failure");
             console.log('AJAX request has FAILED');
-        });1
+        }).always(function() {
+          $('#spinner').css('display', 'none');
+        });
     }
 
   check_dis_completeness = function(flag) {
