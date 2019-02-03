@@ -63,7 +63,7 @@ class CourseOfferingsController < ApplicationController
 
   # GET /course_offerings/:user_id/id/exercise_list
   def get_individual_attempt
-    puts "trying to find individual attempt"
+    #puts "trying to find individual attempt"
     @user_id = User.find_by(id: params[:user_id])
     @course_offering = CourseOffering.find_by(id: params[:id])
     @url = url_for(organization_course_path(
@@ -149,7 +149,7 @@ class CourseOfferingsController < ApplicationController
 
     ex_ids = exercises.collect { |ex| ex.id }
 
-    users = CourseEnrollment.where(course_offering_id: params[:id], course_role_id: CourseRole::STUDENT_ID).joins(:user).includes(:user).order('users.first_name ASC, users.last_name ASC').collect { |e| e.user }
+    users = CourseEnrollment.where(course_offering_id: params[:id], course_role_id: CourseRole::STUDENT_ID).joins(:user).includes(:user).order('users.last_name ASC, users.first_name ASC').collect { |e| e.user }
 
     # only includes students who have attempted at least one exercise in the module
     # but also includes exercise attempt and progress data

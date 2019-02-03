@@ -70,7 +70,7 @@
         %table#module-scores-table.table.table-hover.table-bordered
           %thead#mst-head
             %tr
-              %th
+              %th{colspan: 2}
                 &nbsp;
               %th{style: "text-align: center;", colspan: 5}
                 Module Info
@@ -78,8 +78,9 @@
                 Exercise Info
             %tr#mst-header-row
               %th
-                Name
-                %a{href: '#', "data-tooltip": 'The student\'s name.'} (?)
+                First Name
+              %th
+                Last Name
               %th
                 Points Earned
                 %a{href: '#', "data-tooltip": 'The number of points the student has earned so far for this module.'} (?) 

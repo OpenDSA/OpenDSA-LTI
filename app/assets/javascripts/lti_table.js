@@ -268,7 +268,7 @@ $(function() {
       var exHeader = $('#exercise-info-header');
       var headers = $('#mst-header-row');
       var tbody = $('#mst-body');
-      var exInfoColStartIdx = 6;
+      var exInfoColStartIdx = 7;
       headers.children().slice(exInfoColStartIdx).remove();
       tbody.empty();
       
@@ -298,7 +298,8 @@ $(function() {
           have_ex_data = true;
         }
         html += '<tr>';
-        html += '<td>' + student.first_name + ' ' + student.last_name + '</td>';
+        html += '<td>' + student.first_name + '</td>';
+        html += '<td>' + student.last_name + '</td>';
         if (have_ex_data) {
           var eps = student.odsa_exercise_progresses;
           var mp = student.odsa_module_progresses[0];
