@@ -478,6 +478,7 @@ class LtiController < ApplicationController
       email = "student_view@example.com"
     end
     @user = User.where(email: email).first
+
     if @user.blank?
       # TODO: should mark this as LMS user then prevent this user from login to opendsa domain
       @user = User.new(:email => email,
@@ -492,6 +493,11 @@ class LtiController < ApplicationController
         error.save!
         return false
       end
+    elsif @user.first_name != params[:lis_person_name_given] || @user.last_name != params[:lis_person_name_family]
+      # update user's name
+      @user.first_name = params[:lis_person_name_given]
+      @user.last_name = params[:lis_person_name_family]
+      @user.save
     end
     successful = sign_in @user
     unless successful
