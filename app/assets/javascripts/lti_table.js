@@ -138,7 +138,7 @@ $(function() {
 
 (function() {
 
-  console.dir("lti tablejs")
+  //console.dir("lti tablejs")
 
   $(document).ready(function() {
     $("#combobox").combobox();
@@ -159,6 +159,50 @@ $(function() {
       //handle_select_student();
       //handle_display()
     });
+    
+    $('#btn-select-tool').on('click', function() {
+
+      $('#overview-container').css('display', 'none');
+      $('#detail-container').css('display', 'none');
+      $('#mst-container').css('display', 'none');
+      $('#log').html('');
+      $('#display_table').html('');
+
+      switch($('#select-tool').val()) {
+        case "detail":
+          $('#detail-container').css('display', '');
+          break;
+        case "overview":
+          $('#overview-container').css('display', '');
+          break;
+        default:
+          //
+      }
+    });
+
+    $('#btn-select-module').on('click', handle_module_display);
+
+    $('#btn-module-csv').on('click', function() {
+      var headers = $('#mst-header-row')[0];
+      var tbody = $('#mst-body')[0];
+      var csv = table2csv(headers, tbody, [[/ \(\?\)/g, '']]);
+
+      var dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(csv);
+      var modules = $('#select-module')[0];
+      var selectedModule = modules.options[modules.selectedIndex].innerText
+                                    .replace('-', '_')
+                                    .replace(/\./g, '-')
+                                    .replace(/\s/g, '');
+
+      var exportName = selectedModule + '_' + getTimestamp(new Date());
+      var downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", exportName + ".csv");
+      downloadAnchorNode.style.display = 'none';
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    });
     /*$('#display').click(function() {
       console.log("clicked registered");
       return handle_display();
@@ -166,6 +210,146 @@ $(function() {
 
   });
 
+  function getTimestamp(date) {
+    var month = date.getMonth() + 1;
+    if (month < 10) month = '0' + month;
+    var day = date.getDate();
+    if (day < 10) day = '0' + day;
+    var hour = date.getHours();
+    if (hour < 10) hour = '0' + hour;
+    var minute = date.getMinutes();
+    if (minute < 10) minute = '0' + minute;
+    var second = date.getSeconds();
+    if (second < 10) second = '0' + second;
+
+    var timestamp = '' + date.getFullYear() + month + day + hour + minute + second;
+    return timestamp;
+  }
+
+  function table2csv(headers, body, replacements) {
+    if (!replacements) replacements = [];
+    var csv = '';
+    for (var i = 0; i < headers.children.length; i++) {
+      var cell = headers.children[i];
+      var text = cell.innerText;
+      for (var j = 0; j < replacements.length; j++) {
+        var replacement = replacements[j];
+        text = text.replace(replacement[0], replacement[1]);
+      }
+      csv += '"' + text + '",';
+    }
+    csv += '\n';
+
+    for (var i = 0; i < body.children.length; i++) {
+      var row = body.children[i];
+      for (var j = 0; j < row.children.length; j++) {
+        var cell = row.children[j];
+        csv += '"' + cell.innerText + '",';
+      }
+      csv += '\n';
+    }
+    return csv;
+  }
+
+  handle_module_display = function() {
+    var messages = check_dis_completeness("modules_table");
+    if (messages.length !== 0) {
+      alert(messages);
+      $('#display_table').html('');
+      return;
+    }
+
+    $.ajax({
+      url: "/course_offerings/" + ODSA_DATA.course_offering_id + "/modules/" + $('#select-module').val() + "/progresses",
+      type: 'get'
+    }).done(function(data) {
+
+      var exHeader = $('#exercise-info-header');
+      var headers = $('#mst-header-row');
+      var tbody = $('#mst-body');
+      var exInfoColStartIdx = 6;
+      headers.children().slice(exInfoColStartIdx).remove();
+      tbody.empty();
+      
+      // create a hash to lookup exercise index by id, for later use.
+      var exIdx = {};
+      var points_possible = 0;
+      for (var i = 0; i < data.exercises.length; i++) {
+        var ex = data.exercises[i];
+        exIdx[ex.id] = i;
+        ex.points = parseFloat(ex.points);
+        points_possible += ex.points;
+        headers.append('<th>' + ex.inst_exercise.name + ' (' + ex.points + 'pts)</th>');
+      }
+      exHeader.attr('colSpan', data.exercises.length);
+
+      var enrollments = {};
+      for (i = 0; i < data.enrollments.length; i++) {
+        var enrollment = data.enrollments[i];
+        enrollments[enrollment.user_id] = enrollment;
+      }
+
+      var html = '';
+      for (i = 0; i < data.students.length; i++) {
+        var student = data.students[i];
+        var have_ex_data = false;
+        if (enrollments[student.id]) {
+          student = enrollments[student.id].user;
+          have_ex_data = true;
+        }
+        html += '<tr>';
+        html += '<td>' + student.first_name + ' ' + student.last_name + '</td>';
+        if (have_ex_data) {
+          var eps = student.odsa_exercise_progresses;
+          var mp = student.odsa_module_progresses[0];
+          var latest_proficiency = new Date(0);
+          var exhtml = '';
+          for (var j = 0; j < data.exercises.length; j++) {
+            var found = false;
+            var ex = data.exercises[j];
+            for (var k = 0; k < eps.length; k++) {
+              if (ex.id === eps[k].inst_book_section_exercise_id) {
+                if (eps[k].highest_score >= ex.threshold) {
+                  exhtml += '<td class="success">' + ex.points + '</td>';
+                  var pdate = new Date(eps[j].proficient_date);
+                  if (pdate > latest_proficiency) {
+                    latest_proficiency = pdate;
+                  }
+                }
+                else {
+                  exhtml += '<td>0</td>';
+                }
+                found = true;
+                break;
+              }
+            }
+            if (!found) {
+              exhtml += '<td>0</td>';
+            }
+          }
+          html += '<td>' + (mp.highest_score * points_possible) + '</td>';
+          html += '<td>' + points_possible + '</td>';
+          html += '<td>' + (mp.created_at ? new Date(mp.created_at).toLocaleString() : 'N/A') + '</td>';
+          html += '<td>' + (mp.proficient_date ? new Date(mp.proficient_date).toLocaleString() : 'N/A') + '</td>';
+          html += '<td>' + (latest_proficiency.getTime() > 0 ? latest_proficiency.toLocaleString() : 'N/A') + '</td>';
+          html += exhtml;
+        }
+        else {
+          // student has not attempted any exercise in this module
+          html += '<td>0</td> <td>' + points_possible + '</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>';
+          for (var j = 0; j < data.exercises.length; j++) {
+            html += '<td>0</td>';
+          }
+        }
+        html += '</tr>';
+      }
+      tbody.append(html);
+      $('#mst-container').css('display', '');
+    }).fail(function(error) {
+      console.log(error);
+      alert("Failed to retrieve module progress data.");
+    });
+  };
 
   handle_display = function() {
     var messages = check_dis_completeness("table");
@@ -189,16 +373,14 @@ $(function() {
 
         var khan_ac_exercise = true;
         var header = '<p style="font-size:24px; align=center;"> OpenDSA Progress Table<p>';
-        header += '<table style="border-spacing: 0;">';
-        header += '<tr>';
-        var elem = '<tr>';
-        header += buildProgressHeader(khan_ac_exercise);
+        header += '<table class="table"><thead>';
+        var elem = '<tbody>';
+        header += buildProgressHeader(khan_ac_exercise) + "</thead>";
         elem += getFieldMember(data.inst_section, data.odsa_exercise_progress[0], data.odsa_exercise_attempts, data.inst_book_section_exercise, khan_ac_exercise);
         var header1 = '<p style="font-size:24px; align=center;"> OpenDSA Attempt Table' + data.odsa_exercise_attempts[0].question_name + '<p>';
-        header1 += '<table style="border-spacing: 0;">';
-        header1 += '<tr>';
-        var elem1 = '<tr>';
-        header1 += getAttemptHeader(khan_ac_exercise);
+        header1 += '<table class="table"><thead>';
+        var elem1 = '<tbody>';
+        header1 += getAttemptHeader(khan_ac_exercise) + "</thead>";
         var proficiencyFlag = -1;
         for (var i = 0; i < data.odsa_exercise_attempts.length; i++) {
           if (data.odsa_exercise_attempts[i].earned_proficiency != null && data.odsa_exercise_attempts[i].earned_proficiency && proficiencyFlag == -1) {
@@ -211,23 +393,21 @@ $(function() {
         }
         header1 += elem1;
         header += elem;
-        header += '</table> ';
-        header1 += '</table>';
+        header += '</tbody></table> ';
+        header1 += '</tbody></table>';
         header += '<br>' + header1;
         $('#display_table').html(header);
       } else {
 
         var header = '<p style="font-size:24px; align=center;"> OpenDSA Progress Table<p>';
-        header += '<table style="border-spacing: 0;">';
-        header += '<tr>';
-        var elem = '<tr>';
-        header += buildProgressHeader();
+        header += '<table class="table table-bordered"><thead>';
+        var elem = '<tbody>';
+        header += buildProgressHeader() + '</thead>';
         elem += getFieldMember(data.inst_section, data.odsa_exercise_progress[0], data.odsa_exercise_attempts, data.inst_book_section_exercise);
         var header1 = '<p style="font-size:24px; align=center;"> OpenDSA Attempt Table <p>';
-        header1 += '<table style="border-spacing: 0;">';
-        header1 += '<tr>';
-        var elem1 = '<tr>';
-        header1 += getAttemptHeader();
+        header1 += '<table class="table table-bordered table-hover"><thead>';
+        var elem1 = '<tbody>';
+        header1 += getAttemptHeader() + '</thead>';
         var proficiencyFlag = -1;
         for (var i = 0; i < data.odsa_exercise_attempts.length; i++) {
           if (data.odsa_exercise_attempts[i].earned_proficiency != null && data.odsa_exercise_attempts[i].earned_proficiency && proficiencyFlag == -1) {
@@ -240,15 +420,15 @@ $(function() {
         }
         header1 += elem1;
         header += elem;
-        header += '</table> ';
-        header1 += '</table>';
+        header += '</tbody></table> ';
+        header1 += '</tbody></table>';
         header += '<br>' + header1;
         $('#display_table').html(header);
       }
 
       //change_courses(data);
     }).fail(function(data) {
-      alert("failure")
+      alert("failure");
       console.log('AJAX request has FAILED');
     });
   };
@@ -258,83 +438,83 @@ $(function() {
     var member = '<tr>';
     var pointsEarned = pData.proficient_date ? instBookSecEx.points : 0;
     if (kahn_ex == null || kahn_ex == false) {
-      member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.current_score + '</th>';
-      member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.highest_score + '</th>';
+      member += '<td>' + pData.current_score + '</td>';
+      member += '<td>' + pData.highest_score + '</td>';
     }
-    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.total_correct + '</th>';
-    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + attempts.length + '</th>';
-    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pointsEarned + '</th>';
-    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + instBookSecEx.points + '</th>';
+    member += '<td>' + pData.total_correct + '</td>';
+    member += '<td>' + attempts.length + '</td>';
+    member += '<td>' + pointsEarned + '</td>';
+    member += '<td>' + instBookSecEx.points + '</td>';
     if (pData.proficient_date != null) {
-      member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.proficient_date.substring(0, 10) + " " + pData.proficient_date.substring(11, 16) + '</th>';
+      member += '<td>' + pData.proficient_date.substring(0, 10) + " " + pData.proficient_date.substring(11, 16) + '</td>';
     } else {
-      member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> N/A</th>';
+      member += '<td>N/A</td>';
     }
-    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.first_done.substring(0, 10) + " " + pData.first_done.substring(11, 16) + '</th>';
-    member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.last_done.substring(0, 10) + " " + pData.last_done.substring(11, 16) + '</th>';
-    //member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + sData.lms_posted + '</th>';
-    //member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + sData.time_posted + '</th>';
+    member += '<td>' + pData.first_done.substring(0, 10) + " " + pData.first_done.substring(11, 16) + '</td>';
+    member += '<td>' + pData.last_done.substring(0, 10) + " " + pData.last_done.substring(11, 16) + '</td>';
+    //member += '<td>' + sData.lms_posted + '</td>';
+    //member += '<td>' + sData.time_posted + '</td>';
     return member;
-  }
+  };
 
   buildProgressHeader = function(kahn_ex) {
     var elem = '<tr>';
     if (kahn_ex == null || kahn_ex == false) {
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Current Score </th>';
-      elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Highest Score </th>';
+      elem += '<th>Current Score</th>';
+      elem += '<th>Highest Score</th>';
     }
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Total Correct </th>';
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Total Attempts </th>';
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Points Earned </th>';
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Points Possible </th>';
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Proficient Date </th>';
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> First Done </th>';
-    elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th>';
-    //elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Posted to Canvas? </th>';
-    //elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Posted </th> </tr>';
+    elem += '<th>Total Correct</th>';
+    elem += '<th>Total Attempts</th>';
+    elem += '<th>Points Earned</th>';
+    elem += '<th>Points Possible</th>';
+    elem += '<th>Proficient Date</th>';
+    elem += '<th>First Done</th>';
+    elem += '<th>Last Done</th>';
+    //elem += '<th>Posted to Canvas?</th>';
+    //elem += '<th>Time Posted</th></tr>';
 
-    return elem
-  }
+    return elem;
+  };
   getAttemptHeader = function(kahn_ex) {
     var head = '<tr>';
     if (kahn_ex == null || kahn_ex == false) {
-      head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Question name </th>';
-      head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Request Type </th>';
+      head += '<th>Question name</th>';
+      head += '<th>Request Type</th>';
     } else {
-      head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Pe Score </th>';
-      head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Pe Steps </th>';
+      head += '<th>Pe Score</th>';
+      head += '<th>Pe Steps</th>';
     }
-    head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Correct </th>';
-    head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Worth Credit </th>';
-    head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Done </th>';
-    head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Taken (s)</th>';
+    head += '<th>Correct</th>';
+    head += '<th>Worth Credit</th>';
+    head += '<th>Time Done</th>';
+    head += '<th>Time Taken (s)</th>';
     return head;
-  }
+  };
   getAttemptMemeber = function(aData, j, kahn_ex) {
     var memb = "<tr>";
     //console.dir(aData.earned_proficiency + " and j = " + j)
     if (kahn_ex == null || kahn_ex == false) {
       memb = '';
       if (aData.earned_proficiency != null && j == 1) {
-        memb += '<tr bgcolor="#008000"><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + aData.question_name + '</th>';
+        memb += '<tr class="success"><td>' + aData.question_name + '</td>';
       } else {
-        memb += '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + aData.question_name + '</th>';
+        memb += '<tr><td>' + aData.question_name + '</td>';
       }
-      memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.request_type + '</th>';
+      memb += '<td>' + aData.request_type + '</td>';
     } else {
-      memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.pe_score + '</th>';
-      memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.pe_steps_fixed + '</th>';
+      memb += '<td>' + aData.pe_score + '</td>';
+      memb += '<td>' + aData.pe_steps_fixed + '</td>';
     }
 
-    memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.correct + '</th>';
-    memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.worth_credit + '</th>';
-    memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_done.substring(0, 10) + " " + aData.time_done.substring(11, 16) + '</th>';
-    memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_taken + '</th>';
+    memb += '<td>' + aData.correct + '</td>';
+    memb += '<td>' + aData.worth_credit + '</td>';
+    memb += '<td>' + aData.time_done.substring(0, 10) + " " + aData.time_done.substring(11, 16) + '</td>';
+    memb += '<td>' + aData.time_taken + '</td>';
 
     return memb;
 
 
-  }
+  };
   handle_select_student = function(){
         var messages = check_dis_completeness("individual_student");
         if (messages.length !== 0) {
@@ -359,8 +539,8 @@ $(function() {
                   //<%= escape_javascript(render(:partial => 'lti/show_individual_exercise.html.haml')) %>");
                 //.append("<%= j render(:partial => 'views/lti/show_individual_exercise') %>");
                 //var elem = '<div class="ui-widget">';
-                var elem = '<label><strong>Select Exercise </strong></label>';
-                elem += '<select id="comb">';
+                var elem = '<label class="control-label col-lg-2 col-sm-3">Select Exercise:</label>';
+                elem += '<div class="col-xs-6"><select id="comb" class="form-control">';
                 //elem += '<% @exercise_list.each do |k, q| %>';
                 //elem += '<% if q[1] %>';
                 var keys = Object.keys(data.odsa_exercise_attempts);
@@ -376,12 +556,12 @@ $(function() {
                 }
                 if (!attempt_flag){
                   elem += ' <option value="No_attempt">';
-                    elem += '<strong> No_attempt Made</strong>';
+                    elem += '<strong> No Attempts Made</strong>';
                     elem += '</option>';
                 }
-                elem += '</select>';
+                elem += '</select></div>';
                 if (attempt_flag){
-                  elem += '<button class="btn btn-primary" id="display" onclick="handle_display()" name="display" style="float:right;">Display Detail </button>';
+                  elem += '<input class="btn btn-primary" id="display" onclick="handle_display()" name="display" type="button" value="Display Detail"></input>';
                 }                  
                 $('#log').html(elem);
             
@@ -397,23 +577,32 @@ $(function() {
     var messages;
     messages = [];
     var selectbar1 = $('#combobox').find('option:selected').text();
-    if (flag === 'individual_student'){
-      if (selectbar1 === '' ){
-        messages.push("You need to select a student");
-      return messages;
-      }
-    }else if ("table"){
-      var selectbar2 = $('#comb').find('option:selected').text();
-      if (selectbar1 === '' || selectbar2 === '') {
-        messages.push("You need to select a student or assignment");
-        return messages;
-      }
-      return messages
-    }else{
-      console.log ("unknown error from lti_table.js module")
-      alert ("unknown error from lti_table.js module, written by: Souleymane Dia")
+    switch(flag) {
+      case 'individual_student':
+        if (selectbar1 === '' ){
+          messages.push("You need to select a student");
+          return messages;
+        }
+        break;
+      case 'table':
+        var selectbar2 = $('#comb').find('option:selected').text();
+        if (selectbar1 === '' || selectbar2 === '') {
+          messages.push("You need to select a student or assignment");
+          return messages;
+        }
+        break;
+      case 'modules_table':
+        if (!$("#select-module").val()) {
+          messages.push('You need to select a module');
+          return messages;
+        }
+        break;
+      default:
+        console.log ("unknown error from lti_table.js module");
+        alert ("unknown error from lti_table.js module, written by: Souleymane Dia");
     }
-    return messages
+
+    return messages;
   };
 
 }).call(this);

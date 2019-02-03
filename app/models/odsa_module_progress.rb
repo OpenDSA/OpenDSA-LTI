@@ -43,21 +43,21 @@ class OdsaModuleProgress < ActiveRecord::Base
     old_score = self.highest_score
     update_score(bk_sec_exs)
 
-    # comparing two floats
+    # Comparing two floats.
+    # Only send score to LMS if the score has increased.
     if (self.highest_score - old_score).abs > 0.001
       res = post_score_to_lms()
       unless res.blank?
-        if res.success?
-          self.save!
-        else
+        # res will be null if this module isn't linked to an LMS assignment
+        unless res.success?
           # Failed to post score to LMS.
           # Keep old score so that if the student attempts the exercise again
           # we will try to send the new score again.
           self.highest_score = old_score
-          self.save!
         end
       end
     end
+    self.save!
 
     last_exercise = false
     if self.proficient_date.nil?
@@ -72,7 +72,6 @@ class OdsaModuleProgress < ActiveRecord::Base
           self.save!
           return true
         else
-          self.save!
           return false
         end
       else

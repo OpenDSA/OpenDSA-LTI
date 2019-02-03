@@ -144,6 +144,24 @@ class CourseOfferingsController < ApplicationController
     )
   end
 
+  def find_module_progresses
+    exercises = InstBookSectionExercise.includes(:inst_exercise, inst_section: [:inst_chapter_module]).where("inst_chapter_modules.id = ? AND inst_book_section_exercises.points > 0", params[:inst_chapter_module_id]).references(:inst_chapter_modules)
+
+    ex_ids = exercises.collect { |ex| ex.id }
+
+    users = CourseEnrollment.where(course_offering_id: params[:id], course_role_id: CourseRole::STUDENT_ID).joins(:user).includes(:user).order('users.first_name ASC, users.last_name ASC').collect { |e| e.user }
+
+    # only includes students who have attempted at least one exercise in the module
+    # but also includes exercise attempt and progress data
+    enrollments = CourseEnrollment.joins(:user).includes(user: [:odsa_module_progresses, :odsa_exercise_progresses]).where("course_enrollments.course_offering_id = ? AND course_enrollments.course_role_id = ? AND (odsa_module_progresses.inst_chapter_module_id = ? OR odsa_module_progresses.inst_chapter_module_id IS NULL) AND (odsa_exercise_progresses.inst_book_section_exercise_id IN (?) OR  odsa_exercise_progresses.inst_book_section_exercise_id IS NULL)", params[:id], CourseRole::STUDENT_ID, params[:inst_chapter_module_id], ex_ids).references(:course_enrollments, :odsa_module_progresses, :odsa_exercise_progresses)
+
+    render :json => {
+      exercises: exercises.as_json(include: :inst_exercise),
+      enrollments: enrollments.as_json(include: {user: {include: {odsa_module_progresses: {only: [:current_score, :first_done, :last_done, :highest_score, :id, :proficient_date, :created_at]}, odsa_exercise_progresses: {only: [:id, :inst_book_section_exercise_id, :current_score, :highest_score, :proficient_date]}}, only: [:id, :first_name, :last_name, :odsa_module_progresses]}}),
+      students: users.as_json(only: [:id, :first_name, :last_name]),
+    }
+  end
+
   # -------------------------------------------------------------
   # GET /course_offerings/new
   def new

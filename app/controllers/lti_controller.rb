@@ -420,47 +420,14 @@ class LtiController < ApplicationController
     @course_enrollment.each do |s|
       q = User.where("id=?", s.user_id).select("id, first_name, last_name").first
       @student_list.push(q)
-      #puts "helloo"
       @student_list = @student_list.sort_by &:first_name
     end
 
     @course_id = @course_offering.id
     @instBook = @course_offering.odsa_books.first
 
-    @exercise_list = Hash.new { |hsh, key| hsh[key] = [] }
+    @chapter_list = InstChapter.includes(inst_chapter_modules: [:inst_module]).where("inst_book_id = ? AND inst_chapter_modules.lms_assignment_id IS NOT NULL", @instBook.id).references(:inst_chapter_modules)
 
-    chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
-    chapters.each do |chapter|
-      modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
-      modules.each do |inst_ch_module|
-        sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
-        section_item_position = 1
-        if !sections.empty?
-          sections.each do |section|
-            title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
-                    (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + "." +
-                    section_item_position.to_s.rjust(2, "0") + " - "
-            learning_tool = nil
-            if section
-              title = title + section.name
-              learning_tool = section.learning_tool
-              if !learning_tool
-                if section.gradable
-                  attempted = OdsaExerciseAttempt.where(inst_section_id: section.id)
-                  if attempted.empty?
-                    @exercise_list[section.id].push(title)
-                  else
-                    @exercise_list[section.id].push(title)
-                    @exercise_list[section.id].push('attemp_flag')
-                  end
-                end
-              end
-            end
-            section_item_position += 1
-          end
-        end
-      end
-    end
     render 'show_table.html.haml' and return
   end
 
