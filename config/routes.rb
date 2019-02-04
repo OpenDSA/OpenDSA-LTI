@@ -64,6 +64,7 @@ CodeWorkout::Application.routes.draw do
 
   post 'inst_books/update' => 'inst_books#update', as: :book_update
   post 'inst_books/:id' => 'inst_books#compile', defaults: {format: 'js', data: {type: "script"}}, as: :compile
+  get 'inst_books/:id/validate' => 'inst_books#validate_configuration', as: :book_validate
   get 'inst_books/configure/:id' => 'inst_books#configure', as: :book_configure
   get 'inst_books/configurations/:id' => 'inst_books#configuration', as: :book_configuration
   resources :inst_books

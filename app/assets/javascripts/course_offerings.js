@@ -28,6 +28,12 @@
             //return handle_display();
         });
 
+        $('#inst-book-select').on('change', function() {
+            var bookId = this[this.selectedIndex].value;
+            if (!bookId) return;
+            validate_book_config(bookId);
+        });
+
         init();
     });
 
@@ -174,6 +180,25 @@
         }
 
         return messages;
+    };
+
+    validate_book_config = function(bookId) {
+        $.ajax({
+            url: '/inst_books/' + bookId + '/validate',
+            type: 'get'
+        }).done(function(data) {
+            if (data.res.length > 0) {
+                var msg = 'WARNING - the following modules are listed in the selected configuration but no longer exist on the OpenDSA server:\n';
+                for (var i = 0; i < data.res.length; i++) {
+                    msg += '\n\t- ' + data.res[i].name + ' (' + data.res[i].path + ')';
+                }
+                msg += '\n\nIf you create a course using this configuration, THESE MODULES WILL NOT BE ACCESSIBLE. It is highly recommended that you create/use an updated configuration.';
+                alert(msg);
+            }
+        }).fail(function(error) {
+            console.error('AJAX request has FAILED');
+            console.error(error);
+        });
     };
 
     handle_submit = function() {

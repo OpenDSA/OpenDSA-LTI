@@ -27,6 +27,15 @@ class InstBooksController < ApplicationController
     )
   end
 
+  def validate_configuration
+    book = InstBook.find(params[:id])
+    if (book.blank?)
+      render json: {status: "fail", message: "Book not found."}, status: :not_found
+    end
+    errors = book.validate_configuration()
+    render json: {status: "success", res: errors}
+  end
+
   # POST /inst_books/update
   def update
     inst_book = params['inst_book']

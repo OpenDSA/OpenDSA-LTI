@@ -1,12 +1,11 @@
-  #~ Relationships ............................................................
-  #~ Validation ...............................................................
-  #~ Constants ................................................................
-  #~ Hooks ....................................................................
-  #~ Class methods ............................................................
-  #~ Instance methods .........................................................
-  #~ Private instance methods .................................................
+#~ Relationships ............................................................
+#~ Validation ...............................................................
+#~ Constants ................................................................
+#~ Hooks ....................................................................
+#~ Class methods ............................................................
+#~ Instance methods .........................................................
+#~ Private instance methods .................................................
 class InstBook < ActiveRecord::Base
-
   enum book_type: {Complete: 0, Exercises: 1}
 
   #~ Relationships ............................................................
@@ -21,13 +20,13 @@ class InstBook < ActiveRecord::Base
 
   paginates_per 100
 
-  scope :template, -> {where "template = ?", 1}
+  scope :template, -> { where "template = ?", 1 }
 
   #~ Validation ...............................................................
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
-  def self.save_data_from_json(json, current_user, inst_book=nil)
+  def self.save_data_from_json(json, current_user, inst_book = nil)
     book_data = json
     update_mode = false
     inst_book_id = inst_book
@@ -62,7 +61,7 @@ class InstBook < ActiveRecord::Base
     chapters = book_data['chapters']
 
     ch_position = 0
-    chapters.each do |k,v|
+    chapters.each do |k, v|
       inst_chapter = InstChapter.save_data_from_json(b, k, v, ch_position, update_mode)
       ch_position += 1
     end
@@ -70,17 +69,38 @@ class InstBook < ActiveRecord::Base
 
   def self.get_metadata(user_id)
     return InstBook.where(user_id: user_id)
-      .joins("LEFT JOIN course_offerings ON course_offering_id = course_offerings.id")
-      .joins("LEFT JOIN terms ON term_id = terms.id")
-      .joins("LEFT JOIN courses ON course_id = courses.id")
-      .select('inst_books.id, inst_books.title, inst_books.created_at,
+             .joins("LEFT JOIN course_offerings ON course_offering_id = course_offerings.id")
+             .joins("LEFT JOIN terms ON term_id = terms.id")
+             .joins("LEFT JOIN courses ON course_id = courses.id")
+             .select('inst_books.id, inst_books.title, inst_books.created_at,
                 inst_books.updated_at, inst_books.template, inst_books.desc,
                 inst_books.last_compiled, course_offering_id, label, courses.name AS course_name,
                 courses.number AS course_number, terms.slug AS term')
-      .order('inst_books.template DESC, inst_books.title ASC, terms.starts_on ASC')
+             .order('inst_books.template DESC, inst_books.title ASC, terms.starts_on ASC')
   end
 
   #~ Instance methods .........................................................
+
+  # Checks for modules listed in the book configuration for which an RST
+  # file doesn't exist. This can happen if an RST file has been renamed, moved,
+  # deleted, etc. since the configuration was created.
+  def validate_configuration
+    lang = JSON.parse(self.options)['lang'] || 'en'
+    rst_folder = File.join('public', 'OpenDSA', 'RST', lang)
+    missing_modules = []
+    chapters = InstChapter.includes(inst_chapter_modules: [:inst_module])
+      .references(inst_chapter_modules: [:inst_module])
+      .where(inst_book_id: self.id)
+    for chapter in chapters
+      for mod in chapter.inst_chapter_modules
+        mod_path = mod.inst_module.path
+        unless File.file?(File.join(rst_folder, mod_path + '.rst'))
+          missing_modules << {path: mod_path, name: mod.inst_module.name}
+        end
+      end
+    end
+    return missing_modules
+  end
 
   def to_builder
     Jbuilder.new do |json|
@@ -116,7 +136,7 @@ class InstBook < ActiveRecord::Base
                     for inst_section in inst_chapter_module.inst_sections
                       section_name = inst_section.name
 
-                     # section object
+                      # section object
                       json.set! section_name do
                         json.set! :showsection, inst_section.show
                         learning_tool = inst_section.learning_tool
@@ -130,7 +150,6 @@ class InstBook < ActiveRecord::Base
                             exercises = inst_section.inst_book_section_exercises
                             if !exercises.empty?
                               for inst_book_section_exercise in exercises
-
                                 exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
                                 json.set! exercise_name do
                                   json.set! :required, inst_book_section_exercise.required
@@ -160,17 +179,17 @@ class InstBook < ActiveRecord::Base
   # --------------------------------------------------------------------------
   # clone book configuration
   def clone(current_user)
-      b = InstBook.new
-      b.title = self.title
-      b.desc = self.desc
-      b.options = self.options
-      b.user_id = current_user.id
-      b.save
+    b = InstBook.new
+    b.title = self.title
+    b.desc = self.desc
+    b.options = self.options
+    b.user_id = current_user.id
+    b.save
 
-      inst_chapters.each do |chapter|
-        inst_chapter = chapter.clone(b)
-      end
-      return b
+    inst_chapters.each do |chapter|
+      inst_chapter = chapter.clone(b)
+    end
+    return b
   end
 
   def total_points
@@ -188,6 +207,6 @@ class InstBook < ActiveRecord::Base
   def title_with_created_at
     return "#{title} (created #{created_at})"
   end
+
   #~ Private instance methods .................................................
 end
-
