@@ -188,11 +188,11 @@
             type: 'get'
         }).done(function(data) {
             if (data.res.length > 0) {
-                var msg = 'WARNING - the following modules are listed in the selected configuration but no longer exist on the OpenDSA server:\n';
+                var msg = 'WARNING - the following modules are listed in the selected book configuration but no longer exist on the OpenDSA server:\n';
                 for (var i = 0; i < data.res.length; i++) {
                     msg += '\n\t- ' + data.res[i].name + ' (' + data.res[i].path + ')';
                 }
-                msg += '\n\nIf you create a course using this configuration, THESE MODULES WILL NOT BE ACCESSIBLE. It is highly recommended that you create/use an updated configuration.';
+                msg += '\n\nIf you create a course using this book configuration, THESE MODULES WILL NOT BE ACCESSIBLE. It is highly recommended that you create/use an updated book configuration.';
                 alert(msg);
             }
         }).fail(function(error) {
