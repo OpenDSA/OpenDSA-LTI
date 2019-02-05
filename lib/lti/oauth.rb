@@ -1,7 +1,6 @@
 module OAuth
   def self.generate_oauth_params(consumer_key, consumer_secret, target_url,
                                  params, http_method = :post)
-    byebug
     uri = URI.parse(CGI.unescape_html(target_url))
 
     if uri.port == uri.default_port
