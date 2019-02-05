@@ -8,6 +8,9 @@ class LmsAccess < ActiveRecord::Base
 
   def self.get_oauth_creds(key)
     lms_access = LmsAccess.where(consumer_key: key).first
+    if lms_access.blank?
+      return nil
+    end
     consumer_key = lms_access.consumer_key
     consumer_secret = lms_access.consumer_secret
     {consumer_key => consumer_secret}

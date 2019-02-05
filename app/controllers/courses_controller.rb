@@ -43,7 +43,7 @@ class CoursesController < ApplicationController
   # GET /courses/1/list
   def list
     courses = Course.where(organization_id: params[:organization_id])
-    render :json => courses, :status => :ok
+    render :json => courses.as_json, :status => :ok
   end
 
   # -------------------------------------------------------------
@@ -61,6 +61,13 @@ class CoursesController < ApplicationController
   # POST /courses
   def create
     course_info = params[:course]
+    course = Course.where(name: course_info[:name],
+                          number: course_info[:number],
+                          organization_id: course_info[:organization_id])
+    unless course.blank?
+      render json: ['A course with that number and name already exists for the selected organization.'], status: :forbidden
+      return
+    end
     course = Course.new(
       name: course_info[:name],
       number: course_info[:number],
@@ -68,7 +75,7 @@ class CoursesController < ApplicationController
       user_id: current_user.id,
     )
     if course.save
-      render :json => course, :status => :created
+      render :json => course.as_json, :status => :created
     else
       render :json => course.errors.full_messages, :status => :bad_request
       error = Error.new(:class_name => 'course_save_fail',

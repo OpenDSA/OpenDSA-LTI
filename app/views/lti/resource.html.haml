@@ -2,7 +2,7 @@
   window.jsonFile = #{@json.html_safe};
   window.return_url = "#{params[:content_item_return_url] ? params[:content_item_return_url].html_safe : params[:launch_presentation_return_url].html_safe}";
   window.odsa_launch_url = "#{@launch_url}";
-  window.odsa_organizations = #{@organizations.blank? ? 'undefined' : @organiations.to_json.html_safe};
+  window.odsa_organizations = #{@organizations.blank? ? 'undefined' : @organizations.to_json.html_safe};
   window.organization_id = #{@organization_id.blank? ? 'undefined' : @organization_id};
   window.deepLinking = #{@deep_linking};
   window.odsa_course_info = {
@@ -20,7 +20,7 @@
   };
 
 .row
-  .col-xs-9.alert-msg#alert-box{style: 'display: none;'}
+  .col-xs-12.alert-msg#alert-box{style: 'display: none;'}
     .alert.alert-danger.alert-dismissable{role: 'alert'}
       %button#dismiss-button{type: 'button', class: 'close'}
         %span

@@ -4,8 +4,8 @@
   window.ODSA = window.ODSA || {};
   window.ODSA.languages = #{@languages.to_json.html_safe};
   window.ODSA.codeLanguages = #{@code_languages.to_json.html_safe};
-  window.ODSA.learningTools = #{@learning_tools.to_json.html_safe};
-  window.ODSA.user_books = #{@book_metadata.to_json.html_safe};
+  window.ODSA.learningTools = #{@learning_tools.as_json.to_json.html_safe};
+  window.ODSA.user_books = #{@book_metadata.as_json.to_json.html_safe};
   window.ODSA.availableModules = #{@avail_mods.to_json.html_safe};
 
 = javascript_include_tag "split.min.js"

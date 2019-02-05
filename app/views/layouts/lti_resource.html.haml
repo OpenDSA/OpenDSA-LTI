@@ -3,7 +3,9 @@
     %title OpenDSA
     %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1.0' }
     = stylesheet_link_tag 'application', media: 'all'
-    = javascript_include_tag 'application', media: 'all'
+    -#= javascript_include_tag 'application', media: 'all'
+    = javascript_include_tag 'jquery', media: 'all'
+    = javascript_include_tag 'jstree'
     = stylesheet_link_tag 'theme/warm/theme', media: 'all'
     = stylesheet_link_tag 'lti_resource', media: 'all'
     = javascript_include_tag 'theme/warm/theme'

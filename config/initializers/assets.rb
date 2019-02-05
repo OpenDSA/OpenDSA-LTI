@@ -23,5 +23,5 @@ Rails.application.config.assets.precompile = [
       path !~ /active_admin/ &&
       %w(.js .css).include?(File.extname(filename))
   }, /application.(css|.js)$/,
-  %w(*.png *.jpg *.jpeg *.gif *.mustache.html, *.ico),
+  %w(*.svg, *.png *.jpg *.jpeg *.gif *.mustache.html, *.ico, clippy.svg),
 ]

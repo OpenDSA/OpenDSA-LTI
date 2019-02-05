@@ -410,7 +410,7 @@ class CourseOfferingsController < ApplicationController
         user: current_user,
         course_role: CourseRole.instructor,
       )
-      render :json => course_offering, :status => :created
+      render :json => course_offering.as_json, :status => :created
     else
       render :json => course_offering.errors.full_messages, :status => :bad_request
       error = Error.new(:class_name => 'course_offering_save_fail',

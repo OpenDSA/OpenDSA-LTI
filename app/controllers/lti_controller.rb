@@ -118,13 +118,13 @@ class LtiController < ApplicationController
         inst_section.time_posted = Time.now
         inst_section.save!
       end
-      render :json => {:message => 'success', :res => res.to_json}.to_json
+      render :json => {:message => 'success', :res => res.as_json}.to_json
     else
       if hasBook
         inst_section.lms_posted = false
         inst_section.save!
       end
-      render :json => {:message => 'failure', :res => res.to_json}.to_json, :status => :bad_request
+      render :json => {:message => 'failure', :res => res.as_json}.to_json, :status => :bad_request
       error = Error.new(:class_name => 'post_replace_result_fail',
                         :message => res.inspect, :params => request_params.to_s)
       error.save!
@@ -154,6 +154,11 @@ class LtiController < ApplicationController
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
     $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+    if $oauth_creds.blank?
+      @message = 'Please make sure the consumer key is set correctly in the tool configuration in the LMS.'
+      render 'error'
+      return
+    end
 
     render('error') and return unless lti_authorize!
 
@@ -223,7 +228,7 @@ class LtiController < ApplicationController
     oauth_info = OAuth.generate_oauth_params(consumer_key, consumer_secret, return_url,
                                              content_item_params)
 
-    render :json => oauth_info.to_json, :status => :ok
+    render :json => oauth_info.as_json, :status => :ok
   end
 
   def launch_extrtool
