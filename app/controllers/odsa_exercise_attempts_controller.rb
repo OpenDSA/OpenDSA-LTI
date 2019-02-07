@@ -62,6 +62,8 @@ class OdsaExerciseAttemptsController < ApplicationController
       end
     end
 
+    already_proficient = exercise_progress.proficient?
+
     question_name = params['problem_type']
     if params[:non_summative]
       question_name = params[:non_summative]
@@ -115,6 +117,8 @@ class OdsaExerciseAttemptsController < ApplicationController
           render :json => {
                    :exercise_progress => exercise_progress,
                    :threshold => threshold,
+                   :was_proficient => already_proficient,
+                   :is_proficient => exercise_progress.proficient?,
                  }
         }
       else
@@ -180,6 +184,8 @@ class OdsaExerciseAttemptsController < ApplicationController
         end
       end
 
+      already_proficient = exercise_progress.proficient?
+
       correct = params[:score].to_f >= params[:threshold].to_f
 
       exercise_attempt = OdsaExerciseAttempt.new(
@@ -220,6 +226,8 @@ class OdsaExerciseAttemptsController < ApplicationController
             render :json => {
                      :exercise_progress => exercise_progress,
                      :threshold => threshold,
+                     :was_proficient => already_proficient,
+                     :is_proficient => exercise_progress.proficient?,
                    }
           }
         else
