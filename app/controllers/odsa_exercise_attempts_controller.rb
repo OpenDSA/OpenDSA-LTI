@@ -143,7 +143,7 @@ class OdsaExerciseAttemptsController < ApplicationController
         "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
         params[:inst_book_id], params[:inst_section_id], inst_exercise.id
       ).first
-      if inst_book_section_launch_exexercise == nil
+      if inst_book_section_exercise.blank?
         respond_to do |format|
           msg = {:status => "fail", :message => "Fail!"}
           format.json { render :json => msg }
