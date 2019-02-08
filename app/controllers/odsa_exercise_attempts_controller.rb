@@ -6,16 +6,7 @@ class OdsaExerciseAttemptsController < ApplicationController
   # -------------------------------------------------------------
   # POST /odsa_exercise_attempts
   def create
-    if current_user.blank?
-      error = Error.new(:class_name => 'user_not_logged_in',
-                        :message => "User not logged in. \nUser IP: #{request.remote_ip} \nCookie: " + (request.env['HTTP_COOKIE'] || 'No Cookie Set'),
-                        trace: Thread.current.backtrace.join("\n"),
-                        referer_url: request.env['HTTP_REFERER'],
-                        target_url: request.env['HTTP_HOST'] + request.env['REQUEST_URI'],
-                        user_agent: request.env['HTTP_USER_AGENT'],
-                        params: params.to_json)
-      error.save!
-      render json: {status: 'fail', message: 'You are not logged in. Error id: ' + error.id.to_s}, status: :bad_request
+    unless user_logged_in?
       return
     end
 
@@ -135,6 +126,10 @@ class OdsaExerciseAttemptsController < ApplicationController
   # -------------------------------------------------------------
   # POST /odsa_exercise_attempts/pe
   def create_pe
+    unless user_logged_in?
+      return
+    end
+
     hasBook = params.key?(:inst_book_id)
 
     if params.key?(:inst_book_section_exercise_id)
@@ -148,7 +143,7 @@ class OdsaExerciseAttemptsController < ApplicationController
         "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
         params[:inst_book_id], params[:inst_section_id], inst_exercise.id
       ).first
-      if inst_book_section_exercise == nil
+      if inst_book_section_launch_exexercise == nil
         respond_to do |format|
           msg = {:status => "fail", :message => "Fail!"}
           format.json { render :json => msg }
@@ -252,4 +247,22 @@ class OdsaExerciseAttemptsController < ApplicationController
   end
 
   #~ Private instance methods .................................................
+
+  private
+
+  def user_logged_in?
+    if current_user.blank?
+      error = Error.new(:class_name => 'user_not_logged_in',
+                        :message => "User not logged in. \nUser IP: #{request.remote_ip} \nCookie: " + (request.env['HTTP_COOKIE'] || 'No Cookie Set'),
+                        trace: Thread.current.backtrace.join("\n"),
+                        referer_url: request.env['HTTP_REFERER'],
+                        target_url: request.env['HTTP_HOST'] + request.env['REQUEST_URI'],
+                        user_agent: request.env['HTTP_USER_AGENT'],
+                        params: params.to_json)
+      error.save!
+      render json: {status: 'fail', message: 'OpenDSA was unable to save your exercise attempt. Please make sure your browser is set to allow third-party cookies. Error id: ' + error.id.to_s}, status: :bad_request
+      return false
+    end
+    return true
+  end
 end
