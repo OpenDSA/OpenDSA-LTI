@@ -1,6 +1,6 @@
 # =============================================================================
 # The Ability class is used by CanCan to control how users with various roles
-# can access resources in CodeWorkout.
+# can access resources in OpenDSA.
 #
 class Ability
   include CanCan::Ability
@@ -31,8 +31,9 @@ class Ability
         # A user should only be able to update himself or herself (assuming no
         # other permissions granted below by the global role).
         can [:read, :index], User, User.visible_to_user(user) do |u|
-          u == user || u.course_enrollments.where{
-            course_role_id != CourseRole::STUDENT_ID}.any?
+          u == user || u.course_enrollments.where {
+            course_role_id != CourseRole::STUDENT_ID
+          }.any?
         end
         can [:edit, :update], User, id: user.id
 
@@ -42,7 +43,6 @@ class Ability
       end
     end
   end
-
 
   private
 
@@ -67,7 +67,7 @@ class Ability
         User,
         Course,
         CourseOffering,
-        CourseEnrollment
+        CourseEnrollment,
       ]
     end
 
@@ -76,13 +76,12 @@ class Ability
     if user.global_role.can_manage_all_courses?
       can :manage, [Course, CourseOffering, CourseEnrollment]
     end
-
   end
 
   # -------------------------------------------------------------
   def process_instructor(user)
     if user.global_role.is_instructor? &&
-      !user.global_role.can_manage_all_courses?
+       !user.global_role.can_manage_all_courses?
       # FIXME: The exercise/workout permissions need to be role-based
       # with respect to the course offering, rather than depending on the
       # global role.
@@ -108,9 +107,7 @@ class Ability
       # Everyone can upload and compile his book
       can [:compile, :configure, :configuration], InstBook
     end
-
   end
-
 
   # -------------------------------------------------------------
   # Private: Process course-related permissions.
@@ -119,8 +116,7 @@ class Ability
   #
   def process_courses(user)
     if !user.global_role.can_edit_system_configuration? &&
-      !user.global_role.can_manage_all_courses?
-
+       !user.global_role.can_manage_all_courses?
 
       # Everyone can manage their own course enrollments
       can :manage, CourseEnrollment, user_id: user.id
@@ -149,5 +145,4 @@ class Ability
       end
     end
   end
-
 end

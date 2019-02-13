@@ -1,4 +1,4 @@
-CodeWorkout::Application.routes.draw do
+OpenDSA::Application.routes.draw do
   root 'home#index'
 
   post 'lti/launch'
@@ -49,6 +49,7 @@ CodeWorkout::Application.routes.draw do
     get 'opendsa-canvas' => 'guides#opendsa-canvas', as: :guide_canvas
     get 'opendsa-moodle' => 'guides#opendsa-moodle', as: :guide_moodle
     get 'opendsa-book-configuration' => 'guides#opendsa-book-configuration', as: :guide_book_configuration
+    get 'opendsa-embed' => 'guides#opendsa-embed', as: :guide_embed
   end
 
   # routes anchored at /admin

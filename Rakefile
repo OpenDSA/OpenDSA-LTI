@@ -3,4 +3,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-CodeWorkout::Application.load_tasks
+OpenDSA::Application.load_tasks

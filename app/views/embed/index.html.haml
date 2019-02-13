@@ -1,25 +1,56 @@
+= stylesheet_link_tag 'embed_list', media: 'all'
+= javascript_include_tag 'embed_list'
+
+#preview-modal.modal.fade{tabindex: -1, role: 'dialog'}
+    .modal-dialog.modal-lg{role: 'document', style: 'width: 85%;'}
+        .modal-content
+            .modal-header
+                %button.close{'data-dismiss': 'modal'}
+                    &times;
+                %h3#preview-title.modal-title
+            .modal-body#iframe-container
+                %iframe{src: ''}
+            .modal-footer
+                %button.btn.btn-default{'data-dismiss': 'modal'}
+                    Close
+
+%h1
+    Embeddable Exercises/Visualizations
+
+#instructions-link-container
+    Instructions/documentation for this interface can be found 
+    <a target="_blank" href="#{guide_embed_path}">here</a>.
+
 .panel-group{id: "accordion"}
     - i = 0
     - j = 0
+    - k = 0
     - @folders.each do |fname, mods|
         - i += 1
-        .panel.panel-default
-            .panel-heading
-                .panel-title
-                    %a{"data-toggle": "collapse", "data-parent": "#accordion", href: "##{i}_collapse"}
+        %a{"data-toggle": "collapse", "data-parent": "#accordion", href: "#folder_#{i}_collapse"}
+            .panel.panel-default    
+                .panel-heading
+                    .panel-title
                         #{fname}
-        .panel-collapse.collapse{id: "#{i}_collapse"}
+        .panel-collapse.collapse{id: "folder_#{i}_collapse"}
             .panel-body
                 - ex_hash = {}
                 - mods.each do |mod_name, exs|
-                    - exs.each do |ex|
-                        - unless ex_hash.key?(ex.short_name)
-                            - ex_hash[ex.short_name] = ex
-                            - j += 1
-                            %div
-                                %a{href: ex.embed_url(@host_url), target: "_blank"}
-                                    #{ex.long_name}
-                            .col-xs-6
-                                %input.form-control{:type => "text", :value => ex.embed_code(@host_url), :readonly => "readonly", id: "embedcode_#{j}"}
-                            %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{j}", :type => "button"}
-                                = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")
+                    - j += 1
+                    .panel-group{id: "accordion_mod_#{j}"}
+                        .module-title
+                            %a{"data-toggle": "collapse", "data-parent": "#accordion_mod_#{j}", 
+                            href: "#mod_#{j}_collapse", onclick: "moduleClicked(this)"}
+                                %i.fa.fa-chevron-right #{mod_name}
+                        .panel-collapse.collapse{id: "mod_#{j}_collapse"}
+                            - exs.each do |ex|
+                                - unless ex_hash.key?(ex.short_name)
+                                    - ex_hash[ex.short_name] = ex
+                                    - k += 1
+                                    %div
+                                        %a{href: '#', onclick: "previewExercise(this, '#{ex.long_name}', '#{ex.embed_url(@host_url)}', '#{ex.embed_code(@host_url)}'); event.preventDefault();"}
+                                            #{ex.long_name}
+                                    .col-xs-6
+                                        %input.form-control{:type => "text", :value => ex.embed_code(@host_url), :readonly => "readonly", id: "embedcode_#{k}"}
+                                    %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{k}", :type => "button"}
+                                        = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")

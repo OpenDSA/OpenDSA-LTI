@@ -1,0 +1,18 @@
+.module-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.panel-title {
+    font-size: 25px;
+}
+
+#instructions-link-container {
+    font-size: 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-body {
+    max-height: 650px;
+}

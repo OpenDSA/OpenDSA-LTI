@@ -3,4 +3,4 @@ require File.expand_path('../application', __FILE__)
 require 'rails_extensions'
 
 # Initialize the Rails application.
-CodeWorkout::Application.initialize!
+OpenDSA::Application.initialize!

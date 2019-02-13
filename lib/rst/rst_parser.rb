@@ -7,98 +7,63 @@ require_relative "inlineav"
 
 module RstParser
 
-  RST_DIR = File.join("public", "OpenDSA", "RST", "en")
-  #RST_DIR = File.join("..", "OpenDSA", "RST", "en")
-
-  INCLUDE_DIRS = {
-      "AlgAnal": "Algorithm Analysis",
-      "Background": "Introduction and Mathematical Background",
-      "Binary": "Binary Trees",
-      "Biography": "Biographies",
-      "Bounds": "Lower Bounds",
-      "BTRecurTutor": "Binary Trees Recursion",
-      "CT": "Computational Thinking",
-      "Design": "Design I and II",
-      "Files": "File Processing",
-      "FormalLang": "Formal Languages",
-      "General": "General Trees",
-      "Graph": "Graphs",
-      "Hashing": "Hashing",
-      "Indexing": "Indexing",
-      "List": "Linear Structures",
-      "MemManage": "Memory Management",
-      "NP": "Limits to Computing",
-      "PL": "Programming Languages",
-      "PointersJava": "PointersJava",
-      "RecurTutor": "Recursion",
-      "Searching": "Searching I and II",
-      "SearchStruct": "Search Structures",
-      "SeniorAlgAnal": "Advanced Analysis",
-      "Sorting": "Sorting",
-      "Spatial": "Spatial Data Structures",
-      "Tutorials": "Programming Tutorials",
-      "Development": "Under Development"
-  }
-
-  EX_RE = Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe)")
-
   # Retrieves info about all exercises
   def self.get_exercise_info
-    return Rails.cache.fetch("odsa_all_exercises", expires_in: 1.year) do
-      exercises = get_exercises()
+    return Rails.cache.fetch("odsa_all_exercises", expires_in: 1.week) do
+             exercises = get_exercises()
 
-      inst_exercises = InstExercise.all()
-      inst_ex_map = {}
-      inst_exercises.each do |ex|
-        inst_ex_map[ex.short_name] = ex.id
-      end
+             inst_exercises = InstExercise.all()
+             inst_ex_map = {}
+             inst_exercises.each do |ex|
+               inst_ex_map[ex.short_name] = ex.id
+             end
 
-      exercises.each do |chapter, mod|
-        mod.each do |mod_name, ex_list|
-          ex_list.each do |ex|
-            if inst_ex_map.has_key?(ex.short_name)
-              ex.id = inst_ex_map[ex.short_name]
-            else
-              inst_ex = InstExercise.find_by(short_name: ex.short_name)
-              if inst_ex.blank?
-                # the exercise has not been saved to the database yet
-                inst_ex = InstExercise.new
-                inst_ex.short_name = ex.short_name
-                inst_ex.name = ex.long_name
-                inst_ex.save
-              end
-              inst_ex_map[ex.short_name] = inst_ex.id
-              ex.id = inst_ex.id
-            end
-          end
-        end
-      end
-      return exercises
-    end
+             exercises.each do |chapter, mod|
+               mod.each do |mod_name, ex_list|
+                 ex_list.each do |ex|
+                   if inst_ex_map.has_key?(ex.short_name)
+                     ex.id = inst_ex_map[ex.short_name]
+                   else
+                     inst_ex = InstExercise.find_by(short_name: ex.short_name)
+                     if inst_ex.blank?
+                       # the exercise has not been saved to the database yet
+                       inst_ex = InstExercise.new
+                       inst_ex.short_name = ex.short_name
+                       inst_ex.name = ex.long_name
+                       inst_ex.save
+                     end
+                     inst_ex_map[ex.short_name] = inst_ex.id
+                     ex.id = inst_ex.id
+                   end
+                 end
+               end
+             end
+             return exercises
+           end
   end
 
   # Gets a hash map where the key is the short_name of the exercise
   # and the value is an ExerciseInfo object (located in rst_parser.rb)
   def self.get_exercise_map
-    return Rails.cache.fetch("odsa_all_exercises_map", expires_in: 1.year) do
-      exercises = get_exercise_info
-      ex_map = {}
-      exercises.each do |chapter, modules|
-        modules.each do |mod, exs|
-          exs.each do |ex|
-            ex_map[ex.short_name] = ex
-          end
-        end
-      end
-      return ex_map
-    end
+    return Rails.cache.fetch("odsa_all_exercises_map", expires_in: 1.week) do
+             exercises = get_exercise_info
+             ex_map = {}
+             exercises.each do |chapter, modules|
+               modules.each do |mod, exs|
+                 exs.each do |ex|
+                   ex_map[ex.short_name] = ex
+                 end
+               end
+             end
+             return ex_map
+           end
   end
 
   def self.get_exercises
     exercises = {}
-    INCLUDE_DIRS.each do |short_name, long_name|
+    OpenDSA::EXERCISE_DIRECTORIES.each do |short_name, long_name|
       exercises[long_name] = {}
-      full_dir = File.join(RST_DIR, short_name.to_s)
+      full_dir = File.join(OpenDSA::RST_DIRECTORY, "en", short_name.to_s)
       Find.find(full_dir) do |path|
         if path.end_with?(".rst")
           extract_exercises(path, exercises[long_name])
@@ -126,7 +91,7 @@ module RstParser
       end
       i += 1
     end
-    
+
     if mod_lname == ""
       mod_lname = mod_sname
       i = 0
@@ -142,7 +107,7 @@ module RstParser
         next
       end
 
-      match_data = EX_RE.match(sline)
+      match_data = OpenDSA::EXERCISE_RE.match(sline)
       if match_data != nil
         directive = match_data[2]
         identifier = match_data[3]
@@ -218,15 +183,15 @@ end
 private
 
 def find_av_dimensions(av_path)
-  doc = File.open(av_path) do |f| 
+  doc = File.open(av_path) do |f|
     Nokogiri::HTML(f)
   end
   attrib = doc.at('body').attributes
   if attrib.has_key?('data-width') and attrib.has_key?('data-height')
     return {
-              'width': attrib['data-width'].value.to_i, 
-              'height': attrib['data-height'].value.to_i
-            }
+             'width': attrib['data-width'].value.to_i,
+             'height': attrib['data-height'].value.to_i,
+           }
   end
   return nil
 end

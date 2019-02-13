@@ -2,8 +2,8 @@
 
 :javascript
   window.ODSA = window.ODSA || {};
-  window.ODSA.languages = #{@languages.to_json.html_safe};
-  window.ODSA.codeLanguages = #{@code_languages.to_json.html_safe};
+  window.ODSA.languages = #{OpenDSA::BOOK_LANGUAGES.to_json.html_safe};
+  window.ODSA.codeLanguages = #{OpenDSA::CODE_LANGUAGES.to_json.html_safe};
   window.ODSA.learningTools = #{@learning_tools.as_json.to_json.html_safe};
   window.ODSA.user_books = #{@book_metadata.as_json.to_json.html_safe};
   window.ODSA.availableModules = #{@avail_mods.to_json.html_safe};
@@ -141,7 +141,7 @@
       .col-xs-6
         %select.form-control#book-lang{required: true}
           %option{:value => -1, disabled: true, selected: true}
-          - @languages.each do |lang_code, lang_name|
+          - OpenDSA::BOOK_LANGUAGES.each do |lang_code, lang_name|
             %option{:value => lang_code}
               #{lang_name}
 
@@ -151,11 +151,6 @@
       .col-xs-9.col-md-6{id: "code-langs"}
         %p
           *Drag and drop the languages to order them by priority
-        -# - @code_languages.each do |code_lang, code_info|
-        -#   .code-lang-opt.col-sm-6
-        -#     %input{type: "checkbox", name: "code-lang", id: "code-lang-#{code_lang}", value: code_lang}
-        -#     %label{for: "code-lang-#{code_lang}"}
-        -#       #{code_info[:label]}
         .col-xs-4.checked-list-tree{id: 'code-langs-tree'}
 
     .form-group.border

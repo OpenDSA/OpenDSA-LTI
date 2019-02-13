@@ -24,13 +24,13 @@ class CodeWorker
           pre_lines = $`.count("\n")
         else
           puts 'ERROR: no answer insertion marker in wrapper code: ' +
-            prompt.wrapper_code.to_s
+              prompt.wrapper_code.to_s
         end
       end
       current_attempt = attempt.id.to_s
       language = exv.exercise.language
 
-      lang =  Exercise.extension_of(language)
+      lang = Exercise.extension_of(language)
       # codeworkout_home=`echo $CODEWORKOUT`
 
       # puts "CodeWorker current working directory is #{Dir.pwd}"
@@ -56,13 +56,16 @@ class CodeWorker
 
       if language == "Java"
         result = execute_javatest(
-          prompt.class_name, attempt_dir, pre_lines, answer_lines)
+          prompt.class_name, attempt_dir, pre_lines, answer_lines
+        )
       elsif language == "Ruby"
         result = execute_rubytest(
-          prompt.class_name, attempt_dir, pre_lines, answer_lines)
+          prompt.class_name, attempt_dir, pre_lines, answer_lines
+        )
       elsif language == "Python"
         result = execute_pythontest(
-          prompt.class_name, attempt_dir, pre_lines, answer_lines)
+          prompt.class_name, attempt_dir, pre_lines, answer_lines
+        )
       end # IF INNERMOST
 
       correct = 0.0
@@ -98,23 +101,22 @@ class CodeWorker
         attempt.save!
       end
 
-#      ActiveSupport::Notifications.instrument(
-#        "record_#{current_attempt}_attempt", extra: :nothing) do
-#        puts "SKYFALL"
-#      end
+      #      ActiveSupport::Notifications.instrument(
+      #        "record_#{current_attempt}_attempt", extra: :nothing) do
+      #        puts "SKYFALL"
+      #      end
     end
   end
-
 
   #~ Private instance methods .................................................
   private
 
   # -------------------------------------------------------------
   def execute_javatest(class_name, attempt_dir, pre_lines, answer_lines)
-    cmd = CodeWorkout::Config::JAVA[:ant_cmd] % {attempt_dir: attempt_dir}
+    cmd = OpenDSA::Config::JAVA[:ant_cmd] % {attempt_dir: attempt_dir}
     system(cmd +
-      ">> #{attempt_dir}/err.log " +
-      "2>> #{attempt_dir}/err.log")
+           ">> #{attempt_dir}/err.log " +
+           "2>> #{attempt_dir}/err.log")
 
     # Parse compiler output for error messages to determine success
     error = ''
@@ -176,32 +178,29 @@ class CodeWorker
     return error
   end
 
-
   # -------------------------------------------------------------
   def execute_rubytest(class_name, attempt_dir, pre_lines, answer_lines)
     return 'Ruby execution is temporarily suspended.'
-#    if system("ruby #{class_name}Test.rb",
-#      [:out, :err] => 'err.log',
-#      chdir: attempt_dir)
-#      puts 'FINE', 'RUBY FINE'
-#      return nil
-#    else
-#      puts 'ERROR', 'RUBY ERROR'
-#      return File.read(attempt_dir + '/err.log')
-#    end
+    #    if system("ruby #{class_name}Test.rb",
+    #      [:out, :err] => 'err.log',
+    #      chdir: attempt_dir)
+    #      puts 'FINE', 'RUBY FINE'
+    #      return nil
+    #    else
+    #      puts 'ERROR', 'RUBY ERROR'
+    #      return File.read(attempt_dir + '/err.log')
+    #    end
   end
-
 
   # -------------------------------------------------------------
   def execute_pythontest(class_name, attempt_dir, pre_lines, answer_lines)
     return 'Python execution is temporarily suspended.'
-#    if system("python #{class_name}Test.py",
-#      [:out, :err] => 'err.log',
-#      chdir: attempt_dir)
-#      return nil
-#    else
-#      return File.read(attempt_dir + '/err.log')
-#    end
+    #    if system("python #{class_name}Test.py",
+    #      [:out, :err] => 'err.log',
+    #      chdir: attempt_dir)
+    #      return nil
+    #    else
+    #      return File.read(attempt_dir + '/err.log')
+    #    end
   end
-
 end

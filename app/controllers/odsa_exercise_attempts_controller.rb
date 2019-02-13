@@ -239,7 +239,7 @@ class OdsaExerciseAttemptsController < ApplicationController
   end
 
   def get_count
-    practiced_ex = OdsaExerciseAttempt.count(:conditions => "request_type <> 'hint'") + CodeWorkout::EXERCISES_SOLVED
+    practiced_ex = OdsaExerciseAttempt.count(:conditions => "request_type <> 'hint'") + OpenDSA::EXERCISES_SOLVED
 
     respond_to do |format|
       format.json { render :json => {:practiced_ex => practiced_ex} }

@@ -1,4 +1,4 @@
-CodeWorkout::Application.configure do
+OpenDSA::Application.configure do
   # Settings specified here will take precedence over those in
   # config/application.rb.
 
@@ -11,7 +11,7 @@ CodeWorkout::Application.configure do
   config.eager_load = false
 
   # Show full error reports and disable caching.
-  config.consider_all_requests_local       = true
+  config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
 
   # For SSEs
@@ -20,7 +20,7 @@ CodeWorkout::Application.configure do
 
   # Do care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { :host => ENV['host_url'] }
+  config.action_mailer.default_url_options = {:host => ENV['host_url']}
 
   config.action_mailer.delivery_method = :smtp
 
@@ -31,7 +31,7 @@ CodeWorkout::Application.configure do
     authentication: 'plain',
     enable_starttls_auto: true,
     user_name: ENV['email_user_name'],
-    password: ENV['email_password']
+    password: ENV['email_password'],
   }
 
   # Print deprecation notices to the Rails logger.
@@ -51,11 +51,10 @@ CodeWorkout::Application.configure do
   # Generate digests for assets URLs.
   # config.assets.digest = true
 
-
   config.assets.initialize_on_precompile = true
 
   config.middleware.use LogFile::Display
-#  config.log_level = :info
+  #  config.log_level = :info
   config.log_formatter = proc do |severity, datetime, progname, msg|
     if severity == 'DEBUG' && msg.blank?
       ''
@@ -77,8 +76,8 @@ CodeWorkout::Application.configure do
       "%s %s %s\n" % [
         datetime.strftime('%Y-%m-%d %H:%M:%S'),
         severity_colored,
-        String === msg ? msg : msg.inspect
-        ]
+        String === msg ? msg : msg.inspect,
+      ]
     end
   end
 end

@@ -1,4 +1,4 @@
-CodeWorkout::Application.configure do
+OpenDSA::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
@@ -11,7 +11,7 @@ CodeWorkout::Application.configure do
   config.eager_load = true
 
   # Full error reports are disabled and caching is turned on.
-  config.consider_all_requests_local       = false
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
@@ -65,7 +65,7 @@ CodeWorkout::Application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
 
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { :host => ENV['host_url'] }
+  config.action_mailer.default_url_options = {:host => ENV['host_url']}
 
   config.action_mailer.delivery_method = :smtp
 
@@ -76,9 +76,8 @@ CodeWorkout::Application.configure do
     authentication: 'plain',
     enable_starttls_auto: true,
     user_name: ENV['email_user_name'],
-    password: ENV['email_password']
+    password: ENV['email_password'],
   }
-
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation can not be found).
@@ -93,7 +92,7 @@ CodeWorkout::Application.configure do
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
 
-#  config.log_level = :warn
+  #  config.log_level = :warn
   config.log_formatter = proc do |severity, datetime, progname, msg|
     if severity == 'DEBUG' && msg.blank?
       ''
@@ -101,8 +100,8 @@ CodeWorkout::Application.configure do
       "%s [%s] %s\n" % [
         datetime.strftime('%Y-%m-%d %H:%M:%S'),
         severity,
-        String === msg ? msg : msg.inspect
-        ]
+        String === msg ? msg : msg.inspect,
+      ]
     end
   end
 end

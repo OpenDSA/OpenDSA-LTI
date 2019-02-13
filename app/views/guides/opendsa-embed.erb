@@ -1,0 +1,138 @@
+<style>
+    img {
+        max-height: 500px;
+    }
+</style>
+<div class="row" style="margin:50px">
+  <span class="span12">
+    <div class="text-center">
+      <h1>Embed an Ungraded OpenDSA Exercise or Visualization on Any HTML Page</h1>
+    </div>
+    <br>
+    <p>
+      OpenDSA is an eTextbook project developed at Virginia Tech. OpenDSA
+      materials include many visualizations and interactive exercises that
+      support courses in a wide variety of Computer Science-related topics such
+      as Data Structures and Algorithms (DSA), Formal and Programming Languages.
+    </p>
+    <p>
+      OpenDSA has hundreds of visualizations and exercises.
+      Most algorithms and data structures are illustrated by interactive
+      algorithm visualizations. Students could enter their own test cases to see
+      how the algorithm or data structure works on that input, and they can
+      control the pacing of the visualization.
+    </p>
+
+    <p>
+      This guide is for those who want to include OpenDSA 
+      exercises/visualizations in an arbtirary HTML page. It is important to 
+      note that <b>this method does not allow for the recording of scores</b>.
+      This method is aimed at those who do not have the infrastructure to 
+      support LTI, or do not care about tracking scores, but still want to
+      use OpenDSA exercises/visualizations outside the context of an 
+      OpenDSA eTextbook.
+    </p>
+    <p>
+      <strong>Step 1:</strong> Go to the 
+      <a href="https://opendsa-server.cs.vt.edu/embed" target="_blank">list of embeddable exercises</a>.
+      <div class="text-center">
+        <%= image_tag "guides/embed_1.png" %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 2:</strong> Click on a category to expand it and show the 
+      modules in that category.
+      <div class="text-center">
+        <%= image_tag "guides/embed_2.png" %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 3:</strong> Click on a module to expand it and show the 
+      exercises and visualizations in that module.
+      <div class="text-center">
+        <%= image_tag "guides/embed_3.png" %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 4:</strong> Click on the name of an exercise/visualization
+      to see a preview. To close the preview, either click the Close button
+      in the bottom right of the pop-up window, the &times; icon in the top right, or just
+      click outside the pop-up window.
+      <div class="text-center">
+        <%= image_tag "guides/embed_4a.png" %>
+      </div>
+      <div class="text-center">
+        <%= image_tag "guides/embed_4b.png" %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 5:</strong> After finding an exercise/visualization you want
+      to include on your page, copy the HTML embed code by clicking the 
+      clipboard button.
+      <div class="text-center">
+        <%= image_tag "guides/embed_5.png" %>
+      </div>
+    </p>
+    <p>
+      <strong>Step 6:</strong> Paste the code you copied in the last step 
+      to wherever you want to include the exercise/visualization. 
+      This might be your own HTML page, or it might be an editor that allows 
+      you to specify some HTML. See below for an example of embedding an 
+      exercise/visualization on a Canvas page.
+    </p>
+
+    <h2>Embedding an OpenDSA Exercise/Visualization on a Canvas Page</h3>
+
+    <p>
+        <strong>Step 1:</strong> After following the steps above, go to your
+        course in Canvas and click on the "Pages" link in the left-hand menu.
+        <div class="text-center">
+            <%= image_tag "guides/embed_canvas1.png",  height: '50%' %>
+        </div>
+    </p>
+    <p>
+        <strong>Step 2:</strong> Click the "+ Page" button in the
+        top right.
+        <div class="text-center">
+            <%= image_tag "guides/embed_canvas2.png" %>
+        </div>
+    </p>
+    <p>
+        <strong>Step 3:</strong> Enter a page name in the box at the top.
+        <div class="text-center">
+            <%= image_tag "guides/embed_canvas3.png" %>
+        </div>
+    </p>
+    <p>
+        <strong>Step 4:</strong> If you would like to accompany the exercise
+        or visualization with some prose, enter it into the large
+        textbox.
+        <div class="text-center">
+            <%= image_tag "guides/embed_canvas4.png" %>
+        </div>
+    </p>
+    <p>
+        <strong>Step 5:</strong> Click the "HTML Editor" button.
+        <div class="text-center">
+            <%= image_tag "guides/embed_canvas5.png" %>
+        </div>
+    </p>
+    <p>
+        <strong>Step 6:</strong> Paste the HTML embed code you copied in the 
+        desired location.
+        <div class="text-center">
+            <%= image_tag "guides/embed_canvas6.png" %>
+        </div>
+    </p>
+    <p>
+        <strong>Step 7:</strong> Click "Save" or "Save &amp; Publish". 
+        "Save and Publish" will make the page visible to students.
+        <div class="text-center">
+            <%= image_tag "guides/embed_canvas7.png" %>
+        </div>
+        <div class="text-center">
+            <%= image_tag "guides/embed_canvas_final.png" %>
+        </div>
+    </p>
+  </span>
+</div>
