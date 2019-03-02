@@ -145,11 +145,26 @@ class CourseOfferingsController < ApplicationController
   end
 
   def find_module_progresses
+    chapt_mod = InstChapterModule.find(params[:inst_chapter_module_id])
+    course_offering = chapt_mod.inst_chapter.inst_book.course_offering
+    unless course_offering && course_offering.id == Integer(params[:id])
+      render :json => {
+        message: 'The inst_chapter_module id does not correspond to the specified course offering id.',
+      }, :status => :bad_request
+      return
+    end
+    unless course_offering.is_instructor?(current_user)
+      render :json => {
+        message: 'You are not an instructor for this course offering.',
+      }, :status => :forbidden
+      return
+    end
+
     exercises = InstBookSectionExercise.includes(:inst_exercise, inst_section: [:inst_chapter_module]).where("inst_chapter_modules.id = ? AND inst_book_section_exercises.points > 0", params[:inst_chapter_module_id]).references(:inst_chapter_modules)
 
     ex_ids = exercises.collect { |ex| ex.id }
 
-    users = CourseEnrollment.where(course_offering_id: params[:id], course_role_id: CourseRole::STUDENT_ID).joins(:user).includes(:user).order('users.last_name ASC, users.first_name ASC').collect { |e| e.user }
+    users = CourseEnrollment.where(course_offering_id: params[:id], course_role_id: CourseRole::STUDENT_ID).joins(:user).includes(:user).order('users.last_name ASC, users.first_name ASC, users.email ASC').collect { |e| e.user }
 
     # only includes students who have attempted at least one exercise in the module
     # but also includes exercise attempt and progress data
@@ -157,8 +172,8 @@ class CourseOfferingsController < ApplicationController
 
     render :json => {
       exercises: exercises.as_json(include: :inst_exercise),
-      enrollments: enrollments.as_json(include: {user: {include: {odsa_module_progresses: {only: [:current_score, :first_done, :last_done, :highest_score, :id, :proficient_date, :created_at]}, odsa_exercise_progresses: {only: [:id, :inst_book_section_exercise_id, :current_score, :highest_score, :proficient_date]}}, only: [:id, :first_name, :last_name, :odsa_module_progresses]}}),
-      students: users.as_json(only: [:id, :first_name, :last_name]),
+      enrollments: enrollments.as_json(include: {user: {include: {odsa_module_progresses: {only: [:current_score, :first_done, :last_done, :highest_score, :id, :proficient_date, :created_at]}, odsa_exercise_progresses: {only: [:id, :inst_book_section_exercise_id, :current_score, :highest_score, :proficient_date]}}, only: [:id, :first_name, :last_name, :email, :odsa_module_progresses]}}),
+      students: users.as_json(only: [:id, :first_name, :last_name, :email]),
     }
   end
 
