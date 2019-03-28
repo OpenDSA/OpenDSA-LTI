@@ -498,7 +498,7 @@ PLATFORMS
 DEPENDENCIES
   active_record-acts_as
   active_record_union
-  activeadmin
+  activeadmin (< 2.0)
   acts-as-taggable-on
   acts_as_list
   addressable (~> 2.3, >= 2.3.8)
@@ -591,6 +591,3 @@ DEPENDENCIES
   uglifier (>= 1.3.0)
   wannabe_bool
   whenever
-
-BUNDLED WITH
-   1.17.2
