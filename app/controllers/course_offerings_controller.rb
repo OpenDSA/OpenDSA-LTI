@@ -153,7 +153,7 @@ class CourseOfferingsController < ApplicationController
       }, :status => :bad_request
       return
     end
-    unless course_offering.is_instructor?(current_user)
+    unless course_offering.is_instructor?(current_user) || current_user.global_role.is_admin?
       render :json => {
         message: 'You are not an instructor for this course offering.',
       }, :status => :forbidden
