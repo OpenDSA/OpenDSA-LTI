@@ -417,6 +417,12 @@ class LtiController < ApplicationController
   end
 
   def launch_instructor_tool
+    if !user_signed_in? || !@course_offering.is_instructor?(current_user)
+      @message = 'You must be signed in as an instructor for this course offering.'
+      render 'error'
+      return
+    end
+
     @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
     @student_list = []
     @course_enrollment.each do |s|
@@ -477,7 +483,7 @@ class LtiController < ApplicationController
         @message = 'OpenDSA: Unable to uniquely identify user'
         return false
       end
-      email = "student_view@example.com"
+      email = OpenDSA::STUDENT_VIEW_EMAIL
     end
     @user = User.where(email: email).first
 

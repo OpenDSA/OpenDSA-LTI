@@ -147,12 +147,6 @@ class CourseOfferingsController < ApplicationController
   def find_module_progresses
     chapt_mod = InstChapterModule.find(params[:inst_chapter_module_id])
     course_offering = chapt_mod.inst_chapter.inst_book.course_offering
-    unless course_offering && course_offering.id == Integer(params[:id])
-      render :json => {
-        message: 'The inst_chapter_module id does not correspond to the specified course offering id.',
-      }, :status => :bad_request
-      return
-    end
     unless course_offering.is_instructor?(current_user) || current_user.global_role.is_admin?
       render :json => {
         message: 'You are not an instructor for this course offering.',
@@ -164,7 +158,7 @@ class CourseOfferingsController < ApplicationController
 
     ex_ids = exercises.collect { |ex| ex.id }
 
-    users = CourseEnrollment.where(course_offering_id: params[:id], course_role_id: CourseRole::STUDENT_ID).joins(:user).includes(:user).order('users.last_name ASC, users.first_name ASC, users.email ASC').collect { |e| e.user }
+    users = CourseEnrollment.where(course_offering_id: params[:id], course_role_id: CourseRole::STUDENT_ID).where('users.email != ?', OpenDSA::STUDENT_VIEW_EMAIL).joins(:user).includes(:user).order('users.last_name ASC, users.first_name ASC, users.email ASC').collect { |e| e.user }
 
     # only includes students who have attempted at least one exercise in the module
     # but also includes exercise attempt and progress data

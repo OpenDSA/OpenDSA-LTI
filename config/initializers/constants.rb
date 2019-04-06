@@ -113,4 +113,8 @@ module OpenDSA
       "lang": "javascript",
     },
   }
+
+  # the placeholder email for the OpenDSA account used when an
+  # instructor uses the student view mode in Canvas
+  STUDENT_VIEW_EMAIL = 'student_view@example.com'
 end
