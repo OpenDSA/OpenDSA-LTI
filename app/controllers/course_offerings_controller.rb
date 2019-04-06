@@ -149,7 +149,7 @@ class CourseOfferingsController < ApplicationController
     course_offering = chapt_mod.inst_chapter.inst_book.course_offering
     unless course_offering.is_instructor?(current_user) || current_user.global_role.is_admin?
       render :json => {
-        message: 'You are not an instructor for this course offering.',
+        message: 'You are not an instructor for this course offering. Your user id: ' + current_user.id.to_s,
       }, :status => :forbidden
       return
     end

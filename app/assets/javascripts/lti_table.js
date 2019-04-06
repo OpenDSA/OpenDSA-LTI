@@ -350,7 +350,12 @@ $(function() {
       $('#mst-container').css('display', '');
     }).fail(function(error) {
       console.log(error);
-      alert("Failed to retrieve module progress data.");
+      try {
+        alert('ERROR: ' + JSON.parse(error.responseText).message)
+      }
+      catch {
+        alert("Failed to retrieve module progress data.\n" + error.responseText);
+      }
     }).always(function() {
       $('#spinner').css('display', 'none');
     });
