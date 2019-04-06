@@ -353,7 +353,7 @@ $(function() {
       try {
         alert('ERROR: ' + JSON.parse(error.responseText).message)
       }
-      catch {
+      catch (ex) {
         alert("Failed to retrieve module progress data.\n" + error.responseText);
       }
     }).always(function() {
