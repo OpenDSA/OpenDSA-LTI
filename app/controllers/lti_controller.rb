@@ -5,19 +5,23 @@ class LtiController < ApplicationController
   # the consumer keys/secrets
 
   def launch
+    if params[:lti_message_type] == 'ContentItemSelectionRequest'
+      resource()
+      return
+    end
     unless params.key?(:custom_inst_book_id)
-      launch_ex
+      launch_ex()
       return
     end
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
     @course_offering = CourseOffering.find_by(id: @inst_book.course_offering_id)
-    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+    $oauth_creds = get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
     lms_instance = ensure_lms_instance()
-    render('error') and return unless ensure_user(lms_instance.id)
+    render('error') and return unless ensure_user()
 
     lti_enroll(@course_offering)
 
@@ -30,7 +34,10 @@ class LtiController < ApplicationController
     file_name = nil
     if params.key?(:custom_module_file_name)
       lms_access_id = LmsAccess.where(consumer_key: params[:oauth_consumer_key]).pluck(:id).first
-      ensure_module_progress(lms_access_id)
+      OdsaModuleProgress.get_progress(current_user.id, 
+        params[:custom_inst_chapter_module_id], 
+        params[:custom_inst_book_id], params[:lis_outcome_service_url],
+        params[:lis_result_sourcedid], lms_access_id)
       file_name = params[:custom_module_file_name]
     else
       file_name = params[:custom_section_file_name]
@@ -41,6 +48,7 @@ class LtiController < ApplicationController
                                         "#{file_name.to_s}.html")) and return
   end
 
+  # deprecated
   def assessment
     request_params = JSON.parse(request.body.read.to_s)
     isFullModule = request_params.key?('instChapterModuleId')
@@ -86,7 +94,7 @@ class LtiController < ApplicationController
     launch_params = request_params['toParams']['launch_params']
     if launch_params
       key = launch_params['oauth_consumer_key']
-      $oauth_creds = LmsAccess.get_oauth_creds(key)
+      $oauth_creds = get_oauth_creds(key)
     else
       @message = "The tool never launched"
       render(:error)
@@ -153,9 +161,9 @@ class LtiController < ApplicationController
   def resource
     # must include the oauth proxy object
     require 'oauth/request_proxy/rack_request'
-    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+    $oauth_creds = get_oauth_creds(params[:oauth_consumer_key])
     if $oauth_creds.blank?
-      @message = 'Please make sure the consumer key is set correctly in the tool configuration in the LMS.'
+      @message = 'Please make sure the consumer key is set correctly in the OpenDSA tool configuration in the LMS.'
       render 'error'
       return
     end
@@ -172,13 +180,12 @@ class LtiController < ApplicationController
     email = params.key?(:lis_person_contact_email_primary) ?
       params[:lis_person_contact_email_primary] :
       params[:oauth_consumer_key]
-    @user = User.where(email: email).first
-    if @user.blank? || !@user.global_role.is_instructor_or_admin?
-      @message = 'The email of your LMS account does not match an OpenDSA instructor account.'
+    
+    if !ensure_user() || !(@tp.context_instructor? || current_user.global_role.is_instructor_or_admin?)
+      @message = 'OpenDSA: You must be an instructor to perform this action.'
       render 'error'
       return
     end
-    sign_in @user
 
     @deep_linking = lms_type.name.downcase != 'canvas'
     lms_instance = ensure_lms_instance()
@@ -204,30 +211,88 @@ class LtiController < ApplicationController
 
     @json = exercises.to_json()
 
-    render layout: 'lti_resource'
+    render 'resource', layout: 'lti_resource'
   end
 
   def content_item_selection
-    if !user_signed_in? || !current_user.global_role.is_instructor_or_admin?
-      render :json => {:status => 'fail', :message => 'You must be signed in as an instructor.'}.to_json,
+    if !user_signed_in? #|| !current_user.global_role.is_instructor_or_admin?
+      render :json => {:status => 'fail', :message => 'OpenDSA: Please ensure third-party cookies are enabled in you browser\'s settings.'}.to_json,
         :status => :unauthorized
       return
     end
 
     consumer_key = params['oauth_consumer_key']
-    $oauth_creds = LmsAccess.get_oauth_creds(consumer_key)
+    $oauth_creds = get_oauth_creds(consumer_key)
     consumer_secret = $oauth_creds[consumer_key]
     return_url = params[:content_item_return_url]
 
+    course_offering = CourseOffering.find(params[:course_offering_id])
+    unless course_offering.is_instructor?(current_user)
+      render :json => {:status => 'fail', :message => 'You must be an instructor for the course offering.'}.to_json,
+        :status => :unauthorized
+      return
+    end
+
+    exinfo = params['selected']['exerciseInfo']
+    #gradable = params['selected']['isGradable']
+    exSettings = params['selected']['exerciseSettings']
+    exercise = InstCourseOfferingExercise.find_or_create(course_offering.id, exinfo['id'], exSettings)
+
+    exUrlId = "#{request.protocol}#{request.host_with_port}/inst_course_offering_exercises/#{exercise.id}"
+    launchUrl = request.protocol + request.host_with_port + "/lti/launch"
+    logoUrl = "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png"
+    
     content_item_params = {}
     content_item_params["lti_message_type"] = 'ContentItemSelection'
     content_item_params["lti_version"] = "LTI-1p0"
-    content_item_params["content_items"] = params[:content_items]
-
+    unless params["data"].blank?
+      content_item_params["data"] = params["data"]
+    end
+    content_item = {
+      "@type": "LtiLinkItem",
+      "mediaType": "application/vnd.ims.lti.v1.ltilink",
+      "icon": {
+        "@id": logoUrl,
+        "width": 50,
+        "height": 50
+      },
+      "title": "OpenDSA: " + exinfo["long_name"],
+      "placementAdvice": {
+        "displayWidth": 800,
+        "displayHeight": 1000,
+        "presentationDocumentTarget": "iframe"
+      },
+      "custom": {
+        "inst_course_offering_exercise_id": exercise.id
+      },
+      "lineItem": {
+        "@type": "LineItem",
+        "label": exinfo['long_name'],
+        "reportingMethod": "res:totalScore",
+        "assignedActivity": {
+          "@id": "#{exUrlId}",
+          "activityId": "#{exercise.id}"
+        },
+        "scoreConstraints": {
+          "@type": "NumericLimits",
+          "normalMaximum": exercise.points.to_f,
+          "extraCreditMaximum": 0,
+          "totalMaximum": exercise.points.to_f
+        }
+      }
+    }
+    content_items = {
+      "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
+      "@graph": [
+        content_item
+      ]
+    }
+    content_item_params["content_items"] = content_items.to_json
+        
     require 'lti/oauth'
     oauth_info = OAuth.generate_oauth_params(consumer_key, consumer_secret, return_url,
                                              content_item_params)
-
+    
     render :json => oauth_info.as_json, :status => :ok
   end
 
@@ -279,7 +344,7 @@ class LtiController < ApplicationController
     launch_params["lis_person_name_family"] = current_user.last_name
     launch_params["lis_person_contact_email_primary"] = current_user.email
     launch_params["ext_lti_assignment_id"] = "#{exercise.id}"
-    launch_params["roles"] = get_user_lti_role(course_offering)
+    launch_params["roles"] = get_user_course_role(course_offering)
     launch_params["custom_course_name"] = course_offering.course.name
     launch_params["custom_course_number"] = course_offering.course.number
     launch_params["custom_label"] = course_offering.label
@@ -361,7 +426,7 @@ class LtiController < ApplicationController
 
   private
 
-  def get_user_lti_role(course_offering)
+  def get_user_course_role(course_offering)
     if course_offering.is_instructor?(current_user)
       return "Instructor"
     else
@@ -371,7 +436,7 @@ class LtiController < ApplicationController
 
   def launch_ex
     require 'oauth/request_proxy/rack_request'
-    $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+    $oauth_creds = get_oauth_creds(params[:oauth_consumer_key])
     lms_instance = ensure_lms_instance()
     lms_type_name = params[:tool_consumer_info_product_family_code].downcase
     lms_course_num = get_lms_course_num(lms_type_name, lms_instance)
@@ -379,24 +444,19 @@ class LtiController < ApplicationController
                                            lms_instance_id: lms_instance.id).first
 
     render('error') and return unless lti_authorize!
-    render('error') and return unless ensure_user(lms_instance.id)
+    render('error') and return unless ensure_user()
     lti_enroll(course_offering)
 
     require 'rst/rst_parser'
-    @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
-    @course_off_ex = InstCourseOfferingExercise.find_by(
-      course_offering_id: course_offering.id,
-      resource_link_id: params[:resource_link_id],
-    )
-    if @course_off_ex.blank?
-      @course_off_ex = InstCourseOfferingExercise.new(
-        course_offering: course_offering,
-        inst_exercise_id: @ex.id,
-        resource_link_id: params[:resource_link_id],
-        resource_link_title: params[:resource_link_title],
-        threshold: @ex.threshold,
-      )
-      @course_off_ex.save
+    exmap = RstParser.get_exercise_map()
+    byebug
+    if params.key?(:custom_inst_course_offering_exercise_id)
+      @course_off_ex = InstCourseOfferingExercise.includes(:inst_exercise).find(params[:custom_inst_course_offering_exercise_id])
+      @ex = exmap[@course_off_ex.inst_exercise.short_name]
+    else
+      @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
+        params[:resource_link_id], params[:resource_link_title], @ex)
+      @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
     end
 
     if @ex.instance_of?(AvEmbed)
@@ -404,16 +464,6 @@ class LtiController < ApplicationController
     else
       render 'launch_inlineav', layout: 'lti_launch'
     end
-  end
-
-  def ensure_lms_type(type_name)
-    type_name.downcase!
-    lms_type = LmsType.find_by('lower(name) = :name', name: type_name)
-    if lms_type.blank?
-      lms_type = LmsType.new(name: type_name)
-      lms_type.save
-    end
-    return lms_type
   end
 
   def launch_instructor_tool
@@ -439,6 +489,16 @@ class LtiController < ApplicationController
     render 'show_table.html.haml' and return
   end
 
+  def ensure_lms_type(type_name)
+    type_name.downcase!
+    lms_type = LmsType.find_by('lower(name) = :name', name: type_name)
+    if lms_type.blank?
+      lms_type = LmsType.new(name: type_name)
+      lms_type.save
+    end
+    return lms_type
+  end
+
   def lti_enroll(course_offering)
     role = @tp.context_instructor? ? CourseRole.instructor : CourseRole.student
     if course_offering &&
@@ -461,7 +521,7 @@ class LtiController < ApplicationController
     end
   end
 
-  def ensure_lms_instance
+  def ensure_lms_instance()
     uri = URI.parse(request.referrer)
     url = uri.scheme + '://' + uri.host
     lms_instance = LmsInstance.find_by(url: url)
@@ -475,7 +535,7 @@ class LtiController < ApplicationController
     return lms_instance
   end
 
-  def ensure_user(lms_instance_id)
+  def ensure_user()
     email = params[:lis_person_contact_email_primary]
     if email.blank?
       # try to uniquely identify user some other way
@@ -576,43 +636,11 @@ class LtiController < ApplicationController
     false
   end
 
-  def ensure_course_offering(lms_instance_id, organization_id, lms_course_num, lms_course_code, course_name)
-    course_offering = CourseOffering.find_by(lms_instance_id: lms_instance_id,
-                                             lms_course_num: lms_course_num)
-    if course_offering.blank?
-      if organization_id.blank?
-        return nil
-      end
-      course = Course.find_by(number: lms_course_code,
-                              organization_id: organization_id)
-      if course.blank?
-        course = Course.new(
-          name: course_name,
-          number: lms_course_code,
-          organization_id: organization_id,
-          user_id: current_user.id,
-        )
-        course.save
-      end
-      course_offering = CourseOffering.new(
-        course: course,
-        term: Term.current_or_next_term,
-        label: lms_course_code,
-        lms_instance_id: lms_instance_id,
-        lms_course_code: lms_course_code,
-        lms_course_num: lms_course_num,
-      )
-      course_offering.save
+  def get_oauth_creds(key)
+    if params['tool_consumer_info_product_family_code'].downcase == 'blackboardlearn'
+      $oauth_creds = LmsInstance.get_oauth_creds(params[:oauth_consumer_key])
+    else
+      $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
     end
-    return course_offering
-  end
-
-  def ensure_module_progress(lms_access_id)
-    book_id = params[:custom_inst_book_id]
-    chpt_mod_id = params[:custom_inst_chapter_module_id]
-    OdsaModuleProgress.get_progress(current_user.id, chpt_mod_id, book_id,
-                                    params[:lis_outcome_service_url],
-                                    params[:lis_result_sourcedid],
-                                    lms_access_id)
   end
 end

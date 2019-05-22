@@ -69,6 +69,40 @@ class CourseOffering < ActiveRecord::Base
     end
   end
 
+  #~ Class Methods ............................................................
+
+  def self.ensure_exists(lms_instance_id, organization_id, lms_course_num, lms_course_code, course_name)
+    course_offering = CourseOffering.find_by(lms_instance_id: lms_instance_id,
+                                             lms_course_num: lms_course_num)
+    if course_offering.blank?
+      if organization_id.blank?
+        return nil
+      end
+      course = Course.find_by(number: lms_course_code,
+                              organization_id: organization_id)
+      if course.blank?
+        course = Course.new(
+          name: course_name,
+          number: lms_course_code,
+          organization_id: organization_id,
+          user_id: current_user.id,
+        )
+        course.save
+      end
+      course_offering = CourseOffering.new(
+        course: course,
+        term: Term.current_or_next_term,
+        label: lms_course_code,
+        lms_instance_id: lms_instance_id,
+        lms_course_code: lms_course_code,
+        lms_course_num: lms_course_num,
+      )
+      course_offering.save
+    end
+    return course_offering
+  end
+
+
   #~ Public instance methods ..................................................
 
   # -------------------------------------------------------------

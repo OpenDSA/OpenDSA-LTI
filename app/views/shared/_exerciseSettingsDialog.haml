@@ -1,0 +1,48 @@
+= javascript_include_tag 'jquery-ui'
+= javascript_include_tag "exerciseSettingsDialog"
+
+%div{id: "exercise-settings-dialog", title: "Exercise Settings"}
+  %p.dialog-errors
+  %form.form-horizontal
+    %fieldset.col-xs-12
+      .form-group{id: 'exercise-settings-required-group'}
+        %label.dialog-control-label.col-xs-4{for: "exercise-settings-required"}
+          Required:
+        .col-xs-6
+          %input{type: "checkbox", id: "exercise-settings-required", checked: "checked"}
+      .form-group
+        %label.dialog-control-label.col-xs-4{for: "exercise-settings-points"}
+          Points:
+        .col-xs-6
+          %input{type: "number", min: 0, value: 1, step: 0.01, id: "exercise-settings-points"}
+      .form-group{id: 'exercise-settings-threshold-group'}
+        %label.dialog-control-label.col-xs-4{for: "exercise-settings-threshold"}
+          Threshold:
+        .col-xs-6
+          %input{type: "number", min: 1, value: 5, step: 1, id: "exercise-settings-threshold"}
+      %div{id: 'exercise-settings-pe', style: 'display: none'}
+        .form-group
+          %label.dialog-control-label.col-xs-4{for: "exercise-settings-feedback"}
+            Feedback Mode:
+          .col-xs-6
+            %select{id: "exercise-settings-feedback"}
+              %option{value: 'atend'}
+                atend
+              %option{value: 'continuous'}
+                continuous
+        .form-group
+          %label.dialog-control-label.col-xs-4{for: "exercise-settings-fix"}
+            Fix Mode:
+          .col-xs-6
+            %select{id: "exercise-settings-fix", disabled: true}
+              %option{value: 'undo'}
+                undo
+              %option{value: 'fix'}
+                fix
+        .form-group
+          %label.dialog-control-label.col-xs-4{for: "exercise-settings-code"}
+            Hide Code:
+          .col-xs-6
+            %input{type: "checkbox", id: "exercise-settings-code"}
+      -# Allow form submission using enter key
+      %input{id: "exercise-settings-submit", type: "submit", tabindex: "-1", style: "position:absolute; top: -1000px;"}

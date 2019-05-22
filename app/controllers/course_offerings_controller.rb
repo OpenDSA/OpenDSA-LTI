@@ -145,6 +145,13 @@ class CourseOfferingsController < ApplicationController
   end
 
   def find_module_progresses
+    if current_user.blank?
+      render :json => {
+        message: 'You are not logged in. Please make sure your browser is set to allow third-party cookies',
+      }, :status => :forbidden
+      return
+    end
+
     chapt_mod = InstChapterModule.find(params[:inst_chapter_module_id])
     course_offering = chapt_mod.inst_chapter.inst_book.course_offering
     unless course_offering.is_instructor?(current_user) || current_user.global_role.is_admin?
@@ -158,7 +165,7 @@ class CourseOfferingsController < ApplicationController
 
     ex_ids = exercises.collect { |ex| ex.id }
 
-    users = CourseEnrollment.where(course_offering_id: params[:id], course_role_id: CourseRole::STUDENT_ID).where('users.email != ?', OpenDSA::STUDENT_VIEW_EMAIL).joins(:user).includes(:user).order('users.last_name ASC, users.first_name ASC, users.email ASC').collect { |e| e.user }
+    users = CourseEnrollment.where(course_offering_id: course_offering.id, course_role_id: CourseRole::STUDENT_ID).where('users.email != ?', OpenDSA::STUDENT_VIEW_EMAIL).joins(:user).includes(:user).order('users.last_name ASC, users.first_name ASC, users.email ASC').collect { |e| e.user }
 
     # only includes students who have attempted at least one exercise in the module
     # but also includes exercise attempt and progress data
@@ -400,10 +407,10 @@ class CourseOfferingsController < ApplicationController
   private
 
   def create_lti_course_offering
-    if not can? :create, CourseOffering
-      render :json => ['You are not authorized to create course offerings.'], :status => :forbidden
-      return
-    end
+    # if not can? :create, CourseOffering
+    #   render :json => ['You are not authorized to create course offerings.'], :status => :forbidden
+    #   return
+    # end
     info = params[:course_offering]
     course_offering = CourseOffering.new(
       course_id: info[:course_id],
@@ -442,4 +449,5 @@ class CourseOfferingsController < ApplicationController
     params.require(:course_offering).permit(:course_id, :term_id,
                                             :label, :url, :self_enrollment_allowed)
   end
+  
 end

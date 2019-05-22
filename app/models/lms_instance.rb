@@ -10,10 +10,21 @@ class LmsInstance < ActiveRecord::Base
 
   validates_presence_of :url
 
+  def self.get_oauth_creds(key)
+    lms_instance = LmsInstance.where(consumer_key: key).first
+    if LmsInstance.blank?
+      return nil
+    end
+    consumer_key = lms_instance.consumer_key
+    consumer_secret = lms_instance.consumer_secret
+    {consumer_key => consumer_secret}
+  end
+
 
   def display_name
     "#{url}"
   end
+
 
   #~ Private instance methods .................................................
 end

@@ -16,8 +16,12 @@
   window.course_offering_id = #{@course_offering.blank? ? 'undefined' : @course_offering.id};
   window.content_item_params = {
     oauth_consumer_key: "#{params[:oauth_consumer_key]}",
-    content_item_return_url: "#{params[:content_item_return_url]}"
+    content_item_return_url: "#{params[:content_item_return_url]}",
+    tool_consumer_info_product_family_code: "#{params[:tool_consumer_info_product_family_code]}",
+    data: #{params[:data].blank? ? 'undefined' : ('"' + params[:data] + '"').html_safe}
   };
+
+= render :partial => 'shared/exerciseSettingsDialog'
 
 .row
   .col-xs-12.alert-msg#alert-box{style: 'display: none;'}
@@ -105,3 +109,4 @@
     %input{type: "hidden", name: "oauth_consumer_key", value: ""}
     %input{type: "hidden", name: "oauth_signature_method", value: ""}
     %input{type: "hidden", name: "oauth_signature", value: ""}
+    
