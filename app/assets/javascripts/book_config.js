@@ -358,7 +358,7 @@
         error: function(xhr, txtStatus, errorThrown) {
           hideLoadingOverlay();
           if (txtStatus && errorThrown) {
-            alert('Error saving configuration: ' + textStatus + ' ' + errorThrown);
+            alert('Error saving configuration: ' + txtStatus + ' ' + errorThrown);
           }
           else {
             alert('An error occured while saving the configuration');
