@@ -141,7 +141,8 @@ class LtiController < ApplicationController
 
   def xml_config
     host = request.scheme + "://" + request.host_with_port
-    tc = IMS::LTI::ToolConfig.new(:title => "OpenDSA Tool Provider", :launch_url => host + '/lti/launch')
+    launch_url = host + '/lti/launch'
+    tc = IMS::LTI::ToolConfig.new(:title => "OpenDSA Tool Provider", :launch_url => launch_url)
     tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
     tc.description = "OpenDSA LTI Tool Provider supports LIS Outcome pass-back."
     tc.canvas_privacy_public!
@@ -150,10 +151,16 @@ class LtiController < ApplicationController
       :selection_width => 800,
       :selection_height => 600,
     })
-
-    tc.set_canvas_ext_param(:custom_fields, {
-      canvas_api_base_url: '$Canvas.api.baseUrl',
-    })
+    # tc.set_ext_params('canvas.instructure.com', {
+    #   'assignment_selection': {
+    #     'message_type': 'ContentItemSelectionRequest',
+    #     'url': launch_url
+    #   },
+    #   'link_selection': {
+    #     'message_type': 'ContentItemSelectionRequest',
+    #     'url': launch_url
+    #   },
+    # })
 
     render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
   end
@@ -241,7 +248,14 @@ class LtiController < ApplicationController
     exUrlId = "#{request.protocol}#{request.host_with_port}/inst_course_offering_exercises/#{exercise.id}"
     launchUrl = request.protocol + request.host_with_port + "/lti/launch"
     logoUrl = "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png"
-    
+
+    if return_url.blank?
+      # Canvas resource selection
+      launchUrl += '?custom_inst_course_offering_exercise_id=' + exercise.id.to_s
+      render :json => {launchUrl: launchUrl}, :status => :ok
+      return
+    end
+
     content_item_params = {}
     content_item_params["lti_message_type"] = 'ContentItemSelection'
     content_item_params["lti_version"] = "LTI-1p0"
@@ -651,7 +665,8 @@ class LtiController < ApplicationController
   end
 
   def get_oauth_creds(key)
-    if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
+    lms_code = params['tool_consumer_info_product_family_code']
+    if lms_code and LmsType::has_lms_level_creds?(lms_code)
       $oauth_creds = LmsInstance.get_oauth_creds(params[:oauth_consumer_key])
     else
       $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])

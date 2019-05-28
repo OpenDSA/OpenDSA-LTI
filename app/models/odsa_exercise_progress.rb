@@ -80,7 +80,7 @@ class OdsaExerciseProgress < ActiveRecord::Base
           lti_param)
       end
       tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
-      score = ex.points > 0 ? self.highest_score / ex.points : 0
+      score = ex.points > 0 ? self.highest_score / ex.points : 1
       res = tp.post_extended_replace_result!(score: score)
       unless res.success?
         error = Error.new(:class_name => 'post_replace_result_fail',

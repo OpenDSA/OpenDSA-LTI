@@ -14,7 +14,7 @@ class InstCourseOfferingExercise < ActiveRecord::Base
 
   def self.find_or_create_resource(course_offering_id, resource_link_id, resource_link_title, ex)
     course_off_ex = InstCourseOfferingExercise.find_by(
-      course_offering_id: course_offering.id,
+      course_offering_id: course_offering_id,
       resource_link_id: resource_link_id,
     )
     if course_off_ex.blank?
