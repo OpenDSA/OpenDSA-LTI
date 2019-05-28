@@ -3,6 +3,7 @@ class OdsaExerciseProgress < ActiveRecord::Base
   belongs_to :inst_book_section_exercise
   belongs_to :inst_course_offering_exercise
   belongs_to :user
+  belongs_to :lms_access
 
   #~ Validation ...............................................................
   validate :required_fields
@@ -31,10 +32,11 @@ class OdsaExerciseProgress < ActiveRecord::Base
         lms_access_id: lms_access_id,
       )
       ex.save!
-    elsif ex.lis_outcome_service_url != lis_outcome_service_url || ex.lis_result_sourcedid != lis_result_sourcedid
+    elsif ex.lis_outcome_service_url != lis_outcome_service_url || ex.lis_result_sourcedid != lis_result_sourcedid || ex.lms_access_id != lms_access_id
 
       ex.lis_outcome_service_url = lis_outcome_service_url
       ex.lis_result_sourcedid = lis_result_sourcedid
+      ex.lms_access_id = lms_access_id
       ex.save!
     end
     return ex

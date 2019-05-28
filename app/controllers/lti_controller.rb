@@ -478,7 +478,7 @@ class LtiController < ApplicationController
     if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
       lms_access_id = nil
     else
-      lms_access_id = LmsAccess.find_by(lms_instance_id: lms_instance.id, consumer_key: params[:oauth_consumer_key])
+      lms_access_id = LmsAccess.find_by(lms_instance_id: lms_instance.id, consumer_key: params[:oauth_consumer_key]).id
     end
     OdsaExerciseProgress.get_courseoffex_progress(current_user.id,
       @course_off_ex.id,
