@@ -125,7 +125,6 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     exercise_progress = self.get_exercise_progress
     exercise_progress.first_done ||= DateTime.now
     exercise_progress.last_done = DateTime.now
-
     if hasBook
       book_progress.update_started(inst_exercise)
     end

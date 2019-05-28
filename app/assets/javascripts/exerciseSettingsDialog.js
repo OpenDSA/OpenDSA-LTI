@@ -32,7 +32,6 @@ var ExerciseSettingsDialog = (function () {
         //$('#exercise-settings-submit').on('click', this._exerciseSettingsHelper.bind(this));
 
         var exSettingsForm = this.dialog.find('form').on('submit', function (event) {
-            debugger;
             event.preventDefault();
             this._exerciseSettingsHelper();
         });
@@ -46,6 +45,17 @@ var ExerciseSettingsDialog = (function () {
           else {
             exSettingsFix.attr('disabled', true);
           }
+        });
+
+        var pointsInput = $('#exercise-settings-points');
+        $('#exercise-settings-gradable').on('change', function() {
+            if (this.checked) {
+                pointsInput.removeAttr('disabled');
+            }
+            else {
+                pointsInput.val(0);
+                pointsInput.attr('disabled', true);
+            }
         });
     }
 
@@ -70,6 +80,13 @@ var ExerciseSettingsDialog = (function () {
         var settings = {
             points: Number.parseFloat($('#exercise-settings-points').val()),
         };
+        if ($('#exercise-settings-gradable').is(':checked')) {
+            settings.isGradable = true;
+        }
+        else {
+            settings.isGradable = false;
+            settings.points = 0.0;
+        }
         if (this.currExInfo.type !== 'extr') {
             settings.required = $('#exercise-settings-required').is(':checked');
             if (this.currExInfo.type === 'ka') {
@@ -109,6 +126,7 @@ var ExerciseSettingsDialog = (function () {
                 thresholdElem.attr('step', 0.01);
                 thresholdElem.attr('min', 0);
                 thresholdElem.attr('max', 1);
+                thresholdElem.val(1);
                 $('#exercise-settings-pe').css('display', '');
                 $('#exercise-settings-required-group').css('display', requiredSetting);
                 $('#exercise-settings-threshold-group').css('display', '');

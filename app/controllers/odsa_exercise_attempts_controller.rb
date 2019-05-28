@@ -103,7 +103,11 @@ class OdsaExerciseAttemptsController < ApplicationController
           exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
                                                            inst_course_offering_exercise_id: inst_course_offering_exercise.id)
         end
-
+        if !already_proficient and exercise_progress.proficient? and 
+          exercise_progress.has_inst_course_offering_exercise?()
+          
+          exercise_progress.post_course_offering_exercise_score_to_lms()
+        end
         format.json {
           render :json => {
                    :exercise_progress => exercise_progress,
@@ -212,11 +216,14 @@ class OdsaExerciseAttemptsController < ApplicationController
               inst_book_section_exercise.id
             ).first
           else
-            exercise_progress = OdsaExerciseProgress.find_by(
-              inst_course_offering_exercise_id: inst_course_offering_exercise.id,
-            )
+            exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
+              inst_course_offering_exercise_id: inst_course_offering_exercise.id)
           end
-
+          if !already_proficient and exercise_progress.proficient? and 
+            exercise_progress.has_inst_course_offering_exercise?()
+            
+            exercise_progress.post_course_offering_exercise_score_to_lms()
+          end
           format.json {
             render :json => {
                      :exercise_progress => exercise_progress,

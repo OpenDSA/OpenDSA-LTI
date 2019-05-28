@@ -234,7 +234,7 @@ class LtiController < ApplicationController
     end
 
     exinfo = params['selected']['exerciseInfo']
-    #gradable = params['selected']['isGradable']
+    isGradable = params['selected']['isGradable']
     exSettings = params['selected']['exerciseSettings']
     exercise = InstCourseOfferingExercise.find_or_create(course_offering.id, exinfo['id'], exSettings)
 
@@ -264,10 +264,12 @@ class LtiController < ApplicationController
       },
       "custom": {
         "inst_course_offering_exercise_id": exercise.id
-      },
-      "lineItem": {
+      }
+    }
+    if isGradable
+      content_item["lineItem"] = {
         "@type": "LineItem",
-        "label": exinfo['long_name'],
+        "label": "OpenDSA: " + exinfo['long_name'],
         "reportingMethod": "res:totalScore",
         "assignedActivity": {
           "@id": "#{exUrlId}",
@@ -280,7 +282,7 @@ class LtiController < ApplicationController
           "totalMaximum": exercise.points.to_f
         }
       }
-    }
+    end
     content_items = {
       "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
       "@graph": [
@@ -449,17 +451,29 @@ class LtiController < ApplicationController
 
     require 'rst/rst_parser'
     exmap = RstParser.get_exercise_map()
-    byebug
     if params.key?(:custom_inst_course_offering_exercise_id)
-      @course_off_ex = InstCourseOfferingExercise.includes(:inst_exercise).find(params[:custom_inst_course_offering_exercise_id])
+      @course_off_ex = InstCourseOfferingExercise.find_and_update(params[:custom_inst_course_offering_exercise_id],
+        params[:resource_link_id], params[:resource_link_title])
       @ex = exmap[@course_off_ex.inst_exercise.short_name]
     else
+      # Used for older exercises created before workflow was updated. Can likely be removed after a while.
       @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
         params[:resource_link_id], params[:resource_link_title], @ex)
       @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
     end
+    if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
+      lms_access_id = nil
+    else
+      lms_access_id = LmsAccess.find_by(lms_instance_id: lms_instance.id, consumer_key: params[:oauth_consumer_key])
+    end
+    OdsaExerciseProgress.get_courseoffex_progress(current_user.id,
+      @course_off_ex.id,
+      params[:lis_outcome_service_url],
+      params[:lis_result_sourcedid],
+      lms_access_id)
 
     if @ex.instance_of?(AvEmbed)
+      @av_address = @course_off_ex.build_av_address(@ex.av_address)
       render "launch_avembed", layout: 'lti_launch'
     else
       render 'launch_inlineav', layout: 'lti_launch'
@@ -637,7 +651,7 @@ class LtiController < ApplicationController
   end
 
   def get_oauth_creds(key)
-    if params['tool_consumer_info_product_family_code'].downcase == 'blackboardlearn'
+    if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
       $oauth_creds = LmsInstance.get_oauth_creds(params[:oauth_consumer_key])
     else
       $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])

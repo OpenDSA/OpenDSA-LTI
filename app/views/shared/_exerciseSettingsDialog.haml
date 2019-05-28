@@ -10,6 +10,11 @@
           Required:
         .col-xs-6
           %input{type: "checkbox", id: "exercise-settings-required", checked: "checked"}
+      .form-group{id: 'exercise-settings-gradable-group'}
+        %label.dialog-control-label.col-xs-4{for: "exercise-settings-gradable"}
+          Add to gradebook:
+        .col-xs-6
+          %input{type: "checkbox", id: "exercise-settings-gradable", checked: "checked"}
       .form-group
         %label.dialog-control-label.col-xs-4{for: "exercise-settings-points"}
           Points:

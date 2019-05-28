@@ -33,7 +33,7 @@ class InstCourseOfferingExercise < ActiveRecord::Base
   def self.find_or_create(course_offering_id, inst_exercise_id, settings)
     points = settings.delete('points')
     threshold = settings.delete('threshold')
-    optionsJson = settings.to_json
+    optionsJson = settings.blank? ? nil : settings.to_json
     course_off_ex = InstCourseOfferingExercise.where(
       course_offering_id: course_offering_id,
       inst_exercise_id: inst_exercise_id,
@@ -45,7 +45,7 @@ class InstCourseOfferingExercise < ActiveRecord::Base
         inst_exercise_id: inst_exercise_id,
         points: points,
         threshold: threshold,
-        options: optionsJson
+        options: optionsJson,
       )
     else
       course_off_ex.points = points
@@ -56,6 +56,26 @@ class InstCourseOfferingExercise < ActiveRecord::Base
     return course_off_ex
   end
 
+  def self.find_and_update(id, resource_link_id, resource_link_title)
+    ex = InstCourseOfferingExercise.includes(:inst_exercise).find(id)
+    if ex.resource_link_id != resource_link_id || ex.resource_link_title != resource_link_title
+      ex.resource_link_id = resource_link_id
+      ex.resource_link_title = resource_link_title
+      ex.save!
+    end
+    return ex
+  end
+
   #~ Instance methods .........................................................
+
+  def build_av_address(base_address)
+    if self.options.blank?
+      return base_address
+    end
+    require 'uri'
+    query_string = '?' + URI.encode_www_form(JSON.parse(self.options))
+    return base_address + query_string
+  end
+
   #~ Private instance methods .................................................
 end

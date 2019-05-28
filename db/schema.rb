@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190522024859) do
+ActiveRecord::Schema.define(version: 20190528160712) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -411,6 +411,7 @@ ActiveRecord::Schema.define(version: 20190522024859) do
   add_index "odsa_exercise_progresses", ["inst_course_offering_exercise_id"], name: "odsa_exercise_progresses_inst_course_offering_exercise_id_fk", using: :btree
   add_index "odsa_exercise_progresses", ["lms_access_id"], name: "fk_rails_3327f6b532", using: :btree
   add_index "odsa_exercise_progresses", ["user_id", "inst_book_section_exercise_id"], name: "index_odsa_ex_prog_on_user_id_and_inst_bk_sec_ex_id", unique: true, using: :btree
+  add_index "odsa_exercise_progresses", ["user_id", "inst_course_offering_exercise_id"], name: "index_odsa_exercise_prog_on_user_course_offering_exercise", unique: true, using: :btree
 
   create_table "odsa_module_progresses", force: :cascade do |t|
     t.integer  "user_id",                 limit: 4,   null: false

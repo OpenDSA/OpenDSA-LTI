@@ -201,8 +201,10 @@
       delete settings.required; // not used
       window.content_item_params.selected = {
         exerciseInfo: selected.original.exObj,
-        exerciseSettings: settings
+        exerciseSettings: settings,
+        isGradable: settings.isGradable
       };
+      delete settings.isGradable;
       window.content_item_params.course_offering_id = window.course_offering_id;
       $.ajax({
         url: '/lti/content_item_selection',
