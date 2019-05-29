@@ -78,7 +78,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
         proficient = hasBook ? book_progress.update_proficiency(exercise_progress) : exercise_progress.highest_score >= inst_course_offering_exercise.threshold
         if proficient
           self.earned_proficiency = true
-          self.points_earned = hasBook ? inst_book_section_exercise.points : 1
+          self.points_earned = hasBook ? inst_book_section_exercise.points : inst_course_offering_exercise.points
           self.save!
           exercise_progress.proficient_date ||= DateTime.now
         end
@@ -130,7 +130,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     end
     if self.correct
       self.earned_proficiency = true
-      self.points_earned = hasBook ? inst_book_section_exercise.points : 1
+      self.points_earned = hasBook ? inst_book_section_exercise.points : inst_course_offering_exercise.points
       self.save!
       exercise_progress['total_correct'] += 1
       exercise_progress['total_worth_credit'] += 1
