@@ -25,7 +25,7 @@
       instructions on how to do this.
     </p>
 
-    <h2>Adding OpenDSA as an LTI Tool Provider in Blackboard</h2>
+    <h2 id="for-administrators">Adding OpenDSA as an LTI Tool Provider in Blackboard</h2>
     <p>This section describes how a Blackboard administrator can make OpenDSA
     available for instructors to use in their courses.</p>
 
@@ -59,14 +59,14 @@
     </p>
 
     <p>
-      <strong>Step 3:</strong> Click "Register Provider Domain".
+      <strong>Step 4:</strong> Click "Register Provider Domain".
       <div class="text-center">
         <%= image_tag "guides/blackboard/s3.png", style:'width:50%' %>
       </div>
     </p>
 
     <p>
-      <strong>Step 3:</strong> For <i>Provider Domain</i>, enter <i>opendsa-server.cs.vt.edu</i> .
+      <strong>Step 5:</strong> For <i>Provider Domain</i>, enter <i>opendsa-server.cs.vt.edu</i> .
       Ensure <i>Provider Domain Status</i> is set to <i>Approved</i>.
       <div class="text-center">
         <%= image_tag "guides/blackboard/s4.png", style:'width:50%' %>
@@ -74,7 +74,7 @@
     </p>
 
     <p>
-      <strong>Step 5:</strong> Set the <i>Default Configuration</i> option to
+      <strong>Step 6:</strong> Set the <i>Default Configuration</i> option to
       "Set globally". 
       For <i>Tool Provider Key</i> and <i>Tool Provider Secret</i>, 
       enter the key and secret you were provided in Step 1.
@@ -84,7 +84,7 @@
     </p>
 
     <p>
-      <strong>Step 6:</strong> Set the <i>Send User Data</i> option to
+      <strong>Step 7:</strong> Set the <i>Send User Data</i> option to
       "Send user data only over SSL". 
       Under <i>User Fields to Send</i> check the "Role in Course", "Name", and "Email Address" checkboxes.
       Then, click the Submit button.
@@ -94,7 +94,7 @@
     </p>
 
     <p>
-      <strong>Step 7:</strong> Back on the LTI Tool Providers page, find the tool/provider
+      <strong>Step 8:</strong> Back on the LTI Tool Providers page, find the tool/provider
       "opendsa-server.cs.vt.edu" (which you just added). 
       Hover your mouse over the row, click the down arrow that appears, 
       then click <i>Manage Placements</i>. 
@@ -104,14 +104,14 @@
     </p>
 
     <p>
-      <strong>Step 8:</strong> Click <i>Create Placement</i>.
+      <strong>Step 9:</strong> Click <i>Create Placement</i>.
       <div class="text-center">
         <%= image_tag "guides/blackboard/s8.png", style:'width:50%' %>
       </div>
     </p>
 
     <p>
-      <strong>Step 9:</strong> Enter "OpenDSA" as the <i>Label</i> and "opendsa-deeplinking" as the <i>Handle</i>.
+      <strong>Step 10:</strong> Enter "OpenDSA" as the <i>Label</i> and "opendsa-deeplinking" as the <i>Handle</i>.
       
       <br/>
       For the description, copy and paste the following text:
@@ -125,7 +125,7 @@
     </p>
 
     <p>
-      <strong>Step 10:</strong> Ensure <i>Availability</i> is set to "Yes".
+      <strong>Step 11:</strong> Ensure <i>Availability</i> is set to "Yes".
       Set <i>Type</i> to "Course content tool" and check "Supports deep linking".
       The "Allows grading" checkbox may be automatically disabled, but "Supports deep linking"
       also allows grading.
@@ -149,7 +149,7 @@
     </p>
 
     <p>
-      <strong>Step 11:</strong> For <i>Tool Provider URL</i> enter <i>https://opendsa-server.cs.vt.edu/lti/launch</i> .
+      <strong>Step 12:</strong> For <i>Tool Provider URL</i> enter <i>https://opendsa-server.cs.vt.edu/lti/launch</i> .
       The tool provider key and secret fields should have been automatically populated.
       <div class="text-center">
         <%= image_tag "guides/blackboard/s11.png", style:'width:50%' %>
@@ -160,7 +160,7 @@
       After clicking the "Submit" button, OpenDSA should be available for instructors to use in thier courses.
     </p>
 
-    <h2>Adding an OpenDSA Exercise or Visualization to a Course</h2>
+    <h2 id="for-instructors">Adding an OpenDSA Exercise or Visualization to a Course</h2>
 
     <p>At this point, a Blackboard administrator should already have 
     set up OpenDSA as an LTI tool provider in your Blackboard instance.</p>
