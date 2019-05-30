@@ -200,7 +200,7 @@
   }
 
   function contentItemSelected(selected) {
-    exSettingsDialog.show(selected, {}, true);
+    exSettingsDialog.show(selected, {}, true, window.hideGradebookSettings);
   }
 
   /**

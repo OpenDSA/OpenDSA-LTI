@@ -195,6 +195,7 @@ class LtiController < ApplicationController
     end
 
     @deep_linking = lms_type.name.downcase != 'canvas'
+    @hide_gradebook_settings = lms_type.name.downcase != 'blackboardlearn'
     lms_instance = ensure_lms_instance()
     @lms_course_num = get_lms_course_num(lms_type.name, lms_instance)
     @lms_course_code = params[:context_label]
@@ -465,6 +466,7 @@ class LtiController < ApplicationController
 
     require 'rst/rst_parser'
     exmap = RstParser.get_exercise_map()
+    # TODO: ensure that the exercise instance belongs to the course offering
     if params.key?(:custom_inst_course_offering_exercise_id)
       @course_off_ex = InstCourseOfferingExercise.find_and_update(params[:custom_inst_course_offering_exercise_id],
         params[:resource_link_id], params[:resource_link_title])

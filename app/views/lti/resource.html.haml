@@ -5,6 +5,7 @@
   window.odsa_organizations = #{@organizations.blank? ? 'undefined' : @organizations.to_json.html_safe};
   window.organization_id = #{@organization_id.blank? ? 'undefined' : @organization_id};
   window.deepLinking = #{@deep_linking};
+  window.hideGradebookSettings = #{@hide_gradebook_settings};
   window.odsa_course_info = {
     course_offering: {
       lms_instance_id: #{@lms_instance_id},

@@ -108,11 +108,12 @@ var ExerciseSettingsDialog = (function () {
         this.dialog.dialog('close');
     };
 
-    ExerciseSettingsDialog.prototype.show = function(exInfo, defaultOptions, hideRequired) {
+    ExerciseSettingsDialog.prototype.show = function(exInfo, defaultOptions, hideRequired, hideGradebookSettings) {
         this.currExInfo = exInfo;
         this.dialog.find('form')[0].reset();
         var thresholdElem = $('#exercise-settings-threshold');
         var requiredSetting = hideRequired ? 'none' : '';
+        $('#gradebook-settings-container').css('display', hideGradebookSettings ? 'none' : '');
         switch (exInfo.type) {
             case 'ka':
                 thresholdElem.attr('step', 1);
