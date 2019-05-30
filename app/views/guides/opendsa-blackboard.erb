@@ -1,0 +1,254 @@
+<div class="row" style="margin:50px">
+  <span class="span12">
+    <div class="text-center">
+      <h1>Add an OpenDSA Exercise or Visualization to a Blackboard Course</h1>
+    </div>
+    <br>
+    <p>
+      OpenDSA is an eTextbook project developed at Virginia Tech. OpenDSA
+      materials include many visualizations and interactive exercises that
+      support courses in a wide variety of Computer Science-related topics such
+      as Data Structures and Algorithms (DSA), Formal and Programming Languages.
+    </p>
+    <p>
+      OpenDSA has hundreds of visualizations and exercises.
+      Most algorithms and data structures are illustrated by interactive
+      algorithm visualizations. Students could enter their own test cases to see
+      how the algorithm or data structure works on that input, and they can
+      control the pacing of the visualization.
+    </p>
+    <p>
+      Before instructors can use OpenDSA materials in their Blackboard courses,
+      a Blackboard administrator must add OpenDSA as an LTI tool provider.
+      A course instructor who is using the Blackboard Learn LMS can then add individual
+      OpenDSA materials directly into their Blackboard courses. Below are detailed
+      instructions on how to do this.
+    </p>
+
+    <h2>Adding OpenDSA as an LTI Tool Provider in Blackboard</h2>
+    <p>This section describes how a Blackboard administrator can make OpenDSA
+    available for instructors to use in their courses.</p>
+
+    <p>
+      <strong>Step 1:</strong> Send an email to
+      <a href="mailto:opendsa@cs.vt.edu"> opendsa@cs.vt.edu </a> asking
+      for authorization for your Blackboard instance. Include the URL of your
+      Blackboard instance in your email. You will then be provided with a key and a secret
+      which you will need to set up OpenDSA as an LTI tool provider in your 
+      Blackboard instance.
+    </p>
+
+    <p>
+      <strong>Step 2:</strong> After receiving your key and secret, go to the 
+      administrator control panel in your Blackboard instance. 
+      If you are using the original Blackboard Learn, the link will be in the
+      top right.
+      If you are using Blackboard Learn Ultra, the link will be in the 
+      menu on the left-hand side.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s1.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 3:</strong> In the admin control panel, find the section titled
+      "Integrations". Click on the "LTI Tool Providers" link.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s2.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 3:</strong> Click "Register Provider Domain".
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s3.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 3:</strong> For <i>Provider Domain</i>, enter <i>opendsa-server.cs.vt.edu</i> .
+      Ensure <i>Provider Domain Status</i> is set to <i>Approved</i>.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s4.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 5:</strong> Set the <i>Default Configuration</i> option to
+      "Set globally". 
+      For <i>Tool Provider Key</i> and <i>Tool Provider Secret</i>, 
+      enter the key and secret you were provided in Step 1.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s5.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 6:</strong> Set the <i>Send User Data</i> option to
+      "Send user data only over SSL". 
+      Under <i>User Fields to Send</i> check the "Role in Course", "Name", and "Email Address" checkboxes.
+      Then, click the Submit button.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s6.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 7:</strong> Back on the LTI Tool Providers page, find the tool/provider
+      "opendsa-server.cs.vt.edu" (which you just added). 
+      Hover your mouse over the row, click the down arrow that appears, 
+      then click <i>Manage Placements</i>. 
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s7.png", style:'width:30%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 8:</strong> Click <i>Create Placement</i>.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s8.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 9:</strong> Enter "OpenDSA" as the <i>Label</i> and "opendsa-deeplinking" as the <i>Handle</i>.
+      
+      <br/>
+      For the description, copy and paste the following text:
+      <br/>
+      <i>Computer Science exercises and visualizations.
+      OpenDSA provides hundreds of visualizations and interactive exercises that support courses in a wide variety of Computer Science-related topics such as Data Structures and Algorithms (DSA), Formal Languages, and Programming Languages.</i>
+
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s9v2.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 10:</strong> Ensure <i>Availability</i> is set to "Yes".
+      Set <i>Type</i> to "Course content tool" and check "Supports deep linking".
+      The "Allows grading" checkbox may be automatically disabled, but "Supports deep linking"
+      also allows grading.
+
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s10.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      You may also download the icon below to your computer, then click the "Browse"
+      button next to <i>Icon</i>, and locate where you saved the image to on your computer.
+
+      <div class="text-center">
+        <%= image_tag "/opendsa_logo50.png" %>
+      </div>
+      <br/>
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s10b.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 11:</strong> For <i>Tool Provider URL</i> enter <i>https://opendsa-server.cs.vt.edu/lti/launch</i> .
+      The tool provider key and secret fields should have been automatically populated.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s11.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      After clicking the "Submit" button, OpenDSA should be available for instructors to use in thier courses.
+    </p>
+
+    <h2>Adding an OpenDSA Exercise or Visualization to a Course</h2>
+
+    <p>At this point, a Blackboard administrator should already have 
+    set up OpenDSA as an LTI tool provider in your Blackboard instance.</p>
+
+    <p>
+      To add one or more OpenDSA exercises in your Blackboard Learn course, complete the
+      following steps:
+    </p>
+    
+    <p>
+      <strong>Step 1:</strong> If you are using the original Blackboard interface,
+      click the "Content" link on the left-hand side, then click "Build Content"
+      and then "OpenDSA".
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s12.png", style:'width:30%' %>
+      </div>
+      <br/>
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s13.png", style:'width:30%' %>
+      </div>
+    </p>
+    <p>
+      If you are using the Ultra interface, go to the Course Content section.
+      Click the "+" button at the bottom of the learning module you want
+      to add OpenDSA content to, then click "Content Market". Find "OpenDSA" under
+      the "Institution Tools" section. If you cannot find it, then OpenDSA may 
+      not have been properly configured by your Blackboard administrator.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s17.png", style:'width:50%' %>
+      </div>
+      <br/>
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s18.png", style:'width:40%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 2:</strong> If this is your first time going through this process for your course,
+      you will be asked to provide some information about your course offering. 
+      Fill out all the fields and click "Submit".
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s14a.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 3:</strong> Next, a tree view will be displayed listing the topics
+      for visualizations and exercises that are available. To expand one of the
+      categories, either double click on it, or click the arrow to the left of
+      the folder icon. You will then see sub-categories that you can expand.
+      Expanding a sub-category will display the names of the exercises and
+      visualizations contained within it. Once you find the resource you want
+      to add, simply click on it.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s14b.png", style:'width:50%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 4:</strong> A window will pop-up allowing your to
+      specify settings for the exercise/visualization. The "Add to gradebook"
+      checkbox specifies whether the exercise/visualization should report a score
+      to be added to your gradebook in Blackboard.
+      If checked, a column will be added to your gradebook in Blackboard, and student scores
+      will automatically be recorded there as students complete the exercise/visualization.
+      If unchecked, no column will be added to your gradebook and no scores will be recorded.
+      Click "Submit" when you are finished, or "Cancel" to go back.
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s15.png", style:'width:30%' %>
+      </div>
+    </p>
+
+    <p>
+      <strong>Step 5:</strong> The exercise/visualization you selected should
+      now appear in your course.
+
+      If using the original Blackboard user interface, it should appear
+      similar to this:
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s16.png", style:'width:50%' %>
+      </div>
+    </p>
+    <p>
+      If using Blackboard Ultra, it should look similar to this:
+      <div class="text-center">
+        <%= image_tag "guides/blackboard/s19.png", style:'width:50%' %>
+      </div>
+    </p>
+
+  </span>
+</div>

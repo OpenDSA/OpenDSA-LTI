@@ -48,6 +48,7 @@ OpenDSA::Application.routes.draw do
     get 'opendsa-bookinstance' => 'guides#opendsa-bookinstance', as: :guide_bookinstance
     get 'opendsa-canvas' => 'guides#opendsa-canvas', as: :guide_canvas
     get 'opendsa-moodle' => 'guides#opendsa-moodle', as: :guide_moodle
+    get 'opendsa-blackboard' => 'guides#opendsa-blackboard', as: :guide_blackboard
     get 'opendsa-book-configuration' => 'guides#opendsa-book-configuration', as: :guide_book_configuration
     get 'opendsa-embed' => 'guides#opendsa-embed', as: :guide_embed
   end
