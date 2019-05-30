@@ -84,22 +84,12 @@ class OdsaModuleProgress < ActiveRecord::Base
 
   def post_score_to_lms()
     if self.lis_outcome_service_url and self.lis_result_sourcedid
-      lti_param = {
-        "lis_outcome_service_url" => self.lis_outcome_service_url,
-        "lis_result_sourcedid" => self.lis_result_sourcedid,
-      }
-      tp = IMS::LTI::ToolProvider.new(self.lms_access.consumer_key,
-                                      self.lms_access.consumer_secret,
-                                      lti_param)
-      tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
-
-      res = tp.post_extended_replace_result!(score: self.highest_score)
-      unless res.success?
-        error = Error.new(:class_name => 'post_replace_result_fail',
-                          :message => res.inspect,
-                          :params => self.as_json.to_json)
-        error.save!
-      end
+      require 'lti/outcomes'
+      res = LtiOutcomes.post_score_to_consumer(self.highest_score, 
+                                               self.lis_outcome_service_url,
+                                               self.lis_result_sourcedid,
+                                               self.lms_access.consumer_key,
+                                               self.lms_access.consumer_secret)
       return res
     end
   end

@@ -67,29 +67,28 @@ class OdsaExerciseProgress < ActiveRecord::Base
   def post_course_offering_exercise_score_to_lms()
     if self.lis_outcome_service_url and self.lis_result_sourcedid
       ex = self.inst_course_offering_exercise
-      lti_param = {
-        "lis_outcome_service_url" => self.lis_outcome_service_url,
-        "lis_result_sourcedid" => self.lis_result_sourcedid,
-      }
+      score = 0
+      if self.highest_score >= ex.threshold
+        score = 1
+      end
+
+      consumer_key = nil
+      consumer_secret = nil
       if self.lms_access_id.blank?
         lms_instance = self.inst_course_offering_exercise.course_offering.lms_instance
-        tp = IMS::LTI::ToolProvider.new(lms_instance.consumer_key,
-          lms_instance.consumer_secret,
-          lti_param)
+        consumer_key = lms_instance.consumer_key
+        consumer_secret = lms_instance.consumer_secret
       else
-        tp = IMS::LTI::ToolProvider.new(self.lms_access.consumer_key,
-          self.lms_access.consumer_secret,
-          lti_param)
+        consumer_key = self.lms_access.consumer_key
+        consumer_secret = self.lms_access.consumer_secret
       end
-      tp.extend IMS::LTI::Extensions::OutcomeData::ToolProvider
-      score = ex.points > 0 ? self.highest_score / ex.points : 1
-      res = tp.post_extended_replace_result!(score: score)
-      unless res.success?
-        error = Error.new(:class_name => 'post_replace_result_fail',
-                          :message => res.inspect,
-                          :params => self.as_json.to_json)
-        error.save!
-      end
+
+      require 'lti/outcomes'
+      res = LtiOutcomes.post_score_to_consumer(score, 
+                                               self.lis_outcome_service_url,
+                                               self.lis_result_sourcedid,
+                                               consumer_key,
+                                               consumer_secret)
       return res
     end
   end
