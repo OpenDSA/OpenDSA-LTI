@@ -1,7 +1,7 @@
 class CoursesController < ApplicationController
   load_and_authorize_resource
-  skip_load_resource :only => :show
-  skip_authorize_resource :only => :list
+  skip_load_resource :only => [:show, :create]
+  skip_authorize_resource :only => [:list, :create]
   respond_to :html, :js, :json
 
   #~ Action methods ...........................................................
