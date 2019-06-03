@@ -90,6 +90,16 @@ class Term < ActiveRecord::Base
     return result ? result : Term.first
   end
 
+  def self.find_term(term_slug)
+    term = nil 
+    if term_slug
+      term = term.find(term_slug)
+    end
+    if term.blank?
+      term = current_or_next_term
+    end
+    return term
+  end
 
   #~ Instance methods .........................................................
 

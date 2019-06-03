@@ -25,7 +25,6 @@ class LtiController < ApplicationController
 
     lti_enroll(@course_offering)
 
-    # I change this to be custom intanbook id becuase it is not working on mine yet
     if params.has_key?(:custom_course_offering_id)
       launch_instructor_tool()
       return
@@ -343,9 +342,9 @@ class LtiController < ApplicationController
     @launch_url = tool.launch_url
     launch_params = {}
     launch_params["launch_url"] = @launch_url
-    launch_params["context_label"] = course_offering.name
-    launch_params["context_title"] = course_offering.name
-    launch_params["context_id"] = "#{exercise.id}"
+    launch_params["context_label"] = course_offering.course.number
+    launch_params["context_title"] = course_offering.course.name
+    launch_params["context_id"] = "#{course_offering.id}"
     launch_params["lis_outcome_service_url"] = "#{host}#{lti_grade_passback_path}"
     # we don't need/want scores for instructors
     unless course_offering.is_instructor?(current_user)
@@ -425,8 +424,8 @@ class LtiController < ApplicationController
       progress = OdsaExerciseProgress.find_by(user_id: user_id,
                                               inst_book_section_exercise_id: inst_book_section_exercise_id)
 
-      res.description = progress.blank? ? "Your score is 0" : "Your score is #{progress.current_score}"
-      res.score = progress.current_score
+      res.description = progress.blank? ? "Your score is 0" : "Your score is #{progress.highest_score}"
+      res.score = progress.blank? ? 0 : progress.highest_score
       res.code_major = 'success'
     elsif req.delete_request?
       res.code_major = 'unsupported'
@@ -462,26 +461,72 @@ class LtiController < ApplicationController
 
     render('error') and return unless lti_authorize!
     render('error') and return unless ensure_user()
+
+    if course_offering.blank?
+      unless @tp.context_instructor?
+        @message = 'An instructor must access this exercise first.'
+        render 'error'
+        return
+      end
+      term = Term.find_term(params[:custom_term])
+      orgid = lms_instance.organization_id
+      coursenum = nil
+      if params.key?(:custom_course_number)
+        course = Course.find_by(organization_id: orgid, number: params[:custom_course_number])
+      elsif params.key?(:custom_course_name)
+        course = Course.find_by(organization_id: orgid, name: params[:custom_course_name])
+      else
+        course = Course.find_by(organization_id: orgid, number: params[:context_label])
+        if course.blank?
+          course = Course.new(name: params[:context_title], 
+            number: params[:context_label], 
+            organization_id: orgid,
+            user_id: current_user.id)
+          course.save!
+        end
+      end
+      course_offering = CourseOffering.new(
+        course: course,
+        term: term,
+        label: params[:custom_label] || "#{params[:context_label]}-#{term.slug}",
+        lms_instance: lms_instance,
+        lms_course_code: params[:context_label],
+        lms_course_num: lms_course_num,
+      )
+      course_offering.save!
+    end
+
     lti_enroll(course_offering)
 
     require 'rst/rst_parser'
     exmap = RstParser.get_exercise_map()
-    # TODO: ensure that the exercise instance belongs to the course offering
     if params.key?(:custom_inst_course_offering_exercise_id)
+      # TODO: ensure that the exercise instance belongs to the course offering
       @course_off_ex = InstCourseOfferingExercise.find_and_update(params[:custom_inst_course_offering_exercise_id],
         params[:resource_link_id], params[:resource_link_title])
       @ex = exmap[@course_off_ex.inst_exercise.short_name]
+    elsif params.key?(:custom_ex_short_name)
+      ex_settings = nil
+      if params.key?(:custom_ex_settings)
+        ex_settings = JSON.parse(params[:custom_ex_settings])
+      end
+      @ex = exmap[params[:custom_ex_short_name]]
+      byebug
+      @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
+        params[:resource_link_id], params[:resource_link_title], @ex, ex_settings)
     else
       # Used for older exercises created before workflow was updated. Can likely be removed after a while.
+      @ex = exmap[params[:ex_short_name]]
       @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
-        params[:resource_link_id], params[:resource_link_title], @ex)
-      @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
+        params[:resource_link_id], params[:resource_link_title], @ex, nil)
     end
+
     if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
       lms_access_id = nil
     else
       lms_access_id = LmsAccess.find_by(consumer_key: params[:oauth_consumer_key]).id
     end
+    
     OdsaExerciseProgress.get_courseoffex_progress(current_user.id,
       @course_off_ex.id,
       params[:lis_outcome_service_url],
@@ -524,7 +569,7 @@ class LtiController < ApplicationController
     lms_type = LmsType.find_by('lower(name) = :name', name: type_name)
     if lms_type.blank?
       lms_type = LmsType.new(name: type_name)
-      lms_type.save
+      lms_type.save!
     end
     return lms_type
   end
@@ -649,11 +694,11 @@ class LtiController < ApplicationController
   end
 
   def get_lms_course_num(lms_type_name, lms_instance)
-    if (lms_type_name.downcase == 'canvas')
+    if params.key?(:custom_canvas_course_id)
       return params[:custom_canvas_course_id]
     else
       # generate a somewhat unique string to use as the course id
-      return "#{lms_type_name}_#{lms_instance.id}_#{params[:context_label]}_#{params[:oauth_consumer_key]}"
+      return "#{lms_type_name}_#{lms_instance.id}_#{params[:context_id]}_#{params[:oauth_consumer_key]}"
     end
   end
 

@@ -1,6 +1,9 @@
 = stylesheet_link_tag 'embed_list', media: 'all'
 = javascript_include_tag 'embed_list'
 
+:javascript
+    window.ltiLaunchBaseUrl = "#{@lti_launch_url}";
+
 #preview-modal.modal.fade{tabindex: -1, role: 'dialog'}
     .modal-dialog.modal-lg{role: 'document', style: 'width: 85%;'}
         .modal-content
@@ -13,6 +16,27 @@
             .modal-footer
                 %button.btn.btn-default{'data-dismiss': 'modal'}
                     Close
+
+#lti-launch-url-modal.modal.fade{tabindex: -1, role: 'dialog'}
+    .modal-dialog.modal-lg{role: 'document', style: 'width: 85%;'}
+        .modal-content
+            .modal-header
+                %button.close{'data-dismiss': 'modal'}
+                    &times;
+                %h3#lti-launch-title.modal-title
+        
+            .modal-body#lti-launch-url-modal-body
+                %p
+                    Click the button on the right to copy the URL.
+                .col-xs-6
+                    %input.form-control{:type => "text", :readonly => "readonly", id: "lti-launch-url-input"}
+                %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#lti-launch-url-input", :type => "button"}
+                    = image_tag("clippy.svg", :class => "clippy", :title => "Copy URL to clipboard", :width => "13")
+            .modal-footer
+                %button.btn.btn-default{'data-dismiss': 'modal'}
+                    Close
+
+= render :partial => 'shared/exerciseSettingsDialog'
 
 %h1
     Embeddable Exercises/Visualizations
@@ -48,9 +72,13 @@
                                     - ex_hash[ex.short_name] = ex
                                     - k += 1
                                     %div
+                                        #{ex.long_name}
                                         %a{href: '#', onclick: "previewExercise(this, '#{ex.long_name}', '#{ex.embed_url(@host_url)}', '#{ex.embed_code(@host_url)}'); event.preventDefault();"}
-                                            #{ex.long_name}
+                                            [Preview]
                                     .col-xs-6
                                         %input.form-control{:type => "text", :value => ex.embed_code(@host_url), :readonly => "readonly", id: "embedcode_#{k}"}
                                     %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{k}", :type => "button"}
                                         = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")
+                                    %input.btn.btn-default{type: 'button', value: "Generate LTI Launch URL", 
+                                                           onclick: "ltiResourceSelect(#{ex.as_json.to_json})"}
+                                    

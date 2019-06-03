@@ -9,6 +9,7 @@ class EmbedController < ApplicationController
     require 'rst/rst_parser'
     @folders = RstParser.get_exercise_info()
     @host_url = request.protocol + request.host_with_port
+    @lti_launch_url = @host_url + "/lti/launch"
     render
   end
 

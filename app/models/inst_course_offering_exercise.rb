@@ -12,18 +12,34 @@ class InstCourseOfferingExercise < ActiveRecord::Base
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
 
-  def self.find_or_create_resource(course_offering_id, resource_link_id, resource_link_title, ex)
+  def self.find_or_create_resource(course_offering_id, resource_link_id, resource_link_title, ex, settings)
     course_off_ex = InstCourseOfferingExercise.find_by(
       course_offering_id: course_offering_id,
       resource_link_id: resource_link_id,
     )
     if course_off_ex.blank?
+      points = nil
+      threshold = nil
+      optionsJson = nil
+      if settings.blank?
+        points = 1
+        threshold = ex.threshold
+        optionsJson = nil
+      else
+        points = settings.delete('points') || 1
+        threshold = settings.delete('threshold') || ex.threshold
+        settings.delete('isGradable')
+        settings.delete('required')
+        optionsJson = settings.to_json
+      end
       course_off_ex = InstCourseOfferingExercise.new(
-        course_offering: course_offering,
+        course_offering_id: course_offering_id,
         inst_exercise_id: ex.id,
         resource_link_id: resource_link_id,
         resource_link_title: resource_link_title,
-        threshold: ex.threshold,
+        threshold: threshold,
+        points: points,
+        options: optionsJson,
       )
       course_off_ex.save!
     end
