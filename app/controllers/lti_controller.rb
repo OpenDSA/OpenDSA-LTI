@@ -464,12 +464,17 @@ class LtiController < ApplicationController
 
     if course_offering.blank?
       unless @tp.context_instructor?
-        @message = 'An instructor must access this exercise first.'
+        @message = 'OpenDSA: An instructor must access this exercise first.'
         render 'error'
         return
       end
       term = Term.find_term(params[:custom_term])
       orgid = lms_instance.organization_id
+      if orgid.blank?
+        @message = 'OpenDSA: Could not determine tool consumer organization.'
+        render 'error'
+        return
+      end
       coursenum = nil
       if params.key?(:custom_course_number)
         course = Course.find_by(organization_id: orgid, number: params[:custom_course_number])
@@ -511,7 +516,6 @@ class LtiController < ApplicationController
         ex_settings = JSON.parse(params[:custom_ex_settings])
       end
       @ex = exmap[params[:custom_ex_short_name]]
-      byebug
       @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
         params[:resource_link_id], params[:resource_link_title], @ex, ex_settings)
     else
