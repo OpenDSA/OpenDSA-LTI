@@ -17,7 +17,7 @@ class CreateInstModuleVersions < ActiveRecord::Migration
     add_index :inst_module_versions, [:course_offering_id, :resource_link_id], unique: true, name: "index_inst_module_versions_on_course_resource"
 
     add_column :inst_modules, :current_version_id, :integer
-    add_foreign_key :inst_modules, :current_versions
+    add_foreign_key :inst_modules, :inst_module_versions, column: :current_version_id, primary_key: :id
 
     add_column :odsa_user_interactions, :inst_module_version_id, :integer
     add_foreign_key :odsa_user_interactions, :inst_module_versions

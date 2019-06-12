@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190528160712) do
+ActiveRecord::Schema.define(version: 20190611193930) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -237,13 +237,57 @@ ActiveRecord::Schema.define(version: 20190528160712) do
 
   add_index "inst_exercises", ["short_name"], name: "index_inst_exercises_on_short_name", unique: true, using: :btree
 
-  create_table "inst_modules", force: :cascade do |t|
-    t.string   "path",       limit: 255, null: false
-    t.string   "name",       limit: 255, null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table "inst_module_section_exercises", force: :cascade do |t|
+    t.integer  "inst_module_version_id", limit: 4,                                             null: false
+    t.integer  "inst_module_section_id", limit: 4,                                             null: false
+    t.integer  "inst_exercise_id",       limit: 4,                                             null: false
+    t.decimal  "points",                               precision: 5, scale: 2,                 null: false
+    t.boolean  "required",                                                     default: false
+    t.decimal  "threshold",                            precision: 5, scale: 2,                 null: false
+    t.text     "options",                limit: 65535
+    t.datetime "created_at",                                                                   null: false
+    t.datetime "updated_at",                                                                   null: false
   end
 
+  add_index "inst_module_section_exercises", ["inst_exercise_id"], name: "fk_rails_9b61737c9f", using: :btree
+  add_index "inst_module_section_exercises", ["inst_module_section_id"], name: "fk_rails_b320810099", using: :btree
+  add_index "inst_module_section_exercises", ["inst_module_version_id"], name: "fk_rails_5c4fc2ff52", using: :btree
+
+  create_table "inst_module_sections", force: :cascade do |t|
+    t.integer  "inst_module_version_id", limit: 4,                  null: false
+    t.string   "name",                   limit: 255,                null: false
+    t.boolean  "show",                               default: true
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
+  end
+
+  add_index "inst_module_sections", ["inst_module_version_id"], name: "fk_rails_ff11275e48", using: :btree
+
+  create_table "inst_module_versions", force: :cascade do |t|
+    t.integer  "inst_module_id",      limit: 4,                    null: false
+    t.string   "name",                limit: 255,                  null: false
+    t.string   "git_hash",            limit: 255,                  null: false
+    t.string   "path",                limit: 4096,                 null: false
+    t.boolean  "template",                         default: false
+    t.integer  "course_offering_id",  limit: 4
+    t.string   "resource_link_id",    limit: 255
+    t.string   "resource_link_title", limit: 512
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "inst_module_versions", ["course_offering_id", "resource_link_id"], name: "index_inst_module_versions_on_course_resource", unique: true, using: :btree
+  add_index "inst_module_versions", ["inst_module_id"], name: "fk_rails_7e343b3134", using: :btree
+
+  create_table "inst_modules", force: :cascade do |t|
+    t.string   "path",               limit: 255, null: false
+    t.string   "name",               limit: 255, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "current_version_id", limit: 4
+  end
+
+  add_index "inst_modules", ["current_version_id"], name: "fk_rails_73d3622e40", using: :btree
   add_index "inst_modules", ["path"], name: "index_inst_modules_on_path", unique: true, using: :btree
 
   create_table "inst_sections", force: :cascade do |t|
@@ -378,11 +422,13 @@ ActiveRecord::Schema.define(version: 20190528160712) do
     t.decimal  "pe_score",                                    precision: 5, scale: 2
     t.integer  "pe_steps_fixed",                   limit: 4
     t.integer  "inst_course_offering_exercise_id", limit: 4
+    t.integer  "inst_module_section_exercise_id",  limit: 4
   end
 
   add_index "odsa_exercise_attempts", ["inst_book_id"], name: "odsa_exercise_attempts_inst_book_id_fk", using: :btree
   add_index "odsa_exercise_attempts", ["inst_book_section_exercise_id"], name: "odsa_exercise_attempts_inst_book_section_exercise_id_fk", using: :btree
   add_index "odsa_exercise_attempts", ["inst_course_offering_exercise_id"], name: "odsa_exercise_attempts_inst_course_offering_exercise_id_fk", using: :btree
+  add_index "odsa_exercise_attempts", ["inst_module_section_exercise_id"], name: "fk_rails_6944f2321b", using: :btree
   add_index "odsa_exercise_attempts", ["inst_section_id"], name: "odsa_exercise_attempts_inst_section_id_fk", using: :btree
   add_index "odsa_exercise_attempts", ["user_id"], name: "odsa_exercise_attempts_user_id_fk", using: :btree
 
@@ -405,10 +451,12 @@ ActiveRecord::Schema.define(version: 20190528160712) do
     t.string   "lis_outcome_service_url",          limit: 255
     t.string   "lis_result_sourcedid",             limit: 255
     t.integer  "lms_access_id",                    limit: 4
+    t.integer  "inst_module_section_exercise_id",  limit: 4
   end
 
   add_index "odsa_exercise_progresses", ["inst_book_section_exercise_id"], name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk", using: :btree
   add_index "odsa_exercise_progresses", ["inst_course_offering_exercise_id"], name: "odsa_exercise_progresses_inst_course_offering_exercise_id_fk", using: :btree
+  add_index "odsa_exercise_progresses", ["inst_module_section_exercise_id"], name: "fk_rails_7b1bb7d31f", using: :btree
   add_index "odsa_exercise_progresses", ["lms_access_id"], name: "fk_rails_3327f6b532", using: :btree
   add_index "odsa_exercise_progresses", ["user_id", "inst_book_section_exercise_id"], name: "index_odsa_ex_prog_on_user_id_and_inst_bk_sec_ex_id", unique: true, using: :btree
   add_index "odsa_exercise_progresses", ["user_id", "inst_course_offering_exercise_id"], name: "index_odsa_exercise_prog_on_user_course_offering_exercise", unique: true, using: :btree
@@ -427,10 +475,12 @@ ActiveRecord::Schema.define(version: 20190528160712) do
     t.float    "current_score",           limit: 24,  null: false
     t.float    "highest_score",           limit: 24,  null: false
     t.integer  "lms_access_id",           limit: 4
+    t.integer  "inst_module_version_id",  limit: 4
   end
 
   add_index "odsa_module_progresses", ["inst_book_id"], name: "odsa_module_progresses_inst_book_id_fk", using: :btree
   add_index "odsa_module_progresses", ["inst_chapter_module_id"], name: "odsa_module_progresses_inst_chapter_module_id_fk", using: :btree
+  add_index "odsa_module_progresses", ["inst_module_version_id"], name: "fk_rails_38a9ac7560", using: :btree
   add_index "odsa_module_progresses", ["lms_access_id"], name: "odsa_module_progresses_lms_access_id_fk", using: :btree
   add_index "odsa_module_progresses", ["user_id", "inst_chapter_module_id"], name: "index_odsa_module_progress_on_user_and_module", unique: true, using: :btree
 
@@ -467,12 +517,16 @@ ActiveRecord::Schema.define(version: 20190528160712) do
     t.datetime "updated_at"
     t.integer  "inst_course_offering_exercise_id", limit: 4
     t.integer  "inst_chapter_module_id",           limit: 4
+    t.integer  "inst_module_version_id",           limit: 4
+    t.integer  "inst_module_section_exercise_id",  limit: 4
   end
 
   add_index "odsa_user_interactions", ["inst_book_id"], name: "odsa_user_interactions_inst_book_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_book_section_exercise_id"], name: "odsa_user_interactions_inst_book_section_exercise_id_fk", using: :btree
   add_index "odsa_user_interactions", ["inst_chapter_module_id"], name: "index_odsa_user_interactions_on_inst_chapter_module", using: :btree
   add_index "odsa_user_interactions", ["inst_course_offering_exercise_id"], name: "odsa_user_interactions_inst_course_offering_exercise_id_fk", using: :btree
+  add_index "odsa_user_interactions", ["inst_module_section_exercise_id"], name: "fk_rails_9d3d089a83", using: :btree
+  add_index "odsa_user_interactions", ["inst_module_version_id"], name: "fk_rails_599b647d17", using: :btree
   add_index "odsa_user_interactions", ["inst_section_id"], name: "odsa_user_interactions_inst_section_id_fk", using: :btree
   add_index "odsa_user_interactions", ["user_id"], name: "odsa_user_interactions_user_id_fk", using: :btree
 
@@ -559,6 +613,13 @@ ActiveRecord::Schema.define(version: 20190528160712) do
   add_foreign_key "inst_chapters", "inst_books", name: "inst_chapters_inst_book_id_fk"
   add_foreign_key "inst_course_offering_exercises", "course_offerings", name: "inst_course_offering_exercises_course_offering_id_fk"
   add_foreign_key "inst_course_offering_exercises", "inst_exercises", name: "inst_course_offering_exercises_inst_exercise_id_fk"
+  add_foreign_key "inst_module_section_exercises", "inst_exercises"
+  add_foreign_key "inst_module_section_exercises", "inst_module_sections"
+  add_foreign_key "inst_module_section_exercises", "inst_module_versions"
+  add_foreign_key "inst_module_sections", "inst_module_versions"
+  add_foreign_key "inst_module_versions", "course_offerings"
+  add_foreign_key "inst_module_versions", "inst_modules"
+  add_foreign_key "inst_modules", "inst_module_versions", column: "current_version_id"
   add_foreign_key "inst_sections", "inst_chapter_modules", name: "inst_sections_inst_chapter_module_id_fk"
   add_foreign_key "inst_sections", "inst_modules", name: "inst_sections_inst_module_id_fk"
   add_foreign_key "lms_accesses", "lms_instances", name: "lms_accesses_lms_instance_id_fk"
@@ -570,14 +631,17 @@ ActiveRecord::Schema.define(version: 20190528160712) do
   add_foreign_key "odsa_exercise_attempts", "inst_book_section_exercises", name: "odsa_exercise_attempts_inst_book_section_exercise_id_fk"
   add_foreign_key "odsa_exercise_attempts", "inst_books", name: "odsa_exercise_attempts_inst_book_id_fk"
   add_foreign_key "odsa_exercise_attempts", "inst_course_offering_exercises", name: "odsa_exercise_attempts_inst_course_offering_exercise_id_fk"
+  add_foreign_key "odsa_exercise_attempts", "inst_module_section_exercises"
   add_foreign_key "odsa_exercise_attempts", "inst_sections", name: "odsa_exercise_attempts_inst_section_id_fk"
   add_foreign_key "odsa_exercise_attempts", "users", name: "odsa_exercise_attempts_user_id_fk"
   add_foreign_key "odsa_exercise_progresses", "inst_book_section_exercises", name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk"
   add_foreign_key "odsa_exercise_progresses", "inst_course_offering_exercises", name: "odsa_exercise_progresses_inst_course_offering_exercise_id_fk"
+  add_foreign_key "odsa_exercise_progresses", "inst_module_section_exercises"
   add_foreign_key "odsa_exercise_progresses", "lms_accesses"
   add_foreign_key "odsa_exercise_progresses", "users", name: "odsa_exercise_progresses_user_id_fk"
   add_foreign_key "odsa_module_progresses", "inst_books", name: "odsa_module_progresses_inst_book_id_fk"
   add_foreign_key "odsa_module_progresses", "inst_chapter_modules", name: "odsa_module_progresses_inst_chapter_module_id_fk"
+  add_foreign_key "odsa_module_progresses", "inst_module_versions"
   add_foreign_key "odsa_module_progresses", "lms_accesses", name: "odsa_module_progresses_lms_access_id_fk"
   add_foreign_key "odsa_module_progresses", "users", name: "odsa_module_progresses_user_id_fk"
   add_foreign_key "odsa_student_extensions", "inst_sections", name: "odsa_student_extensions_inst_section_id_fk"
@@ -585,6 +649,8 @@ ActiveRecord::Schema.define(version: 20190528160712) do
   add_foreign_key "odsa_user_interactions", "inst_book_section_exercises", name: "odsa_user_interactions_inst_book_section_exercise_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_books", name: "odsa_user_interactions_inst_book_id_fk"
   add_foreign_key "odsa_user_interactions", "inst_course_offering_exercises", name: "odsa_user_interactions_inst_course_offering_exercise_id_fk"
+  add_foreign_key "odsa_user_interactions", "inst_module_section_exercises"
+  add_foreign_key "odsa_user_interactions", "inst_module_versions"
   add_foreign_key "odsa_user_interactions", "inst_sections", name: "odsa_user_interactions_inst_section_id_fk"
   add_foreign_key "odsa_user_interactions", "users", name: "odsa_user_interactions_user_id_fk"
   add_foreign_key "users", "global_roles", name: "users_global_role_id_fk"
