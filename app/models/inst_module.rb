@@ -2,6 +2,7 @@ class InstModule < ActiveRecord::Base
   #~ Relationships ............................................................
   has_many :inst_chapter_modules
   has_many :inst_sections
+  has_many :inst_module_versions
 
 
   #~ Validation ...............................................................

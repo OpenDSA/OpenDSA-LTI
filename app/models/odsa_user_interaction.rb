@@ -6,14 +6,17 @@ class OdsaUserInteraction < ActiveRecord::Base
   belongs_to :inst_section
   belongs_to :user
   belongs_to :inst_chapter_module
+  belongs_to :inst_module_version
+  belongs_to :inst_module_section_exercise
 
   #~ Validation ...............................................................
   validate :required_fields
 
   def required_fields
-    if not(inst_book_id.present? or inst_course_offering_exercise_id.present?)
-      errors.add(:inst_book_id, "or inst_course_offering_exercise_id must be present")
-      errors.add(:inst_course_offering_exercise_id, "or inst_book_id must be present")
+    if not(inst_book_id.present? or inst_course_offering_exercise_id.present? or inst_module_version_id.present?)
+      errors.add(:inst_book_id, "or inst_course_offering_exercise_id or inst_module_version_id must be present")
+      errors.add(:inst_course_offering_exercise_id, "or inst_book_id or inst_module_version_id must be present")
+      errors.add(:inst_module_version_id, "or inst_book_id or inst_course_offering_exercise_id must be present")
     end
   end
 

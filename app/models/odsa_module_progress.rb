@@ -3,6 +3,7 @@ class OdsaModuleProgress < ActiveRecord::Base
   belongs_to :user
   belongs_to :inst_book
   belongs_to :inst_chapter_module
+  belongs_to :inst_module_version
   belongs_to :lms_access
 
   #~ Validation ...............................................................
