@@ -3,39 +3,49 @@ module OpenDSA
   EXERCISES_SOLVED = 2305932
 
   # Directories that contain RST files with exercises in them that
-  # we want to expose through LTI
-  EXERCISE_DIRECTORIES = {
-    "AlgAnal": "Algorithm Analysis",
-    "Background": "Introduction and Mathematical Background",
-    "Binary": "Binary Trees",
-    "Biography": "Biographies",
-    "Bounds": "Lower Bounds",
-    "BTRecurTutor": "Binary Trees Recursion",
-    "CT": "Computational Thinking",
-    "Design": "Design",
-    "Files": "File Processing",
-    "FormalLang": "Formal Languages",
-    "General": "General Trees",
-    "Graph": "Graphs",
-    "Hashing": "Hashing",
-    "Indexing": "Indexing",
-    "List": "Linear Structures",
-    "MemManage": "Memory Management",
-    "NP": "Limits to Computing",
-    "PL": "Programming Languages",
-    "PointersJava": "Pointers in Java",
-    "RecurTutor": "Recursion",
-    "Searching": "Searching",
-    "SearchStruct": "Search Structures",
-    "SeniorAlgAnal": "Advanced Analysis",
-    "Sorting": "Sorting",
-    "Spatial": "Spatial Data Structures",
-    "Tutorials": "Programming Tutorials",
-    "Development": "Under Development",
+  # we want to expose through LTI.
+  # These directories are also used to determine which modules should be
+  # made available as standalone modules exposed through LTI.
+  STANDALONE_DIRECTORIES = {
+    "AlgAnal" => "Algorithm Analysis",
+    "Background" => "Introduction and Mathematical Background",
+    "Binary" => "Binary Trees",
+    "Biography" => "Biographies",
+    "Bounds" => "Lower Bounds",
+    "BTRecurTutor" => "Binary Trees Recursion",
+    "CT" => "Computational Thinking",
+    "Design" => "Design",
+    "Files" => "File Processing",
+    "FormalLang" => "Formal Languages",
+    "General" => "General Trees",
+    "Graph" => "Graphs",
+    "Hashing" => "Hashing",
+    "Indexing" => "Indexing",
+    "List" => "Linear Structures",
+    "MemManage" => "Memory Management",
+    "NP" => "Limits to Computing",
+    "PL" => "Programming Languages",
+    "PointersJava" => "Pointers in Java",
+    "RecurTutor" => "Recursion",
+    "Searching" => "Searching",
+    "SearchStruct" => "Search Structures",
+    "SeniorAlgAnal" => "Advanced Analysis",
+    "Sorting" => "Sorting",
+    "Spatial" => "Spatial Data Structures",
+    "Tutorials" => "Programming Tutorials",
+    #"Development" => "Under Development",
   }
 
+  OPENDSA_DIRECTORY = File.join("public", "OpenDSA")
+
   # The directory where RST files are located
-  RST_DIRECTORY = File.join("public", "OpenDSA", "RST")
+  RST_DIRECTORY = File.join(OPENDSA_DIRECTORY, "RST")
+
+  # The directory where book configuration files are located
+  BOOK_CONFIG_DIRECTORY = File.join(OPENDSA_DIRECTORY, "config")
+
+  STANDALONE_MODULES_DIR_NAME = "StandaloneModules"
+  STANDALONE_MODULES_DIRECTORY = File.join(OPENDSA_DIRECTORY, STANDALONE_MODULES_DIR_NAME)
 
   # A regular expression to match exercise/slideshow/frame directives in RST files
   EXERCISE_RE = Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe|ff)")
