@@ -257,6 +257,9 @@ ActiveRecord::Schema.define(version: 20190611193930) do
     t.integer  "inst_module_version_id", limit: 4,                  null: false
     t.string   "name",                   limit: 255,                null: false
     t.boolean  "show",                               default: true
+    t.string   "learning_tool",          limit: 255
+    t.string   "resource_type",          limit: 255
+    t.string   "resource_name",          limit: 255
     t.datetime "created_at",                                        null: false
     t.datetime "updated_at",                                        null: false
   end
@@ -267,7 +270,7 @@ ActiveRecord::Schema.define(version: 20190611193930) do
     t.integer  "inst_module_id",      limit: 4,                    null: false
     t.string   "name",                limit: 255,                  null: false
     t.string   "git_hash",            limit: 255,                  null: false
-    t.string   "path",                limit: 4096,                 null: false
+    t.string   "file_path",           limit: 4096,                 null: false
     t.boolean  "template",                         default: false
     t.integer  "course_offering_id",  limit: 4
     t.string   "resource_link_id",    limit: 255

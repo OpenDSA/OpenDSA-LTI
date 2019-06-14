@@ -4,6 +4,9 @@ class CreateInstModuleSections < ActiveRecord::Migration
       t.integer   :inst_module_version_id, null: false
       t.string    :name, null: false
       t.boolean   :show, default: true
+      t.string    :learning_tool
+      t.string    :resource_type
+      t.string    :resource_name
       t.timestamps null: false
     end
 

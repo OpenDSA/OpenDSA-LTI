@@ -4,7 +4,7 @@ class CreateInstModuleVersions < ActiveRecord::Migration
       t.integer    :inst_module_id, null: false
       t.string     :name, null: false
       t.string     :git_hash, null: false          # the git commit hash for the version of the module RST file
-      t.string     :path, null: false, limit: 4096 # path to the compiled module HTML file
+      t.string     :file_path, null: false, limit: 4096 # path to the compiled module HTML file
       t.boolean    :template, default: false
       t.integer    :course_offering_id
       t.string     :resource_link_id
