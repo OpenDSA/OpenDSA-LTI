@@ -81,6 +81,54 @@ class InstModule < ActiveRecord::Base
     return outdated
   end
 
+  def self.get_current_versions_dict()
+    return Rails.cache.fetch("odsa_current_module_versions_dict", expires_in: 1.years) do
+      InstModule.build_current_versions_dict()
+    end
+  end
+
+  # build a dictionary containing the latest module versions and their settings
+  def self.build_current_versions_dict()
+    versions = InstModuleVersion.includes(:inst_module, inst_module_sections: [{inst_module_section_exercises: [:inst_exercise]}])
+                                .joins("INNER JOIN inst_modules ON inst_modules.current_version_id = inst_module_versions.id")
+    dict = {}
+    versions.each do |version|
+      json = version.as_json(include: {
+        inst_module: {}, 
+        inst_module_sections: {
+          include: {
+            inst_module_section_exercises: {
+              include: {
+                inst_exercise: {}
+              }
+            }
+          }
+        }
+      })
+      
+      path_parts = version.inst_module.path.split('/')
+      if path_parts.size > 1
+        json['folder_name'] = path_parts[0]
+        json['mod_name'] = path_parts[1]
+      else
+        json['folder_name'] = 'root'
+        json['mod_name'] = path_parts[0]
+      end
+
+      if dict.key?(json['folder_name'])
+        dict[json['folder_name']]['modules'][json['mod_name']] = json
+      else
+        dict[json['folder_name']] = {
+          'long_name' => OpenDSA::STANDALONE_DIRECTORIES[json['folder_name']],
+          'modules' => {},
+        }
+        dict[json['folder_name']]['modules'][json['mod_name']] = json
+      end
+    end
+    
+    return dict
+  end
+
   # ~ Instance methods .........................................................
   # ~ Private instance methods .................................................
 end

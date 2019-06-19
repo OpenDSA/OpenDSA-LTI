@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190611193930) do
+ActiveRecord::Schema.define(version: 20190618150406) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -227,12 +227,17 @@ ActiveRecord::Schema.define(version: 20190611193930) do
 
   create_table "inst_exercises", force: :cascade do |t|
     t.string   "name",          limit: 255
-    t.string   "short_name",    limit: 255, null: false
+    t.string   "short_name",    limit: 255,   null: false
     t.string   "ex_type",       limit: 50
     t.string   "description",   limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "learning_tool", limit: 255
+    t.string   "av_address",    limit: 512
+    t.integer  "width",         limit: 4
+    t.integer  "height",        limit: 4
+    t.text     "links",         limit: 65535
+    t.text     "scripts",       limit: 65535
   end
 
   add_index "inst_exercises", ["short_name"], name: "index_inst_exercises_on_short_name", unique: true, using: :btree

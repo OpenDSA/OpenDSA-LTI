@@ -67,6 +67,21 @@ class InstExercise < ActiveRecord::Base
 
     book_sec_ex.save
   end
+
+  def self.get_av_dimensions(av_path)
+    path = File.join(OpenDSA::OPENDSA_DIRECTORY, av_path)
+    doc = File.open(path) do |f|
+      Nokogiri::HTML(f)
+    end
+    attrib = doc.at('body').attributes
+    if attrib.has_key?('data-width') and attrib.has_key?('data-height')
+      return {
+               'width': attrib['data-width'].value.to_i,
+               'height': attrib['data-height'].value.to_i,
+             }
+    end
+    return nil
+  end
   #~ Instance methods .........................................................
   #~ Private instance methods .................................................
 end

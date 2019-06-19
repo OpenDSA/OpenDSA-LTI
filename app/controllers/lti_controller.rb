@@ -10,7 +10,7 @@ class LtiController < ApplicationController
       return
     end
     unless params.key?(:custom_inst_book_id)
-      launch_ex()
+      launch_standalone_resource()
       return
     end
     # must include the oauth proxy object
@@ -212,11 +212,8 @@ class LtiController < ApplicationController
     end
 
     @launch_url = request.protocol + request.host_with_port + "/lti/launch"
-
-    require 'rst/rst_parser'
-    exercises = RstParser.get_exercise_info()
-
-    @json = exercises.to_json()
+    module_info = InstModule.get_current_versions_dict()
+    @json = module_info.to_json()
 
     render 'resource', layout: 'lti_resource'
   end
@@ -240,18 +237,38 @@ class LtiController < ApplicationController
       return
     end
 
-    exinfo = params['selected']['exerciseInfo']
-    isGradable = params['selected']['isGradable']
-    exSettings = params['selected']['exerciseSettings']
-    exercise = InstCourseOfferingExercise.find_or_create(course_offering.id, exinfo['id'], exSettings)
+    byebug
 
-    exUrlId = "#{request.protocol}#{request.host_with_port}/inst_course_offering_exercises/#{exercise.id}"
+    resourceInfo = nil
+    resourceUrlId = nil
+    if params['selected'].key?('moduleInfo')
+      resourceInfo = {
+        points: params['selected']['moduleSettings']['points'],
+        custom_param_name: 'custom_inst_module_id',
+        resource_id: params['selected']['moduleInfo']['id'],
+        title: params['selected']['moduleInfo']['name']
+      }
+      resourceUrlId = "#{request.protocol}#{request.host_with_port}/inst_modules/#{resourceInfo[:resource_id]}"
+    else
+      exinfo = params['selected']['exerciseInfo']
+      exSettings = params['selected']['exerciseSettings']
+      exercise = InstCourseOfferingExercise.find_or_create(course_offering.id, exinfo['id'], exSettings)
+      resourceUrlId = "#{request.protocol}#{request.host_with_port}/inst_course_offering_exercises/#{exercise.id}"
+      resourceInfo = {
+        points: exercise.points,
+        custom_param_name: 'custom_inst_course_offering_exercise_id',
+        resource_id: exercise.id,
+        title: exinfo["long_name"]
+      }
+    end
+
+    isGradable = params['selected']['isGradable']
     launchUrl = request.protocol + request.host_with_port + "/lti/launch"
     logoUrl = "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png"
 
     if return_url.blank?
       # Canvas resource selection
-      launchUrl += '?custom_inst_course_offering_exercise_id=' + exercise.id.to_s
+      launchUrl += "?#{resourceInfo[:custom_param_name]}=" + resourceInfo[:resource_id].to_s
       render :json => {launchUrl: launchUrl}, :status => :ok
       return
     end
@@ -270,30 +287,30 @@ class LtiController < ApplicationController
         "width": 50,
         "height": 50
       },
-      "title": "OpenDSA: " + exinfo["long_name"],
+      "title": "OpenDSA: " + resourceInfo[:title],
       "placementAdvice": {
         "displayWidth": 800,
         "displayHeight": 1000,
         "presentationDocumentTarget": "iframe"
       },
       "custom": {
-        "inst_course_offering_exercise_id": exercise.id
+        "#{resourceInfo[:custom_param_name]}": resourceInfo[:resource_id]
       }
     }
     if isGradable
       content_item["lineItem"] = {
         "@type": "LineItem",
-        "label": "OpenDSA: " + exinfo['long_name'],
+        "label": "OpenDSA: " + resourceInfo[:title],
         "reportingMethod": "res:totalScore",
         "assignedActivity": {
-          "@id": "#{exUrlId}",
-          "activityId": "#{exercise.id}"
+          "@id": "#{resourceUrlId}",
+          "activityId": "#{resourceInfo[:resource_id]}"
         },
         "scoreConstraints": {
           "@type": "NumericLimits",
-          "normalMaximum": exercise.points.to_f,
+          "normalMaximum": resourceInfo[:points].to_f,
           "extraCreditMaximum": 0,
-          "totalMaximum": exercise.points.to_f
+          "totalMaximum": resourceInfo[:points].points.to_f
         }
       }
     end
@@ -319,16 +336,48 @@ class LtiController < ApplicationController
       return
     end
 
-    exercise = InstBookSectionExercise.includes(:inst_exercise, :inst_book, inst_book: [{course_offering: [:term, :course]}])
-      .find_by(id: params[:inst_book_section_exercise_id])
+    byebug
 
-    if exercise.blank?
-      @message = "Error: could not locate exercise with id '#{params[:inst_book_section_exercise_id]}'"
+    exercise = nil
+    course_offering = nil
+    lis_result_sourcedid = nil
+    resource_link_id = nil
+
+    if params[:context_type].blank?
+      byebug
+      exercise = InstBookSectionExercise.includes(:inst_exercise, :inst_book, inst_book: [{course_offering: [:term, :course]}])
+      .find_by(id: params[:exercise_id])
+      course_offering = exercise.inst_book.course_offering
+      lis_result_sourcedid = "#{current_user.id}_#{exercise.id}"
+      resource_link_id = "#{exercise.id}"
+    elsif params[:context_type] == 'standalone-module'
+      byebug
+      exercise = InstCourseModuleSectionExercise.includes(:inst_exercise, course_offering: [:term, :course])
+                                                .find(params[:exercise_id])
+      course_offering = exercise.course_offering
+      lis_result_sourcedid = "#{current_user.id}_#{exercise.id}_#{params[:context_type]}"
+      resource_link_id = "#{exercise.id}_#{params[:context_type]}"
+    elsif params[:context_type] == 'standalone-exercise'
+      byebug
+      exercise = InstCourseOfferingExercise.includes(:inst_exercise, course_offering: [:term, :course])
+                                           .find(params[:exercise_id])
+      course_offering = exercise.course_offering
+      lis_result_sourcedid = "#{current_user.id}_#{exercise.id}_#{params[:context_type]}"
+      resource_link_id = "#{exercise.id}_#{params[:context_type]}"
+    else
+      @message = "Error: unrecognized value '#{params[:context_type]}' for parameter 'context_type'"
       render :error
       return
     end
 
-    course_offering = exercise.inst_book.course_offering
+    if exercise.blank?
+      @message = "Error: could not locate exercise with id '#{params[:exercise_id]}'"
+      unless params[:context_type].blank?
+        @message += " and context type '#{params[:context_type]}'"
+      end
+      render :error
+      return
+    end
 
     unless course_offering.is_enrolled?(current_user)
       @message = 'Error: you are not enrolled in this course'
@@ -348,19 +397,20 @@ class LtiController < ApplicationController
     launch_params["lis_outcome_service_url"] = "#{host}#{lti_grade_passback_path}"
     # we don't need/want scores for instructors
     unless course_offering.is_instructor?(current_user)
-      launch_params["lis_result_sourcedid"] = "#{current_user.id}_#{exercise.id}"
+      launch_params["lis_result_sourcedid"] = lis_result_sourcedid
     end
     launch_params["lti_message_type"] = "basic-lti-launch-request"
     launch_params["lti_version"] = "LTI-1p0"
-    launch_params["resource_link_id"] = "#{exercise.id}"
+    launch_params["resource_link_id"] = resource_link_id
     launch_params["resource_link_title"] = exercise.inst_exercise.short_name
     launch_params["tool_consumer_info_product_family_code"] = "opendsa"
     launch_params["user_id"] = "#{current_user.id}"
     launch_params["lis_person_name_given"] = current_user.first_name
     launch_params["lis_person_name_family"] = current_user.last_name
     launch_params["lis_person_contact_email_primary"] = current_user.email
-    launch_params["ext_lti_assignment_id"] = "#{exercise.id}"
+    launch_params["ext_lti_assignment_id"] = resource_link_id
     launch_params["roles"] = get_user_course_role(course_offering)
+    launch_params["launch_presentation_document_target"] = "iframe"
     launch_params["custom_course_name"] = course_offering.course.name
     launch_params["custom_course_number"] = course_offering.course.number
     launch_params["custom_label"] = course_offering.label
@@ -373,60 +423,33 @@ class LtiController < ApplicationController
   end
 
   def grade_passback
+    byebug
     req = IMS::LTI::OutcomeRequest.from_post_request(request)
     res = IMS::LTI::OutcomeResponse.new
     res.message_ref_identifier = req.message_identifier
     res.operation = req.operation
     res.severity = 'status'
 
-    if req.replace_request?
-      # set a new score for the user
-
-      # lis_result_sourcedid is in format {user_id}_{inst_book_section_exercise_id}
-      # (because that is how we sent it in the original launch request)
-      tokens = req.lis_result_sourcedid.split("_")
-      user_id = tokens[0]
-      inst_book_section_exercise_id = tokens[1]
-      score = Float(req.score.to_s)
-
-      if score < 0.0 || score > 1.0
-        res.description = "The score must be between 0.0 and 1.0"
-        res.code_major = 'failure'
-      else
-        # we store exercise scores in the database as an integer
-        score = Integer(score * 100)
-        ex_progress = OdsaExerciseProgress.find_by(user_id: tokens[0],
-                                                   inst_book_section_exercise_id: inst_book_section_exercise_id)
-        if ex_progress.blank?
-          ex_progress = OdsaExerciseProgress.new(user_id: tokens[0],
-                                                 inst_book_section_exercise_id: inst_book_section_exercise_id)
+    # lis_result_sourcedid was sent by us in the original LTI launch request
+    tokens = req.lis_result_sourcedid.split("_")
+    user_id = tokens[0]
+    exercise_id = tokens[1]
+    
+    if req.replace_request? || req.read_request?
+      if tokens.size == 3
+        context_type = tokens[2]
+        if context_type == 'standalone-module'
+          res = InstModuleSectionExercise.handle_grade_passback(req, res, user_id, exercise_id)
+        elsif context_type == 'standalone-exercise'
+          res = InstCourseOfferingExercise.handle_grade_passback(req, res, user_id, exercise_id)
+        else
+          res.description = "invalid lis_result_sourcedid"
+          res.code_major = 'failure'
+          return
         end
-        old_score = ex_progress.current_score
-        ex_progress.update_score(score)
-        ex_progress.save!
-
-        bk_sec_ex = InstBookSectionExercise.includes(:inst_exercise, inst_section: [:inst_chapter_module])
-          .find_by(id: inst_book_section_exercise_id)
-        inst_chapter_module = bk_sec_ex.inst_section.inst_chapter_module
-
-        # update the score for the module containing the exercise
-        mod_prog = OdsaModuleProgress.get_progress(user_id, inst_chapter_module.id, bk_sec_ex.inst_book_id)
-        mod_prog.update_proficiency(bk_sec_ex.inst_exercise)
-
-        res.description = "Your old score of #{old_score} has been replaced with #{score}"
-        res.code_major = 'success'
+      else
+        res = InstBookSectionExercise.handle_grade_passback(req, res, user_id, exercise_id)
       end
-    elsif req.read_request?
-      # return the score for the user
-      tokens = req.lis_result_sourcedid.split("_")
-      user_id = tokens[0]
-      inst_book_section_exercise_id = tokens[1]
-      progress = OdsaExerciseProgress.find_by(user_id: user_id,
-                                              inst_book_section_exercise_id: inst_book_section_exercise_id)
-
-      res.description = progress.blank? ? "Your score is 0" : "Your score is #{progress.highest_score}"
-      res.score = progress.blank? ? 0 : progress.highest_score
-      res.code_major = 'success'
     elsif req.delete_request?
       res.code_major = 'unsupported'
       res.description = "#{req.operation} is not supported"
@@ -446,11 +469,11 @@ class LtiController < ApplicationController
     if course_offering.is_instructor?(current_user)
       return "Instructor"
     else
-      return "Student"
+      return "Learner"
     end
   end
 
-  def launch_ex
+  def launch_standalone_resource
     require 'oauth/request_proxy/rack_request'
     $oauth_creds = get_oauth_creds(params[:oauth_consumer_key])
     lms_instance = ensure_lms_instance()
@@ -493,7 +516,7 @@ class LtiController < ApplicationController
       course_offering = CourseOffering.new(
         course: course,
         term: term,
-        label: params[:custom_label] || "#{params[:context_label]}-#{term.slug}",
+        label: params[:custom_label] || "#{params[:context_label]}-#{params[:context_id]}",
         lms_instance: lms_instance,
         lms_course_code: params[:context_label],
         lms_course_num: lms_course_num,
@@ -503,6 +526,17 @@ class LtiController < ApplicationController
 
     lti_enroll(course_offering)
 
+    if params.key?(:custom_inst_module_id)
+      launch_standalone_module(course_offering)
+    else
+      launch_standalone_exercise(course_offering)
+    end
+  end
+
+  def launch_standalone_exercise(course_offering)
+    
+    # TODO: stop using RstParser
+    
     require 'rst/rst_parser'
     exmap = RstParser.get_exercise_map()
     if params.key?(:custom_inst_course_offering_exercise_id)
@@ -543,6 +577,53 @@ class LtiController < ApplicationController
     else
       render 'launch_inlineav', layout: 'lti_launch'
     end
+  end
+
+  def launch_standalone_module(course_offering)
+    byebug
+    # check for existing module
+    @mod_version = InstModuleVersion.find_by(resource_link_id: params[:resource_link_id], course_offering_id: course_offering.id)
+    # clone template module if necessary
+    if @mod_version.blank?
+      instmod = InstModule.find(params[:custom_inst_module_id])
+      current_template = instmod.current_version
+      @mod_version = current_template.clone(course_offering, params[:resource_link_id], params[:resource_link_title])
+    end
+    # create dictionary of exercise settings
+
+    # TODO: ? dictionary keys should be exercise short name, value should be settings ?
+    # TODO: apply settings to exercises on front-end
+    # TODO: ? create module progress record ?
+    # TODO: capture exercise attempts, exercise progresses, module progresses, user interactions
+    # TODO: test that everything works
+
+    # build dictionary of exercise settings
+    exercise_objs = @mod_version.inst_module_section_exercises.includes(:inst_exercise)
+    @exercises = {}
+    exercise_objs.each do |obj|
+      ex_data = {
+        'inst_module_section_exercise_id' => obj.id,
+        'inst_module_version_id' => obj.inst_module_version_id,
+        'inst_module_section_id' => obj.inst_module_section_id,
+        'points' => obj.points,
+        'threshold' => obj.threshold,
+        'required' => obj.required,
+        'options' => obj.options,
+        'short_name' => obj.inst_exercise.short_name,
+        'long_name' => obj.inst_exercise.name,
+        'type' => obj.inst_exercise.ex_type,
+        'learning_tool' => obj.inst_exercise.learning_tool,
+      }
+      unless ex_data['learning_tool'].blank?
+        extrtool_launch_base_url = request.protocol + request.host_with_port + "/lti/launch_extrtool"
+        ex_data['launch_url'] = "#{extrtool_launch_base_url}/#{obj.id}?context_type=standalone-module"
+      end
+      @exercises[ex_data['short_name']] = ex_data
+    end
+    
+    byebug
+    # display module
+    @section_html = File.read(@mod_version.file_path) and return
   end
 
   def launch_instructor_tool
@@ -701,8 +782,8 @@ class LtiController < ApplicationController
     if params.key?(:custom_canvas_course_id)
       return params[:custom_canvas_course_id]
     else
-      # generate a somewhat unique string to use as the course id
-      return "#{lms_type_name}_#{lms_instance.id}_#{params[:context_id]}_#{params[:oauth_consumer_key]}"
+      # generate a unique string to use as the course id
+      return "#{lms_type_name}_#{lms_instance.id}_#{params[:context_id]}"
     end
   end
 

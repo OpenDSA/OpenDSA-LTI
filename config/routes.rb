@@ -8,7 +8,7 @@ OpenDSA::Application.routes.draw do
   post 'lti/resource', to: 'lti#resource', as: :lti_resource
   post 'lti/content_item_selection', to: 'lti#content_item_selection', as: :lti_content_item_selection
   post 'lti/course_offering', to: 'lti#create_course_offering', as: :lti_course_offering
-  get 'lti/launch_extrtool/:inst_book_section_exercise_id', to: 'lti#launch_extrtool', as: :lti_launch_extrtool
+  get 'lti/launch_extrtool/:exercise_id', to: 'lti#launch_extrtool', as: :lti_launch_extrtool
   post 'lti/outcomes', to: 'lti#grade_passback', as: :lti_grade_passback
 
   resources :odsa_user_interactions

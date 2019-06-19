@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# a stand-alone module (i.e. not contained in a book) that is tied directly to a course offering
 class InstModuleVersion < ActiveRecord::Base
   belongs_to :inst_module
   belongs_to :course_offering
@@ -41,6 +42,30 @@ class InstModuleVersion < ActiveRecord::Base
     end
     
     return version
+  end
+
+  def clone(course_offering, resource_link_id, resource_link_title)
+    imv = nil
+    
+    InstModuleVersion.transaction do 
+      imv = InstModuleVersion.new(
+        inst_module_id: self.inst_module_id,
+        name: self.name,
+        git_hash: self.git_hash,
+        file_path: self.file_path,
+        template: false,
+        course_offering: course_offering,
+        resource_link_id: resource_link_id,
+        resource_link_title: resource_link_title,
+      )
+      imv.save!
+      
+      inst_module_sections.each do |ims|
+        inst_mod_sect = ims.clone(imv)
+      end
+    end
+
+    return imv
   end
 
 end

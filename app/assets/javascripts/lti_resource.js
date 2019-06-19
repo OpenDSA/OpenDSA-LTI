@@ -168,13 +168,24 @@
 
   function contentItemFinalized(selected, settings) {
     // console.log(getResourceURL(selected.original.url_params));
+    debugger;
     delete settings.required; // not used
-    window.content_item_params.selected = {
-      exerciseInfo: selected.original.exObj,
-      exerciseSettings: settings,
-      isGradable: settings.isGradable
-    };
-    delete settings.isGradable;
+    if (selected.type === 'module') {
+      window.content_item_params.selected = {
+        moduleInfo:  selected.original.modObj,
+        moduleSettings: settings,
+        isGradable: settings.isGradable
+      };
+      delete settings.isGradable;
+    }
+    else {
+      window.content_item_params.selected = {
+        exerciseInfo: selected.original.exObj.inst_exercise,
+        exerciseSettings: settings,
+        isGradable: settings.isGradable
+      };
+      delete settings.isGradable;
+    }
     window.content_item_params.course_offering_id = window.course_offering_id;
     $.ajax({
       url: '/lti/content_item_selection',
@@ -200,7 +211,7 @@
   }
 
   function contentItemSelected(selected) {
-    exSettingsDialog.show(selected, {}, true, window.hideGradebookSettings);
+    exSettingsDialog.show(selected, {}, true, window.hideGradebookSettings); 
   }
 
   /**
@@ -211,28 +222,33 @@
     // prepare tree data
     $.each(jsonFile, function (ch_index, ch_obj) {
       var tree_ch_obj = {
-        'text': ch_index,
+        'text': ch_obj.long_name,
         'type': 'chapter',
         'children': []
       };
-      $.each(ch_obj, function (mod_index, exercises) {
-        if (exercises !== null) {
+      $.each(ch_obj.modules, function (mod_index, mod_obj) {
+        if (mod_obj !== null) {
           var tree_mod_obj = {
-            'text': mod_index,
+            'text': mod_obj.inst_module.name,
             'type': 'module',
-            'children': []
+            'children': [],
+            'modObj': mod_obj.inst_module
           };
-          $.each(exercises, function (ex_index, ex) {
-            if (ex !== null) {
-              var tree_sec_obj = {
-                'text': ex.long_name,
-                'type': ex.type,
-                'url_params': {
-                  'ex_short_name': ex.short_name
-                },
-                'exObj': ex,
-              };
-              tree_mod_obj.children.push(tree_sec_obj);
+          $.each(mod_obj.inst_module_sections, function (sec_index, sec_obj) {
+            if (sec_obj !== null) {
+              $.each(sec_obj.inst_module_section_exercises, function (imse_index, imse_obj) {
+                if (imse_obj.inst_exercise.ex_type !== 'dgm') {
+                  var tree_ex_obj = {
+                    'text': imse_obj.inst_exercise.name || imse_obj.inst_exercise.short_name,
+                    'type': imse_obj.inst_exercise.ex_type,
+                    'url_params': {
+                      'ex_short_name': imse_obj.inst_exercise.short_name
+                    },
+                    'exObj': imse_obj,
+                  };
+                  tree_mod_obj.children.push(tree_ex_obj);
+                }
+              });
             }
           });
           tree_ch_obj.children.push(tree_mod_obj);
@@ -246,7 +262,7 @@
       // listen for select event
       .on('select_node.jstree', function (e, data) {
         var selected = data.node;
-        if (0 > $.inArray(selected.type, ['chapter', 'module', 'section'])) {
+        if (0 > $.inArray(selected.type, ['chapter', 'section'])) {
           contentItemSelected(selected);
         }
       })

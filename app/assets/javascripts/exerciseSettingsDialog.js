@@ -87,12 +87,12 @@ var ExerciseSettingsDialog = (function () {
             settings.isGradable = false;
             settings.points = 0.0;
         }
-        if (this.currExInfo.type !== 'extr') {
+        if (this.currResourceInfo.type !== 'extr') {
             settings.required = $('#exercise-settings-required').is(':checked');
-            if (this.currExInfo.type === 'ka') {
+            if (this.currResourceInfo.type === 'ka') {
                 settings.threshold = Number.parseInt($('#exercise-settings-threshold').val());
             }
-            if (this.currExInfo.type === 'pe') {
+            if (this.currResourceInfo.type === 'pe') {
                 settings.threshold = Number.parseFloat($('#exercise-settings-threshold').val());
                 var feedback = $('#exercise-settings-feedback').val();
                 if (feedback === 'continuous') {
@@ -104,17 +104,26 @@ var ExerciseSettingsDialog = (function () {
                 }
             }
         }
-        this.onSubmit(this.currExInfo, settings);
+        this.onSubmit(this.currResourceInfo, settings);
         this.dialog.dialog('close');
     };
 
-    ExerciseSettingsDialog.prototype.show = function(exInfo, defaultOptions, hideRequired, hideGradebookSettings) {
-        this.currExInfo = exInfo;
+    ExerciseSettingsDialog.prototype.show = function(resourceInfo, defaultOptions, hideRequired, hideGradebookSettings) {
+        this.currResourceInfo = resourceInfo;
         this.dialog.find('form')[0].reset();
         var thresholdElem = $('#exercise-settings-threshold');
         var requiredSetting = hideRequired ? 'none' : '';
         $('#gradebook-settings-container').css('display', hideGradebookSettings ? 'none' : '');
-        switch (exInfo.type) {
+
+        if (resourceInfo.type === 'module') {
+            $('#exercise-settings-dialog').attr('title', 'Module Settings');
+        }
+        else {
+            $('#exercise-settings-dialog').attr('title', 'Exercise Settings');
+        }
+        showDialog = true;
+
+        switch (resourceInfo.type) {
             case 'ka':
                 thresholdElem.attr('step', 1);
                 thresholdElem.attr('min', 1);
@@ -136,16 +145,25 @@ var ExerciseSettingsDialog = (function () {
                 $('#exercise-settings-pe').css('display', 'none');
                 $('#exercise-settings-required-group').css('display', 'none');
                 $('#exercise-settings-threshold-group').css('display', 'none');
+                showDialog = (requiredSetting !== 'none') || !hideGradebookSettings
                 break;
             case 'ss':
                 $('#exercise-settings-pe').css('display', 'none');
                 $('#exercise-settings-required-group').css('display', requiredSetting);
                 $('#exercise-settings-threshold-group').css('display', 'none');
+                showDialog = (requiredSetting !== 'none') || !hideGradebookSettings
                 break;
             case 'ff':
                 $('#exercise-settings-pe').css('display', 'none');
                 $('#exercise-settings-required-group').css('display', requiredSetting);
                 $('#exercise-settings-threshold-group').css('display', 'none');
+                showDialog = (requiredSetting !== 'none') || !hideGradebookSettings
+                break;
+            case 'module':
+                $('#exercise-settings-pe').css('display', 'none');
+                $('#exercise-settings-required-group').css('display', 'none');
+                $('#exercise-settings-threshold-group').css('display', 'none');
+                showDialog = (requiredSetting !== 'none') || !hideGradebookSettings
                 break;
         }
         for (var option in defaultOptions) {
@@ -158,7 +176,7 @@ var ExerciseSettingsDialog = (function () {
                 $('#exercise-settings-' + option).val(value);
             }
         }
-        if (exInfo.type === 'pe') {
+        if (resourceInfo.type === 'pe') {
             var hideCode = 'JXOP-code' in defaultOptions && defaultOptions['JXOP-code'] === 'none';
             $('#exercise-settings-' + option).prop('checked', hideCode);
             if ($('#exercise-settings-feedback').val() === 'continuous') {
@@ -168,8 +186,12 @@ var ExerciseSettingsDialog = (function () {
                 $('#exercise-settings-fix').attr('disabled', true);
             }
         }
-        this.dialog.dialog('option', 'exId', exInfo.id);
-        this.dialog.dialog('open');
+        if (showDialog) {
+            this.dialog.dialog('open');
+        }
+        else {
+            this._exerciseSettingsHelper();
+        }
     };
 
     return ExerciseSettingsDialog;

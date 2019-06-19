@@ -52,12 +52,18 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   end
 
   def update_ka_exercise_progress
+    byebug
     hasBook = !inst_book_section_exercise_id.blank?
+    has_standalone_module = !inst_module_section_exercise_id.blank?
+
     if hasBook
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
       book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
       module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
+    elsif has_standalone_module
+      inst_exercise = InstExercise.find_by(id: inst_module_section_exercise.inst_exercise_id)
+      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
     else
       inst_exercise = InstExercise.find_by(id: inst_course_offering_exercise.inst_exercise_id)
     end
@@ -77,10 +83,23 @@ class OdsaExerciseAttempt < ActiveRecord::Base
         exercise_progress['total_worth_credit'] += 1
         exercise_progress['current_score'] += 1
         exercise_progress['highest_score'] = [exercise_progress['highest_score'], exercise_progress['current_score']].max
-        proficient = hasBook ? book_progress.update_proficiency(exercise_progress) : exercise_progress.highest_score >= inst_course_offering_exercise.threshold
+        proficient = false
+        if hasBook
+          proficient = book_progress.update_proficiency(exercise_progress)
+        elsif has_standalone_module
+          proficient = exercise_progress.highest_score >= inst_module_section_exercise.threshold
+        else
+          proficient = exercise_progress.highest_score >= inst_course_offering_exercise.threshold
+        end
         if proficient
           self.earned_proficiency = true
-          self.points_earned = hasBook ? inst_book_section_exercise.points : inst_course_offering_exercise.points
+          if hasBook
+            self.points_earned = inst_book_section_exercise.points
+          elsif has_standalone_module
+            self.points_earned = inst_module_section_exercise.points
+          else
+            self.points_earned = inst_course_offering_exercise.points
+          end
           self.save!
           exercise_progress.proficient_date ||= DateTime.now
         end
@@ -109,20 +128,30 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       exercise_progress['hinted_exercise'] = self['question_name']
     end
     exercise_progress.save!
-    if hasBook and proficient
-      module_progress.update_proficiency(inst_exercise)
+    if proficient
+      if hasBook
+        module_progress.update_proficiency(inst_exercise)
+      elsif has_standalone_module
+        module_progress.update_proficiency(inst_module_section_exercise)
+      end
     end
   end
 
   def update_pe_exercise_progress
+    byebug
+
     hasBook = !inst_book_section_exercise_id.blank?
+    has_standalone_module = !inst_module_section_exercise_id.blank?
     if hasBook
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
       book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
       module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
+    elsif has_standalone_module
+      inst_exercise = InstExercise.find(inst_module_section_exercise.inst_exercise_id)
+      module_progress = OdsaModuleProgress.get_standalone_progress()
     else
-      inst_exercise = InstExercise.find_by(id: inst_course_offering_exercise.inst_exercise_id)
+      inst_exercise = InstExercise.find(inst_course_offering_exercise.inst_exercise_id)
     end
     exercise_progress = self.get_exercise_progress
     exercise_progress.first_done ||= DateTime.now
@@ -132,7 +161,13 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     end
     if self.correct
       self.earned_proficiency = true
-      self.points_earned = hasBook ? inst_book_section_exercise.points : inst_course_offering_exercise.points
+      if hasBook
+        self.points_earned = inst_book_section_exercise.points
+      elsif has_standalone_module
+        self.points_earned = inst_module_section_exercise.points
+      else
+        self.points_earned = inst_course_offering_exercise.points
+      end
       self.save!
       exercise_progress['total_correct'] += 1
       exercise_progress['total_worth_credit'] += 1
@@ -143,6 +178,8 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       if hasBook
         module_progress.update_proficiency(inst_exercise)
         book_progress.update_proficiency(exercise_progress)
+      elsif has_standalone_module
+        module_progress.update_proficiency(inst_module_section_exercise)
       end
     else
       exercise_progress.save!
@@ -150,13 +187,16 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   end
 
   def get_exercise_progress
-    if inst_book_section_exercise_id.blank?
-      return OdsaExerciseProgress.find_by(user_id: user_id,
-                                          inst_course_offering_exercise_id: inst_course_offering_exercise_id)
-    else
+    if !inst_book_section_exercise_id.blank?
       return OdsaExerciseProgress.where("user_id=? and inst_book_section_exercise_id=?",
-                                        user.id,
-                                        inst_book_section_exercise.id).first
+        user.id,
+        inst_book_section_exercise.id).first
+    elsif !inst_module_section_exercise_id.blank? 
+      return OdsaExerciseProgress.find_by(user_id: user_id,
+        inst_module_section_exercise_id: inst_module_section_exercise_id)
+    else
+      return OdsaExerciseProgress.find_by(user_id: user_id,
+        inst_course_offering_exercise_id: inst_course_offering_exercise_id)
     end
   end
 

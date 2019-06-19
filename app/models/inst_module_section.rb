@@ -1,3 +1,5 @@
+
+# a section in a stand-alone module
 class InstModuleSection < ActiveRecord::Base
   belongs_to :inst_module_version
   has_many :inst_module_section_exercises, dependent: :destroy
@@ -20,6 +22,24 @@ class InstModuleSection < ActiveRecord::Base
         InstModuleSectionExercise.save_data_from_json(inst_module_version, sec, k, v) if v.is_a?(Hash)
       end
     end
+  end
+
+  def clone(inst_module_version)
+    ims = InstModuleSection.new(
+      inst_module_version: inst_module_version,
+      name: self.name,
+      show: self.show,
+      learning_tool: self.learning_tool,
+      resource_type: self.resource_type,
+      resource_name: self.resource_name
+    )
+    ims.save!
+
+    self.inst_module_section_exercises.each do |imse|
+      imse.clone(inst_module_version, ims)
+    end
+    
+    return ims
   end
 
 end

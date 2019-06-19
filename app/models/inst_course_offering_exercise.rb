@@ -82,6 +82,47 @@ class InstCourseOfferingExercise < ActiveRecord::Base
     return ex
   end
 
+  def self.handle_grade_passback(req, res, user_id, inst_course_offering_exercise_id)
+    ex_progress = OdsaExerciseProgress.find_by(user_id: user_id,
+      inst_course_offering_exercise_id: inst_course_offering_exercise_id)
+
+    if req.replace_request?
+      # set a new score for the user
+            
+      score = Float(req.score.to_s)
+
+      if score < 0.0 || score > 1.0
+        res.description = "The score must be between 0.0 and 1.0"
+        res.code_major = 'failure'
+      else
+        # we store exercise scores in the database as an integer
+        score = Integer(score * 100)
+        if ex_progress.blank?
+          ex_progress = OdsaExerciseProgress.new(user_id: user_id,
+              inst_course_offering_exercise_id: inst_course_offering_exercise_id)
+        end
+        old_score = ex_progress.current_score
+        ex_progress.update_score(score)
+        lms_res = ex_progress.post_course_offering_exercise_score_to_lms()
+        if lms_res.success?
+          ex_progress.save!
+          res.description = "Your old score of #{old_score} has been replaced with #{score}"
+          res.code_major = 'success'
+        else
+          res.description = "Failed to transmit score"
+          res.code_major = 'failure'
+        end
+      end
+    elsif req.read_request?
+      # return the score for the user
+      res.description = ex_progress.blank? ? "Your score is 0" : "Your score is #{ex_progress.highest_score}"
+      res.score = ex_progress.blank? ? 0 : ex_progress.highest_score
+      res.code_major = 'success'
+    end
+    
+    return res
+  end
+
   #~ Instance methods .........................................................
 
   def build_av_address(base_address)

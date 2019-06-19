@@ -19,11 +19,17 @@
     <% if params.key?(:custom_inst_chapter_module_id) %>
       TP.moduleTitle = "<%= params[:custom_module_title] %>";
       TP.instChapterModuleId = "<%= params[:custom_inst_chapter_module_id] %>";
+    <% elsif params.key?(:custom_inst_module_id) %>
+      TP.moduleTitle = "<%= @mod_version.name %>";
+      TP.instModuleVersionId = "<%= @mod_version.id %>";
+      TP.exerciseSettings = @exercises.to_json.html_safe;
     <% else %>
       TP.sectionTitle = "<%= params[:custom_section_title] %>";
       TP.instSectionId = "<%= params[:custom_inst_section_id] %>";
     <% end %>
-    TP.instBookId = "<%= params[:custom_inst_book_id] %>";
+    <% if params.key?(:custom_inst_book_id) %>
+      TP.instBookId = "<%= params[:custom_inst_book_id] %>";
+    <% end %>
 
     window.ODSA = window.ODSA || {};
     window.ODSA.TP = TP;

@@ -1,4 +1,4 @@
-# TODO: document this script
+# Generates stand-alone modules
 
 task :update_module_versions => :environment do
 
@@ -13,7 +13,7 @@ task :update_module_versions => :environment do
     ]
 
     FULL_CONFIG_FILENAME = '_config.json'
-
+    LANG = 'en'
     TIMESTAMP = Time.now.strftime('%Y%m%d%H%M%S')
     OUTPUT_DIRECTORY = File.join(OpenDSA::STANDALONE_MODULES_DIRECTORY, TIMESTAMP)
     OUTPUT_DIRECTORY_REL = TIMESTAMP # output directory relative to the build directory
@@ -37,7 +37,7 @@ task :update_module_versions => :environment do
         config = consolidate_reference_configs()
         module_paths = config['chapters']['modules'].keys
         # filter out modules that don't need their current version updated
-        outdated = InstModule.outdated_module_paths(module_paths, 'en', verbose=true)
+        outdated = InstModule.outdated_module_paths(module_paths, LANG, verbose=true)
         config['chapters']['modules'] = config['chapters']['modules'].slice(*outdated.keys)
         outdated.each do |mod_path, git_hash|
             config['chapters']['modules'][mod_path]['git_hash'] = git_hash

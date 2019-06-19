@@ -10,7 +10,10 @@ class OdsaExerciseAttemptsController < ApplicationController
       return
     end
 
+    byebug
+
     hasBook = params.key?(:inst_book_id)
+    is_standalone_module = params.key?(:inst_module_section_exercise_id)
     inst_exercise = nil
     if params.key?(:sha1)
       inst_exercise = InstExercise.find_by(short_name: params[:sha1])
@@ -37,6 +40,16 @@ class OdsaExerciseAttemptsController < ApplicationController
                                                             inst_book_section_exercise.id).first
         exercise_progress = OdsaExerciseProgress.new(user: current_user,
                                                      inst_book_section_exercise: inst_book_section_exercise)
+        exercise_progress.save
+      end
+    elsif is_standalone_module
+      byebug
+      inst_module_section_exercise = InstModuleSectionExercise.find(params[:inst_module_section_exercise_id])
+      threshold = inst_module_section_exercise.threshold
+      unless exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
+                                                              inst_module_section_exercise_id: inst_module_section_exercise.id)
+        exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                                                     inst_module_section_exercise: inst_module_section_exercise)
         exercise_progress.save
       end
     else
@@ -79,6 +92,7 @@ class OdsaExerciseAttemptsController < ApplicationController
       inst_section: inst_section,
       inst_book_section_exercise: inst_book_section_exercise,
       inst_course_offering_exercise: inst_course_offering_exercise,
+      inst_module_section_exercise: inst_module_section_exercise,
       worth_credit: worth_credit,
       correct: params[:complete],
       time_done: Time.now,
@@ -99,6 +113,9 @@ class OdsaExerciseAttemptsController < ApplicationController
             current_user.id,
             inst_book_section_exercise.id
           ).first
+        elsif is_standalone_module
+          exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
+                                                          inst_module_section_exercise_id: inst_module_section_exercise.id)
         else
           exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
                                                            inst_course_offering_exercise_id: inst_course_offering_exercise.id)
@@ -134,8 +151,10 @@ class OdsaExerciseAttemptsController < ApplicationController
       return
     end
 
-    hasBook = params.key?(:inst_book_id)
+    byebug
 
+    hasBook = params.key?(:inst_book_id)
+    is_standalone_module = params.key?(:inst_module_section_exercise_id)
     if params.key?(:inst_book_section_exercise_id)
       inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
       threshold = inst_book_section_exercise.threshold
@@ -155,6 +174,10 @@ class OdsaExerciseAttemptsController < ApplicationController
         return
       end
       threshold = inst_book_section_exercise.threshold
+    elsif is_standalone_module
+      byebug
+      inst_module_section_exercise = InstModuleSectionExercise.find(params[:inst_module_section_exercise_id])
+      threshold = inst_module_section_exercise.threshold
     else
       inst_course_offering_exercise = InstCourseOfferingExercise.find_by(
         id: params[:inst_course_offering_exercise_id],
@@ -162,7 +185,7 @@ class OdsaExerciseAttemptsController < ApplicationController
       threshold = inst_course_offering_exercise.threshold
     end
 
-    if inst_book_section_exercise != nil or inst_course_offering_exercise != nil
+    if inst_book_section_exercise != nil or inst_course_offering_exercise != nil or inst_module_section_exercise != nil
       if hasBook
         unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
                                                     inst_book_section_exercise_id=?",
@@ -170,6 +193,15 @@ class OdsaExerciseAttemptsController < ApplicationController
                                                               inst_book_section_exercise.id).first
           exercise_progress = OdsaExerciseProgress.new(user: current_user,
                                                        inst_book_section_exercise: inst_book_section_exercise)
+          exercise_progress.save
+        end
+      elsif is_standalone_module
+        unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
+                                                      inst_module_section_exercise_id=?",
+                                                              current_user.id,
+                                                              inst_module_section_exercise.id).first
+          exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                          inst_module_section_exercise: inst_module_section_exercise)
           exercise_progress.save
         end
       else
@@ -193,6 +225,7 @@ class OdsaExerciseAttemptsController < ApplicationController
         inst_section: inst_section,
         inst_book_section_exercise: inst_book_section_exercise,
         inst_course_offering_exercise: inst_course_offering_exercise,
+        inst_module_section_exercise: inst_module_section_exercise,
         worth_credit: correct,
         correct: correct,
         time_done: Time.now,
@@ -215,6 +248,9 @@ class OdsaExerciseAttemptsController < ApplicationController
               current_user.id,
               inst_book_section_exercise.id
             ).first
+          elsif is_standalone_module
+            exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
+              inst_module_section_exercise_id: inst_module_section_exercise.id)
           else
             exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
               inst_course_offering_exercise_id: inst_course_offering_exercise.id)

@@ -35,7 +35,6 @@ class OdsaExerciseProgress < ActiveRecord::Base
       )
       ex.save!
     elsif ex.lis_outcome_service_url != lis_outcome_service_url || ex.lis_result_sourcedid != lis_result_sourcedid || ex.lms_access_id != lms_access_id
-
       ex.lis_outcome_service_url = lis_outcome_service_url
       ex.lis_result_sourcedid = lis_result_sourcedid
       ex.lms_access_id = lms_access_id

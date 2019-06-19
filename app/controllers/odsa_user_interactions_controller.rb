@@ -10,6 +10,10 @@ class OdsaUserInteractionsController < ApplicationController
     errors = []
     params[:eventList].each do |event|
       hasBook = event.key?(:inst_book_id)
+      is_standalone_module = event.key?(:inst_module_version_id)
+      
+      byebug
+      
       if hasBook
         inst_book_id = params[:inst_book_id]
         if event[:inst_section_id] != ""
@@ -26,6 +30,11 @@ class OdsaUserInteractionsController < ApplicationController
             "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
             inst_book_id, inst_section_id, inst_exercise.id
           ).pluck(:id).first
+        end
+      elsif is_standalone_module
+        inst_module_version_id = event[:inst_module_version_id]
+        if event[:inst_module_section_exercise_id] != ""
+          inst_module_section_exercise_id = event[:inst_module_section_exercise_id]
         end
       else
         inst_course_offering_exercise_id = event[:inst_course_offering_exercise_id]
@@ -45,6 +54,8 @@ class OdsaUserInteractionsController < ApplicationController
         inst_chapter_module_id: inst_chapter_module_id,
         inst_book_section_exercise_id: inst_book_section_exercise_id,
         inst_course_offering_exercise_id: inst_course_offering_exercise_id,
+        inst_module_version_id: inst_module_version_id,
+        inst_module_section_exercise_id: inst_module_section_exercise_id,
         name: event[:type],
         description: event[:desc],
         action_time: Time.at(event[:tstamp].to_f / 1000),
