@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190618150406) do
+ActiveRecord::Schema.define(version: 20190619211127) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -468,10 +468,11 @@ ActiveRecord::Schema.define(version: 20190618150406) do
   add_index "odsa_exercise_progresses", ["lms_access_id"], name: "fk_rails_3327f6b532", using: :btree
   add_index "odsa_exercise_progresses", ["user_id", "inst_book_section_exercise_id"], name: "index_odsa_ex_prog_on_user_id_and_inst_bk_sec_ex_id", unique: true, using: :btree
   add_index "odsa_exercise_progresses", ["user_id", "inst_course_offering_exercise_id"], name: "index_odsa_exercise_prog_on_user_course_offering_exercise", unique: true, using: :btree
+  add_index "odsa_exercise_progresses", ["user_id", "inst_module_section_exercise_id"], name: "index_odsa_ex_prog_on_user_module_sec_ex", unique: true, using: :btree
 
   create_table "odsa_module_progresses", force: :cascade do |t|
     t.integer  "user_id",                 limit: 4,   null: false
-    t.integer  "inst_book_id",            limit: 4,   null: false
+    t.integer  "inst_book_id",            limit: 4
     t.datetime "first_done",                          null: false
     t.datetime "last_done",                           null: false
     t.datetime "proficient_date",                     null: false
@@ -491,6 +492,7 @@ ActiveRecord::Schema.define(version: 20190618150406) do
   add_index "odsa_module_progresses", ["inst_module_version_id"], name: "fk_rails_38a9ac7560", using: :btree
   add_index "odsa_module_progresses", ["lms_access_id"], name: "odsa_module_progresses_lms_access_id_fk", using: :btree
   add_index "odsa_module_progresses", ["user_id", "inst_chapter_module_id"], name: "index_odsa_module_progress_on_user_and_module", unique: true, using: :btree
+  add_index "odsa_module_progresses", ["user_id", "inst_module_version_id"], name: "index_odsa_mod_prog_on_user_mod_version", unique: true, using: :btree
 
   create_table "odsa_student_extensions", force: :cascade do |t|
     t.integer  "user_id",         limit: 4

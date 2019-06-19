@@ -7,6 +7,14 @@ class OdsaModuleProgress < ActiveRecord::Base
   belongs_to :lms_access
 
   #~ Validation ...............................................................
+  validate :required_fields
+
+  def required_fields
+    if not(inst_book_id.present? or inst_module_version_id.present?)
+      errors.add(:base, "inst_book_id or inst_module_version_id must be present")
+    end
+  end
+
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
@@ -32,10 +40,11 @@ class OdsaModuleProgress < ActiveRecord::Base
   end
 
   def self.get_standalone_progress(user_id, inst_module_version_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil)
+    byebug
     module_progress = OdsaModuleProgress.find_by(user_id: user_id, inst_module_version_id: inst_module_version_id)
     if module_progress == nil
       module_progress = OdsaModuleProgress.new(user_id: user_id, inst_module_version_id: inst_module_version_id)
-      unless lis_outcome_service_url == nil or lis_result_sourcedid == nil or lms_access_id == nil
+      unless lis_outcome_service_url == nil or lis_result_sourcedid == nil
         module_progress.lis_outcome_service_url = lis_outcome_service_url
         module_progress.lis_result_sourcedid = lis_result_sourcedid
         module_progress.lms_access_id = lms_access_id
@@ -161,7 +170,8 @@ class OdsaModuleProgress < ActiveRecord::Base
     module_exercises = mod_sec_exs.collect { |ex| ex.id } || []
     exercise_progresses = OdsaExerciseProgress.join(:inst_module_section_exercises)
       .where("inst_module_section_exercises.inst_module_version_id = #{self.inst_module_version_id} AND user_id = #{self.user_id}")
-    proficient_exercises = exercise_progresses.collect( |ep| ep.proficient?) || [] 
+    proficient_exercises = exercise_progresses.select{ |ep| ep.proficient? }
+                                              .collect{ |ep| ep.inst_module_section_exercise_id } || [] 
 
     self.first_done ||= DateTime.now
     self.last_done = DateTime.now

@@ -621,8 +621,18 @@ class LtiController < ApplicationController
       @exercises[ex_data['short_name']] = ex_data
     end
     
+    # ensure module progress exists and update it if necessary
     byebug
-    # display module
+    if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
+      lms_access_id = nil
+    else
+      lms_access_id = LmsAccess.find_by(consumer_key: params[:oauth_consumer_key]).id
+    end
+    mod_prog = OdsaModuleProgress.get_standalone_progress(current_user.id, 
+      @mod_version.id, params[:lis_outcome_service_url],
+      params[:lis_result_sourcedid], lms_access_id)
+
+    byebug
     @section_html = File.read(@mod_version.file_path) and return
   end
 

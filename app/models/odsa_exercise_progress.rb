@@ -11,9 +11,7 @@ class OdsaExerciseProgress < ActiveRecord::Base
 
   def required_fields
     if not(inst_book_section_exercise_id.present? or inst_course_offering_exercise_id.present? or inst_module_section_exercise_id.present?)
-      errors.add(:inst_book_section_exercise_id, "or inst_course_offering_exercise_id or inst_module_section_exercise_id must be present")
-      errors.add(:inst_course_offering_exercise_id, "or inst_book_section_exercise_id or inst_module_section_exercise_id must be present")
-      errors.add(:inst_module_section_exercise_id, "or inst_book_section_exercise_id or inst_course_offering_exercise_id must be present")
+      errors.add(:base, "inst_book_section_exercise_id or inst_course_offering_exercise_id or inst_module_section_exercise_id must be present")
     end
   end
 
