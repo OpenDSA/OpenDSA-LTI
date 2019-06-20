@@ -137,18 +137,23 @@ task :update_module_versions => :environment do
             if successful
                 puts "Saving new stand-alone module versions to the database."
                 lti_html_dir = File.join(OUTPUT_DIRECTORY, 'lti_html')
+                fail_count = 0
+                success_count = 0
+                num_modules = config['chapters']['modules'].size
                 config['chapters']['modules'].each do |mod_path, settings|
                     mod_name = mod_path.split('/')[-1]
                     settings['file_path'] = File.join(lti_html_dir, mod_name + '.html')
                     begin
                         InstModuleVersion.save_data_from_json(mod_path, settings)
+                        success_count += 1
                     rescue Exception => e
-                        puts "Failed to save module version for #{mod_path}:"
-                        puts e.message
+                        fail_count += 1
+                        puts "Failed to save module version for #{mod_path}: #{e.message}"
+                        puts "Stack trace:"
                         puts e.backtrace
                     end
                 end
-                puts "Finished updating standalone modules."
+                puts "Finished updating standalone modules. Successful for #{success_count} out of #{num_modules} modules (#{fail_count} failed)."
             end
         end
     end

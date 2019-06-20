@@ -10,8 +10,6 @@ class OdsaExerciseAttemptsController < ApplicationController
       return
     end
 
-    byebug
-
     hasBook = params.key?(:inst_book_id)
     is_standalone_module = params.key?(:inst_module_section_exercise_id)
     inst_exercise = nil
@@ -43,7 +41,6 @@ class OdsaExerciseAttemptsController < ApplicationController
         exercise_progress.save
       end
     elsif is_standalone_module
-      byebug
       inst_module_section_exercise = InstModuleSectionExercise.find(params[:inst_module_section_exercise_id])
       threshold = inst_module_section_exercise.threshold
       unless exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
@@ -104,7 +101,7 @@ class OdsaExerciseAttemptsController < ApplicationController
       request_type: request_type,
       ip_address: request.ip,
     )
-
+    
     respond_to do |format|
       if exercise_attempt.save
         if hasBook
@@ -150,11 +147,9 @@ class OdsaExerciseAttemptsController < ApplicationController
     unless user_logged_in?
       return
     end
-
-    byebug
-
+    
     hasBook = params.key?(:inst_book_id)
-    is_standalone_module = params.key?(:inst_module_section_exercise_id)
+    is_standalone_module = params.key?(:inst_module_version_id)
     if params.key?(:inst_book_section_exercise_id)
       inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
       threshold = inst_book_section_exercise.threshold
@@ -175,8 +170,10 @@ class OdsaExerciseAttemptsController < ApplicationController
       end
       threshold = inst_book_section_exercise.threshold
     elsif is_standalone_module
-      byebug
-      inst_module_section_exercise = InstModuleSectionExercise.find(params[:inst_module_section_exercise_id])
+      inst_exercise = InstExercise.find_by(short_name: params[:exercise])
+      inst_module_section_exercise = InstModuleSectionExercise.find_by(
+                                                        inst_exercise_id: inst_exercise.id, 
+                                                        inst_module_version_id: params[:inst_module_version_id])
       threshold = inst_module_section_exercise.threshold
     else
       inst_course_offering_exercise = InstCourseOfferingExercise.find_by(

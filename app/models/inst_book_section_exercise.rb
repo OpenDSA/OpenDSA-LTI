@@ -27,7 +27,7 @@ class InstBookSectionExercise < ActiveRecord::Base
   def self.handle_grade_passback(req, res, user_id, inst_book_section_exercise_id)
     ex_progress = OdsaExerciseProgress.find_by(user_id: user_id,
         inst_book_section_exercise_id: inst_book_section_exercise_id)
-
+    byebug
     if req.replace_request?
       # set a new score for the user
             

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# an exercise in a stand-alone module
+# an \exercise in a stand-alone module
 class InstModuleSectionExercise < ActiveRecord::Base
   belongs_to :inst_module_version, inverse_of: :inst_module_section_exercises
   belongs_to :inst_module_section, inverse_of: :inst_module_section_exercises
@@ -68,7 +68,7 @@ class InstModuleSectionExercise < ActiveRecord::Base
   def self.handle_grade_passback(req, _res, user_id, inst_module_section_exercise_id)
     ex_progress = OdsaExerciseProgress.find_by(user_id: user_id,
                                                inst_module_section_exercise_id: inst_module_section_exercise_id)
-
+    byebug
     if req.replace_request?
       # set a new score for the user
             

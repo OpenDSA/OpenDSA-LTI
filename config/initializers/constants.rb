@@ -33,7 +33,7 @@ module OpenDSA
     "Sorting" => "Sorting",
     "Spatial" => "Spatial Data Structures",
     "Tutorials" => "Programming Tutorials",
-    #"Development" => "Under Development",
+    "Development" => "Under Development",
   }
 
   OPENDSA_DIRECTORY = File.join("public", "OpenDSA")

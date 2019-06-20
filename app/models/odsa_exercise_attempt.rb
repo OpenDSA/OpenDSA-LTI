@@ -31,7 +31,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   validate :required_fields
 
   def required_fields
-    if not(inst_book_section_exercise_id.present? or inst_course_offering_exercise_id.present?)
+    if !(inst_book_section_exercise_id.present? or inst_course_offering_exercise_id.present? or inst_module_section_exercise_id.present?)
       errors.add(:base, "inst_book_section_exercise_id or inst_course_offering_exercise_id or inst_module_section_exercise_id must be present")
     end
   end
@@ -50,7 +50,6 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   end
 
   def update_ka_exercise_progress
-    byebug
     hasBook = !inst_book_section_exercise_id.blank?
     has_standalone_module = !inst_module_section_exercise_id.blank?
 
@@ -60,7 +59,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
       module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
     elsif has_standalone_module
-      inst_exercise = InstExercise.find_by(id: inst_module_section_exercise.inst_exercise_id)
+      inst_exercise = InstExercise.find_by(id: inst_module_section_exercise.inst_exercise)
       module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
     else
       inst_exercise = InstExercise.find_by(id: inst_course_offering_exercise.inst_exercise_id)
@@ -136,8 +135,6 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   end
 
   def update_pe_exercise_progress
-    byebug
-
     hasBook = !inst_book_section_exercise_id.blank?
     has_standalone_module = !inst_module_section_exercise_id.blank?
     if hasBook
@@ -147,7 +144,7 @@ class OdsaExerciseAttempt < ActiveRecord::Base
       module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
     elsif has_standalone_module
       inst_exercise = InstExercise.find(inst_module_section_exercise.inst_exercise_id)
-      module_progress = OdsaModuleProgress.get_standalone_progress()
+      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
     else
       inst_exercise = InstExercise.find(inst_course_offering_exercise.inst_exercise_id)
     end

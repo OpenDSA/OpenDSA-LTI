@@ -4,6 +4,7 @@ class OdsaExerciseProgressesController < ApplicationController
   #~ Action methods ...........................................................
   def update
     hasBook = params.key?(:inst_book_id)
+    has_standalone_module = params.key?(:inst_module_section_exercise_id)
     if hasBook
       inst_book_section_exercise = nil
       if params.key?(:inst_book_section_exercise_id)
@@ -21,6 +22,13 @@ class OdsaExerciseProgressesController < ApplicationController
                                                             inst_book_section_exercise.id).first
         exercise_progress = OdsaExerciseProgress.new(user: current_user,
                                                      inst_book_section_exercise: inst_book_section_exercise)
+      end
+    elsif has_standalone_module
+      unless exercise_progress = OdsaExerciseProgress.where("user_id=? and inst_module_section_exercise_id=?",
+                                                            current_user.id,
+                                                            params[:inst_module_section_exercise_id]).first
+        exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                                                    inst_module_section_exercise_id: params[:inst_module_section_exercise_id])
       end
     else
       unless exercise_progress = OdsaExerciseProgress.where("user_id=? and inst_course_offering_exercise_id=?",
@@ -52,13 +60,14 @@ class OdsaExerciseProgressesController < ApplicationController
       show_section()
       return
     end
-    inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
     hasBook = (params.key?(:inst_book_id) or params.key?(:inst_book_section_exercise_id))
+    has_standalone_module = params.key?(:inst_module_section_exercise_id)
     if hasBook
       inst_book_section_exercise = nil
       if params.key?(:inst_book_section_exercise_id)
         inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
       else
+        inst_exercise = InstExercise.find_by(short_name: params[:exercise_name])
         inst_book_section_exercise = InstBookSectionExercise.find_by(
           inst_book_id: params[:inst_book_id],
           inst_section_id: params[:inst_section_id],
@@ -71,6 +80,13 @@ class OdsaExerciseProgressesController < ApplicationController
         user_id: current_user.id,
       )
       threshold = inst_book_section_exercise.threshold
+    elsif has_standalone_module
+      inst_module_section_exercise = InstModuleSectionExercise.find(params[:inst_module_section_exercise_id])
+      exercise_progress = OdsaExerciseProgress.find_by(
+        inst_module_section_exercise_id: inst_module_section_exercise.id,
+        user_id: current_user.id,
+      )
+      threshold = inst_module_section_exercise.threshold
     else
       inst_course_offering_exercise = InstCourseOfferingExercise.find(params[:inst_course_offering_exercise_id])
       exercise_progress = OdsaExerciseProgress.find_by(

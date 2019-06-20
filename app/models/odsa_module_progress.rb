@@ -40,7 +40,6 @@ class OdsaModuleProgress < ActiveRecord::Base
   end
 
   def self.get_standalone_progress(user_id, inst_module_version_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil)
-    byebug
     module_progress = OdsaModuleProgress.find_by(user_id: user_id, inst_module_version_id: inst_module_version_id)
     if module_progress == nil
       module_progress = OdsaModuleProgress.new(user_id: user_id, inst_module_version_id: inst_module_version_id)
@@ -61,8 +60,6 @@ class OdsaModuleProgress < ActiveRecord::Base
 
   #~ Instance methods .........................................................
   def update_proficiency(inst_exercise)
-    # TODO: handle standalone modules
-    byebug
     if self.inst_module_version_id
       # standalone module
       return update_standalone_proficiency(inst_exercise)
@@ -119,6 +116,7 @@ class OdsaModuleProgress < ActiveRecord::Base
   end
 
   def post_score_to_lms()
+    byebug
     if self.lis_outcome_service_url and self.lis_result_sourcedid
       require 'lti/outcomes'
       res = LtiOutcomes.post_score_to_consumer(self.highest_score, 
@@ -163,12 +161,10 @@ class OdsaModuleProgress < ActiveRecord::Base
   def update_standalone_proficiency(inst_module_section_exercise)
     # find all exercises in the module
     # find exercises the user has achieved proficiency on
-
-    byebug
     
     mod_sec_exs = self.inst_module_version.inst_module_section_exercises || []
     module_exercises = mod_sec_exs.collect { |ex| ex.id } || []
-    exercise_progresses = OdsaExerciseProgress.join(:inst_module_section_exercises)
+    exercise_progresses = OdsaExerciseProgress.joins(:inst_module_section_exercise)
       .where("inst_module_section_exercises.inst_module_version_id = #{self.inst_module_version_id} AND user_id = #{self.user_id}")
     proficient_exercises = exercise_progresses.select{ |ep| ep.proficient? }
                                               .collect{ |ep| ep.inst_module_section_exercise_id } || [] 
@@ -176,7 +172,7 @@ class OdsaModuleProgress < ActiveRecord::Base
     self.first_done ||= DateTime.now
     self.last_done = DateTime.now
     old_score = self.highest_score
-    update_standalone_score(mod_sec_exs)
+    update_standalone_score(mod_sec_exs, exercise_progresses)
 
     # Comparing two floats.
     # Only send score to LMS if the score has increased.
@@ -220,9 +216,9 @@ class OdsaModuleProgress < ActiveRecord::Base
   def update_standalone_score(mod_sec_exs, exercise_progresses)
     score = 0
     total_points = 0
-    bk_sec_exs.each do |ex|
+    mod_sec_exs.each do |ex|
       total_points += ex.points
-      prog = exercise_progresses.detect { |p| p.inst_book_section_exercise_id == ex.id }
+      prog = exercise_progresses.detect { |p| p.inst_module_section_exercise_id == ex.id }
       if !prog.blank? and prog.proficient?
         score += ex.points
       end

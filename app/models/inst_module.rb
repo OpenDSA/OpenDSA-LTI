@@ -91,7 +91,15 @@ class InstModule < ActiveRecord::Base
   def self.build_current_versions_dict()
     versions = InstModuleVersion.includes(:inst_module, inst_module_sections: [{inst_module_section_exercises: [:inst_exercise]}])
                                 .joins("INNER JOIN inst_modules ON inst_modules.current_version_id = inst_module_versions.id")
+    
     dict = {}
+    OpenDSA::STANDALONE_DIRECTORIES.each do |folder_name, display_name|
+      dict[folder_name] = {
+        'long_name' => display_name,
+        'modules' => {},
+      }
+    end
+
     versions.each do |version|
       json = version.as_json(include: {
         inst_module: {}, 
@@ -115,15 +123,7 @@ class InstModule < ActiveRecord::Base
         json['mod_name'] = path_parts[0]
       end
 
-      if dict.key?(json['folder_name'])
-        dict[json['folder_name']]['modules'][json['mod_name']] = json
-      else
-        dict[json['folder_name']] = {
-          'long_name' => OpenDSA::STANDALONE_DIRECTORIES[json['folder_name']],
-          'modules' => {},
-        }
-        dict[json['folder_name']]['modules'][json['mod_name']] = json
-      end
+      dict[json['folder_name']]['modules'][json['mod_name']] = json
     end
     
     return dict

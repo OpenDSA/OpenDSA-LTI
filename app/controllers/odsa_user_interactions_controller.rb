@@ -12,8 +12,6 @@ class OdsaUserInteractionsController < ApplicationController
       hasBook = event.key?(:inst_book_id)
       is_standalone_module = event.key?(:inst_module_version_id)
       
-      byebug
-      
       if hasBook
         inst_book_id = params[:inst_book_id]
         if event[:inst_section_id] != ""
@@ -71,6 +69,7 @@ class OdsaUserInteractionsController < ApplicationController
       if @user_interaction.save
         failed_to_save = false
       else
+        byebug
         failed_to_save = true
         error_msgs << @user_interaction.errors.full_messages
       end
