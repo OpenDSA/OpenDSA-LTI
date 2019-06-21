@@ -88,7 +88,14 @@ task :update_module_versions => :environment do
         output_file_path = File.join(OUTPUT_DIRECTORY, File.basename(config_file_path))
         script_path = File.join(OpenDSA::OPENDSA_DIRECTORY, 'tools', 'simple2full.py')
 
-        %x(python #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose)
+        require 'open3'
+        command = "python #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
+        stdout, stderr, status = Open3.capture3(command)
+        unless status.success?
+            puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
+            puts stdout
+            puts stderr
+        end
 
         json = File.read(output_file_path)
         config_dict = JSON.parse(json)

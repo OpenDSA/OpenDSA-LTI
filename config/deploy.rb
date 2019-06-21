@@ -10,6 +10,9 @@ ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 # Default deploy_to directory is /var/www/my_app
 set :deploy_to, '/home/deploy/OpenDSA-LTI'
 
+set :opendsa_branch, ENV['opendsa_branch'] || 'master'
+set :khan_branch, ENV['khan_branch'] || 'master'
+
 # Default value for :scm is :git
 # set :scm, :git
 
@@ -159,15 +162,14 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; git checkout master; make pull;" #make rst2json;"
-      # upload _generated config files
+      execute "cd ~/OpenDSA; git checkout #{fetch(:opendsa_branch)}; make pull;"
     end
   end
 
   # manually checkout master for khan-exercises repository
   after :finishing, 'deploy:checkout_ka' do
     on roles :all do
-      execute "cd ~/OpenDSA/khan-exercises; git checkout master; git pull;"
+      execute "cd ~/OpenDSA/khan-exercises; git checkout #{fetch(:khan_branch)}; git pull;"
     end
   end
 
@@ -191,8 +193,8 @@ namespace :deploy do
 
       # set in app/models/inst_module.rb
       Rails.cache.delete('odsa_current_module_versions_dict')
-      Rails.cache.delete('odsa_current_module_versions_dict')
+      Rails.cache.delete('odsa_embeddable_dict')
     end
   end
-  
+
 end
