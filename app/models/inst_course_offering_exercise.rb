@@ -86,7 +86,6 @@ class InstCourseOfferingExercise < ActiveRecord::Base
     ex_progress = OdsaExerciseProgress.find_by(user_id: user_id,
       inst_course_offering_exercise_id: inst_course_offering_exercise_id)
     
-    byebug
     if req.replace_request?
       # set a new score for the user
             
@@ -128,11 +127,11 @@ class InstCourseOfferingExercise < ActiveRecord::Base
 
   def build_av_address(base_address)
     if self.options.blank?
-      return base_address
+      return '/OpenDSA/' + base_address
     end
     require 'uri'
     query_string = '?' + URI.encode_www_form(JSON.parse(self.options))
-    return base_address + query_string
+    return '/OpenDSA/' + base_address + query_string
   end
 
   #~ Private instance methods .................................................

@@ -197,7 +197,7 @@ class LtiController < ApplicationController
     @hide_gradebook_settings = lms_type.name.downcase != 'blackboardlearn'
     lms_instance = ensure_lms_instance()
     @lms_course_num = get_lms_course_num(lms_type.name, lms_instance)
-    @lms_course_code = params[:context_label]
+    @lms_course_code = "#{params[:context_title]} - #{params[:context_label]}"
     @lms_instance_id = lms_instance.id
     @organization_id = lms_instance.organization_id
     @course_offering = CourseOffering.find_by(
@@ -237,14 +237,12 @@ class LtiController < ApplicationController
       return
     end
 
-    byebug
-
     resourceInfo = nil
     resourceUrlId = nil
     if params['selected'].key?('moduleInfo')
       resourceInfo = {
         points: params['selected']['moduleSettings']['points'],
-        custom_param_name: 'custom_inst_module_id',
+        custom_param_name: 'inst_module_id',
         resource_id: params['selected']['moduleInfo']['id'],
         title: params['selected']['moduleInfo']['name']
       }
@@ -256,9 +254,9 @@ class LtiController < ApplicationController
       resourceUrlId = "#{request.protocol}#{request.host_with_port}/inst_course_offering_exercises/#{exercise.id}"
       resourceInfo = {
         points: exercise.points,
-        custom_param_name: 'custom_inst_course_offering_exercise_id',
+        custom_param_name: 'inst_course_offering_exercise_id',
         resource_id: exercise.id,
-        title: exinfo["long_name"]
+        title: exinfo["name"]
       }
     end
 
@@ -310,7 +308,7 @@ class LtiController < ApplicationController
           "@type": "NumericLimits",
           "normalMaximum": resourceInfo[:points].to_f,
           "extraCreditMaximum": 0,
-          "totalMaximum": resourceInfo[:points].points.to_f
+          "totalMaximum": resourceInfo[:points].to_f
         }
       }
     end
@@ -321,7 +319,7 @@ class LtiController < ApplicationController
       ]
     }
     content_item_params["content_items"] = content_items.to_json
-        
+
     require 'lti/oauth'
     oauth_info = OAuth.generate_oauth_params(consumer_key, consumer_secret, return_url,
                                              content_item_params)
@@ -336,44 +334,85 @@ class LtiController < ApplicationController
       return
     end
 
-    byebug
+    launch_extrtool_helper(params[:exercise_id], params[:context_type])
+  end
 
+  def grade_passback
+    req = IMS::LTI::OutcomeRequest.from_post_request(request)
+    res = IMS::LTI::OutcomeResponse.new
+    res.message_ref_identifier = req.message_identifier
+    res.operation = req.operation
+    res.severity = 'status'
+
+    # lis_result_sourcedid was sent by us in the original LTI launch request
+    tokens = req.lis_result_sourcedid.split("_")
+    user_id = tokens[0]
+    exercise_id = tokens[1]
+    
+    if req.replace_request? || req.read_request?
+      if tokens.size == 3
+        context_type = tokens[2]
+        if context_type == 'standalone-module'
+          res = InstModuleSectionExercise.handle_grade_passback(req, res, user_id, exercise_id)
+        elsif context_type == 'standalone-exercise'
+          res = InstCourseOfferingExercise.handle_grade_passback(req, res, user_id, exercise_id)
+        else
+          res.description = "invalid lis_result_sourcedid"
+          res.code_major = 'failure'
+          return
+        end
+      else
+        res = InstBookSectionExercise.handle_grade_passback(req, res, user_id, exercise_id)
+      end
+    elsif req.delete_request?
+      res.code_major = 'unsupported'
+      res.description = "#{req.operation} is not supported"
+    else
+      res.severity = 'error'
+      res.code_major = 'unsupported'
+      res.description = "#{req.operation} is not supported"
+    end
+
+    xml = res.generate_response_xml
+    render xml: xml
+  end
+
+  private
+
+  def launch_extrtool_helper(exercise_id, context_type = nil)
     exercise = nil
     course_offering = nil
     lis_result_sourcedid = nil
     resource_link_id = nil
 
-    if params[:context_type].blank?
-      byebug
+    if context_type.blank?
       exercise = InstBookSectionExercise.includes(:inst_exercise, :inst_book, inst_book: [{course_offering: [:term, :course]}])
-      .find_by(id: params[:exercise_id])
+      .find_by(id: exercise_id)
       course_offering = exercise.inst_book.course_offering
       lis_result_sourcedid = "#{current_user.id}_#{exercise.id}"
       resource_link_id = "#{exercise.id}"
-    elsif params[:context_type] == 'standalone-module'
-      byebug
-      exercise = InstCourseModuleSectionExercise.includes(:inst_exercise, course_offering: [:term, :course])
-                                                .find(params[:exercise_id])
-      course_offering = exercise.course_offering
-      lis_result_sourcedid = "#{current_user.id}_#{exercise.id}_#{params[:context_type]}"
-      resource_link_id = "#{exercise.id}_#{params[:context_type]}"
-    elsif params[:context_type] == 'standalone-exercise'
-      byebug
+    elsif context_type == 'standalone-module'
+      exercise = InstModuleSectionExercise.includes(:inst_exercise, inst_module_version: [{course_offering: [:term, :course]}])
+                                                .find(exercise_id)
+      course_offering = exercise.inst_module_version.course_offering
+      lis_result_sourcedid = "#{current_user.id}_#{exercise.id}_#{context_type}"
+      resource_link_id = "#{exercise.id}_#{context_type}"
+    elsif context_type == 'standalone-exercise'
       exercise = InstCourseOfferingExercise.includes(:inst_exercise, course_offering: [:term, :course])
-                                           .find(params[:exercise_id])
+                                           .find(exercise_id)
       course_offering = exercise.course_offering
-      lis_result_sourcedid = "#{current_user.id}_#{exercise.id}_#{params[:context_type]}"
-      resource_link_id = "#{exercise.id}_#{params[:context_type]}"
+      lis_result_sourcedid = "#{current_user.id}_#{exercise.id}_#{context_type}"
+      resource_link_id = "#{exercise.id}_#{context_type}"
     else
-      @message = "Error: unrecognized value '#{params[:context_type]}' for parameter 'context_type'"
+      @message = "Error: unrecognized value '#{context_type}' for parameter 'context_type'"
       render :error
       return
     end
 
     if exercise.blank?
-      @message = "Error: could not locate exercise with id '#{params[:exercise_id]}'"
-      unless params[:context_type].blank?
-        @message += " and context type '#{params[:context_type]}'"
+      @message = "Error: could not locate exercise with id '#{exercise_id}'"
+      unless context_type.blank?
+        @message += " and context type '#{context_type}'"
       end
       render :error
       return
@@ -421,49 +460,6 @@ class LtiController < ApplicationController
 
     render 'launch_extrtool', layout: 'header_minimal'
   end
-
-  def grade_passback
-    byebug
-    req = IMS::LTI::OutcomeRequest.from_post_request(request)
-    res = IMS::LTI::OutcomeResponse.new
-    res.message_ref_identifier = req.message_identifier
-    res.operation = req.operation
-    res.severity = 'status'
-
-    # lis_result_sourcedid was sent by us in the original LTI launch request
-    tokens = req.lis_result_sourcedid.split("_")
-    user_id = tokens[0]
-    exercise_id = tokens[1]
-    
-    if req.replace_request? || req.read_request?
-      if tokens.size == 3
-        context_type = tokens[2]
-        if context_type == 'standalone-module'
-          res = InstModuleSectionExercise.handle_grade_passback(req, res, user_id, exercise_id)
-        elsif context_type == 'standalone-exercise'
-          res = InstCourseOfferingExercise.handle_grade_passback(req, res, user_id, exercise_id)
-        else
-          res.description = "invalid lis_result_sourcedid"
-          res.code_major = 'failure'
-          return
-        end
-      else
-        res = InstBookSectionExercise.handle_grade_passback(req, res, user_id, exercise_id)
-      end
-    elsif req.delete_request?
-      res.code_major = 'unsupported'
-      res.description = "#{req.operation} is not supported"
-    else
-      res.severity = 'error'
-      res.code_major = 'unsupported'
-      res.description = "#{req.operation} is not supported"
-    end
-
-    xml = res.generate_response_xml
-    render xml: xml
-  end
-
-  private
 
   def get_user_course_role(course_offering)
     if course_offering.is_instructor?(current_user)
@@ -516,9 +512,9 @@ class LtiController < ApplicationController
       course_offering = CourseOffering.new(
         course: course,
         term: term,
-        label: params[:custom_label] || "#{params[:context_label]}-#{params[:context_id]}",
+        label: params[:custom_label] || "#{params[:context_title]} - #{params[:context_label]}",
         lms_instance: lms_instance,
-        lms_course_code: params[:context_label],
+        lms_course_code: "#{params[:context_title]} - #{params[:context_label]}",
         lms_course_num: lms_course_num,
       )
       course_offering.save!
@@ -535,26 +531,22 @@ class LtiController < ApplicationController
 
   def launch_standalone_exercise(course_offering)
     
-    # TODO: stop using RstParser
-    
-    require 'rst/rst_parser'
-    exmap = RstParser.get_exercise_map()
     if params.key?(:custom_inst_course_offering_exercise_id)
       # TODO: ensure that the exercise instance belongs to the course offering
       @course_off_ex = InstCourseOfferingExercise.find_and_update(params[:custom_inst_course_offering_exercise_id],
         params[:resource_link_id], params[:resource_link_title])
-      @ex = exmap[@course_off_ex.inst_exercise.short_name]
+      @ex = @course_off_ex.inst_exercise
     elsif params.key?(:custom_ex_short_name)
       ex_settings = nil
       if params.key?(:custom_ex_settings)
         ex_settings = JSON.parse(params[:custom_ex_settings])
       end
-      @ex = exmap[params[:custom_ex_short_name]]
+      @ex = InstExercise.find_by(short_name: params[:custom_ex_short_name])
       @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
         params[:resource_link_id], params[:resource_link_title], @ex, ex_settings)
     else
       # Used for older exercises created before workflow was updated. Can likely be removed after a while.
-      @ex = exmap[params[:ex_short_name]]
+      @ex = InstExercise.find_by(short_name: params[:ex_short_name])
       @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
         params[:resource_link_id], params[:resource_link_title], @ex, nil)
     end
@@ -571,16 +563,17 @@ class LtiController < ApplicationController
       params[:lis_result_sourcedid],
       lms_access_id)
 
-    if @ex.instance_of?(AvEmbed)
+    if !@ex.av_address.blank?
       @av_address = @course_off_ex.build_av_address(@ex.av_address)
       render "launch_avembed", layout: 'lti_launch'
+    elsif !@ex.learning_tool.blank?
+      launch_extrtool_helper(@course_off_ex.id, 'standalone-exercise')
     else
       render 'launch_inlineav', layout: 'lti_launch'
     end
   end
 
   def launch_standalone_module(course_offering)
-    byebug
     # check for existing module
     @mod_version = InstModuleVersion.find_by(resource_link_id: params[:resource_link_id], course_offering_id: course_offering.id)
     # clone template module if necessary
@@ -621,18 +614,17 @@ class LtiController < ApplicationController
       @exercises[ex_data['short_name']] = ex_data
     end
     
-    # ensure module progress exists and update it if necessary
-    byebug
     if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
       lms_access_id = nil
     else
       lms_access_id = LmsAccess.find_by(consumer_key: params[:oauth_consumer_key]).id
     end
+    
+    # ensure module progress exists and update it if necessary
     mod_prog = OdsaModuleProgress.get_standalone_progress(current_user.id, 
       @mod_version.id, params[:lis_outcome_service_url],
       params[:lis_result_sourcedid], lms_access_id)
 
-    byebug
     @section_html = File.read(@mod_version.file_path) and return
   end
 

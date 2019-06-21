@@ -116,14 +116,25 @@ class OdsaModuleProgress < ActiveRecord::Base
   end
 
   def post_score_to_lms()
-    byebug
     if self.lis_outcome_service_url and self.lis_result_sourcedid
+
+      consumer_key = nil
+      consumer_secret = nil
+      if self.lms_access_id.blank?
+        lms_instance = self.inst_module_version.course_offering.lms_instance
+        consumer_key = lms_instance.consumer_key
+        consumer_secret = lms_instance.consumer_secret
+      else
+        consumer_key = self.lms_access.consumer_key
+        consumer_secret = self.lms_access.consumer_secret
+      end
+
       require 'lti/outcomes'
       res = LtiOutcomes.post_score_to_consumer(self.highest_score, 
                                                self.lis_outcome_service_url,
                                                self.lis_result_sourcedid,
-                                               self.lms_access.consumer_key,
-                                               self.lms_access.consumer_secret)
+                                               consumer_key,
+                                               consumer_secret)
       return res
     end
   end

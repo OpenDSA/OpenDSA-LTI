@@ -2,16 +2,18 @@
     id="<%= @ex.short_name %>"
     class="embedContainer"
     data-exer-name="<%= @ex.short_name %>"
-    data-long-name="<%= @ex.long_name %>"
+    data-long-name="<%= @ex.name %>"
+    data-short-name="<%= @ex.short_name %>"
     data-frame-src="<%= @av_address %>"
-    data-frame-width="<%= @ex.width %>"
-    data-frame-height="<%= @ex.height %>"
-    data-external="<%= @ex.external %>"
+    data-frame-width="<%= @ex.width || 950 %>"
+    data-frame-height="<%= @ex.height  || 800 %>"
+    data-external="<%= false %>"
     data-points="<%= @course_off_ex.points %>"
-    data-required="<%= @ex.required %>"
-    data-showhide="<%= @ex.showhide %>"
+    data-required="<%= true %>"
+    data-showhide="show"
     data-threshold="<%= @course_off_ex.threshold %>"
-    data-type="<%= @ex.type %>">
+    data-type="<%= @ex.ex_type %>"
+    data-exer-id="<% @course_off_ex.id %>">
   <div class="center">
     <div id="<%= @ex.short_name %>_iframe"></div>
   </div>

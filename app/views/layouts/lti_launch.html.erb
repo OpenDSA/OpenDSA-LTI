@@ -1,7 +1,7 @@
 <html lang ="en">
 <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-  <title><%= @ex.long_name %></title>
+  <title><%= @ex.name %></title>
   <link href="/OpenDSA/RST/_themes/haiku/static/haiku.css_t" rel="stylesheet" type="text/css"/>
   <link href="/OpenDSA/lib/normalize.css" rel="stylesheet" type="text/css"/>
   <link href="/OpenDSA/JSAV/css/JSAV.css" rel="stylesheet" type="text/css"/>
@@ -63,7 +63,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" type="text/javascript"></script>
   <script src="/OpenDSA/lib/dataStructures.js" type="text/javascript"></script>
   <script src="/OpenDSA/lib/conceptMap.js" type="text/javascript"></script>
-  <script>ODSA.SETTINGS.DISP_MOD_COMP = true;ODSA.SETTINGS.MODULE_NAME = "<%= @ex.mod_name %>"; ODSA.SETTINGS.BUILD_CMAP = false;JSAV_OPTIONS['lang']='en';JSAV_EXERCISE_OPTIONS['code']='java';</script>
+  <script>ODSA.SETTINGS.DISP_MOD_COMP = true;ODSA.SETTINGS.MODULE_NAME = "<%= @ex.name %>"; ODSA.SETTINGS.BUILD_CMAP = false;JSAV_OPTIONS['lang']='en';JSAV_EXERCISE_OPTIONS['code']='java';</script>
   <div class="content">
     <%= yield %>
   </div>

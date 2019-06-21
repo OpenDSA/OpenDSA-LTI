@@ -69,7 +69,6 @@ class OdsaUserInteractionsController < ApplicationController
       if @user_interaction.save
         failed_to_save = false
       else
-        byebug
         failed_to_save = true
         error_msgs << @user_interaction.errors.full_messages
       end

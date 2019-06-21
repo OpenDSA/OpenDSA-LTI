@@ -168,7 +168,6 @@
 
   function contentItemFinalized(selected, settings) {
     // console.log(getResourceURL(selected.original.url_params));
-    debugger;
     delete settings.required; // not used
     if (selected.type === 'module') {
       window.content_item_params.selected = {
@@ -237,7 +236,7 @@
           $.each(mod_obj.inst_module_sections, function (sec_index, sec_obj) {
             if (sec_obj !== null) {
               $.each(sec_obj.inst_module_section_exercises, function (imse_index, imse_obj) {
-                if (imse_obj.inst_exercise.ex_type !== 'dgm') {
+                if (imse_obj.inst_exercise.ex_type !== 'dgm' && imse_obj.inst_exercise.ex_type !== 'extr') {
                   var tree_ex_obj = {
                     'text': imse_obj.inst_exercise.name || imse_obj.inst_exercise.short_name,
                     'type': imse_obj.inst_exercise.ex_type,
