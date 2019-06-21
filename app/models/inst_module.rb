@@ -87,6 +87,12 @@ class InstModule < ActiveRecord::Base
     end
   end
 
+  def self.get_embeddable_dict()
+    return Rails.cache.fetch("odsa_embeddable_dict", expires_in: 1.years) do
+      InstModule.build_embeddable_dict()
+    end
+  end
+
   # build a dictionary containing the latest module versions and their settings
   def self.build_current_versions_dict()
     versions = InstModuleVersion.includes(:inst_module, inst_module_sections: [{inst_module_section_exercises: [:inst_exercise]}])
@@ -126,6 +132,56 @@ class InstModule < ActiveRecord::Base
       dict[json['folder_name']]['modules'][json['mod_name']] = json
     end
     
+    return dict
+  end
+
+  # build a dictionary containing only modules with exercises that can be embedded
+  def self.build_embeddable_dict()
+    versions = InstModuleVersion.includes(:inst_module, inst_module_sections: [{inst_module_section_exercises: [:inst_exercise]}])
+                                .joins("INNER JOIN inst_modules ON inst_modules.current_version_id = inst_module_versions.id")
+    
+    dict = {}
+    OpenDSA::STANDALONE_DIRECTORIES.each do |folder_name, display_name|
+      dict[folder_name] = {
+        'long_name' => display_name,
+        'modules' => {},
+      }
+    end
+
+    versions.each do |version|
+      # exclude modules with no exercises we can embed
+      exclude_types = ['dgm', 'extr']
+      exercises = version.inst_module_section_exercises.select{ |ex| !exclude_types.include?(ex.inst_exercise.ex_type)}
+      if exercises.size == 0
+        next
+      end
+      
+      json = version.as_json(include: {
+        inst_module: {}, 
+        inst_module_sections: {
+          include: {
+            inst_module_section_exercises: {
+              include: {
+                inst_exercise: {}
+              }
+            }
+          }
+        }
+      })
+      
+      path_parts = version.inst_module.path.split('/')
+      if path_parts.size > 1
+        json['folder_name'] = path_parts[0]
+        json['mod_name'] = path_parts[1]
+      else
+        json['folder_name'] = 'root'
+        json['mod_name'] = path_parts[0]
+      end
+      dict[json['folder_name']]['modules'][json['mod_name']] = json
+    end
+    
+    dict = dict.select{ |folder_name, folder_obj| folder_obj['modules'].size > 0}
+
     return dict
   end
 

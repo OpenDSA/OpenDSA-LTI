@@ -16,11 +16,13 @@ function ltiExerciseSettingsChosen(selected, settings) {
     launchUrl += 'custom_ex_short_name=' + selected.short_name;
     launchUrl += '&custom_ex_settings=' + encodeURIComponent(JSON.stringify(settings));
     $('#lti-launch-url-input').val(launchUrl);
-    $('#lti-launch-title')[0].innerHTML = 'LTI Launch URL - ' + selected.long_name;
+    $('#lti-launch-title')[0].innerHTML = 'LTI Launch URL - ' + selected.name;
     $('#lti-launch-url-modal').modal();
 }
 
 function ltiResourceSelect(selected) {
+    selected = selected.inst_exercise;
+    selected.type = selected.ex_type;
     if ($.inArray(selected.type, ['ss', 'ff']) !== -1) {
         ltiExerciseSettingsChosen(selected, {});
     }

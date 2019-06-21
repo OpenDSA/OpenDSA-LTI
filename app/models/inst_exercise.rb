@@ -82,6 +82,28 @@ class InstExercise < ActiveRecord::Base
     end
     return nil
   end
+  
+  def self.embed_url(host, short_name)
+    return "#{host}/embed/#{short_name}"
+  end
+
+  def self.embed_code(host, short_name, av_address=nil, height=nil)
+    url = InstExercise.embed_url(host, short_name)
+    if !av_address.blank?
+      return "<iframe src=\"#{url}\" height=\"#{height || 950}\" width=\"100%\" scrolling=\"no\"></iframe>"
+    end
+    return "<iframe src=\"#{url}\" height=\"600\" width=\"100%\"></iframe>"    
+  end
+
   #~ Instance methods .........................................................
+
+  def embed_url(host)
+    return InstExercise.embed_url(host, self.short_name)
+  end
+
+  def embed_code(host)
+    return InstExercise.embed_code(host, self.av_address, self.height)
+  end
+  
   #~ Private instance methods .................................................
 end

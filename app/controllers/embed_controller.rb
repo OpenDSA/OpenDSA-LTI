@@ -6,11 +6,7 @@ class EmbedController < ApplicationController
   # with links to the exercises and the html required to include
   # the resource in an iframe
   def index
-    require 'rst/rst_parser'
-
-    # TODO: stop using RstParser
-
-    @folders = RstParser.get_exercise_info()
+    @folders = InstModule.get_embeddable_dict()
     @host_url = request.protocol + request.host_with_port
     @lti_launch_url = @host_url + "/lti/launch"
     render
@@ -19,15 +15,17 @@ class EmbedController < ApplicationController
   # GET /embed/:ex_short_name
   # Displays an exercise
   def show
-    require 'rst/rst_parser'
-    @ex = RstParser.get_exercise_map()[params[:ex_short_name]]
-    if @ex.blank?
+    @ex = InstExercise.find_by(short_name: params[:ex_short_name])
+    if @ex.blank? || !@ex.learning_tool.blank?
       @message = "No resource found with the name \"#{params[:ex_short_name]}\""
       render 'lti/error' and return
     end
-    if @ex.instance_of?(AvEmbed)
-      @ex_url = "#{request.protocol}#{request.host_with_port}#{@ex.av_address}"
+    if !@ex.av_address.blank?
+      @ex_url = "#{request.protocol}#{request.host_with_port}/OpenDSA/#{@ex.av_address}"
       render 'embed_av', layout: 'embed_inlineav'
+    elsif !@ex.learning_tool.blank?
+      # external tool
+      # not implemented
     else
       render 'embed_inlineav', layout: 'embed_inlineav'
     end

@@ -49,36 +49,43 @@
     - i = 0
     - j = 0
     - k = 0
-    - @folders.each do |fname, mods|
+    - @folders.each do |fname, fobj|
         - i += 1
         %a{"data-toggle": "collapse", "data-parent": "#accordion", href: "#folder_#{i}_collapse"}
             .panel.panel-default    
                 .panel-heading
                     .panel-title
-                        #{fname}
+                        #{fobj['long_name']}
         .panel-collapse.collapse{id: "folder_#{i}_collapse"}
             .panel-body
                 - ex_hash = {}
-                - mods.each do |mod_name, exs|
+                - fobj['modules'].each do |mod_name, mod_obj|
                     - j += 1
                     .panel-group{id: "accordion_mod_#{j}"}
                         .module-title
                             %a{"data-toggle": "collapse", "data-parent": "#accordion_mod_#{j}", 
                             href: "#mod_#{j}_collapse", onclick: "moduleClicked(this)"}
-                                %i.fa.fa-chevron-right #{mod_name}
+                                %i.fa.fa-chevron-right #{mod_obj['name']}
                         .panel-collapse.collapse{id: "mod_#{j}_collapse"}
-                            - exs.each do |ex|
-                                - unless ex_hash.key?(ex.short_name)
-                                    - ex_hash[ex.short_name] = ex
-                                    - k += 1
-                                    %div
-                                        #{ex.long_name}
-                                        %a{href: '#', onclick: "previewExercise(this, '#{ex.long_name}', '#{ex.embed_url(@host_url)}', '#{ex.embed_code(@host_url)}'); event.preventDefault();"}
-                                            [Preview]
-                                    .col-xs-6
-                                        %input.form-control{:type => "text", :value => ex.embed_code(@host_url), :readonly => "readonly", id: "embedcode_#{k}"}
-                                    %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{k}", :type => "button"}
-                                        = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")
-                                    %input.btn.btn-default{type: 'button', value: "Generate LTI Launch URL", 
-                                                           onclick: "ltiResourceSelect(#{ex.as_json.to_json})"}
-                                    
+                            - mod_obj['inst_module_sections'].each do |section_obj|
+                                - section_obj['inst_module_section_exercises'].each do |ex|
+                                    - inst_exercise = ex['inst_exercise']
+                                    - short_name = inst_exercise['short_name']
+                                    - av_address = inst_exercise['av_address']
+                                    - height = inst_exercise['height']
+                                    - unless ex_hash.key?(inst_exercise['short_name']) || ['extr', 'dgm'].include?(inst_exercise['ex_type'])
+                                        - ex_hash[short_name] = ex
+                                        - k += 1
+                                        - embed_code = InstExercise.embed_code(@host_url, short_name, av_address, height)
+                                        - embed_url = InstExercise.embed_url(@host_url, short_name)
+                                        %div
+                                            #{inst_exercise['name']}
+                                            %a{href: '#', onclick: "previewExercise(this, '#{inst_exercise['name']}', '#{embed_url}', '#{embed_code}'); event.preventDefault();"}
+                                                [Preview]
+                                        .col-xs-6
+                                            %input.form-control{:type => "text", :value => embed_code, :readonly => "readonly", id: "embedcode_#{k}"}
+                                        %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{k}", :type => "button"}
+                                            = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")
+                                        %input.btn.btn-default{type: 'button', value: "Generate LTI Launch URL", 
+                                                            onclick: "ltiResourceSelect(#{ex.as_json.to_json})"}
+                                        
