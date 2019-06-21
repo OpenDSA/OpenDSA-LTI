@@ -266,7 +266,7 @@ class LtiController < ApplicationController
 
     if return_url.blank?
       # Canvas resource selection
-      launchUrl += "?#{resourceInfo[:custom_param_name]}=" + resourceInfo[:resource_id].to_s
+      launchUrl += "?custom_#{resourceInfo[:custom_param_name]}=" + resourceInfo[:resource_id].to_s
       render :json => {launchUrl: launchUrl}, :status => :ok
       return
     end
