@@ -171,31 +171,28 @@ namespace :deploy do
     end
   end
 
-  after 'deploy:pull_opendsa', 'deploy:update_module_versions' do
-    desc 'Generate/update stand-alone modules'
-    task :update_module_versions do
-      on roles :all do
-        within release_path do
-          with rails_env: fetch(:rails_env) do
-            execute :rake, 'update_module_versions'
-          end
+  # update or create stand-alone module versions
+  after :finishing, 'deploy:update_module_versions' do
+    on roles :all do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'update_module_versions'
         end
       end
     end
   end
 
-  after 'deploy:update_module_versions', 'deploy:clear_rails_cache' do
-    desc 'Clear the Rails Cache of specific entries'
-    task :clear_rails_cache do
-      on roles :all do
-        # used by app/controllers/configurations/book_controller.rb
-        Rails.cache.delete('odsa_reference_book_configs')
-        Rails.cache.delete('odsa_available_modules')
+  # clear cache entries that may now be outdated
+  after :finishing, 'deploy:clear_rails_cache' do
+    on roles :all do
+      # used by app/controllers/configurations/book_controller.rb
+      Rails.cache.delete('odsa_reference_book_configs')
+      Rails.cache.delete('odsa_available_modules')
 
-        # set in app/models/inst_module.rb
-        Rails.cache.delete('odsa_current_module_versions_dict')
-        Rails.cache.delete('odsa_current_module_versions_dict')
-      end
+      # set in app/models/inst_module.rb
+      Rails.cache.delete('odsa_current_module_versions_dict')
+      Rails.cache.delete('odsa_current_module_versions_dict')
     end
   end
+  
 end
