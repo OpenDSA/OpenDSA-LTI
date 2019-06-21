@@ -9,6 +9,10 @@ LmsType.delete_all
 
 LmsType.create!(
   name:                          'Canvas')
+LmsType.create!(
+  name:                          'moodle')
+LmsType.create!(
+  name:                          'BlackboardLearn')
 
 # ---------------------------------------------------------------
 # Create the default late policies.
