@@ -190,13 +190,7 @@ namespace :deploy do
     on roles :all do
       within release_path do
         with rails_env: fetch(:rails_env) do
-          # used by app/controllers/configurations/book_controller.rb
-          Rails.cache.delete('odsa_reference_book_configs')
-          Rails.cache.delete('odsa_available_modules')
-
-          # set in app/models/inst_module.rb
-          Rails.cache.delete('odsa_current_module_versions_dict')
-          Rails.cache.delete('odsa_embeddable_dict')
+          execute :rake, 'clear_rails_cache'
         end
       end
     end
