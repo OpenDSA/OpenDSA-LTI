@@ -269,7 +269,7 @@
         'types': itemTypes,
         'core': {
           'data': [{
-            'text': 'OpenDSA Exercises and Visualizations',
+            'text': 'OpenDSA Materials',
             'state': {
               'opened': true,
               'selected': true
