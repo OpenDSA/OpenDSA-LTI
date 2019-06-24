@@ -21,8 +21,8 @@ ActiveAdmin.register LmsInstance do
       f.input :lms_type, collection: LmsType.all.order(:name)
       f.input :url
       f.input :organization, collection: Organization.all.order(:name)
-      # f.input :consumer_key
-      # f.input :consumer_secret
+      f.input :consumer_key
+      f.input :consumer_secret
     end
     f.actions
   end
