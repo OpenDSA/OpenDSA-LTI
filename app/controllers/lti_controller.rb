@@ -523,13 +523,13 @@ class LtiController < ApplicationController
     lti_enroll(course_offering)
 
     if params.key?(:custom_inst_module_id)
-      launch_standalone_module(course_offering)
+      launch_standalone_module(course_offering, lms_instance)
     else
-      launch_standalone_exercise(course_offering)
+      launch_standalone_exercise(course_offering, lms_instance)
     end
   end
 
-  def launch_standalone_exercise(course_offering)
+  def launch_standalone_exercise(course_offering, lms_instance)
     
     if params.key?(:custom_inst_course_offering_exercise_id)
       # TODO: ensure that the exercise instance belongs to the course offering
@@ -573,7 +573,7 @@ class LtiController < ApplicationController
     end
   end
 
-  def launch_standalone_module(course_offering)
+  def launch_standalone_module(course_offering, lms_instance)
     # check for existing module
     @mod_version = InstModuleVersion.find_by(resource_link_id: params[:resource_link_id], course_offering_id: course_offering.id)
     # clone template module if necessary
@@ -614,7 +614,7 @@ class LtiController < ApplicationController
       @exercises[ex_data['short_name']] = ex_data
     end
     
-    if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
+    if lms_instance.has_oauth_creds?()
       lms_access_id = nil
     else
       lms_access_id = LmsAccess.find_by(consumer_key: params[:oauth_consumer_key]).id
