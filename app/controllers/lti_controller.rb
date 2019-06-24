@@ -525,7 +525,7 @@ class LtiController < ApplicationController
         params[:resource_link_id], params[:resource_link_title], @ex, nil)
     end
 
-    if LmsType::has_lms_level_creds?(params['tool_consumer_info_product_family_code'])
+    if lms_instance.has_oauth_creds?()
       lms_access_id = nil
     else
       lms_access_id = LmsAccess.find_by(consumer_key: params[:oauth_consumer_key]).id
@@ -716,11 +716,10 @@ class LtiController < ApplicationController
   end
 
   def get_oauth_creds(key)
-    lms_code = params['tool_consumer_info_product_family_code']
-    if lms_code and LmsType::has_lms_level_creds?(lms_code)
-      $oauth_creds = LmsInstance.get_oauth_creds(params[:oauth_consumer_key])
-    else
-      $oauth_creds = LmsAccess.get_oauth_creds(params[:oauth_consumer_key])
+    oauth_creds = LmsInstance.get_oauth_creds(key)
+    if oauth_creds.blank?
+      oauth_creds = LmsAccess.get_oauth_creds(key)
     end
+    return oauth_creds
   end
 end

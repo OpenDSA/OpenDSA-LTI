@@ -12,7 +12,7 @@ class LmsInstance < ActiveRecord::Base
 
   def self.get_oauth_creds(key)
     lms_instance = LmsInstance.where(consumer_key: key).first
-    if LmsInstance.blank?
+    if lms_instance.blank? or lms_instance.consumer_key.blank? or lms_instance.consumer_secret.blank?
       return nil
     end
     consumer_key = lms_instance.consumer_key
@@ -20,6 +20,9 @@ class LmsInstance < ActiveRecord::Base
     {consumer_key => consumer_secret}
   end
 
+  def has_oauth_creds?
+    return not(self.consumer_key.blank? || self.consumer_secret.blank?)
+  end
 
   def display_name
     "#{url}"
