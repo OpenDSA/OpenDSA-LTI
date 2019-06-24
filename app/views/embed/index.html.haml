@@ -26,12 +26,44 @@
                 %h3#lti-launch-title.modal-title
         
             .modal-body#lti-launch-url-modal-body
-                %p
-                    Click the button on the right to copy the URL.
-                .col-xs-6
-                    %input.form-control{:type => "text", :readonly => "readonly", id: "lti-launch-url-input"}
-                %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#lti-launch-url-input", :type => "button"}
-                    = image_tag("clippy.svg", :class => "clippy", :title => "Copy URL to clipboard", :width => "13")
+                %p.col-xs-12
+                    Click the button to the right of each textbox to copy the value.
+                %hr.col-xs-12
+                %div.col-xs-12
+                    %p
+                        Copy the launch URL and parameters individually:
+                    .form-group
+                        %label.control-label{for: "lti-launch-base-url-input"}
+                            Launch URL:
+                        .col-xs-12
+                            .col-xs-6
+                                %input.form-control{:type => "text", :readonly => "readonly", id: "lti-launch-base-url-input"}
+                            %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#lti-launch-base-url-input", :type => "button"}
+                                = image_tag("clippy.svg", :class => "clippy", :title => "Copy URL to clipboard", :width => "13")
+                    .form-group
+                        %label.control-label{for: "lti-launch-name-input"}
+                            custom_ex_short_name:
+                        .col-xs-12
+                            .col-xs-6
+                                %input.form-control{:type => "text", :readonly => "readonly", id: "lti-launch-name-input"}
+                            %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#lti-launch-name-input", :type => "button"}
+                                = image_tag("clippy.svg", :class => "clippy", :title => "Copy name to clipboard", :width => "13")
+                    .form-group
+                        %label.control-label{for: "lti-launch-settings-input"}
+                            custom_ex_settings:
+                        .col-xs-12
+                            .col-xs-6
+                                %input.form-control{:type => "text", :readonly => "readonly", id: "lti-launch-settings-input"}
+                            %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#lti-launch-settings-input", :type => "button"}
+                                = image_tag("clippy.svg", :class => "clippy", :title => "Copy settings to clipboard", :width => "13")
+                %hr.col-xs-12
+                %div.col-xs-8      
+                    %p
+                        or copy the launch URL with the parameters in the query string:
+                    .col-xs-10
+                        %input.form-control{:type => "text", :readonly => "readonly", id: "lti-launch-url-input"}
+                    %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#lti-launch-url-input", :type => "button"}
+                        = image_tag("clippy.svg", :class => "clippy", :title => "Copy URL to clipboard", :width => "13")
             .modal-footer
                 %button.btn.btn-default{'data-dismiss': 'modal'}
                     Close
@@ -86,6 +118,6 @@
                                             %input.form-control{:type => "text", :value => embed_code, :readonly => "readonly", id: "embedcode_#{k}"}
                                         %button.clipboard-btn.btn.btn-default{"data-clipboard-target" => "#embedcode_#{k}", :type => "button"}
                                             = image_tag("clippy.svg", :class => "clippy", :title => "Copy embed code to clipboard", :width => "13")
-                                        %input.btn.btn-default{type: 'button', value: "Generate LTI Launch URL", 
+                                        %input.btn.btn-default{type: 'button', value: "Generate LTI Launch Info", 
                                                             onclick: "ltiResourceSelect(#{ex.as_json.to_json})"}
                                         

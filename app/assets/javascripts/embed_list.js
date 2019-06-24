@@ -12,11 +12,20 @@ function previewExercise(anchor, name, url, embed_code) {
 }
 
 function ltiExerciseSettingsChosen(selected, settings) {
+    delete settings.isGradable;
+    delete settings.required;
+
     var launchUrl = window.ltiLaunchBaseUrl + '?';
+    var settingsJson = JSON.stringify(settings);
     launchUrl += 'custom_ex_short_name=' + selected.short_name;
-    launchUrl += '&custom_ex_settings=' + encodeURIComponent(JSON.stringify(settings));
+    launchUrl += '&custom_ex_settings=' + encodeURIComponent(settingsJson);
     $('#lti-launch-url-input').val(launchUrl);
-    $('#lti-launch-title')[0].innerHTML = 'LTI Launch URL - ' + selected.name;
+    $('#lti-launch-title')[0].innerHTML = 'LTI Launch Info - ' + selected.name;
+
+    $('#lti-launch-base-url-input').val(window.ltiLaunchBaseUrl);
+    $('#lti-launch-name-input').val(selected.short_name);
+    $('#lti-launch-settings-input').val(settingsJson);
+    
     $('#lti-launch-url-modal').modal();
 }
 
