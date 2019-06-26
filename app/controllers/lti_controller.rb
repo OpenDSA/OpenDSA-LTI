@@ -141,25 +141,36 @@ class LtiController < ApplicationController
   def xml_config
     host = request.scheme + "://" + request.host_with_port
     launch_url = host + '/lti/launch'
-    tc = IMS::LTI::ToolConfig.new(:title => "OpenDSA Tool Provider", :launch_url => launch_url)
+    tc = IMS::LTI::ToolConfig.new(:title => "OpenDSA", :launch_url => launch_url)
     tc.extend IMS::LTI::Extensions::Canvas::ToolConfig
-    tc.description = "OpenDSA LTI Tool Provider supports LIS Outcome pass-back."
+    tc.description = "OpenDSA LTI Tool Provider supporting grade pass-back."
     tc.canvas_privacy_public!
-    tc.canvas_resource_selection!({
-      :url => host + '/lti/resource',
-      :selection_width => 800,
-      :selection_height => 600,
-    })
-    # tc.set_ext_params('canvas.instructure.com', {
-    #   'assignment_selection': {
-    #     'message_type': 'ContentItemSelectionRequest',
-    #     'url': launch_url
-    #   },
-    #   'link_selection': {
-    #     'message_type': 'ContentItemSelectionRequest',
-    #     'url': launch_url
-    #   },
+    # tc.canvas_resource_selection!({
+    #   :url => host + '/lti/resource',
+    #   :selection_width => 800,
+    #   :selection_height => 600,
     # })
+    tc.set_ext_params('canvas.instructure.com', {
+      'assignment_selection': {
+        'message_type': 'ContentItemSelectionRequest',
+        'url': launch_url
+      },
+      'link_selection': {
+        'message_type': 'ContentItemSelectionRequest',
+        'url': launch_url
+      },
+      'editor_button': {
+        'message_type': 'ContentItemSelectionRequest',
+        'url': launch_url
+      },
+      'icon_url': "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png",
+      'custom_fields': {
+        'custom_canvas_course_id': '$Canvas.course.id',
+        'custom_contact_email_primary': '$Person.email.primary',
+      },
+      # 'selection_height': 800,
+      # 'selection_width': 600
+    })
 
     render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
   end
@@ -193,8 +204,8 @@ class LtiController < ApplicationController
       return
     end
 
-    @deep_linking = lms_type.name.downcase != 'canvas'
-    @hide_gradebook_settings = lms_type.name.downcase != 'blackboardlearn'
+    @deep_linking = params[:lti_message_type] == 'ContentItemSelectionRequest'
+    @hide_gradebook_settings = !(params[:auto_create] == true || lms_type.name.downcase == 'blackboardlearn')
     lms_instance = ensure_lms_instance()
     @lms_course_num = get_lms_course_num(lms_type.name, lms_instance)
     @lms_course_code = "#{params[:context_title]} - #{params[:context_label]}"
@@ -262,11 +273,11 @@ class LtiController < ApplicationController
 
     isGradable = params['selected']['isGradable']
     launchUrl = request.protocol + request.host_with_port + "/lti/launch"
+    launchUrl += "?custom_#{resourceInfo[:custom_param_name]}=" + resourceInfo[:resource_id].to_s
     logoUrl = "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png"
 
     if return_url.blank?
       # Canvas resource selection
-      launchUrl += "?custom_#{resourceInfo[:custom_param_name]}=" + resourceInfo[:resource_id].to_s
       render :json => {launchUrl: launchUrl}, :status => :ok
       return
     end
@@ -287,10 +298,11 @@ class LtiController < ApplicationController
       },
       "title": "OpenDSA: " + resourceInfo[:title],
       "placementAdvice": {
-        "displayWidth": 800,
-        "displayHeight": 1000,
+        "displayWidth": 950,
+        "displayHeight": params['selected'].key?('moduleInfo') ? 1000 : 750,
         "presentationDocumentTarget": "iframe"
       },
+      'url': launchUrl,
       "custom": {
         "#{resourceInfo[:custom_param_name]}": resourceInfo[:resource_id]
       }
@@ -345,6 +357,12 @@ class LtiController < ApplicationController
     res.severity = 'status'
 
     # lis_result_sourcedid was sent by us in the original LTI launch request
+    # and identifies the user and exercise the score is for
+    if req.lis_result_sourcedid.blank?
+      res.description = "Missing lis_result_sourcedid"
+      res.code_major = 'failure'
+      return
+    end
     tokens = req.lis_result_sourcedid.split("_")
     user_id = tokens[0]
     exercise_id = tokens[1]
@@ -582,13 +600,6 @@ class LtiController < ApplicationController
       current_template = instmod.current_version
       @mod_version = current_template.clone(course_offering, params[:resource_link_id], params[:resource_link_title])
     end
-    # create dictionary of exercise settings
-
-    # TODO: ? dictionary keys should be exercise short name, value should be settings ?
-    # TODO: apply settings to exercises on front-end
-    # TODO: ? create module progress record ?
-    # TODO: capture exercise attempts, exercise progresses, module progresses, user interactions
-    # TODO: test that everything works
 
     # build dictionary of exercise settings
     exercise_objs = @mod_version.inst_module_section_exercises.includes(:inst_exercise)
@@ -652,6 +663,9 @@ class LtiController < ApplicationController
   end
 
   def ensure_lms_type(type_name)
+    if type_name.blank?
+      type_name = 'canvas'
+    end
     type_name.downcase!
     lms_type = LmsType.find_by('lower(name) = :name', name: type_name)
     if lms_type.blank?
@@ -698,7 +712,7 @@ class LtiController < ApplicationController
   end
 
   def ensure_user()
-    email = params[:lis_person_contact_email_primary]
+    email = params[:lis_person_contact_email_primary] || params[:custom_contact_email_primary]
     if email.blank?
       # try to uniquely identify user some other way
       if params[:user_id].blank?
