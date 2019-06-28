@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190619211127) do
+ActiveRecord::Schema.define(version: 20190628190129) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -222,7 +222,7 @@ ActiveRecord::Schema.define(version: 20190619211127) do
     t.text     "options",             limit: 4294967295
   end
 
-  add_index "inst_course_offering_exercises", ["course_offering_id", "resource_link_id"], name: "index_inst_course_offering_exercises_on_course_offering_res", unique: true, using: :btree
+  add_index "inst_course_offering_exercises", ["course_offering_id", "resource_link_id", "inst_exercise_id"], name: "index_inst_course_offering_exercises_on_course_offering_res", unique: true, using: :btree
   add_index "inst_course_offering_exercises", ["inst_exercise_id"], name: "inst_course_offering_exercises_inst_exercise_id_fk", using: :btree
 
   create_table "inst_exercises", force: :cascade do |t|
@@ -621,7 +621,7 @@ ActiveRecord::Schema.define(version: 20190619211127) do
   add_foreign_key "inst_chapter_modules", "inst_chapters", name: "inst_chapter_modules_inst_chapter_id_fk"
   add_foreign_key "inst_chapter_modules", "inst_modules", name: "inst_chapter_modules_inst_module_id_fk"
   add_foreign_key "inst_chapters", "inst_books", name: "inst_chapters_inst_book_id_fk"
-  add_foreign_key "inst_course_offering_exercises", "course_offerings", name: "inst_course_offering_exercises_course_offering_id_fk"
+  add_foreign_key "inst_course_offering_exercises", "course_offerings"
   add_foreign_key "inst_course_offering_exercises", "inst_exercises", name: "inst_course_offering_exercises_inst_exercise_id_fk"
   add_foreign_key "inst_module_section_exercises", "inst_exercises"
   add_foreign_key "inst_module_section_exercises", "inst_module_sections"

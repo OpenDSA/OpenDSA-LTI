@@ -16,6 +16,7 @@ class InstCourseOfferingExercise < ActiveRecord::Base
     course_off_ex = InstCourseOfferingExercise.find_by(
       course_offering_id: course_offering_id,
       resource_link_id: resource_link_id,
+      inst_exercise_id: ex.id,
     )
     if course_off_ex.blank?
       points = nil
