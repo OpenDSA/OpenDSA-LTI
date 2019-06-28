@@ -303,9 +303,9 @@ class LtiController < ApplicationController
         "presentationDocumentTarget": "iframe"
       },
       'url': launchUrl,
-      "custom": {
-        "#{resourceInfo[:custom_param_name]}": resourceInfo[:resource_id]
-      }
+      # "custom": {
+      #   "#{resourceInfo[:custom_param_name]}": resourceInfo[:resource_id]
+      # }
     }
     if isGradable
       content_item["lineItem"] = {
