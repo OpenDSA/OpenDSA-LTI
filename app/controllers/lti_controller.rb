@@ -153,15 +153,21 @@ class LtiController < ApplicationController
     tc.set_ext_params('canvas.instructure.com', {
       'assignment_selection': {
         'message_type': 'ContentItemSelectionRequest',
-        'url': launch_url
+        'url': launch_url,
+        'selection_width': 800,
+        'selection_height': 600
       },
       'link_selection': {
         'message_type': 'ContentItemSelectionRequest',
-        'url': launch_url
+        'url': launch_url,
+        'selection_width': 800,
+        'selection_height': 600
       },
       'editor_button': {
         'message_type': 'ContentItemSelectionRequest',
-        'url': launch_url
+        'url': launch_url,
+        'selection_width': 800,
+        'selection_height': 600
       },
       'icon_url': "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png",
       'custom_fields': {
