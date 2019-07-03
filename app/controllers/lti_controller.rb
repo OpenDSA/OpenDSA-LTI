@@ -259,7 +259,6 @@ class LtiController < ApplicationController
     launchUrl = request.protocol + request.host_with_port + "/lti/launch"
     require "addressable/uri"    
     if params['selected'].key?('moduleInfo')
-      byebug
       resourceInfo = {
         points: params['selected']['moduleSettings']['points'],
         resource_id: params['selected']['moduleInfo']['id'],
