@@ -28,7 +28,10 @@ class InstCourseOfferingExercise < ActiveRecord::Base
         optionsJson = nil
       else
         points = settings.delete('points') || 1
-        threshold = settings.delete('threshold') || ex.threshold
+        threshold = settings.delete('threshold')
+        unless threshold
+          threshold = ex.ex_type == 'ka' ? 5 : 1  
+        end
         settings.delete('isGradable')
         settings.delete('required')
         optionsJson = settings.to_json

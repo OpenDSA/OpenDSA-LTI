@@ -256,30 +256,39 @@ class LtiController < ApplicationController
 
     resourceInfo = nil
     resourceUrlId = nil
+    launchUrl = request.protocol + request.host_with_port + "/lti/launch"
+    require "addressable/uri"    
     if params['selected'].key?('moduleInfo')
+      byebug
       resourceInfo = {
         points: params['selected']['moduleSettings']['points'],
-        custom_param_name: 'inst_module_id',
         resource_id: params['selected']['moduleInfo']['id'],
-        title: params['selected']['moduleInfo']['name']
+        title: params['selected']['moduleInfo']['name'],
       }
+      
       resourceUrlId = "#{request.protocol}#{request.host_with_port}/inst_modules/#{resourceInfo[:resource_id]}"
+      
+      uri = Addressable::URI.new
+      uri.query_values = {custom_inst_module_id: resourceInfo[:resource_id]}
+      launchUrl = launchUrl + '?' + uri.query
     else
       exinfo = params['selected']['exerciseInfo']
       exSettings = params['selected']['exerciseSettings']
-      exercise = InstCourseOfferingExercise.find_or_create(course_offering.id, exinfo['id'], exSettings)
-      resourceUrlId = "#{request.protocol}#{request.host_with_port}/inst_course_offering_exercises/#{exercise.id}"
       resourceInfo = {
-        points: exercise.points,
-        custom_param_name: 'inst_course_offering_exercise_id',
-        resource_id: exercise.id,
+        points: exSettings['points'] || 1,
+        resource_id: exinfo['id'],
         title: exinfo["name"]
       }
+      resourceUrlId = "#{request.protocol}#{request.host_with_port}/inst_exercise/#{exinfo['id']}"
+      uri = Addressable::URI.new
+      uri.query_values = {
+        custom_ex_short_name: exinfo['short_name'],
+        custom_ex_settings: exSettings.to_json
+      }
+      launchUrl = launchUrl + '?' + uri.query
     end
 
     isGradable = params['selected']['isGradable']
-    launchUrl = request.protocol + request.host_with_port + "/lti/launch"
-    launchUrl += "?custom_#{resourceInfo[:custom_param_name]}=" + resourceInfo[:resource_id].to_s
     logoUrl = "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png"
 
     if return_url.blank?
@@ -310,7 +319,6 @@ class LtiController < ApplicationController
       },
       'url': launchUrl,
       # "custom": {
-      #   "#{resourceInfo[:custom_param_name]}": resourceInfo[:resource_id]
       # }
     }
     if isGradable
