@@ -170,7 +170,8 @@ class CourseOffering < ActiveRecord::Base
 
   # -------------------------------------------------------------
   def effective_cutoff_date
-    self.cutoff_date || self.term.ends_on
+    # if no cutoff date is set, then always allow enrollment
+    self.cutoff_date || (Time.now + 1.years) #self.term.ends_on
   end
 
 
