@@ -16,7 +16,7 @@ module OpenDSA
     "CT" => "Computational Thinking",
     "Design" => "Design",
     "Files" => "File Processing",
-    "FormalLang" => "Formal Languages",
+    "VisFormalLang" => "Formal Languages",
     "General" => "General Trees",
     "Graph" => "Graphs",
     "Hashing" => "Hashing",
