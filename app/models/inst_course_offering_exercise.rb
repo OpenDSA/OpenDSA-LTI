@@ -24,7 +24,7 @@ class InstCourseOfferingExercise < ActiveRecord::Base
       optionsJson = nil
       if settings.blank?
         points = 1
-        threshold = ex.threshold
+        threshold = ex.ex_type == 'ka' ? 5 : 1
         optionsJson = nil
       else
         points = settings.delete('points') || 1
