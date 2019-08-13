@@ -129,9 +129,10 @@ class InstModule < ActiveRecord::Base
         json['mod_name'] = path_parts[0]
       end
 
-      dict[json['folder_name']]['modules'][json['mod_name']] = json
+      if dict.include?(json['folder_name'])
+        dict[json['folder_name']]['modules'][json['mod_name']] = json
+      end
     end
-    
     return dict
   end
 
