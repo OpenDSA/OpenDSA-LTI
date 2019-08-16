@@ -28,5 +28,11 @@ module OpenDSA
 
     # configure delayed job system
     config.active_job.queue_adapter = :delayed_job
+
+    # disable SSL check during development
+    #if Rails.env.development?
+    #  OpenSSL::SSL.const_set(:VERIFY_PEER, OpenSSL::SSL::VERIFY_NONE)
+    #  puts 'SSL DISABLED'
+    #end
   end
 end
