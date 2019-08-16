@@ -24,7 +24,7 @@ class InstModuleSectionExercise < ActiveRecord::Base
         ex.name = json['long_name']
       end
       save_ex = true
-    elsif ex.ex_type.blank?
+    elsif ex.ex_type.blank? || ex.ex_type != json['type']
       ex.ex_type = json['type']
       save_ex = true
     end
