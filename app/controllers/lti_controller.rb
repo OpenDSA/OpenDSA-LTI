@@ -733,7 +733,6 @@ class LtiController < ApplicationController
         @message = 'OpenDSA: Unable to uniquely identify user'
         return false
       end
-      byebug
       email = "#{lms_instance.id}_#{params[:user_id]}@#{lms_instance.url}"
     end
     @user = User.where(email: email).first
