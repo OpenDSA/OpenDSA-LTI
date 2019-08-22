@@ -21,7 +21,7 @@ class LtiController < ApplicationController
 
     render('error') and return unless lti_authorize!
     lms_instance = ensure_lms_instance()
-    render('error') and return unless ensure_user()
+    render('error') and return unless ensure_user(lms_instance)
 
     lti_enroll(@course_offering)
 
@@ -200,11 +200,13 @@ class LtiController < ApplicationController
       return
     end
 
+    lms_instance = ensure_lms_instance()    
+
     email = params.key?(:lis_person_contact_email_primary) ?
       params[:lis_person_contact_email_primary] :
       params[:oauth_consumer_key]
     
-    if !ensure_user() || !(@tp.context_instructor? || current_user.global_role.is_instructor_or_admin?)
+    if !ensure_user(lms_instance) || !(@tp.context_instructor? || current_user.global_role.is_instructor_or_admin?)
       @message = 'OpenDSA: You must be an instructor to perform this action.'
       render 'error'
       return
@@ -212,7 +214,6 @@ class LtiController < ApplicationController
 
     @deep_linking = params[:lti_message_type] == 'ContentItemSelectionRequest'
     @hide_gradebook_settings = !(params[:auto_create] == true || lms_type.name.downcase == 'blackboardlearn')
-    lms_instance = ensure_lms_instance()
     @lms_course_num = get_lms_course_num(lms_type.name, lms_instance)
     @lms_course_code = "#{params[:context_title]} - #{params[:context_label]}"
     @lms_instance_id = lms_instance.id
@@ -510,7 +511,7 @@ class LtiController < ApplicationController
                                            lms_instance_id: lms_instance.id).first
 
     render('error') and return unless lti_authorize!
-    render('error') and return unless ensure_user()
+    render('error') and return unless ensure_user(lms_instance)
 
     if course_offering.blank?
       unless @tp.context_instructor?
@@ -724,7 +725,7 @@ class LtiController < ApplicationController
     return lms_instance
   end
 
-  def ensure_user()
+  def ensure_user(lms_instance)
     email = params[:lis_person_contact_email_primary] || params[:custom_contact_email_primary]
     if email.blank?
       # try to uniquely identify user some other way
@@ -732,7 +733,8 @@ class LtiController < ApplicationController
         @message = 'OpenDSA: Unable to uniquely identify user'
         return false
       end
-      email = OpenDSA::STUDENT_VIEW_EMAIL
+      byebug
+      email = "#{lms_instance.id}_#{params[:user_id]}@#{lms_instance.url}"
     end
     @user = User.where(email: email).first
 
