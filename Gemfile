@@ -93,7 +93,7 @@ group :doc do
 end
 
 # Gems for authentication and authorization.
-gem 'devise'
+gem 'devise', '~> 4.7.1'
 gem 'omniauth'
 gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'
