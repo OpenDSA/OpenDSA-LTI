@@ -54,6 +54,8 @@ class InstModuleSectionExercise < ActiveRecord::Base
     inst_mod_sec_ex.required = json['required'] || false
     inst_mod_sec_ex.threshold = if json['type'] == 'pe'
                                   json['threshold'] || 1
+                                elsif json['type'] == 'ae'
+                                  json['threshold'] || 0
                                 elsif json['type'] == 'extr'
                                   json['threshold'] || 100
                                 else
