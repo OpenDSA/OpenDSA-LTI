@@ -285,7 +285,11 @@ class OdsaExerciseAttemptsController < ApplicationController
     unless user_logged_in?
       return
     end
-    
+    respond_to do |format|
+      msg = {:status => "fail", :message => "TEST!"}
+      format.json { render :json => msg }
+    end
+    return
     hasBook = params.key?(:inst_book_id)
     is_standalone_module = params.key?(:inst_module_version_id)
     if params.key?(:inst_book_section_exercise_id)
