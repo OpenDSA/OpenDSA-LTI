@@ -184,7 +184,6 @@ class OdsaExerciseAttempt < ActiveRecord::Base
   end
 
   def update_ae_exercise_progress
-    byebug
     hasBook = !inst_book_section_exercise_id.blank?
     has_standalone_module = !inst_module_section_exercise_id.blank?
     if hasBook
