@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190628190129) do
+ActiveRecord::Schema.define(version: 20200118232324) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -409,28 +409,29 @@ ActiveRecord::Schema.define(version: 20190628190129) do
   end
 
   create_table "odsa_exercise_attempts", force: :cascade do |t|
-    t.integer  "user_id",                          limit: 4,                          null: false
+    t.integer  "user_id",                          limit: 4,                           null: false
     t.integer  "inst_book_id",                     limit: 4
     t.integer  "inst_section_id",                  limit: 4
     t.integer  "inst_book_section_exercise_id",    limit: 4
-    t.boolean  "worth_credit",                                                        null: false
-    t.datetime "time_done",                                                           null: false
-    t.integer  "time_taken",                       limit: 4,                          null: false
-    t.integer  "count_hints",                      limit: 4,                          null: false
-    t.boolean  "hint_used",                                                           null: false
-    t.decimal  "points_earned",                               precision: 5, scale: 2, null: false
-    t.boolean  "earned_proficiency",                                                  null: false
-    t.integer  "count_attempts",                   limit: 8,                          null: false
-    t.string   "ip_address",                       limit: 20,                         null: false
-    t.string   "question_name",                    limit: 50,                         null: false
+    t.boolean  "worth_credit",                                                         null: false
+    t.datetime "time_done",                                                            null: false
+    t.integer  "time_taken",                       limit: 4,                           null: false
+    t.integer  "count_hints",                      limit: 4,                           null: false
+    t.boolean  "hint_used",                                                            null: false
+    t.decimal  "points_earned",                                precision: 5, scale: 2, null: false
+    t.boolean  "earned_proficiency",                                                   null: false
+    t.integer  "count_attempts",                   limit: 8,                           null: false
+    t.string   "ip_address",                       limit: 20,                          null: false
+    t.string   "question_name",                    limit: 50,                          null: false
     t.string   "request_type",                     limit: 50
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "correct"
-    t.decimal  "pe_score",                                    precision: 5, scale: 2
+    t.decimal  "pe_score",                                     precision: 5, scale: 2
     t.integer  "pe_steps_fixed",                   limit: 4
     t.integer  "inst_course_offering_exercise_id", limit: 4
     t.integer  "inst_module_section_exercise_id",  limit: 4
+    t.string   "answer",                           limit: 255
   end
 
   add_index "odsa_exercise_attempts", ["inst_book_id"], name: "odsa_exercise_attempts_inst_book_id_fk", using: :btree
@@ -604,15 +605,15 @@ ActiveRecord::Schema.define(version: 20190628190129) do
   add_index "users", ["slug"], name: "index_users_on_slug", unique: true, using: :btree
   add_index "users", ["time_zone_id"], name: "index_users_on_time_zone_id", using: :btree
 
-  add_foreign_key "course_enrollments", "course_offerings", name: "course_enrollments_course_offering_id_fk"
+  add_foreign_key "course_enrollments", "course_offerings", name: "course_enrollments_course_offering_id_fk", on_delete: :cascade
   add_foreign_key "course_enrollments", "course_roles", name: "course_enrollments_course_role_id_fk"
-  add_foreign_key "course_enrollments", "users", name: "course_enrollments_user_id_fk"
-  add_foreign_key "course_offerings", "courses", name: "course_offerings_course_id_fk"
+  add_foreign_key "course_enrollments", "users", name: "course_enrollments_user_id_fk", on_delete: :cascade
+  add_foreign_key "course_offerings", "courses", name: "course_offerings_course_id_fk", on_delete: :cascade
   add_foreign_key "course_offerings", "late_policies", name: "course_offerings_late_policy_id_fk"
   add_foreign_key "course_offerings", "lms_instances", name: "course_offerings_lms_instance_id_fk"
-  add_foreign_key "course_offerings", "terms", name: "course_offerings_term_id_fk"
-  add_foreign_key "courses", "organizations", name: "courses_organization_id_fk"
-  add_foreign_key "identities", "users", name: "identities_user_id_fk"
+  add_foreign_key "course_offerings", "terms", name: "course_offerings_term_id_fk", on_delete: :cascade
+  add_foreign_key "courses", "organizations", name: "courses_organization_id_fk", on_delete: :cascade
+  add_foreign_key "identities", "users", name: "identities_user_id_fk", on_delete: :cascade
   add_foreign_key "inst_book_section_exercises", "inst_books", name: "inst_book_section_exercises_inst_book_id_fk"
   add_foreign_key "inst_book_section_exercises", "inst_exercises", name: "inst_book_section_exercises_inst_exercise_id_fk"
   add_foreign_key "inst_book_section_exercises", "inst_sections", name: "inst_book_section_exercises_inst_section_id_fk"
