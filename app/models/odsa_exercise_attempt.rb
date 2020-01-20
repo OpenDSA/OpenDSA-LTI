@@ -206,7 +206,11 @@ class OdsaExerciseAttempt < ActiveRecord::Base
     if self.correct
       self.earned_proficiency = true
       if hasBook
-        self.points_earned = inst_book_section_exercise.points
+        if self.request_type == 'AE'
+          self.points_earned = inst_book_section_exercise.points * self.pe_score
+        else
+          self.points_earned = inst_book_section_exercise.points
+        end
       elsif has_standalone_module
         self.points_earned = inst_module_section_exercise.points
       else

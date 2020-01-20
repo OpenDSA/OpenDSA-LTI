@@ -217,7 +217,7 @@ class OdsaExerciseAttemptsController < ApplicationController
         correct = params[:score].to_f >= params[:threshold].to_f
         exerciseType = "PE"
       else
-        correct = true
+        correct = 1
         exerciseType = "AE"
       end
 
