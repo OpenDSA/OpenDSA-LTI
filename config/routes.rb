@@ -22,6 +22,7 @@ OpenDSA::Application.routes.draw do
   get '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
   post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_pe'
+  post '/odsa_exercise_attempts/ae' => 'odsa_exercise_attempts#create_ae'
   # get '/odsa_exercise_attempts/get_count' => 'odsa_exercise_attempts#get_count'
 
   #me
