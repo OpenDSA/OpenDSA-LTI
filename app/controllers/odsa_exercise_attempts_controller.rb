@@ -211,16 +211,10 @@ class OdsaExerciseAttemptsController < ApplicationController
           exercise_progress.save
         end
       end
-      exerciseType = ""
-      already_proficient = exercise_progress.proficient?
-      if params[:type] == "pe"
-        correct = params[:score].to_f >= params[:threshold].to_f
-        exerciseType = "PE"
-      else
-        correct = 1
-        exerciseType = "AE"
-      end
 
+      already_proficient = exercise_progress.proficient?
+      correct = params[:score].to_f >= params[:threshold].to_f
+      
       exercise_attempt = OdsaExerciseAttempt.new(
         inst_book_id: params[:inst_book_id],
         user: current_user,
@@ -236,7 +230,7 @@ class OdsaExerciseAttemptsController < ApplicationController
         count_attempts: params[:uiid],
         hint_used: 0,
         question_name: params[:exercise],
-        request_type: exerciseType,
+        request_type: "PE",
         ip_address: request.ip,
         pe_score: params[:score],
         pe_steps_fixed: params[:steps_fixed],
