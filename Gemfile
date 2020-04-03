@@ -150,5 +150,5 @@ gem "mustache", "~> 1.0"
 gem "whenever", :require => false
 
 #for setting SameSite=None to cookies generated
-gem 'user_agent_parser', '< 2.5.2' # 2.6.0 or higher requires ruby>=2.4
+gem 'user_agent_parser', '< 2.6.1' # 2.6.0 or higher requires ruby>=2.4
 gem 'rails_same_site_cookie'
