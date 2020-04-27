@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< Updated upstream
 ActiveRecord::Schema.define(version: 20190628190129) do
+=======
+ActiveRecord::Schema.define(version: 20200425231608) do
+>>>>>>> Stashed changes
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -550,6 +554,15 @@ ActiveRecord::Schema.define(version: 20190628190129) do
 
   add_index "organizations", ["name"], name: "index_organizations_on_name", unique: true, using: :btree
   add_index "organizations", ["slug"], name: "index_organizations_on_slug", unique: true, using: :btree
+
+  create_table "pi_attempts", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.string   "frame_name", limit: 255
+    t.integer  "question",   limit: 4
+    t.integer  "correct",    limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "terms", force: :cascade do |t|
     t.integer  "season",     limit: 4,   null: false

@@ -24,6 +24,11 @@ OpenDSA::Application.routes.draw do
   post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_pe'
   # get '/odsa_exercise_attempts/get_count' => 'odsa_exercise_attempts#get_count'
 
+  post '/pi_attempts' => 'pi_attempts#create'
+  get '/pi_attempts/get_attempts' => 'pi_attempts#get_attempts'
+  get '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
+  get '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
+  
   #me
   #get '/Display' => 'course_offerings#postData'
   #get '/course_offerings/:id/Display' => 'course_offerings#postData'
