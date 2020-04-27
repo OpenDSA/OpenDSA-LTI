@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< Updated upstream
-ActiveRecord::Schema.define(version: 20190628190129) do
-=======
 ActiveRecord::Schema.define(version: 20200425231608) do
->>>>>>> Stashed changes
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
