@@ -315,6 +315,7 @@ GEM
     mysql2 (0.5.2)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
+    nio4r (2.5.2)
     nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
     oauth (0.5.4)
@@ -357,10 +358,11 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     public_suffix (3.0.3)
-    puma (3.11.4)
+    puma (4.3.1)
+      nio4r (~> 2.0)
     rabl (0.14.0)
       activesupport (>= 2.3.14)
-    rack (1.6.11)
+    rack (1.6.12)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.11.1)
@@ -382,6 +384,9 @@ GEM
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.2.0)
       loofah (~> 2.2, >= 2.2.2)
+    rails_same_site_cookie (0.1.8)
+      rack (>= 1.5)
+      user_agent_parser (~> 2.5)
     railties (4.2.11.1)
       actionpack (= 4.2.11.1)
       activesupport (= 4.2.11.1)
@@ -479,6 +484,7 @@ GEM
     uber (0.1.0)
     uglifier (4.1.20)
       execjs (>= 0.3.0, < 3)
+    user_agent_parser (2.5.1)
     virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
@@ -569,10 +575,11 @@ DEPENDENCIES
   pandarus (~> 0.6.7)
   progress_job
   pry
-  puma (~> 3.11.4)
+  puma (~> 4.3.1)
   rabl
   rails (< 5)
   rails-erd!
+  rails_same_site_cookie
   redcarpet
   remotipart
   representable
@@ -589,6 +596,7 @@ DEPENDENCIES
   truncate_html
   tzinfo
   uglifier (>= 1.3.0)
+  user_agent_parser (< 2.5.2)
   wannabe_bool
   whenever
 

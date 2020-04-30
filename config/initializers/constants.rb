@@ -48,7 +48,7 @@ module OpenDSA
   STANDALONE_MODULES_DIRECTORY = File.join(OPENDSA_DIRECTORY, STANDALONE_MODULES_DIR_NAME)
 
   # A regular expression to match exercise/slideshow/frame directives in RST files
-  EXERCISE_RE = Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe|ff)")
+  EXERCISE_RE = Regexp.new("^(\.\. )(avembed|inlineav):: (([^\s]+\/)*([^\s.]*)(\.html)?) (ka|ss|pe|ff|ae)")
 
   # A regular expression to match external tool directives in RST files
   EXTR_RE = Regexp.new("^(\.\. )(extrtoolembed:: '([^']+)')")

@@ -213,9 +213,8 @@ class OdsaExerciseAttemptsController < ApplicationController
       end
 
       already_proficient = exercise_progress.proficient?
-
       correct = params[:score].to_f >= params[:threshold].to_f
-
+      
       exercise_attempt = OdsaExerciseAttempt.new(
         inst_book_id: params[:inst_book_id],
         user: current_user,
@@ -352,7 +351,8 @@ class OdsaExerciseAttemptsController < ApplicationController
 
       already_proficient = exercise_progress.proficient?
 
-      correct = params[:score].to_f >= params[:threshold].to_f
+      correct = 1
+      #correct = params[:score].to_f >= params[:threshold].to_f
 
       exercise_attempt = OdsaExerciseAttempt.new(
         inst_book_id: params[:inst_book_id],
@@ -395,6 +395,7 @@ class OdsaExerciseAttemptsController < ApplicationController
             
             exercise_progress.post_course_offering_exercise_score_to_lms()
           end
+          # byebug
           format.json {
             render :json => {
                      :exercise_progress => exercise_progress,

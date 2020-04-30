@@ -2,80 +2,83 @@
 
 // allows us to customize node apperances when they are rendered
 // from https://github.com/vakata/jstree/blob/master/src/misc.js
-(function (factory) {
-	"use strict";
-	if (typeof define === 'function' && define.amd) {
-		define('jstree.node_customize', ['jquery','jstree'], factory);
-	}
-	else if(typeof exports === 'object') {
-		factory(require('jquery'), require('jstree'));
-	}
-	else {
-		factory(jQuery, jQuery.jstree);
-	}
-}(function ($, jstree, undefined) {
-	"use strict";
+(function(factory) {
+  "use strict";
+  if (typeof define === "function" && define.amd) {
+    define("jstree.node_customize", ["jquery", "jstree"], factory);
+  } else if (typeof exports === "object") {
+    factory(require("jquery"), require("jstree"));
+  } else {
+    factory(jQuery, jQuery.jstree);
+  }
+})(function($, jstree, undefined) {
+  "use strict";
 
-	if($.jstree.plugins.node_customize) { return; }
+  if ($.jstree.plugins.node_customize) {
+    return;
+  }
 
-	/**
-	 * the settings object.
-	 * key is the attribute name to select the customizer function from switch.
-	 * switch is a key => function(el, node) map.
-	 * default: function(el, node) will be called if the type could not be mapped
-	 * @name $.jstree.defaults.node_customize
-	 * @plugin node_customize
-	 */
-	$.jstree.defaults.node_customize = {
-		"key": "type",
-		"switch": {},
-		"default": null
-	};
+  /**
+   * the settings object.
+   * key is the attribute name to select the customizer function from switch.
+   * switch is a key => function(el, node) map.
+   * default: function(el, node) will be called if the type could not be mapped
+   * @name $.jstree.defaults.node_customize
+   * @plugin node_customize
+   */
+  $.jstree.defaults.node_customize = {
+    key: "type",
+    switch: {},
+    default: null
+  };
 
-	$.jstree.plugins.node_customize = function (options, parent) {
-		this.redraw_node = function (obj, deep, callback, force_draw) {
-			var node_id = obj;
-			var el = parent.redraw_node.apply(this, arguments);
-			if (el) {
-				var node = this._model.data[node_id];
-				var cfg = this.settings.node_customize;
-				var key = cfg.key;
-				var type =  (node && node.original && node.original[key]);
-				var customizer = (type && cfg.switch[type]) || cfg.default;
-				if(customizer)
-					customizer(el, node);
-			}
-			return el;
-		};
-	};
-}));
+  $.jstree.plugins.node_customize = function(options, parent) {
+    this.redraw_node = function(obj, deep, callback, force_draw) {
+      var node_id = obj;
+      var el = parent.redraw_node.apply(this, arguments);
+      if (el) {
+        var node = this._model.data[node_id];
+        var cfg = this.settings.node_customize;
+        var key = cfg.key;
+        var type = node && node.original && node.original[key];
+        var customizer = (type && cfg.switch[type]) || cfg.default;
+        if (customizer) customizer(el, node);
+      }
+      return el;
+    };
+  };
+});
 
-(function () {
+(function() {
   // constants
-  var EXTR_OPTIONS = ['points'];
+  var EXTR_OPTIONS = ["points"];
 
-  var availTree, includedTree,
-      includedTreeElem, availTreeElem,
-      langSelect, addChapterDialog, renameChapterDialog,
-      exSettingsDialog;
+  var availTree,
+    includedTree,
+    includedTreeElem,
+    availTreeElem,
+    langSelect,
+    addChapterDialog,
+    renameChapterDialog,
+    exSettingsDialog;
 
   var changesMade = false;
 
   // indicates if we are in the processing of loading an existing configuration
   var loadingConfig = false;
-  
+
   /* whether any changes have been made to the configuration */
   var dirty = false;
 
   /* id of the loaded configuration, or null */
   var bookId = null;
 
-  $(document).ready(function () {
+  $(document).ready(function() {
     var codeLangTreeData = [];
     for (var langId in window.ODSA.codeLanguages) {
       var codeLang = window.ODSA.codeLanguages[langId];
       codeLangTreeData.push({
-        id: encodeId(langId + '-lang'),
+        id: encodeId(langId + "-lang"),
         text: codeLang.label,
         langId: langId
       });
@@ -88,9 +91,19 @@
         copy: false
       },
       core: {
-        check_callback: function(operation, node, node_parent, node_position, more) {
-          return operation === 'move_node' && node_parent.id === '#' && 
-            !more.is_multi && !more.is_foreign;
+        check_callback: function(
+          operation,
+          node,
+          node_parent,
+          node_position,
+          more
+        ) {
+          return (
+            operation === "move_node" &&
+            node_parent.id === "#" &&
+            !more.is_multi &&
+            !more.is_foreign
+          );
         },
         data: codeLangTreeData
       },
@@ -98,239 +111,249 @@
     });
 
     // setup the split pane used for book content selection
-    var pane1 = document.querySelector('#chosen-pane');
-    var pane2 = document.querySelector('#available-pane');
+    var pane1 = document.querySelector("#chosen-pane");
+    var pane2 = document.querySelector("#available-pane");
     Split([pane1, pane2], {
       sizes: [50, 50],
       minSize: 280
     });
 
-    langSelect = $('#book-lang');
+    langSelect = $("#book-lang");
     if (langSelect.val() != null && langSelect.val() != -1) {
       initializeJsTree(ODSA.availableModules[langSelect.val()].children);
     }
-    langSelect.on('change', function() {
+    langSelect.on("change", function() {
       if (!loadingConfig) {
         initializeJsTree(ODSA.availableModules[langSelect.val()].children);
       }
     });
 
     // dialog displayed when creating a new chapter
-    addChapterDialog = $('#add-chapter-dialog').dialog({
+    addChapterDialog = $("#add-chapter-dialog").dialog({
       autoOpen: false,
       modal: true,
       width: 500,
       buttons: {
-        'Add': function() {
+        Add: function() {
           if (addChapter()) {
-            addChapterDialog.dialog('close');
+            addChapterDialog.dialog("close");
           }
         },
-        'Cancel': function() {
-          addChapterDialog.dialog('close');
-          updateDialogErrors(addChapterDialog, '');
+        Cancel: function() {
+          addChapterDialog.dialog("close");
+          updateDialogErrors(addChapterDialog, "");
         }
       },
       close: function() {
         addChapterForm[0].reset();
       },
       open: function() {
-        updateDialogErrors(addChapterDialog, '');
+        updateDialogErrors(addChapterDialog, "");
       }
     });
 
-    var addChapterForm = addChapterDialog.find('form').on('submit', function(event) {
-      event.preventDefault();
-      addChapter();
+    var addChapterForm = addChapterDialog
+      .find("form")
+      .on("submit", function(event) {
+        event.preventDefault();
+        addChapter();
+      });
+
+    $("#btn-add-chapter").on("click", function() {
+      addChapterDialog.dialog("open");
     });
 
-    $('#btn-add-chapter').on('click', function() {
-      addChapterDialog.dialog('open');
-    });
-
-    $('#add-chapter-submit').on('click', function() {
+    $("#add-chapter-submit").on("click", function() {
       if (addChapter()) {
-        addChapterDialog.dialog('close');
+        addChapterDialog.dialog("close");
       }
     });
 
     // dialog displayed when renaming a chapter
-    renameChapterDialog = $('#rename-chapter-dialog').dialog({
+    renameChapterDialog = $("#rename-chapter-dialog").dialog({
       autoOpen: false,
       modal: true,
       width: 500,
       buttons: {
-        'Rename': renameChapterHelper,
-        'Cancel': function() {
-          renameChapterDialog.dialog('close');
-          updateDialogErrors(addChapterDialog, '');
+        Rename: renameChapterHelper,
+        Cancel: function() {
+          renameChapterDialog.dialog("close");
+          updateDialogErrors(addChapterDialog, "");
         }
       },
       close: function() {
         renameChapterForm[0].reset();
       },
       open: function() {
-        updateDialogErrors(addChapterDialog, '');
+        updateDialogErrors(addChapterDialog, "");
       }
     });
 
-    $('#rename-chapter-submit').on('click', function() {
+    $("#rename-chapter-submit").on("click", function() {
       renameChapterHelper();
     });
 
-    var renameChapterForm = renameChapterDialog.find('form').on('submit', function(event) {
-      event.preventDefault();
-      renameChapterHelper();
-    });
+    var renameChapterForm = renameChapterDialog
+      .find("form")
+      .on("submit", function(event) {
+        event.preventDefault();
+        renameChapterHelper();
+      });
 
     function renameChapterHelper() {
-      var nodeId = renameChapterDialog.dialog('option', 'nodeId');
-      var newName = $.trim($('#chapter-newname').val());
+      var nodeId = renameChapterDialog.dialog("option", "nodeId");
+      var newName = $.trim($("#chapter-newname").val());
       if (renameChapter(nodeId, newName)) {
-        renameChapterDialog.dialog('close');
+        renameChapterDialog.dialog("close");
       }
     }
 
     // dialog displayed when editing exercise settings
-    exSettingsDialog = $('#exercise-settings-dialog').dialog({
+    exSettingsDialog = $("#exercise-settings-dialog").dialog({
       autoOpen: false,
       modal: true,
       width: 500,
       buttons: {
-        'Save': exerciseSettingsHelper,
-        'Cancel': function() {
-          exSettingsDialog.dialog('close');
-          updateDialogErrors(exSettingsDialog, '');
+        Save: exerciseSettingsHelper,
+        Cancel: function() {
+          exSettingsDialog.dialog("close");
+          updateDialogErrors(exSettingsDialog, "");
         }
       },
       close: function() {
         exSettingsForm[0].reset();
       },
       open: function() {
-        updateDialogErrors(exSettingsDialog, '');
+        updateDialogErrors(exSettingsDialog, "");
       }
     });
 
-    $('#exercise-settings-submit').on('click', exerciseSettingsHelper);
+    $("#exercise-settings-submit").on("click", exerciseSettingsHelper);
 
-    var exSettingsForm = exSettingsDialog.find('form').on('submit', function(event) {
-      event.preventDefault();
-      exerciseSettingsHelper();
-    });
+    var exSettingsForm = exSettingsDialog
+      .find("form")
+      .on("submit", function(event) {
+        event.preventDefault();
+        exerciseSettingsHelper();
+      });
 
     // parse settings from the dialog and apply them to the
     // target exercise
     function exerciseSettingsHelper() {
-      var node = getIncludedNode(exSettingsDialog.dialog('option', 'nodeId'));
+      var node = getIncludedNode(exSettingsDialog.dialog("option", "nodeId"));
       var settings = {
-        points: Number.parseFloat($('#exercise-settings-points').val()),
+        points: Number.parseFloat($("#exercise-settings-points").val())
       };
-      if (node.type !== 'extr') {
-        settings.required = $('#exercise-settings-required').is(':checked');
-        if (node.type === 'ka') {
-          settings.threshold = Number.parseInt($('#exercise-settings-threshold').val());
+      if (node.type !== "extr") {
+        settings.required = $("#exercise-settings-required").is(":checked");
+        if (node.type === "ka") {
+          settings.threshold = Number.parseInt(
+            $("#exercise-settings-threshold").val()
+          );
         }
-        if (node.type === 'pe') {
-          settings.threshold = Number.parseFloat($('#exercise-settings-threshold').val());
-          var feedback = $('#exercise-settings-feedback').val();
-          if (feedback === 'continuous') {
-            settings['JXOP-feedback'] = feedback;
-            settings['JXOP-fix'] = $('#exercise-settings-fix').val();
+        if (node.type === "pe") {
+          settings.threshold = Number.parseFloat(
+            $("#exercise-settings-threshold").val()
+          );
+          var feedback = $("#exercise-settings-feedback").val();
+          if (feedback === "continuous") {
+            settings["JXOP-feedback"] = feedback;
+            settings["JXOP-fix"] = $("#exercise-settings-fix").val();
           }
-          if ($('#exercise-settings-code').is(':checked')) {
-            settings['JXOP-code'] = 'none';
+          if ($("#exercise-settings-code").is(":checked")) {
+            settings["JXOP-code"] = "none";
           }
         }
       }
       setExerciseSettings(node, settings);
-      exSettingsDialog.dialog('close');
+      exSettingsDialog.dialog("close");
     }
 
-    var kaOptionList = ['required', 'points', 'threshold'];
+    var kaOptionList = ["required", "points", "threshold"];
     for (var i = 0; i < kaOptionList.length; i++) {
       var kaOption = kaOptionList[i];
-      var elem = $('#glob-ka-' + kaOption);
-      elem.on('change', function() {
-        onGlobalExerciseSettingsUpdate('ka', globalKaSettings());
+      var elem = $("#glob-ka-" + kaOption);
+      elem.on("change", function() {
+        onGlobalExerciseSettingsUpdate("ka", globalKaSettings());
       });
     }
 
-    var ffOptionList = ['required', 'points'];
+    var ffOptionList = ["required", "points"];
     for (var i = 0; i < ffOptionList.length; i++) {
       var ffOption = ffOptionList[i];
-      var elem = $('#glob-ff-' + ffOption);
-      elem.on('change', function() {
-        onGlobalExerciseSettingsUpdate('ff', globalFfSettings());
+      var elem = $("#glob-ff-" + ffOption);
+      elem.on("change", function() {
+        onGlobalExerciseSettingsUpdate("ff", globalFfSettings());
       });
     }
 
-    var peOptionList = ['required', 'points', 'threshold', 'feedback', 'fix'];
+    var peOptionList = ["required", "points", "threshold", "feedback", "fix"];
     for (var i = 0; i < peOptionList.length; i++) {
       var peOption = peOptionList[i];
-      var elem = $('#glob-pe-' + peOption);
-      elem.on('change', function() {
-        onGlobalExerciseSettingsUpdate('pe', globalPeSettings());
+      var elem = $("#glob-pe-" + peOption);
+      elem.on("change", function() {
+        onGlobalExerciseSettingsUpdate("pe", globalPeSettings());
       });
     }
 
-    var extrOptionList = ['points'];
+    var extrOptionList = ["points"];
     for (var i = 0; i < ODSA.learningTools.length; i++) {
       var tool = ODSA.learningTools[i];
       for (var j = 0; j < extrOptionList.length; j++) {
         var extrOption = extrOptionList[j];
-        var elem = $('#glob-' + tool.name + '-' + extrOption);
-        elem.on('change', function() {
-          onGlobalExerciseSettingsUpdate('extr', globalExtrSettings(tool.name), tool.name);
+        var elem = $("#glob-" + tool.name + "-" + extrOption);
+        elem.on("change", function() {
+          onGlobalExerciseSettingsUpdate(
+            "extr",
+            globalExtrSettings(tool.name),
+            tool.name
+          );
         });
       }
     }
 
-    var exSettingsFeedback = $('#exercise-settings-feedback');
-    var exSettingsFix = $('#exercise-settings-fix');
-    exSettingsFeedback.on('change', function() {
-      if (exSettingsFeedback.val() === 'continuous') {
-        exSettingsFix.removeAttr('disabled');
-      }
-      else {
-        exSettingsFix.attr('disabled', true);
+    var exSettingsFeedback = $("#exercise-settings-feedback");
+    var exSettingsFix = $("#exercise-settings-fix");
+    exSettingsFeedback.on("change", function() {
+      if (exSettingsFeedback.val() === "continuous") {
+        exSettingsFix.removeAttr("disabled");
+      } else {
+        exSettingsFix.attr("disabled", true);
       }
     });
 
-
-    var submitType = 'download';
-    $('#book-config-form').on('submit', function(event) {
+    var submitType = "download";
+    $("#book-config-form").on("submit", function(event) {
       event.preventDefault();
-      if (submitType === 'download') {
+      if (submitType === "download") {
         downloadConfig();
+      } else {
+        saveConfig(submitType === "update");
       }
-      else {
-        saveConfig(submitType === 'update');
-      }
     });
 
-    $('#btn-update-config').on('click', function(event) {
-      submitType = 'update';
+    $("#btn-update-config").on("click", function(event) {
+      submitType = "update";
     });
 
-    $('#btn-save-config').on('click', function(event) {
-      submitType = 'save';
+    $("#btn-save-config").on("click", function(event) {
+      submitType = "save";
     });
 
-    $('#btn-download-config').on('click', function(event) {
-      submitType = 'download';
+    $("#btn-download-config").on("click", function(event) {
+      submitType = "download";
     });
 
     function saveConfig(update) {
       document.activeElement.blur();
-      $('#btn-save-config').attr('disabled', true);
-      $('#btn-update-config').attr('disabled', true);
-      $('#btn-download-config').attr('disabled', true);
+      $("#btn-save-config").attr("disabled", true);
+      $("#btn-update-config").attr("disabled", true);
+      $("#btn-download-config").attr("disabled", true);
       var overlayMsg;
       if (update) {
-        overlayMsg = 'Updating';
-      }
-      else {
-        overlayMsg = 'Saving';
+        overlayMsg = "Updating";
+      } else {
+        overlayMsg = "Saving";
       }
       displayLoadingOverlay(overlayMsg);
 
@@ -342,32 +365,32 @@
       }
 
       $.ajax({
-        type: 'POST',
-        url: '/inst_books/update',
+        type: "POST",
+        url: "/inst_books/update",
         data: JSON.stringify({ inst_book: config }),
-        contentType: 'application/json',
+        contentType: "application/json",
         success: function(data, txtStatus, xhr) {
           hideLoadingOverlay();
           if (update) {
-            alert('Your book configuration was updated successfully.');
-          }
-          else {
-            alert('Your book configuration was saved successfully.');
+            alert("Your book configuration was updated successfully.");
+          } else {
+            alert("Your book configuration was saved successfully.");
           }
         },
         error: function(xhr, txtStatus, errorThrown) {
           hideLoadingOverlay();
           if (txtStatus && errorThrown) {
-            alert('Error saving configuration: ' + txtStatus + ' ' + errorThrown);
-          }
-          else {
-            alert('An error occured while saving the configuration');
+            alert(
+              "Error saving configuration: " + txtStatus + " " + errorThrown
+            );
+          } else {
+            alert("An error occured while saving the configuration");
           }
         },
         complete: function() {
-          $('#btn-save-config').removeAttr('disabled', true);
-          $('#btn-update-config').removeAttr('disabled', true);
-          $('#btn-download-config').removeAttr('disabled', true);
+          $("#btn-save-config").removeAttr("disabled", true);
+          $("#btn-update-config").removeAttr("disabled", true);
+          $("#btn-download-config").removeAttr("disabled", true);
         }
       });
     }
@@ -376,34 +399,36 @@
       var config = allGlobalSettings();
       config.chapters = includedChapters();
 
-      var dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, 2) + '\n');
-      var exportName = config.title.replace(/ /g, '_');
-      var downloadAnchorNode = document.createElement('a');
+      var dataStr =
+        "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(config, null, 2) + "\n");
+      var exportName = config.title.replace(/ /g, "_");
+      var downloadAnchorNode = document.createElement("a");
       downloadAnchorNode.setAttribute("href", dataStr);
       downloadAnchorNode.setAttribute("download", exportName + ".json");
-      downloadAnchorNode.style.display = 'none';
+      downloadAnchorNode.style.display = "none";
       document.body.appendChild(downloadAnchorNode);
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
     }
 
-    $('#upload-config-file').on('change', function() {
-      $('#config-file-load').removeAttr('disabled');
+    $("#upload-config-file").on("change", function() {
+      $("#config-file-load").removeAttr("disabled");
     });
 
-    if ($('#upload-config-file')[0].value !== '') {
-      $('#config-file-load').removeAttr('disabled');
+    if ($("#upload-config-file")[0].value !== "") {
+      $("#config-file-load").removeAttr("disabled");
     }
 
     // load a configuration from the file on the user's computer
-    $('#config-file-load').on('click', loadFileConfiguration);
+    $("#config-file-load").on("click", loadFileConfiguration);
 
     // load a configuration from a reference configuration stored on the
     // OpenDSA server
-    $('#reference-config-load').on('click', loadReferenceConfiguration);
+    $("#reference-config-load").on("click", loadReferenceConfiguration);
 
     // load one of the user's configurations stored in the OpenDSA database
-    $('#user-config-load').on('click', loadUserConfiguration);
+    $("#user-config-load").on("click", loadUserConfiguration);
   });
 
   /* changes made from default options
@@ -416,20 +441,22 @@
 
   /* mark a tree node as having settings different from the globals/defaults */
   function markModified(nodeId, elem) {
-    var iconId = nodeId + '_modified';
-    if (getOption(nodeId, 'showsection') === false) {
-      $(elem).addClass('section-hidden');
+    var iconId = nodeId + "_modified";
+    if (getOption(nodeId, "showsection") === false) {
+      $(elem).addClass("section-hidden");
     }
-    if ($('#' + iconId).length === 0) {
+    if ($("#" + iconId).length === 0) {
       var node = getIncludedNode(nodeId);
       if (!node) return;
-      elem.prepend('<i id="' + iconId + '" class="jstree-icon modified-icon">M</i>');
+      elem.prepend(
+        '<i id="' + iconId + '" class="jstree-icon modified-icon">M</i>'
+      );
       for (var i = 0; i < node.parents.length; i++) {
         var parentId = node.parents[i];
-        if (parentId === '#') {
+        if (parentId === "#") {
           continue;
         }
-        var anchor = $('#' + parentId + '_anchor');
+        var anchor = $("#" + parentId + "_anchor");
         markModifiedChildren(parentId, anchor);
       }
     }
@@ -438,14 +465,14 @@
   /* Mark a tree node as having children with settings different from
      the global/default settings */
   function markModifiedChildren(nodeId, elem) {
-    var iconId = nodeId + '_childmodified';
-    if ($('#' + iconId).length === 0) {
-      var modifiedIcon = $('#' + nodeId + '_modified');
-      var html = '<i id="' + iconId + '" class="jstree-icon modifiedchild-icon">•</i>';
+    var iconId = nodeId + "_childmodified";
+    if ($("#" + iconId).length === 0) {
+      var modifiedIcon = $("#" + nodeId + "_modified");
+      var html =
+        '<i id="' + iconId + '" class="jstree-icon modifiedchild-icon">•</i>';
       if (modifiedIcon.length > 0) {
         modifiedIcon.after(html);
-      }
-      else {
+      } else {
         elem.prepend(html);
       }
     }
@@ -468,18 +495,18 @@
   /* Mark a tree node has not having any children with settings different from
      the global/default settings */
   function markNotModifiedChildren(nodeId) {
-    var iconId = nodeId + '_childmodified';
-    $('#' + iconId).remove();
+    var iconId = nodeId + "_childmodified";
+    $("#" + iconId).remove();
   }
 
   /* mark a tree node as not having settings different from the globals/defaults */
   function markNotModified(nodeId) {
-    var iconId = nodeId + '_modified';
-    $('#' + iconId).remove();
+    var iconId = nodeId + "_modified";
+    $("#" + iconId).remove();
     var node = getIncludedNode(nodeId);
     for (var i = 0; i < node.parents.length; i++) {
       var parentId = node.parents[i];
-      if (parentId === '#') continue;
+      if (parentId === "#") continue;
       if (!hasModifiedChildren(parentId)) {
         markNotModifiedChildren(parentId);
       }
@@ -490,19 +517,19 @@
      for a tree node */
   function setOption(nodeId, optionName, optionValue) {
     var opts = optionChanges[nodeId];
-    if (typeof opts === 'undefined') {
+    if (typeof opts === "undefined") {
       opts = {};
       optionChanges[nodeId] = opts;
     }
     opts[optionName] = optionValue;
-    var anchor = $('#' + nodeId + '_anchor');
+    var anchor = $("#" + nodeId + "_anchor");
     markModified(nodeId, anchor);
   }
 
   /* Remove an option for a given node */
   function deleteOption(nodeId, optionName) {
     var opts = optionChanges[nodeId];
-    if (typeof opts === 'undefined') return;
+    if (typeof opts === "undefined") return;
     delete opts[optionName];
     if ($.isEmptyObject(opts)) {
       // the options object is empty, so remove it
@@ -522,7 +549,7 @@
 
   /* Get all of the settings for a given node */
   function getOptions(node) {
-    if (typeof node !== 'object') {
+    if (typeof node !== "object") {
       node = getIncludedNode(node);
     }
     var opts = optionChanges[node.id] || {};
@@ -560,7 +587,7 @@
   function addModule(node, parent) {
     if (node.original.included === true) return false;
     node.original.included = true;
-    includedTree.jstree().copy_node(node, parent, 'last');
+    includedTree.jstree().copy_node(node, parent, "last");
     availTree.jstree().delete_node(node);
   }
 
@@ -576,13 +603,19 @@
   /* Add a chapter to the included tree */
   function addChapter(name) {
     if (!name) {
-      var elem = $('#chapter-name');
+      var elem = $("#chapter-name");
       name = $.trim(elem.val());
     }
     var valid = validateChapterName(addChapterDialog, name);
 
     if (valid) {
-      includedTree.jstree(true).create_node('#', {text: name, type: 'chapter', id: encodeChapterId(name)}, "last");
+      includedTree
+        .jstree(true)
+        .create_node(
+          "#",
+          { text: name, type: "chapter", id: encodeChapterId(name) },
+          "last"
+        );
     }
 
     return valid;
@@ -591,8 +624,14 @@
   /* Check that the chapter name is unique and meets other requirements */
   function validateChapterName(dialog, name, ignore) {
     var valid = !chapterExists(dialog, name, ignore);
-    valid = valid && checkRegexp(dialog, name, /^.{1,100}$/,
-      'Name must be between 1 and 100 characters long.');
+    valid =
+      valid &&
+      checkRegexp(
+        dialog,
+        name,
+        /^.{1,100}$/,
+        "Name must be between 1 and 100 characters long."
+      );
     return valid;
   }
 
@@ -603,8 +642,11 @@
     for (var i = 0; i < treeNodes.length; i++) {
       var node = treeNodes[i];
       var chapterName = node.text;
-      if (name.toLowerCase() === chapterName.toLowerCase() && node.id !== ignore) {
-        updateDialogErrors(dialog, 'A chapter with that name already exists.');
+      if (
+        name.toLowerCase() === chapterName.toLowerCase() &&
+        node.id !== ignore
+      ) {
+        updateDialogErrors(dialog, "A chapter with that name already exists.");
         return true;
       }
     }
@@ -623,54 +665,54 @@
 
   /* Sets the error message on the dialog */
   function updateDialogErrors(dialog, msg) {
-    var errors = dialog.find('.dialog-errors');
+    var errors = dialog.find(".dialog-errors");
     if (!msg) {
-      errors.text('');
+      errors.text("");
       return;
     }
-    errors
-      .text(msg)
-      .addClass('ui-state-highlight');
+    errors.text(msg).addClass("ui-state-highlight");
     setTimeout(function() {
-      errors.removeClass('ui-state-highlight', 1500);
+      errors.removeClass("ui-state-highlight", 1500);
     }, 500);
   }
 
   /* Display a semi-transparent overlay, a loading indicator,
    and a short message */
   function displayLoadingOverlay(msg) {
-    if (typeof msg === 'undefined') {
-      msg = 'Loading';
+    if (typeof msg === "undefined") {
+      msg = "Loading";
     }
-    $('#overlay-message').text(msg);
-    $('#loading-container').css('display', '');
+    $("#overlay-message").text(msg);
+    $("#loading-container").css("display", "");
   }
 
   function hideLoadingOverlay() {
-    $('#loading-container').css('display', 'none');
+    $("#loading-container").css("display", "none");
   }
 
   /* Gets the global exercise settings  (glob_exer_options) */
   function globalExerSettings() {
     return {
-      'JXOP-debug': $('#JXOP-debug').is(':checked').toString()
+      "JXOP-debug": $("#JXOP-debug")
+        .is(":checked")
+        .toString()
     };
   }
 
   /* Gets the global Khan-Academy Exercise settings (glob_ka_options) */
   function globalKaSettings() {
     return {
-      required: $('#glob-ka-required').is(':checked'),
-      points: Number.parseFloat($('#glob-ka-points').val()),
-      threshold: Number.parseInt($('#glob-ka-threshold').val())
+      required: $("#glob-ka-required").is(":checked"),
+      points: Number.parseFloat($("#glob-ka-points").val()),
+      threshold: Number.parseInt($("#glob-ka-threshold").val())
     };
   }
 
   /* Gets the global Frame settings (glob_ff_options) */
   function globalFfSettings() {
     return {
-      required: $('#glob-ff-required').is(':checked'),
-      points: Number.parseFloat($('#glob-ff-points').val()),
+      required: $("#glob-ff-required").is(":checked"),
+      points: Number.parseFloat($("#glob-ff-points").val()),
       threshold: 1
     };
   }
@@ -678,17 +720,17 @@
   /* Gets the global Proficiency Exercise settings (glob_pe_options) */
   function globalPeSettings() {
     return {
-      required: $('#glob-pe-required').is(':checked'),
-      points: Number.parseFloat($('#glob-pe-points').val()),
-      threshold: Number.parseFloat($('#glob-pe-threshold').val())
+      required: $("#glob-pe-required").is(":checked"),
+      points: Number.parseFloat($("#glob-pe-points").val()),
+      threshold: Number.parseFloat($("#glob-pe-threshold").val())
     };
   }
 
   /* Gets the global Slideshow settings (glob_ss_options) */
   function globalSsSettings() {
     return {
-      required: $('#glob-ss-required').is(':checked'),
-      points: Number.parseFloat($('#glob-ss-points').val()),
+      required: $("#glob-ss-required").is(":checked"),
+      points: Number.parseFloat($("#glob-ss-points").val()),
       threshold: 1
     };
   }
@@ -699,17 +741,17 @@
   function globalExtrSettings(toolName) {
     if (toolName) {
       return {
-        points: Number.parseFloat($('#glob-' + toolName + '-points').val())
+        points: Number.parseFloat($("#glob-" + toolName + "-points").val())
       };
     }
 
     var settings = {
-      points: Number.parseFloat($('#glob-extr-points').val())
+      points: Number.parseFloat($("#glob-extr-points").val())
     };
-    for (var i = 0; i < ODSA.learningTools.length; i++){
+    for (var i = 0; i < ODSA.learningTools.length; i++) {
       var tool = ODSA.learningTools[i];
       settings[tool.name] = {
-        points: Number.parseFloat($('#glob-' + tool.name + '-points').val())
+        points: Number.parseFloat($("#glob-" + tool.name + "-points").val())
       };
     }
     return settings;
@@ -724,7 +766,7 @@
 
   /* Gets the code languages the user has selected */
   function selectedCodeLanguages() {
-    var treeElem = $('#code-langs-tree');
+    var treeElem = $("#code-langs-tree");
     var nodes = treeElem.jstree().get_json();
     var selected = {};
     for (var i = 0; i < nodes.length; i++) {
@@ -740,18 +782,18 @@
   /* Gets an object containing all the global book settings */
   function allGlobalSettings() {
     return {
-      title: $('#book-title').val(),
-      desc: $('#book-desc').val(),
+      title: $("#book-title").val(),
+      desc: $("#book-desc").val(),
       build_dir: "Books",
       code_dir: "SourceCode/",
-      lang: $('#book-lang').val(),
+      lang: $("#book-lang").val(),
       code_lang: selectedCodeLanguages(),
-      build_JSAV: $('#build-jsav').is(':checked'),
-      build_cmap: $('#build-cmap').is(':checked'),
-      suppress_todo: $('#suppress-todo').is(':checked'),
-      dispModComp: $('#disp-mod-comp').is(':checked'),
-      tabbed_codeinc: $('#tabbed-codeinc').is(':checked'),
-      narration_enabled: $('#narration-enabled').is(':checked'),
+      build_JSAV: $("#build-jsav").is(":checked"),
+      build_cmap: $("#build-cmap").is(":checked"),
+      suppress_todo: $("#suppress-todo").is(":checked"),
+      dispModComp: $("#disp-mod-comp").is(":checked"),
+      tabbed_codeinc: $("#tabbed-codeinc").is(":checked"),
+      narration_enabled: $("#narration-enabled").is(":checked"),
       glob_exer_options: globalExerSettings(),
       glob_ss_options: globalSsSettings(),
       glob_ka_options: globalKaSettings(),
@@ -787,11 +829,10 @@
             if (changes) {
               var fixed = {};
               for (var change in changes) {
-                if (change.indexOf('JXOP-') === 0) {
+                if (change.indexOf("JXOP-") === 0) {
                   fixed.exer_options = fixed.exer_options || {};
                   fixed.exer_options[change] = changes[change];
-                }
-                else {
+                } else {
                   fixed[change] = changes[change];
                 }
               }
@@ -820,22 +861,25 @@
   function globalTypeSettings(node) {
     var globals;
     switch (node.type) {
-      case 'ss':
+      case "ss":
         globals = globalSsSettings();
         break;
-      case 'ka':
+      case "ka":
         globals = globalKaSettings();
         break;
-      case 'pe':
+      case "pe":
         globals = globalPeSettings();
         break;
-      case 'ff':
+      case "ff":
         globals = globalFfSettings();
         break;
-      case 'extr':
+      case "ae":
+        globals = globalFfSettings();
+        break;
+      case "extr":
         globals = globalExtrSettings(node.original.learning_tool);
         break;
-      case 'section':
+      case "section":
         globals = globalSectionSettings();
         break;
       default:
@@ -859,8 +903,7 @@
       var value = settings[setting];
       if (!(setting in globalSettings) || value !== globalSettings[setting]) {
         setOption(node.id, setting, value);
-      }
-      else {
+      } else {
         deleteOption(node.id, setting);
       }
     }
@@ -871,7 +914,10 @@
   function onGlobalExerciseSettingsUpdate(type, changes, toolName) {
     for (var nodeId in optionChanges) {
       var node = getIncludedNode(nodeId);
-      if (node.type !== type || (toolName && node.original.learning_tool !== toolName)) {
+      if (
+        node.type !== type ||
+        (toolName && node.original.learning_tool !== toolName)
+      ) {
         continue;
       }
       var options = optionChanges[nodeId];
@@ -898,121 +944,133 @@
   /* Loads the settings from the specified configuration. Used to load
   minimal configurations, such as  */
   function loadConfiguration(config) {
-    $('#book-config-form')[0].reset();
+    $("#book-config-form")[0].reset();
     for (var key in config) {
-      switch(key) {
-        case 'title':
-          $('#book-title').val(config.title);
+      switch (key) {
+        case "title":
+          $("#book-title").val(config.title);
           break;
-        case 'desc':
-          $('#book-desc').val(config.desc);
+        case "desc":
+          $("#book-desc").val(config.desc);
           break;
-        case 'code_lang':
+        case "code_lang":
           setCodeLangs(config.code_lang);
           break;
-        case 'lang':
-          $('#book-lang').val(config.lang);
+        case "lang":
+          $("#book-lang").val(config.lang);
           break;
-        case 'build_JSAV':
-          $('#build-jsav').prop('checked', config.build_JSAV);
+        case "build_JSAV":
+          $("#build-jsav").prop("checked", config.build_JSAV);
           break;
-        case 'build_cmap':
-          $('#build-cmap').prop('checked', config.build_cmap);
+        case "build_cmap":
+          $("#build-cmap").prop("checked", config.build_cmap);
           break;
-        case 'suppress_todo':
-          $('#suppress-todo').prop('checked', true); //config.suppress_todo);
+        case "suppress_todo":
+          $("#suppress-todo").prop("checked", true); //config.suppress_todo);
           break;
-        case 'dispModComp':
-          $('#disp-mod-comp').prop('checked', config.dispModComp);
+        case "dispModComp":
+          $("#disp-mod-comp").prop("checked", config.dispModComp);
           break;
-        case 'tabbed_codeinc':
-          $('#tabbed-codeinc').prop('checked', config.tabbed_codeinc);
+        case "tabbed_codeinc":
+          $("#tabbed-codeinc").prop("checked", config.tabbed_codeinc);
           break;
-        case 'narration_enabled':
-          $('#narration-enabled').prop('checked', config.narration_enabled);
+        case "narration_enabled":
+          $("#narration-enabled").prop("checked", config.narration_enabled);
           break;
-        case 'glob_exer_options':
+        case "glob_exer_options":
           setGlobExerOptions(config.glob_exer_options);
           break;
-        case 'glob_ss_options':
+        case "glob_ss_options":
           setGlobSsOptions(config.glob_ss_options);
           break;
-        case 'glob_ka_options':
+        case "glob_ka_options":
           setGlobKaOptions(config.glob_ka_options);
           break;
-        case 'glob_pe_options':
+        case "glob_pe_options":
           setGlobPeOptions(config.glob_pe_options);
           break;
-        case 'glob_ff_options':
+        case "glob_ff_options":
           setGlobFfOptions(config.glob_ff_options);
           break;
-        case 'glob_extr_options':
+        case "glob_extr_options":
           setGlobExtrOptions(config.glob_extr_options);
           break;
-        case 'chapters':
+        case "chapters":
           //loadChapters(config.chapters, config.lang);
           break;
         default:
-          //
+        //
       }
     }
-    initializeJsTree(ODSA.availableModules[config.lang].children, config.chapters, function() {
-      hideLoadingOverlay();
-    });
+    initializeJsTree(
+      ODSA.availableModules[config.lang].children,
+      config.chapters,
+      function() {
+        hideLoadingOverlay();
+      }
+    );
   }
 
   /* Loads a 'full' configuration file that includes the settings for 
      all exercises, and no global exercise settings. An example
      of this is a configuration pulled from the database. */
   function loadFullConfiguration(config) {
-    initializeJsTree(ODSA.availableModules[config.lang].children, {}, function() {
-      $('#book-config-form')[0].reset();
-      for (var key in config) {
-        switch(key) {
-          case 'title':
-            $('#book-title').val(config.title);
-            break;
-          case 'desc':
-            $('#book-desc').val(config.desc);
-            break;
-          case 'code_lang':
-            setCodeLangs(config.code_lang);
-            break;
-          case 'lang':
-            $('#book-lang').val(config.lang);
-            break;
-          case 'build_JSAV':
-            $('#build-jsav').prop('checked', config.build_JSAV);
-            break;
-          case 'build_cmap':
-            $('#build-cmap').prop('checked', config.build_cmap);
-            break;
-          case 'suppress_todo':
-            $('#suppress-todo').prop('checked', true); //config.suppress_todo);
-            break;
-          case 'dispModComp':
-            $('#disp-mod-comp').prop('checked', config.dispModComp);
-            break;
-          case 'tabbed_codeinc':
-            $('#tabbed-codeinc').prop('checked', config.tabbed_codeinc);
-            break;
-          case 'narration_enabled':
-            $('#narration-enabled').prop('checked', config.narration_enabled);
-            break;
-          case 'glob_exer_options':
-            setGlobExerOptions(config.glob_exer_options);
-            break;
-          case 'chapters':
-            config.chapters = convertChapters(config.chapters);
-            break;
-          default:
+    initializeJsTree(
+      ODSA.availableModules[config.lang].children,
+      {},
+      function() {
+        $("#book-config-form")[0].reset();
+        for (var key in config) {
+          switch (key) {
+            case "title":
+              $("#book-title").val(config.title);
+              break;
+            case "desc":
+              $("#book-desc").val(config.desc);
+              break;
+            case "code_lang":
+              setCodeLangs(config.code_lang);
+              break;
+            case "lang":
+              $("#book-lang").val(config.lang);
+              break;
+            case "build_JSAV":
+              $("#build-jsav").prop("checked", config.build_JSAV);
+              break;
+            case "build_cmap":
+              $("#build-cmap").prop("checked", config.build_cmap);
+              break;
+            case "suppress_todo":
+              $("#suppress-todo").prop("checked", true); //config.suppress_todo);
+              break;
+            case "dispModComp":
+              $("#disp-mod-comp").prop("checked", config.dispModComp);
+              break;
+            case "tabbed_codeinc":
+              $("#tabbed-codeinc").prop("checked", config.tabbed_codeinc);
+              break;
+            case "narration_enabled":
+              $("#narration-enabled").prop("checked", config.narration_enabled);
+              break;
+            case "glob_exer_options":
+              setGlobExerOptions(config.glob_exer_options);
+              break;
+            case "chapters":
+              config.chapters = convertChapters(config.chapters);
+              break;
+            default:
             //console.log(key + ' not supported by interface');
+          }
         }
+        initializeJsTree(
+          ODSA.availableModules[config.lang].children,
+          config.chapters,
+          function() {
+            hideLoadingOverlay();
+          }
+        );
       }
-      initializeJsTree(ODSA.availableModules[config.lang].children, config.chapters, function() {
-        hideLoadingOverlay();
-      });
-    });
+    );
   }
 
   /* Convert a 'full' configuration to a 'minimal' configuration */
@@ -1031,10 +1089,10 @@
       var chapter = chapters[chapterName];
       for (var key in chapter) {
         var item = chapter[key];
-        if (typeof item !== 'object' || item === null) continue;
+        if (typeof item !== "object" || item === null) continue;
         var mod = {};
         modules[key] = mod;
-        if ('sections' in item) {
+        if ("sections" in item) {
           for (var sectName in item.sections) {
             var section = item.sections[sectName];
             if (section.showsection === false) {
@@ -1042,11 +1100,11 @@
                 showsection: false
               };
             }
-            if ('exercises' in section) {
+            if ("exercises" in section) {
               // Go through each exercise and check whether each setting matches
-              // the global default setting. If it does, remove that setting. 
-              // If all of the settings for an exercise match the global 
-              // default settings, then there is no need to include that 
+              // the global default setting. If it does, remove that setting.
+              // If all of the settings for an exercise match the global
+              // default settings, then there is no need to include that
               // exercise in the config.
               for (var exName in section.exercises) {
                 var exercise = section.exercises[exName];
@@ -1054,9 +1112,11 @@
                 var node = getAvailNode(nodeId);
                 var globalSettings = globalTypeSettings(node);
                 for (var opt in exercise) {
-                  if (opt in globalSettings && 
-                    exercise[opt] === globalSettings[opt]) {
-                      delete exercise[opt];
+                  if (
+                    opt in globalSettings &&
+                    exercise[opt] === globalSettings[opt]
+                  ) {
+                    delete exercise[opt];
                   }
                 }
                 if (!$.isEmptyObject(exercise)) {
@@ -1074,34 +1134,34 @@
   /* Determines the best global defaults for each exercise type based on
     the most frequently occuring settings */
   function determineGlobalDefaults(chapters) {
-    // tracks the different values each option takes 
+    // tracks the different values each option takes
     // and how many time those values occur
     var tallies = {
-      'glob_ss_options': {
+      glob_ss_options: {
         points: { 0: 0 },
         threshold: { 1: 0 },
         required: { false: 0 }
       },
-      'glob_ka_options': {
+      glob_ka_options: {
         points: { 1: 0 },
         threshold: { 5: 0 },
         required: { true: 0 }
       },
-      'glob_pe_options': {
+      glob_pe_options: {
         points: { 1: 0 },
         threshold: { 1: 0 },
         required: { true: 0 }
       },
-      'glob_ff_options': {
+      glob_ff_options: {
         points: { 1: 0 },
         threshold: { 1: 0 },
         required: { true: 0 }
       },
-      'glob_extr_options': {
-        'code-workout': {
-          points: {1: 0}
+      glob_extr_options: {
+        "code-workout": {
+          points: { 1: 0 }
         },
-        points: {1: 0}
+        points: { 1: 0 }
       }
     };
 
@@ -1110,17 +1170,17 @@
       var chapter = chapters[chapterName];
       for (var key in chapter) {
         var item = chapter[key];
-        if (typeof item !== 'object' || item === null) continue;
-        if ('sections' in item) {
+        if (typeof item !== "object" || item === null) continue;
+        if ("sections" in item) {
           for (var sectName in item.sections) {
             var section = item.sections[sectName];
-            if ('exercises' in section) {
+            if ("exercises" in section) {
               for (var exName in section.exercises) {
                 var exercise = section.exercises[exName];
                 var nodeId = encodeExerciseId(key, exName);
                 var node = getAvailNode(nodeId);
-                var tally = tallies['glob_' + node.type + '_options'];
-                if (node.type === 'extr') {
+                var tally = tallies["glob_" + node.type + "_options"];
+                if (node.type === "extr") {
                   tally = tally[node.original.learning_tool] || tally;
                 }
                 for (var option in tally) {
@@ -1128,8 +1188,7 @@
                     var val = exercise[option];
                     if (val in tally[option]) {
                       tally[option][val] += 1;
-                    }
-                    else {
+                    } else {
                       tally[option][val] = 1;
                     }
                   }
@@ -1155,11 +1214,9 @@
       }
       if ($.isNumeric(maxKey)) {
         maxKey = Number(maxKey);
-      }
-      else if (maxKey === 'true') {
+      } else if (maxKey === "true") {
         maxKey = true;
-      }
-      else if (maxKey === 'false') {
+      } else if (maxKey === "false") {
         maxKey = false;
       }
       return maxKey;
@@ -1168,12 +1225,11 @@
     for (var glob_opt in tallies) {
       var tally = tallies[glob_opt];
       results[glob_opt] = {};
-      if (glob_opt === 'glob_extr_options') {
+      if (glob_opt === "glob_extr_options") {
         for (var key in tally) {
           if ($.inArray(key, EXTR_OPTIONS) >= 0) {
             results[glob_opt][key] = maxKey(tally[key]);
-          }
-          else {
+          } else {
             var toolObj = tally[key];
             var toolOpts = {};
             results[glob_opt][key] = toolOpts;
@@ -1182,8 +1238,7 @@
             }
           }
         }
-      }
-      else {
+      } else {
         for (var opt in tally) {
           var maxCount = -1;
           var maxVal = null;
@@ -1196,17 +1251,17 @@
 
   function confirmLoad() {
     if (!changesMade) return true;
-    return window.confirm('WARNING - any unsaved changes will be lost.');
+    return window.confirm("WARNING - any unsaved changes will be lost.");
   }
 
   function setBookId(id) {
     bookId = id;
-    $('#btn-update-config').css('display', '');
+    $("#btn-update-config").css("display", "");
   }
 
   function clearBookId() {
     bookId = null;
-    $('#btn-update-config').css('display', 'none');
+    $("#btn-update-config").css("display", "none");
   }
 
   /* Load a configuration from the user's computer */
@@ -1215,17 +1270,17 @@
     clearBookId();
     loadingConfig = true;
     displayLoadingOverlay();
-    $('#config-file-load').attr('disabled', true);
-    $('#reference-config-load').attr('disabled', true);
-    var file = $('#upload-config-file')[0].files[0];
+    $("#config-file-load").attr("disabled", true);
+    $("#reference-config-load").attr("disabled", true);
+    var file = $("#upload-config-file")[0].files[0];
     var reader = new FileReader();
-    reader.onload = (function(event) {
+    reader.onload = function(event) {
       var config = JSON.parse(event.target.result);
       loadConfiguration(config);
-      $('#config-file-load').removeAttr('disabled');
-      $('#reference-config-load').removeAttr('disabled');
+      $("#config-file-load").removeAttr("disabled");
+      $("#reference-config-load").removeAttr("disabled");
       loadingConfig = false;
-    });
+    };
     reader.readAsText(file);
   }
 
@@ -1235,21 +1290,21 @@
     clearBookId();
     loadingConfig = true;
     displayLoadingOverlay();
-    $('#config-file-load').attr('disabled', true);
-    $('#reference-config-load').attr('disabled', true);
-    var url = $('#reference-config').val();
+    $("#config-file-load").attr("disabled", true);
+    $("#reference-config-load").attr("disabled", true);
+    var url = $("#reference-config").val();
     $.ajax({
       url: url,
       success: function(data, txtStatus, xhr) {
         loadConfiguration(data);
       },
       error: function(xhr, txtStatus, errorThrown) {
-        alert('Error loading configuration: ' + textStatus + ' ' + errorThrown);
+        alert("Error loading configuration: " + textStatus + " " + errorThrown);
       },
       complete: function(xhr, textStatus) {
-        $('#reference-config-load').removeAttr('disabled');
-        if ($('#upload-config-file')[0].value !== '') {
-          $('#config-file-load').removeAttr('disabled');
+        $("#reference-config-load").removeAttr("disabled");
+        if ($("#upload-config-file")[0].value !== "") {
+          $("#config-file-load").removeAttr("disabled");
         }
         loadingConfig = false;
       }
@@ -1261,24 +1316,24 @@
     if (!confirmLoad()) return;
     loadingConfig = true;
     displayLoadingOverlay();
-    $('#config-file-load').attr('disabled', true);
-    $('#reference-config-load').attr('disabled', true);
-    $('#user-config-load').attr('disabled', true);
-    setBookId($('#user-config').val());
-    var url = '/inst_books/configurations/' + bookId;
+    $("#config-file-load").attr("disabled", true);
+    $("#reference-config-load").attr("disabled", true);
+    $("#user-config-load").attr("disabled", true);
+    setBookId($("#user-config").val());
+    var url = "/inst_books/configurations/" + bookId;
     $.ajax({
       url: url,
       success: function(data, txtStatus, xhr) {
         loadFullConfiguration(data);
       },
       error: function(xhr, txtStatus, errorThrown) {
-        alert('Error loading configuration: ' + textStatus + ' ' + errorThrown);
+        alert("Error loading configuration: " + textStatus + " " + errorThrown);
       },
       complete: function(xhr, textStatus) {
-        $('#user-config-load').removeAttr('disabled');
-        $('#reference-config-load').removeAttr('disabled');
-        if ($('#upload-config-file')[0].value !== '') {
-          $('#config-file-load').removeAttr('disabled');
+        $("#user-config-load").removeAttr("disabled");
+        $("#reference-config-load").removeAttr("disabled");
+        if ($("#upload-config-file")[0].value !== "") {
+          $("#config-file-load").removeAttr("disabled");
         }
         loadingConfig = false;
       }
@@ -1287,15 +1342,15 @@
 
   /* Sets the selected code languages */
   function setCodeLangs(langs) {
-    var tree = $('#code-langs-tree').jstree();
+    var tree = $("#code-langs-tree").jstree();
     tree.uncheck_all();
     var position = 0;
     for (var lang in langs) {
       // jquery doesn't work when element id's contain '+' characters, e.g. C++
-      var node = tree.get_node(encodeId(lang) + '-lang');
+      var node = tree.get_node(encodeId(lang) + "-lang");
       if (node !== false) {
         tree.check_node(node);
-        tree.move_node(node, '#', position++);
+        tree.move_node(node, "#", position++);
       }
     }
   }
@@ -1303,7 +1358,7 @@
   /* Sets the global exercise options */
   function setGlobExerOptions(options) {
     for (var option in options) {
-      $('#' + option).prop('checked', options[option]);
+      $("#" + option).prop("checked", options[option]);
     }
   }
 
@@ -1311,11 +1366,10 @@
   function setGlobSsOptions(options) {
     for (var option in options) {
       var value = options[option];
-      if (typeof value === 'boolean') {
-        $('#glob-ss-' + option).prop('checked', value);
-      }
-      else {
-        $('#glob-ss-' + option).val(value);
+      if (typeof value === "boolean") {
+        $("#glob-ss-" + option).prop("checked", value);
+      } else {
+        $("#glob-ss-" + option).val(value);
       }
     }
   }
@@ -1324,11 +1378,10 @@
   function setGlobKaOptions(options) {
     for (var option in options) {
       var value = options[option];
-      if (typeof value === 'boolean') {
-        $('#glob-ka-' + option).prop('checked', value);
-      }
-      else {
-        $('#glob-ka-' + option).val(value);
+      if (typeof value === "boolean") {
+        $("#glob-ka-" + option).prop("checked", value);
+      } else {
+        $("#glob-ka-" + option).val(value);
       }
     }
   }
@@ -1337,11 +1390,10 @@
   function setGlobPeOptions(options) {
     for (var option in options) {
       var value = options[option];
-      if (typeof value === 'boolean') {
-        $('#glob-pe-' + option).prop('checked', value);
-      }
-      else {
-        $('#glob-pe-' + option).val(value);
+      if (typeof value === "boolean") {
+        $("#glob-pe-" + option).prop("checked", value);
+      } else {
+        $("#glob-pe-" + option).val(value);
       }
     }
   }
@@ -1350,11 +1402,10 @@
   function setGlobFfOptions(options) {
     for (var option in options) {
       var value = options[option];
-      if (typeof value === 'boolean') {
-        $('#glob-ff-' + option).prop('checked', value);
-      }
-      else {
-        $('#glob-ff-' + option).val(value);
+      if (typeof value === "boolean") {
+        $("#glob-ff-" + option).prop("checked", value);
+      } else {
+        $("#glob-ff-" + option).val(value);
       }
     }
   }
@@ -1363,17 +1414,15 @@
   function setGlobExtrOptions(options) {
     for (var option in options) {
       var value = options[option];
-      if (option === 'points') {
-        $('#glob-extr-points').val(value);
-      }
-      else {
+      if (option === "points") {
+        $("#glob-extr-points").val(value);
+      } else {
         for (var opt in value) {
           var val = value[opt];
-          if (typeof val === 'boolean') {
-            $('#glob-' + option + '-' + opt).prop('checked', val);
-          }
-          else {
-            $('#glob-' + option + '-' + opt).val(val);
+          if (typeof val === "boolean") {
+            $("#glob-" + option + "-" + opt).prop("checked", val);
+          } else {
+            $("#glob-" + option + "-" + opt).val(val);
           }
         }
       }
@@ -1382,7 +1431,9 @@
 
   /* Encodes the specified string for use as an html element id */
   function encodeId(id) {
-    return encodeURIComponent(id).replace(/[%'()]/g, '').toLowerCase();
+    return encodeURIComponent(id)
+      .replace(/[%'()]/g, "")
+      .toLowerCase();
   }
 
   function encodeExerciseId(modPath, exName) {
@@ -1394,7 +1445,7 @@
   }
 
   function encodeChapterId(chapterName) {
-    return 'chapter_' + encodeId(chapterName);
+    return "chapter_" + encodeId(chapterName);
   }
 
   /**
@@ -1402,88 +1453,93 @@
    */
   function initializeJsTree(availData, chapters, callback) {
     if (availTree) {
-      availTree.jstree('destroy');
-      includedTree.jstree('destroy');
+      availTree.jstree("destroy");
+      includedTree.jstree("destroy");
     }
 
     optionChanges = {};
     var includedData;
-    if (langSelect.val() === 'en' && typeof chapters === 'undefined') {
+    if (langSelect.val() === "en" && typeof chapters === "undefined") {
       // include some default chapters
       includedData = [
-        {text: 'Preface', id: 'chapter_Preface', type: 'chapter'},
-        {text: 'Appendix', id: 'chapter_Appendix', type: 'chapter'}
+        { text: "Preface", id: "chapter_Preface", type: "chapter" },
+        { text: "Appendix", id: "chapter_Appendix", type: "chapter" }
       ];
-    }
-    else {
+    } else {
       includedData = [];
     }
 
     // node types
     itemTypes = {
-      'chapter': {
-        icon: 'fa fa-folder-o'
+      chapter: {
+        icon: "fa fa-folder-o"
       },
-      'module': {
-        icon: 'fa fa-files-o'
+      module: {
+        icon: "fa fa-files-o"
       },
-      'section': {
-        icon: 'fa fa-file-o'
+      section: {
+        icon: "fa fa-file-o"
       },
-      'ka': {
-        icon: 'ka-icon',
+      ka: {
+        icon: "ka-icon"
       },
-      'ss': {
-        icon: 'ss-icon'
+      ss: {
+        icon: "ss-icon"
       },
-      'pe': {
-        icon: 'pe-icon'
+      pe: {
+        icon: "pe-icon"
       },
-      'ff': {
-        icon: 'ff-icon'
+      ae: {
+        icon: "ka-icon"
       },
-      'extr': {
-        icon: 'et-icon'
+      ff: {
+        icon: "ff-icon"
+      },
+      extr: {
+        icon: "et-icon"
       }
     };
 
-    includedTreeElem = $('#included-modules');
+    includedTreeElem = $("#included-modules");
     // tree of chapters and modules included in the book
     includedTree = includedTreeElem.jstree({
-      'types': itemTypes,
-      'dnd': {
+      types: itemTypes,
+      dnd: {
         // drag and drop settings
         copy: false,
-        is_draggable: function (nodes) {
+        is_draggable: function(nodes) {
           return true;
         },
-        inside_pos: 'last'
+        inside_pos: "last"
       },
-      'contextmenu': {
+      contextmenu: {
         // menu displayed when right clicking on certain nodes
         items: function(node) {
-          if (node.type === 'chapter') {
+          if (node.type === "chapter") {
             return {
-              'rename': {
-                label: 'Rename',
+              rename: {
+                label: "Rename",
                 action: function(args) {
                   var node = includedTree.jstree(true).get_node(args.reference);
-                  renameChapterDialog.dialog('option', 'nodeId', node.id);
-                  renameChapterDialog.find('#chapter-newname').val(node.text).focus(
-                    function() {
+                  renameChapterDialog.dialog("option", "nodeId", node.id);
+                  renameChapterDialog
+                    .find("#chapter-newname")
+                    .val(node.text)
+                    .focus(function() {
                       this.select();
-                    }
-                  );
-                  renameChapterDialog.dialog('open');
+                    });
+                  renameChapterDialog.dialog("open");
                 }
               },
-              'remove': {
-                label: 'Remove',
+              remove: {
+                label: "Remove",
                 action: function(args) {
                   var node = includedTree.jstree(true).get_node(args.reference);
                   // remove all of the modules in the chapter
                   while (node.children.length > 0) {
-                    var child = includedTree.jstree(true).get_node(node.children[0]);
+                    var child = includedTree
+                      .jstree(true)
+                      .get_node(node.children[0]);
                     removeModule(child);
                   }
                   // remove the chapter
@@ -1492,10 +1548,10 @@
               }
             };
           }
-          if (node.type === 'module') {
+          if (node.type === "module") {
             return {
-              'remove': {
-                label: 'Remove',
+              remove: {
+                label: "Remove",
                 action: function(args) {
                   var node = includedTree.jstree(true).get_node(args.reference);
                   removeModule(node);
@@ -1503,101 +1559,136 @@
               }
             };
           }
-          if (node.type === 'section') {
-            if (getOption(node.id, 'showsection') === false) {
+          if (node.type === "section") {
+            if (getOption(node.id, "showsection") === false) {
               return {
-                'show': {
-                  label: 'Show Section',
+                show: {
+                  label: "Show Section",
                   action: function(args) {
-                    var node = includedTree.jstree(true).get_node(args.reference);
+                    var node = includedTree
+                      .jstree(true)
+                      .get_node(args.reference);
                     node.original.showsection = false;
-                    $('#' + node.a_attr.id).removeClass('section-hidden');
-                    deleteOption(node.id, 'showsection');
+                    $("#" + node.a_attr.id).removeClass("section-hidden");
+                    deleteOption(node.id, "showsection");
                   }
                 }
               };
-            }
-            else {
+            } else {
               return {
-                'hide': {
-                  label: 'Hide Section',
+                hide: {
+                  label: "Hide Section",
                   action: function(args) {
-                    var node = includedTree.jstree(true).get_node(args.reference);
+                    var node = includedTree
+                      .jstree(true)
+                      .get_node(args.reference);
                     node.original.showsection = true;
-                    setOption(node.id, 'showsection', false);
+                    setOption(node.id, "showsection", false);
                   }
                 }
               };
             }
           }
-          if ($.inArray(node.type, ['ka', 'pe', 'extr', 'ss', 'ff']) >= 0) {
+          if (
+            $.inArray(node.type, ["ka", "pe", "extr", "ss", "ff", "ae"]) >= 0
+          ) {
             return {
-              'settings': {
-                label: 'Edit Exercise Settings',
+              settings: {
+                label: "Edit Exercise Settings",
                 action: function(args) {
-                  exSettingsDialog.find('form')[0].reset();
+                  exSettingsDialog.find("form")[0].reset();
                   var node = includedTree.jstree(true).get_node(args.reference);
-                  var thresholdElem = $('#exercise-settings-threshold');
+                  var thresholdElem = $("#exercise-settings-threshold");
                   switch (node.type) {
-                    case 'ka':
-                      thresholdElem.attr('step', 1);
-                      thresholdElem.attr('min', 1);
-                      thresholdElem.removeAttr('max');
-                      $('#exercise-settings-pe').css('display', 'none');
-                      $('#exercise-settings-required-group').css('display', '');
-                      $('#exercise-settings-threshold-group').css('display', '');
+                    case "ka":
+                      thresholdElem.attr("step", 1);
+                      thresholdElem.attr("min", 1);
+                      thresholdElem.removeAttr("max");
+                      $("#exercise-settings-pe").css("display", "none");
+                      $("#exercise-settings-required-group").css("display", "");
+                      $("#exercise-settings-threshold-group").css(
+                        "display",
+                        ""
+                      );
                       break;
-                    case 'pe':
-                      thresholdElem.attr('step', 0.01);
-                      thresholdElem.attr('min', 0);
-                      thresholdElem.attr('max', 1);
-                      $('#exercise-settings-pe').css('display', 'none');
-                      $('#exercise-settings-required-group').css('display', '');
-                      $('#exercise-settings-threshold-group').css('display', '');
+                    case "pe":
+                      thresholdElem.attr("step", 0.01);
+                      thresholdElem.attr("min", 0);
+                      thresholdElem.attr("max", 1);
+                      $("#exercise-settings-pe").css("display", "none");
+                      $("#exercise-settings-required-group").css("display", "");
+                      $("#exercise-settings-threshold-group").css(
+                        "display",
+                        ""
+                      );
                       break;
-                    case 'extr':
-                      $('#exercise-settings-pe').css('display', 'none');
-                      $('#exercise-settings-required-group').css('display', 'none');
-                      $('#exercise-settings-threshold-group').css('display', 'none');
+                    case "ae":
+                      thresholdElem.attr("step", 0.01);
+                      thresholdElem.attr("min", 0);
+                      thresholdElem.attr("max", 1);
+                      $("#exercise-settings-pe").css("display", "none");
+                      $("#exercise-settings-required-group").css("display", "");
+                      $("#exercise-settings-threshold-group").css(
+                        "display",
+                        ""
+                      );
                       break;
-                    case 'ss':
-                      $('#exercise-settings-pe').css('display', 'none');
-                      $('#exercise-settings-required-group').css('display', '');
-                      $('#exercise-settings-threshold-group').css('display', 'none');
+                    case "extr":
+                      $("#exercise-settings-pe").css("display", "none");
+                      $("#exercise-settings-required-group").css(
+                        "display",
+                        "none"
+                      );
+                      $("#exercise-settings-threshold-group").css(
+                        "display",
+                        "none"
+                      );
                       break;
-                    case 'ff':
-                      $('#exercise-settings-pe').css('display', 'none');
-                      $('#exercise-settings-required-group').css('display', '');
-                      $('#exercise-settings-threshold-group').css('display', 'none');
+                    case "ss":
+                      $("#exercise-settings-pe").css("display", "none");
+                      $("#exercise-settings-required-group").css("display", "");
+                      $("#exercise-settings-threshold-group").css(
+                        "display",
+                        "none"
+                      );
+                      break;
+                    case "ff":
+                      $("#exercise-settings-pe").css("display", "none");
+                      $("#exercise-settings-required-group").css("display", "");
+                      $("#exercise-settings-threshold-group").css(
+                        "display",
+                        "none"
+                      );
                       break;
                   }
                   var options = getOptions(node);
                   for (var option in options) {
                     var value = options[option];
-                    option = option.replace('JXOP-', '');
-                    if (typeof value === 'boolean') {
-                      $('#exercise-settings-' + option).prop('checked', value);
-                    }
-                    else {
-                      $('#exercise-settings-' + option).val(value);
-                    }
-                  }
-                  if (node.type === 'pe') {
-                    var hideCode = 'JXOP-code' in options && options['JXOP-code'] === 'none';
-                    $('#exercise-settings-' + option).prop('checked', hideCode);
-                    if ($('#exercise-settings-feedback').val() === 'continuous') {
-                      $('#exercise-settings-fix').removeAttr('disabled');
-                    }
-                    else {
-                      $('#exercise-settings-fix').attr('disabled', true);
+                    option = option.replace("JXOP-", "");
+                    if (typeof value === "boolean") {
+                      $("#exercise-settings-" + option).prop("checked", value);
+                    } else {
+                      $("#exercise-settings-" + option).val(value);
                     }
                   }
-                  exSettingsDialog.dialog('option', 'nodeId', node.id);
-                  exSettingsDialog.dialog('open');
+                  if (node.type === "pe") {
+                    var hideCode =
+                      "JXOP-code" in options && options["JXOP-code"] === "none";
+                    $("#exercise-settings-" + option).prop("checked", hideCode);
+                    if (
+                      $("#exercise-settings-feedback").val() === "continuous"
+                    ) {
+                      $("#exercise-settings-fix").removeAttr("disabled");
+                    } else {
+                      $("#exercise-settings-fix").attr("disabled", true);
+                    }
+                  }
+                  exSettingsDialog.dialog("option", "nodeId", node.id);
+                  exSettingsDialog.dialog("open");
                 }
               },
-              'reset-settings': {
-                label: 'Reset Settings',
+              "reset-settings": {
+                label: "Reset Settings",
                 action: function(args) {
                   var node = getIncludedNode(args.reference);
                   deleteAllOptions(node.id);
@@ -1608,11 +1699,11 @@
           return {};
         }
       },
-      'node_customize': {
+      node_customize: {
         // customize node appearances when they are rendered
         default: function(elem, node) {
           if (!node) return;
-          var anchor = $(elem).find('#' + node.id + '_anchor');
+          var anchor = $(elem).find("#" + node.id + "_anchor");
           if (node.id in optionChanges) {
             markModified(node.id, anchor);
           }
@@ -1621,30 +1712,39 @@
           }
         }
       },
-      'core': {
+      core: {
         // control which operations are allowed for each node type
-        'check_callback': function (operation, node, node_parent, node_position, more) {
-          if (node.type === 'chapter') {
-            if (operation === 'delete_node') {
+        check_callback: function(
+          operation,
+          node,
+          node_parent,
+          node_position,
+          more
+        ) {
+          if (node.type === "chapter") {
+            if (operation === "delete_node") {
               // only allow deletion of chapters with no children
               return node.children.length === 0;
             }
-            if (operation === 'rename_node') return true;
+            if (operation === "rename_node") return true;
             // '#' is the type of the root node
             // chapters can only be children of the root node
-            return node_parent.type === '#' && (operation === 'move_node' || operation === 'create_node');
+            return (
+              node_parent.type === "#" &&
+              (operation === "move_node" || operation === "create_node")
+            );
           }
-          if (node.type === 'module') {
-            if (operation === 'move_node') {
+          if (node.type === "module") {
+            if (operation === "move_node") {
               // only allow modules to be children of chapters
-              return node_parent.type === 'chapter';
+              return node_parent.type === "chapter";
             }
-            if (operation === 'copy_node' && more.is_multi) {
+            if (operation === "copy_node" && more.is_multi) {
               // allow nodes to be copied from the Available tree only
               node.original.included = true;
               return true;
             }
-            if (operation === 'delete_node') {
+            if (operation === "delete_node") {
               // only allow deletion of nodes marked as not being included
               // in the book
               return node.original.included === false;
@@ -1652,142 +1752,158 @@
           }
           return false;
         },
-        'data': includedData
+        data: includedData
       },
-      'plugins': ['dnd', 'types', 'wholerow', 'contextmenu', 'node_customize']
+      plugins: ["dnd", "types", "wholerow", "contextmenu", "node_customize"]
     });
 
-    availTreeElem = $('#available-modules');
+    availTreeElem = $("#available-modules");
     // tree of modules available to be included in the book
     availTree = availTreeElem.jstree({
-        'types': itemTypes,
-        'dnd': {
-          // drag and drop settings
-          copy: false,
-          is_draggable: function (nodes) {
-            for (var i = 0; i < nodes.length; i++) {
-              if (nodes[i].type !== 'module') return false;
+      types: itemTypes,
+      dnd: {
+        // drag and drop settings
+        copy: false,
+        is_draggable: function(nodes) {
+          for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].type !== "module") return false;
+          }
+          return true;
+        }
+      },
+      conditionalselect: function(node, event) {
+        // only modules can be seelcted
+        return node.type === "module";
+      },
+      contextmenu: {
+        items: function(node) {
+          return {}; // no context menu
+        }
+      },
+      sort: function(node1, node2) {
+        // sort nodes in alphabetical order
+        var n1 = this.get_node(node1);
+        var n2 = this.get_node(node2);
+        if (n1.type === n2.type) {
+          return n1.text > n2.text ? 1 : -1;
+        }
+        return n1.type === "chapter" ? 1 : -1;
+      },
+      core: {
+        check_callback: function(
+          operation,
+          node,
+          node_parent,
+          node_position,
+          more
+        ) {
+          // only allow deleting of nodes that were moved to the Included tree
+          changesMade = true;
+          return (
+            operation === "copy_node" ||
+            (operation === "delete_node" && node.original.included)
+          );
+        },
+        data: availData
+      },
+      plugins: [
+        "search",
+        "dnd",
+        "types",
+        "wholerow",
+        "conditionalselect",
+        "sort",
+        "contextmenu"
+      ]
+    });
+
+    // when nodes are moved to a different tree through drag and drop,
+    // their original data is not copied by jsTree, so we have to copy
+    // it over ourselves
+    function restoreData(tree, node, origTree, original) {
+      node = tree.jstree().get_node(node);
+      original = origTree.jstree().get_node(original);
+      Object.assign(node.original, original.original);
+      tree.jstree().set_id(node, original.id);
+      $.each(node.children, function(index, child) {
+        var origChild = original.children[index];
+        restoreData(tree, child, origTree, origChild);
+      });
+    }
+
+    $("#included-modules").bind("copy_node.jstree", function(e, data) {
+      restoreData(includedTree, data.node, availTree, data.original);
+    });
+
+    $("#available-modules").bind("copy_node.jstree", function(e, data) {
+      restoreData(availTree, data.node, includedTree, data.original);
+    });
+
+    $("#available-modules").bind("ready.jstree", function() {
+      var missingModules = [];
+      if (chapters) {
+        // we are loading an existing configuration
+        for (var chapter in chapters) {
+          var modules = chapters[chapter];
+          addChapter(chapter);
+          var chapterNode = getIncludedNode(encodeChapterId(chapter));
+          for (var mod in modules) {
+            var children = modules[mod];
+            var modId = encodeId(mod);
+            var modNode = getAvailNode(modId);
+            if (modNode === false) {
+              console.log('Could not find module with node id"' + modId + '"');
+              missingModules.push(mod);
+              continue;
             }
-            return true;
-          }
-        },
-        'conditionalselect': function(node, event) {
-          // only modules can be seelcted
-          return node.type === 'module';
-        },
-        'contextmenu': {
-          items: function(node) {
-            return {}; // no context menu
-          }
-        },
-        'sort': function(node1, node2) {
-          // sort nodes in alphabetical order
-          var n1 = this.get_node(node1);
-          var n2 = this.get_node(node2);
-          if (n1.type === n2.type) {
-            return n1.text > n2.text ? 1 : -1;
-          }
-          return n1.type === 'chapter' ? 1 : -1;
-        },
-        'core': {
-          'check_callback': function (operation, node, node_parent, node_position, more) {
-            // only allow deleting of nodes that were moved to the Included tree
-            changesMade = true;
-            return operation === 'copy_node' ||
-              (operation === 'delete_node' && node.original.included);
-          },
-          'data': availData
-        },
-        'plugins': ['search', 'dnd', 'types', 'wholerow', 'conditionalselect', 'sort', 'contextmenu']
-      });
-
-      // when nodes are moved to a different tree through drag and drop,
-      // their original data is not copied by jsTree, so we have to copy
-      // it over ourselves
-      function restoreData(tree, node, origTree, original) {
-        node = tree.jstree().get_node(node);
-        original = origTree.jstree().get_node(original);
-        Object.assign(node.original, original.original);
-        tree.jstree().set_id(node, original.id);
-        $.each(node.children, function(index, child) {
-          var origChild = original.children[index];
-          restoreData(tree, child, origTree, origChild);
-        });
-      }
-
-      $("#included-modules").bind('copy_node.jstree', function(e, data) {
-        restoreData(includedTree, data.node, availTree, data.original);
-      });
-
-      $("#available-modules").bind('copy_node.jstree', function(e, data) {
-        restoreData(availTree, data.node, includedTree,data.original);
-      });
-
-      $("#available-modules").bind('ready.jstree', function() {
-        var missingModules = [];
-        if (chapters) {
-          // we are loading an existing configuration
-          for (var chapter in chapters) {
-            var modules = chapters[chapter];
-            addChapter(chapter);
-            var chapterNode = getIncludedNode(encodeChapterId(chapter));
-            for (var mod in modules) {
-              var children = modules[mod];
-              var modId = encodeId(mod);
-              var modNode = getAvailNode(modId);
-              if (modNode === false) {
-                console.log('Could not find module with node id"' + modId + '"');
-                missingModules.push(mod);
+            addModule(modNode, chapterNode);
+            for (var child in children) {
+              var id = "|";
+              var options = children[child];
+              if ("showsection" in options) {
+                id += "sect|" + child;
+              } else {
+                id += "|" + child;
+              }
+              id = modNode.id + encodeId(id);
+              var childNode = getIncludedNode(id);
+              if (childNode === false) {
+                //console.log('Could not find item with node id"' + id + '"');
                 continue;
               }
-              addModule(modNode, chapterNode);
-              for (var child in children) {
-                var id = '|';
-                var options = children[child];
-                if ('showsection' in options) {
-                  id += 'sect|' + child;
-                }
-                else {
-                  id += '|' + child;
-                }
-                id = modNode.id + encodeId(id);
-                var childNode = getIncludedNode(id);
-                if (childNode === false) {
-                  //console.log('Could not find item with node id"' + id + '"');
-                  continue;
-                }
-                options = cleanOptions(childNode, options);
-                for (var option in options) {
-                  var value = options[option];
-                  setOption(id, option, value);
-                }
+              options = cleanOptions(childNode, options);
+              for (var option in options) {
+                var value = options[option];
+                setOption(id, option, value);
               }
             }
           }
-          if (missingModules.length > 0) {
-            var msg = 'WARNING - the following modules were listed in the configuration but do not exist on the OpenDSA server:\n';
-            for (var i = 0; i < missingModules.length; i++) {
-              msg += '\n\t- ' + missingModules[i];
-            }
-            msg += '\n\n These modules will be omitted.';
-            alert(msg);
-          }
-          if (callback) callback();
         }
+        if (missingModules.length > 0) {
+          var msg =
+            "WARNING - the following modules were listed in the configuration but do not exist on the OpenDSA server:\n";
+          for (var i = 0; i < missingModules.length; i++) {
+            msg += "\n\t- " + missingModules[i];
+          }
+          msg += "\n\n These modules will be omitted.";
+          alert(msg);
+        }
+        if (callback) callback();
+      }
 
-        $('#btn-add-chapter').removeAttr('disabled');
-        if (langSelect.val() !== 'en' || chapters) return;
+      $("#btn-add-chapter").removeAttr("disabled");
+      if (langSelect.val() !== "en" || chapters) return;
 
-        // add some default modules
-        var intro = availTree.jstree().get_node('intro');
-        var glossary = availTree.jstree().get_node('glossary');
-        var biblio = availTree.jstree().get_node('bibliography');
-        var preface = includedTree.jstree().get_node('chapter_Preface');
-        var appendix = includedTree.jstree().get_node('chapter_Appendix');
-        addModule(intro, preface);
-        addModule(glossary, appendix);
-        addModule(biblio, appendix);
-        changesMade = false;
-      });
+      // add some default modules
+      var intro = availTree.jstree().get_node("intro");
+      var glossary = availTree.jstree().get_node("glossary");
+      var biblio = availTree.jstree().get_node("bibliography");
+      var preface = includedTree.jstree().get_node("chapter_Preface");
+      var appendix = includedTree.jstree().get_node("chapter_Appendix");
+      addModule(intro, preface);
+      addModule(glossary, appendix);
+      addModule(biblio, appendix);
+      changesMade = false;
+    });
   }
 })();

@@ -31,7 +31,7 @@ gem 'representable'
 gem 'redcarpet'
 gem 'loofah'
 gem 'truncate_html'
-gem 'puma', '~> 3.11.4'
+gem 'puma', '~> 4.3.1'
 gem 'tzinfo' # For timezone support
 
 # Bootstrap Datepicker
@@ -148,3 +148,7 @@ gem 'jstree-rails-4', '~> 3.2', '>= 3.2.1'
 gem 'clipboard-rails'
 gem "mustache", "~> 1.0"
 gem "whenever", :require => false
+
+#for setting SameSite=None to cookies generated
+gem 'user_agent_parser', '< 2.5.2' # 2.6.0 or higher requires ruby>=2.4
+gem 'rails_same_site_cookie'
