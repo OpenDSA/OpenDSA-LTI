@@ -8,27 +8,30 @@ class PiAttemptsController < ApplicationController
   # GET /pi_attempts/get_attempts
   def get_attempts
     attempts = PiAttempt.where(user_id: current_user.id, frame_name: params[:frame_name], question: params[:question]).count
+    result = {"result" => attempts}
     respond_do |format|
       format.html
-      format.json {render json: attempts}
+      format.json {render json: result}
     end
   end
 
   # GET /pi_attempts/get_checkpoint
   def get_checkpoint
     checkpoint = PiAttempt.where(user_id: current_user.id, frame_name: params[:frame_name]).maximum("question")
+    result = {"result" => checkpoint}
     respond_do |format|
       format.html
-      format.json {render json: checkpoint}
+      format.json {render json: result}
     end
   end
 
   # GET /pi_attempts/get_progress
   def get_progress
     progress = PiAttempt.where(user_id: current_user.id, frame_name: params[:frame_name], correct: 1).maximum("question")
+    result = {"result" => progress}
     respond_do |format|
       format.html
-      format.json {render json: progress}
+      format.json {render json: result}
     end
   end
 
