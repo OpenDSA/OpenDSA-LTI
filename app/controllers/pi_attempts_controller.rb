@@ -10,7 +10,6 @@ class PiAttemptsController < ApplicationController
     attempts = PiAttempt.where(user_id: current_user.id, frame_name: params[:frame_name], question: params[:question]).count
     result = {"result" => attempts}
     respond_to do |format|
-      format.html
       format.json {render json: result}
     end
   end
@@ -20,7 +19,6 @@ class PiAttemptsController < ApplicationController
     checkpoint = PiAttempt.where(user_id: current_user.id, frame_name: params[:frame_name]).maximum("question")
     result = {"result" => checkpoint}
     respond_to do |format|
-      format.html
       format.json {render json: result}
     end
   end
@@ -30,7 +28,6 @@ class PiAttemptsController < ApplicationController
     progress = PiAttempt.where(user_id: current_user.id, frame_name: params[:frame_name], correct: 1).maximum("question")
     result = {"result" => progress}
     respond_to do |format|
-      format.html
       format.json {render json: result}
     end
   end
