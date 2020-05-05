@@ -7,7 +7,7 @@ class PiAttemptsController < ApplicationController
 
   # GET /pi_attempts/get_attempts
   def get_attempts
-    attempts = PiAttempt.where(user_id: current_user.id, frame_name: params[:frame_name], question: params[:question]).count
+    attempts = PiAttempt.where("user_id = ? AND frame_name = ? AND question = ?", current_user.id, params[:frame_name], params[:question]).count
     result = {"result" => attempts}
     respond_to do |format|
       format.json {render json: result}
