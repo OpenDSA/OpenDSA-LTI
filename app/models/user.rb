@@ -19,6 +19,7 @@ class User < ActiveRecord::Base
   has_many  :inst_books, inverse_of: :user
   has_many  :courses, inverse_of: :user
   has_many  :odsa_exercise_attempts, inverse_of: :user
+  has_many  :pi_attempts, inverse_of: :user
   has_many  :odsa_exercise_progresses, inverse_of: :user
   has_many  :odsa_module_progresses, inverse_of: :user
   has_many  :odsa_book_progresses, inverse_of: :user
