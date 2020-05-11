@@ -58,3 +58,7 @@ tasks.todo
 /config/application.yml
 /config/database.yml
 /config/secret.yml
+
+
+.idea/
+.rakeTasks
