@@ -31,7 +31,7 @@ gem 'representable'
 gem 'redcarpet'
 gem 'loofah'
 gem 'truncate_html'
-gem 'puma', '~> 4.3.1'
+gem 'puma', '~> 4.3.5'
 gem 'tzinfo' # For timezone support
 
 # Bootstrap Datepicker
