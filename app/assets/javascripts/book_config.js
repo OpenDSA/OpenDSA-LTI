@@ -2,7 +2,7 @@
 
 // allows us to customize node apperances when they are rendered
 // from https://github.com/vakata/jstree/blob/master/src/misc.js
-(function(factory) {
+(function (factory) {
   "use strict";
   if (typeof define === "function" && define.amd) {
     define("jstree.node_customize", ["jquery", "jstree"], factory);
@@ -11,7 +11,7 @@
   } else {
     factory(jQuery, jQuery.jstree);
   }
-})(function($, jstree, undefined) {
+})(function ($, jstree, undefined) {
   "use strict";
 
   if ($.jstree.plugins.node_customize) {
@@ -29,11 +29,11 @@
   $.jstree.defaults.node_customize = {
     key: "type",
     switch: {},
-    default: null
+    default: null,
   };
 
-  $.jstree.plugins.node_customize = function(options, parent) {
-    this.redraw_node = function(obj, deep, callback, force_draw) {
+  $.jstree.plugins.node_customize = function (options, parent) {
+    this.redraw_node = function (obj, deep, callback, force_draw) {
       var node_id = obj;
       var el = parent.redraw_node.apply(this, arguments);
       if (el) {
@@ -49,7 +49,7 @@
   };
 });
 
-(function() {
+(function () {
   // constants
   var EXTR_OPTIONS = ["points"];
 
@@ -73,25 +73,25 @@
   /* id of the loaded configuration, or null */
   var bookId = null;
 
-  $(document).ready(function() {
+  $(document).ready(function () {
     var codeLangTreeData = [];
     for (var langId in window.ODSA.codeLanguages) {
       var codeLang = window.ODSA.codeLanguages[langId];
       codeLangTreeData.push({
         id: encodeId(langId + "-lang"),
         text: codeLang.label,
-        langId: langId
+        langId: langId,
       });
     }
     var treeData = $("#code-langs-tree").jstree({
       checkbox: {
-        tie_selection: false
+        tie_selection: false,
       },
       dnd: {
-        copy: false
+        copy: false,
       },
       core: {
-        check_callback: function(
+        check_callback: function (
           operation,
           node,
           node_parent,
@@ -105,9 +105,9 @@
             !more.is_foreign
           );
         },
-        data: codeLangTreeData
+        data: codeLangTreeData,
       },
-      plugins: ["checkbox", "dnd", "wholerow"]
+      plugins: ["checkbox", "dnd", "wholerow"],
     });
 
     // setup the split pane used for book content selection
@@ -115,14 +115,14 @@
     var pane2 = document.querySelector("#available-pane");
     Split([pane1, pane2], {
       sizes: [50, 50],
-      minSize: 280
+      minSize: 280,
     });
 
     langSelect = $("#book-lang");
     if (langSelect.val() != null && langSelect.val() != -1) {
       initializeJsTree(ODSA.availableModules[langSelect.val()].children);
     }
-    langSelect.on("change", function() {
+    langSelect.on("change", function () {
       if (!loadingConfig) {
         initializeJsTree(ODSA.availableModules[langSelect.val()].children);
       }
@@ -134,36 +134,36 @@
       modal: true,
       width: 500,
       buttons: {
-        Add: function() {
+        Add: function () {
           if (addChapter()) {
             addChapterDialog.dialog("close");
           }
         },
-        Cancel: function() {
+        Cancel: function () {
           addChapterDialog.dialog("close");
           updateDialogErrors(addChapterDialog, "");
-        }
+        },
       },
-      close: function() {
+      close: function () {
         addChapterForm[0].reset();
       },
-      open: function() {
+      open: function () {
         updateDialogErrors(addChapterDialog, "");
-      }
+      },
     });
 
     var addChapterForm = addChapterDialog
       .find("form")
-      .on("submit", function(event) {
+      .on("submit", function (event) {
         event.preventDefault();
         addChapter();
       });
 
-    $("#btn-add-chapter").on("click", function() {
+    $("#btn-add-chapter").on("click", function () {
       addChapterDialog.dialog("open");
     });
 
-    $("#add-chapter-submit").on("click", function() {
+    $("#add-chapter-submit").on("click", function () {
       if (addChapter()) {
         addChapterDialog.dialog("close");
       }
@@ -176,26 +176,26 @@
       width: 500,
       buttons: {
         Rename: renameChapterHelper,
-        Cancel: function() {
+        Cancel: function () {
           renameChapterDialog.dialog("close");
           updateDialogErrors(addChapterDialog, "");
-        }
+        },
       },
-      close: function() {
+      close: function () {
         renameChapterForm[0].reset();
       },
-      open: function() {
+      open: function () {
         updateDialogErrors(addChapterDialog, "");
-      }
+      },
     });
 
-    $("#rename-chapter-submit").on("click", function() {
+    $("#rename-chapter-submit").on("click", function () {
       renameChapterHelper();
     });
 
     var renameChapterForm = renameChapterDialog
       .find("form")
-      .on("submit", function(event) {
+      .on("submit", function (event) {
         event.preventDefault();
         renameChapterHelper();
       });
@@ -215,24 +215,24 @@
       width: 500,
       buttons: {
         Save: exerciseSettingsHelper,
-        Cancel: function() {
+        Cancel: function () {
           exSettingsDialog.dialog("close");
           updateDialogErrors(exSettingsDialog, "");
-        }
+        },
       },
-      close: function() {
+      close: function () {
         exSettingsForm[0].reset();
       },
-      open: function() {
+      open: function () {
         updateDialogErrors(exSettingsDialog, "");
-      }
+      },
     });
 
     $("#exercise-settings-submit").on("click", exerciseSettingsHelper);
 
     var exSettingsForm = exSettingsDialog
       .find("form")
-      .on("submit", function(event) {
+      .on("submit", function (event) {
         event.preventDefault();
         exerciseSettingsHelper();
       });
@@ -242,7 +242,7 @@
     function exerciseSettingsHelper() {
       var node = getIncludedNode(exSettingsDialog.dialog("option", "nodeId"));
       var settings = {
-        points: Number.parseFloat($("#exercise-settings-points").val())
+        points: Number.parseFloat($("#exercise-settings-points").val()),
       };
       if (node.type !== "extr") {
         settings.required = $("#exercise-settings-required").is(":checked");
@@ -273,7 +273,7 @@
     for (var i = 0; i < kaOptionList.length; i++) {
       var kaOption = kaOptionList[i];
       var elem = $("#glob-ka-" + kaOption);
-      elem.on("change", function() {
+      elem.on("change", function () {
         onGlobalExerciseSettingsUpdate("ka", globalKaSettings());
       });
     }
@@ -282,7 +282,7 @@
     for (var i = 0; i < ffOptionList.length; i++) {
       var ffOption = ffOptionList[i];
       var elem = $("#glob-ff-" + ffOption);
-      elem.on("change", function() {
+      elem.on("change", function () {
         onGlobalExerciseSettingsUpdate("ff", globalFfSettings());
       });
     }
@@ -291,8 +291,17 @@
     for (var i = 0; i < peOptionList.length; i++) {
       var peOption = peOptionList[i];
       var elem = $("#glob-pe-" + peOption);
-      elem.on("change", function() {
+      elem.on("change", function () {
         onGlobalExerciseSettingsUpdate("pe", globalPeSettings());
+      });
+    }
+
+    var aeOptionList = ["required", "points", "threshold", "feedback", "fix"];
+    for (var i = 0; i < aeOptionList.length; i++) {
+      var peOption = aeOptionList[i];
+      var elem = $("#glob-ae-" + peOption);
+      elem.on("change", function () {
+        onGlobalExerciseSettingsUpdate("ae", globalAeSettings());
       });
     }
 
@@ -302,7 +311,7 @@
       for (var j = 0; j < extrOptionList.length; j++) {
         var extrOption = extrOptionList[j];
         var elem = $("#glob-" + tool.name + "-" + extrOption);
-        elem.on("change", function() {
+        elem.on("change", function () {
           onGlobalExerciseSettingsUpdate(
             "extr",
             globalExtrSettings(tool.name),
@@ -314,7 +323,7 @@
 
     var exSettingsFeedback = $("#exercise-settings-feedback");
     var exSettingsFix = $("#exercise-settings-fix");
-    exSettingsFeedback.on("change", function() {
+    exSettingsFeedback.on("change", function () {
       if (exSettingsFeedback.val() === "continuous") {
         exSettingsFix.removeAttr("disabled");
       } else {
@@ -323,7 +332,7 @@
     });
 
     var submitType = "download";
-    $("#book-config-form").on("submit", function(event) {
+    $("#book-config-form").on("submit", function (event) {
       event.preventDefault();
       if (submitType === "download") {
         downloadConfig();
@@ -332,15 +341,15 @@
       }
     });
 
-    $("#btn-update-config").on("click", function(event) {
+    $("#btn-update-config").on("click", function (event) {
       submitType = "update";
     });
 
-    $("#btn-save-config").on("click", function(event) {
+    $("#btn-save-config").on("click", function (event) {
       submitType = "save";
     });
 
-    $("#btn-download-config").on("click", function(event) {
+    $("#btn-download-config").on("click", function (event) {
       submitType = "download";
     });
 
@@ -369,7 +378,7 @@
         url: "/inst_books/update",
         data: JSON.stringify({ inst_book: config }),
         contentType: "application/json",
-        success: function(data, txtStatus, xhr) {
+        success: function (data, txtStatus, xhr) {
           hideLoadingOverlay();
           if (update) {
             alert("Your book configuration was updated successfully.");
@@ -377,7 +386,7 @@
             alert("Your book configuration was saved successfully.");
           }
         },
-        error: function(xhr, txtStatus, errorThrown) {
+        error: function (xhr, txtStatus, errorThrown) {
           hideLoadingOverlay();
           if (txtStatus && errorThrown) {
             alert(
@@ -387,11 +396,11 @@
             alert("An error occured while saving the configuration");
           }
         },
-        complete: function() {
+        complete: function () {
           $("#btn-save-config").removeAttr("disabled", true);
           $("#btn-update-config").removeAttr("disabled", true);
           $("#btn-download-config").removeAttr("disabled", true);
-        }
+        },
       });
     }
 
@@ -412,7 +421,7 @@
       downloadAnchorNode.remove();
     }
 
-    $("#upload-config-file").on("change", function() {
+    $("#upload-config-file").on("change", function () {
       $("#config-file-load").removeAttr("disabled");
     });
 
@@ -671,7 +680,7 @@
       return;
     }
     errors.text(msg).addClass("ui-state-highlight");
-    setTimeout(function() {
+    setTimeout(function () {
       errors.removeClass("ui-state-highlight", 1500);
     }, 500);
   }
@@ -693,9 +702,7 @@
   /* Gets the global exercise settings  (glob_exer_options) */
   function globalExerSettings() {
     return {
-      "JXOP-debug": $("#JXOP-debug")
-        .is(":checked")
-        .toString()
+      "JXOP-debug": $("#JXOP-debug").is(":checked").toString(),
     };
   }
 
@@ -704,7 +711,7 @@
     return {
       required: $("#glob-ka-required").is(":checked"),
       points: Number.parseFloat($("#glob-ka-points").val()),
-      threshold: Number.parseInt($("#glob-ka-threshold").val())
+      threshold: Number.parseInt($("#glob-ka-threshold").val()),
     };
   }
 
@@ -713,7 +720,7 @@
     return {
       required: $("#glob-ff-required").is(":checked"),
       points: Number.parseFloat($("#glob-ff-points").val()),
-      threshold: 1
+      threshold: 1,
     };
   }
 
@@ -722,7 +729,15 @@
     return {
       required: $("#glob-pe-required").is(":checked"),
       points: Number.parseFloat($("#glob-pe-points").val()),
-      threshold: Number.parseFloat($("#glob-pe-threshold").val())
+      threshold: Number.parseFloat($("#glob-pe-threshold").val()),
+    };
+  }
+
+  function globalAeSettings() {
+    return {
+      required: $("#glob-ae-required").is(":checked"),
+      points: Number.parseFloat($("#glob-ae-points").val()),
+      threshold: Number.parseFloat($("#glob-ae-threshold").val()),
     };
   }
 
@@ -731,7 +746,7 @@
     return {
       required: $("#glob-ss-required").is(":checked"),
       points: Number.parseFloat($("#glob-ss-points").val()),
-      threshold: 1
+      threshold: 1,
     };
   }
 
@@ -741,17 +756,17 @@
   function globalExtrSettings(toolName) {
     if (toolName) {
       return {
-        points: Number.parseFloat($("#glob-" + toolName + "-points").val())
+        points: Number.parseFloat($("#glob-" + toolName + "-points").val()),
       };
     }
 
     var settings = {
-      points: Number.parseFloat($("#glob-extr-points").val())
+      points: Number.parseFloat($("#glob-extr-points").val()),
     };
     for (var i = 0; i < ODSA.learningTools.length; i++) {
       var tool = ODSA.learningTools[i];
       settings[tool.name] = {
-        points: Number.parseFloat($("#glob-" + tool.name + "-points").val())
+        points: Number.parseFloat($("#glob-" + tool.name + "-points").val()),
       };
     }
     return settings;
@@ -760,7 +775,7 @@
   /* Gets the default settings for sections */
   function globalSectionSettings() {
     return {
-      showsection: true
+      showsection: true,
     };
   }
 
@@ -798,8 +813,9 @@
       glob_ss_options: globalSsSettings(),
       glob_ka_options: globalKaSettings(),
       glob_pe_options: globalPeSettings(),
+      glob_ae_options: globalAeSettings(),
       glob_ff_options: globalFfSettings(),
-      glob_extr_options: globalExtrSettings()
+      glob_extr_options: globalExtrSettings(),
     };
   }
 
@@ -874,7 +890,7 @@
         globals = globalFfSettings();
         break;
       case "ae":
-        globals = globalFfSettings();
+        globals = globalAeSettings();
         break;
       case "extr":
         globals = globalExtrSettings(node.original.learning_tool);
@@ -989,6 +1005,9 @@
         case "glob_pe_options":
           setGlobPeOptions(config.glob_pe_options);
           break;
+        case "glob_ae_options":
+          setGlobAeOptions(config.glob_ae_options);
+          break;
         case "glob_ff_options":
           setGlobFfOptions(config.glob_ff_options);
           break;
@@ -1005,7 +1024,7 @@
     initializeJsTree(
       ODSA.availableModules[config.lang].children,
       config.chapters,
-      function() {
+      function () {
         hideLoadingOverlay();
       }
     );
@@ -1018,7 +1037,7 @@
     initializeJsTree(
       ODSA.availableModules[config.lang].children,
       {},
-      function() {
+      function () {
         $("#book-config-form")[0].reset();
         for (var key in config) {
           switch (key) {
@@ -1065,7 +1084,7 @@
         initializeJsTree(
           ODSA.availableModules[config.lang].children,
           config.chapters,
-          function() {
+          function () {
             hideLoadingOverlay();
           }
         );
@@ -1079,6 +1098,7 @@
     setGlobSsOptions(defaults.glob_ss_options);
     setGlobKaOptions(defaults.glob_ka_options);
     setGlobPeOptions(defaults.glob_pe_options);
+    setGlobAeOptions(defaults.glob_ae_options);
     setGlobFfOptions(defaults.glob_ff_options);
     setGlobExtrOptions(defaults.glob_extr_options);
 
@@ -1097,7 +1117,7 @@
             var section = item.sections[sectName];
             if (section.showsection === false) {
               mod[sectName] = {
-                showsection: false
+                showsection: false,
               };
             }
             if ("exercises" in section) {
@@ -1140,29 +1160,29 @@
       glob_ss_options: {
         points: { 0: 0 },
         threshold: { 1: 0 },
-        required: { false: 0 }
+        required: { false: 0 },
       },
       glob_ka_options: {
         points: { 1: 0 },
         threshold: { 5: 0 },
-        required: { true: 0 }
+        required: { true: 0 },
       },
       glob_pe_options: {
         points: { 1: 0 },
         threshold: { 1: 0 },
-        required: { true: 0 }
+        required: { true: 0 },
       },
       glob_ff_options: {
         points: { 1: 0 },
         threshold: { 1: 0 },
-        required: { true: 0 }
+        required: { true: 0 },
       },
       glob_extr_options: {
         "code-workout": {
-          points: { 1: 0 }
+          points: { 1: 0 },
         },
-        points: { 1: 0 }
-      }
+        points: { 1: 0 },
+      },
     };
 
     // count occurences of each option value
@@ -1202,7 +1222,7 @@
 
     // determine most common option values by looking at counts
     var results = {};
-    var maxKey = function(dict) {
+    var maxKey = function (dict) {
       var maxCount = -1;
       var maxKey = null;
       for (var key in dict) {
@@ -1274,7 +1294,7 @@
     $("#reference-config-load").attr("disabled", true);
     var file = $("#upload-config-file")[0].files[0];
     var reader = new FileReader();
-    reader.onload = function(event) {
+    reader.onload = function (event) {
       var config = JSON.parse(event.target.result);
       loadConfiguration(config);
       $("#config-file-load").removeAttr("disabled");
@@ -1295,19 +1315,19 @@
     var url = $("#reference-config").val();
     $.ajax({
       url: url,
-      success: function(data, txtStatus, xhr) {
+      success: function (data, txtStatus, xhr) {
         loadConfiguration(data);
       },
-      error: function(xhr, txtStatus, errorThrown) {
+      error: function (xhr, txtStatus, errorThrown) {
         alert("Error loading configuration: " + textStatus + " " + errorThrown);
       },
-      complete: function(xhr, textStatus) {
+      complete: function (xhr, textStatus) {
         $("#reference-config-load").removeAttr("disabled");
         if ($("#upload-config-file")[0].value !== "") {
           $("#config-file-load").removeAttr("disabled");
         }
         loadingConfig = false;
-      }
+      },
     });
   }
 
@@ -1323,20 +1343,20 @@
     var url = "/inst_books/configurations/" + bookId;
     $.ajax({
       url: url,
-      success: function(data, txtStatus, xhr) {
+      success: function (data, txtStatus, xhr) {
         loadFullConfiguration(data);
       },
-      error: function(xhr, txtStatus, errorThrown) {
+      error: function (xhr, txtStatus, errorThrown) {
         alert("Error loading configuration: " + textStatus + " " + errorThrown);
       },
-      complete: function(xhr, textStatus) {
+      complete: function (xhr, textStatus) {
         $("#user-config-load").removeAttr("disabled");
         $("#reference-config-load").removeAttr("disabled");
         if ($("#upload-config-file")[0].value !== "") {
           $("#config-file-load").removeAttr("disabled");
         }
         loadingConfig = false;
-      }
+      },
     });
   }
 
@@ -1394,6 +1414,18 @@
         $("#glob-pe-" + option).prop("checked", value);
       } else {
         $("#glob-pe-" + option).val(value);
+      }
+    }
+  }
+
+  /* Sets the global Automated Exercise Options */
+  function setGlobAeOptions(options) {
+    for (var option in options) {
+      var value = options[option];
+      if (typeof value === "boolean") {
+        $("#glob-ae-" + option).prop("checked", value);
+      } else {
+        $("#glob-ae-" + option).val(value);
       }
     }
   }
@@ -1463,7 +1495,7 @@
       // include some default chapters
       includedData = [
         { text: "Preface", id: "chapter_Preface", type: "chapter" },
-        { text: "Appendix", id: "chapter_Appendix", type: "chapter" }
+        { text: "Appendix", id: "chapter_Appendix", type: "chapter" },
       ];
     } else {
       includedData = [];
@@ -1472,32 +1504,32 @@
     // node types
     itemTypes = {
       chapter: {
-        icon: "fa fa-folder-o"
+        icon: "fa fa-folder-o",
       },
       module: {
-        icon: "fa fa-files-o"
+        icon: "fa fa-files-o",
       },
       section: {
-        icon: "fa fa-file-o"
+        icon: "fa fa-file-o",
       },
       ka: {
-        icon: "ka-icon"
+        icon: "ka-icon",
       },
       ss: {
-        icon: "ss-icon"
+        icon: "ss-icon",
       },
       pe: {
-        icon: "pe-icon"
+        icon: "pe-icon",
       },
       ae: {
-        icon: "ka-icon"
+        icon: "ae-icon",
       },
       ff: {
-        icon: "ff-icon"
+        icon: "ff-icon",
       },
       extr: {
-        icon: "et-icon"
-      }
+        icon: "et-icon",
+      },
     };
 
     includedTreeElem = $("#included-modules");
@@ -1507,33 +1539,33 @@
       dnd: {
         // drag and drop settings
         copy: false,
-        is_draggable: function(nodes) {
+        is_draggable: function (nodes) {
           return true;
         },
-        inside_pos: "last"
+        inside_pos: "last",
       },
       contextmenu: {
         // menu displayed when right clicking on certain nodes
-        items: function(node) {
+        items: function (node) {
           if (node.type === "chapter") {
             return {
               rename: {
                 label: "Rename",
-                action: function(args) {
+                action: function (args) {
                   var node = includedTree.jstree(true).get_node(args.reference);
                   renameChapterDialog.dialog("option", "nodeId", node.id);
                   renameChapterDialog
                     .find("#chapter-newname")
                     .val(node.text)
-                    .focus(function() {
+                    .focus(function () {
                       this.select();
                     });
                   renameChapterDialog.dialog("open");
-                }
+                },
               },
               remove: {
                 label: "Remove",
-                action: function(args) {
+                action: function (args) {
                   var node = includedTree.jstree(true).get_node(args.reference);
                   // remove all of the modules in the chapter
                   while (node.children.length > 0) {
@@ -1544,19 +1576,19 @@
                   }
                   // remove the chapter
                   includedTree.jstree(true).delete_node(node);
-                }
-              }
+                },
+              },
             };
           }
           if (node.type === "module") {
             return {
               remove: {
                 label: "Remove",
-                action: function(args) {
+                action: function (args) {
                   var node = includedTree.jstree(true).get_node(args.reference);
                   removeModule(node);
-                }
-              }
+                },
+              },
             };
           }
           if (node.type === "section") {
@@ -1564,28 +1596,28 @@
               return {
                 show: {
                   label: "Show Section",
-                  action: function(args) {
+                  action: function (args) {
                     var node = includedTree
                       .jstree(true)
                       .get_node(args.reference);
                     node.original.showsection = false;
                     $("#" + node.a_attr.id).removeClass("section-hidden");
                     deleteOption(node.id, "showsection");
-                  }
-                }
+                  },
+                },
               };
             } else {
               return {
                 hide: {
                   label: "Hide Section",
-                  action: function(args) {
+                  action: function (args) {
                     var node = includedTree
                       .jstree(true)
                       .get_node(args.reference);
                     node.original.showsection = true;
                     setOption(node.id, "showsection", false);
-                  }
-                }
+                  },
+                },
               };
             }
           }
@@ -1595,7 +1627,7 @@
             return {
               settings: {
                 label: "Edit Exercise Settings",
-                action: function(args) {
+                action: function (args) {
                   exSettingsDialog.find("form")[0].reset();
                   var node = includedTree.jstree(true).get_node(args.reference);
                   var thresholdElem = $("#exercise-settings-threshold");
@@ -1685,23 +1717,23 @@
                   }
                   exSettingsDialog.dialog("option", "nodeId", node.id);
                   exSettingsDialog.dialog("open");
-                }
+                },
               },
               "reset-settings": {
                 label: "Reset Settings",
-                action: function(args) {
+                action: function (args) {
                   var node = getIncludedNode(args.reference);
                   deleteAllOptions(node.id);
-                }
-              }
+                },
+              },
             };
           }
           return {};
-        }
+        },
       },
       node_customize: {
         // customize node appearances when they are rendered
-        default: function(elem, node) {
+        default: function (elem, node) {
           if (!node) return;
           var anchor = $(elem).find("#" + node.id + "_anchor");
           if (node.id in optionChanges) {
@@ -1710,11 +1742,11 @@
           if (hasModifiedChildren(node.id)) {
             markModifiedChildren(node.id, anchor);
           }
-        }
+        },
       },
       core: {
         // control which operations are allowed for each node type
-        check_callback: function(
+        check_callback: function (
           operation,
           node,
           node_parent,
@@ -1752,9 +1784,9 @@
           }
           return false;
         },
-        data: includedData
+        data: includedData,
       },
-      plugins: ["dnd", "types", "wholerow", "contextmenu", "node_customize"]
+      plugins: ["dnd", "types", "wholerow", "contextmenu", "node_customize"],
     });
 
     availTreeElem = $("#available-modules");
@@ -1764,23 +1796,23 @@
       dnd: {
         // drag and drop settings
         copy: false,
-        is_draggable: function(nodes) {
+        is_draggable: function (nodes) {
           for (var i = 0; i < nodes.length; i++) {
             if (nodes[i].type !== "module") return false;
           }
           return true;
-        }
+        },
       },
-      conditionalselect: function(node, event) {
+      conditionalselect: function (node, event) {
         // only modules can be seelcted
         return node.type === "module";
       },
       contextmenu: {
-        items: function(node) {
+        items: function (node) {
           return {}; // no context menu
-        }
+        },
       },
-      sort: function(node1, node2) {
+      sort: function (node1, node2) {
         // sort nodes in alphabetical order
         var n1 = this.get_node(node1);
         var n2 = this.get_node(node2);
@@ -1790,7 +1822,7 @@
         return n1.type === "chapter" ? 1 : -1;
       },
       core: {
-        check_callback: function(
+        check_callback: function (
           operation,
           node,
           node_parent,
@@ -1804,7 +1836,7 @@
             (operation === "delete_node" && node.original.included)
           );
         },
-        data: availData
+        data: availData,
       },
       plugins: [
         "search",
@@ -1813,8 +1845,8 @@
         "wholerow",
         "conditionalselect",
         "sort",
-        "contextmenu"
-      ]
+        "contextmenu",
+      ],
     });
 
     // when nodes are moved to a different tree through drag and drop,
@@ -1825,21 +1857,21 @@
       original = origTree.jstree().get_node(original);
       Object.assign(node.original, original.original);
       tree.jstree().set_id(node, original.id);
-      $.each(node.children, function(index, child) {
+      $.each(node.children, function (index, child) {
         var origChild = original.children[index];
         restoreData(tree, child, origTree, origChild);
       });
     }
 
-    $("#included-modules").bind("copy_node.jstree", function(e, data) {
+    $("#included-modules").bind("copy_node.jstree", function (e, data) {
       restoreData(includedTree, data.node, availTree, data.original);
     });
 
-    $("#available-modules").bind("copy_node.jstree", function(e, data) {
+    $("#available-modules").bind("copy_node.jstree", function (e, data) {
       restoreData(availTree, data.node, includedTree, data.original);
     });
 
-    $("#available-modules").bind("ready.jstree", function() {
+    $("#available-modules").bind("ready.jstree", function () {
       var missingModules = [];
       if (chapters) {
         // we are loading an existing configuration

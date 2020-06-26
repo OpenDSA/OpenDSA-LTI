@@ -1,4 +1,4 @@
-(function() {
+(function () {
   var exSettingsDialog;
 
   /**
@@ -49,10 +49,10 @@
     $.ajax({
       url: "/courses/" + organizationId + "/list",
       type: "get",
-      contentType: "application/json"
+      contentType: "application/json",
     })
-      .done(function(data) {
-        data.forEach(function(course) {
+      .done(function (data) {
+        data.forEach(function (course) {
           html +=
             '<option value="' +
             course.id +
@@ -66,7 +66,7 @@
         courseSelect.html(html);
         courseSelect.removeAttr("disabled");
       })
-      .fail(function(data) {
+      .fail(function (data) {
         courseSelect.html("");
         displayErrors(data.responseJSON);
       });
@@ -83,20 +83,20 @@
       course: {
         name: name,
         number: number,
-        organization_id: organizationId
-      }
+        organization_id: organizationId,
+      },
     };
     $.ajax({
       url: "/courses",
       type: "post",
       data: JSON.stringify(request_data),
-      contentType: "application/json"
+      contentType: "application/json",
     })
-      .done(function(data) {
+      .done(function (data) {
         $("#alert-box").css("display", "none");
         createCourseOffering(organizationId, data.id);
       })
-      .fail(function(data) {
+      .fail(function (data) {
         displayErrors(data.responseJSON);
       });
   }
@@ -115,15 +115,15 @@
       url: "/course_offerings",
       type: "post",
       data: JSON.stringify(window.odsa_course_info),
-      contentType: "application/json"
+      contentType: "application/json",
     })
-      .done(function(data) {
+      .done(function (data) {
         window.course_offering_id = data.id;
         $("#alert-box").css("display", "none");
         $("#course_info_form").css("display", "none");
         initializeJsTree();
       })
-      .fail(function(data) {
+      .fail(function (data) {
         displayErrors(data.responseJSON);
       });
   }
@@ -134,7 +134,7 @@
    */
   function displayErrors(errors) {
     html = "";
-    errors.forEach(function(error) {
+    errors.forEach(function (error) {
       html += "<li>" + error + "</li>";
     });
     $("#alert-messages").html(html);
@@ -142,42 +142,42 @@
   }
 
   // prepare and send back the complete url used by canvas to configure lti launch
-  var getResourceURL = function(obj) {
+  var getResourceURL = function (obj) {
     var urlParams = {
       embed_type: "basic_lti",
-      url: obj.launchUrl
+      url: obj.launchUrl,
     };
     return window.return_url + "?" + $.param(urlParams);
   };
 
   var itemTypes = {
     chapter: {
-      icon: "fa fa-folder-o"
+      icon: "fa fa-folder-o",
     },
     module: {
-      icon: "fa fa-files-o"
+      icon: "fa fa-files-o",
     },
     section: {
-      icon: "fa fa-file-o"
+      icon: "fa fa-file-o",
     },
     ka: {
-      icon: "ka-icon"
+      icon: "ka-icon",
     },
     ss: {
-      icon: "ss-icon"
+      icon: "ss-icon",
     },
     pe: {
-      icon: "pe-icon"
+      icon: "pe-icon",
     },
     ae: {
-      icon: "pe-icon"
+      icon: "ae-icon",
     },
     ff: {
-      icon: "ff-icon"
+      icon: "ff-icon",
     },
     extr: {
-      icon: "et-icon"
-    }
+      icon: "et-icon",
+    },
   };
 
   function contentItemFinalized(selected, settings) {
@@ -187,14 +187,14 @@
       window.content_item_params.selected = {
         moduleInfo: selected.original.modObj,
         moduleSettings: settings,
-        isGradable: settings.isGradable
+        isGradable: settings.isGradable,
       };
       delete settings.isGradable;
     } else {
       window.content_item_params.selected = {
         exerciseInfo: selected.original.exObj.inst_exercise,
         exerciseSettings: settings,
-        isGradable: settings.isGradable
+        isGradable: settings.isGradable,
       };
       delete settings.isGradable;
     }
@@ -203,9 +203,9 @@
       url: "/lti/content_item_selection",
       type: "post",
       data: JSON.stringify(window.content_item_params),
-      contentType: "application/json"
+      contentType: "application/json",
     })
-      .done(function(data) {
+      .done(function (data) {
         console.log(data);
         if (deepLinking) {
           for (var key in data) {
@@ -218,7 +218,7 @@
           window.location.href = resourceUrl;
         }
       })
-      .fail(function(data) {
+      .fail(function (data) {
         displayErrors(data.responseJSON);
       });
   }
@@ -233,23 +233,23 @@
   function initializeJsTree() {
     var chapters = [];
     // prepare tree data
-    $.each(jsonFile, function(ch_index, ch_obj) {
+    $.each(jsonFile, function (ch_index, ch_obj) {
       var tree_ch_obj = {
         text: ch_obj.long_name,
         type: "chapter",
-        children: []
+        children: [],
       };
-      $.each(ch_obj.modules, function(mod_index, mod_obj) {
+      $.each(ch_obj.modules, function (mod_index, mod_obj) {
         if (mod_obj !== null) {
           var tree_mod_obj = {
             text: mod_obj.inst_module.name,
             type: "module",
             children: [],
-            modObj: mod_obj.inst_module
+            modObj: mod_obj.inst_module,
           };
-          $.each(mod_obj.inst_module_sections, function(sec_index, sec_obj) {
+          $.each(mod_obj.inst_module_sections, function (sec_index, sec_obj) {
             if (sec_obj !== null) {
-              $.each(sec_obj.inst_module_section_exercises, function(
+              $.each(sec_obj.inst_module_section_exercises, function (
                 imse_index,
                 imse_obj
               ) {
@@ -263,9 +263,9 @@
                       imse_obj.inst_exercise.short_name,
                     type: imse_obj.inst_exercise.ex_type,
                     url_params: {
-                      ex_short_name: imse_obj.inst_exercise.short_name
+                      ex_short_name: imse_obj.inst_exercise.short_name,
                     },
-                    exObj: imse_obj
+                    exObj: imse_obj,
                   };
                   tree_mod_obj.children.push(tree_ex_obj);
                 }
@@ -281,7 +281,7 @@
     // insialize tree instance
     treeContainer = $("#using_json")
       // listen for select event
-      .on("select_node.jstree", function(e, data) {
+      .on("select_node.jstree", function (e, data) {
         var selected = data.node;
         if (0 > $.inArray(selected.type, ["chapter", "section"])) {
           contentItemSelected(selected);
@@ -295,17 +295,17 @@
               text: "OpenDSA Materials",
               state: {
                 opened: true,
-                selected: true
+                selected: true,
               },
-              children: chapters
-            }
-          ]
+              children: chapters,
+            },
+          ],
         },
-        plugins: ["types"]
+        plugins: ["types"],
       });
   }
 
-  $(document).ready(function() {
+  $(document).ready(function () {
     exSettingsDialog = new ExerciseSettingsDialog(
       contentItemFinalized,
       "Submit"
@@ -313,7 +313,7 @@
     // whether we know what organization they are from
     hasOrg = typeof window.organization_id !== "undefined";
 
-    $("#dismiss-button").on("click", function(event) {
+    $("#dismiss-button").on("click", function (event) {
       $("#alert-box").css("display", "none");
     });
 
@@ -322,7 +322,7 @@
       initializeJsTree();
     } else {
       // course offering doesn't exist, make the user provide some info first
-      $("#course_info_form").on("submit", function(event) {
+      $("#course_info_form").on("submit", function (event) {
         event.preventDefault();
         orgId = hasOrg
           ? window.organization_id
@@ -337,15 +337,15 @@
               "organization_name=" +
               $("#organization_name").val() +
               "&organization_abbreviation=" +
-              $("#organization_abbreviation").val()
+              $("#organization_abbreviation").val(),
           })
-            .done(function(data) {
+            .done(function (data) {
               $("#alert-box").css("display", "none");
               var courseNumber = $("#course_number").val();
               var courseName = $("#course_name").val();
               createCourse(courseNumber, courseName, data.id);
             })
-            .fail(function(data) {
+            .fail(function (data) {
               displayErrors(data.responseJSON);
             });
         } else if (courseId == -1) {
@@ -358,7 +358,7 @@
           createCourseOffering(orgId, courseId);
         }
       });
-      $("#select_course").on("change", function() {
+      $("#select_course").on("change", function () {
         var selectCourse = $("#select_course");
         var otherCourseInputs = $("#other_course_inputs");
         id = selectCourse.val();
@@ -373,7 +373,7 @@
       if (hasOrg) {
         populateCourses(window.organization_id);
       } else {
-        $("#select_organization").on("change", function() {
+        $("#select_organization").on("change", function () {
           var orgId = $("#select_organization").val();
           if (orgId == -1) {
             // they selected "Other", so make them provide us info about their
