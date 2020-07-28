@@ -36,12 +36,12 @@ class CodeWorker
       # puts "CodeWorker current working directory is #{Dir.pwd}"
 
       term = Term.current_term
-      term_name = term ? term.slug : 'no-term'
-      attempt_dir = 'usr/attempts/' + term_name + '/' + current_attempt
+      term_name = term ? term.slug : "no-term"
+      attempt_dir = "usr/attempts/" + term_name + "/" + current_attempt
       # puts "DIRECTORY",attempt_dir,"DIRECTORY"
       FileUtils.mkdir_p(attempt_dir)
       if !Dir[attempt_dir].empty?
-        puts 'WARNING, OVERWRITING EXISTING DIRECTORY = ' + attempt_dir
+        puts "WARNING, OVERWRITING EXISTING DIRECTORY = " + attempt_dir
         FileUtils.remove_dir(attempt_dir, true)
         FileUtils.mkdir_p(attempt_dir)
       end
@@ -74,13 +74,13 @@ class CodeWorker
       total = 0.0
       answer =
         attempt.prompt_answers.where(prompt: prompt.acting_as).first.specific
-      if !File.exist?(attempt_dir + '/results.csv')
+      if !File.exist?(attempt_dir + "/results.csv")
         answer.error = result
         # puts "CODE-ERROR-FEEDBACK", answer.error, "CODE-ERROR-FEEDBACK"
         total = 1.0
         answer.save
       else
-        CSV.foreach(attempt_dir + '/results.csv') do |line|
+        CSV.foreach(attempt_dir + "/results.csv") do |line|
           # find test id
           test_id = line[2][/\d+/].to_i
           test_case = prompt.test_cases.where(id: test_id).first
@@ -120,7 +120,7 @@ class CodeWorker
 
     # Parse compiler output for error messages to determine success
     error = ''
-    logfile = attempt_dir + '/reports/compile.log'
+    logfile = attempt_dir + "/reports/compile.log"
     if File.exist?(logfile)
       xtra = ''
       skip = 0
@@ -170,7 +170,7 @@ class CodeWorker
     else
       # If there's an error, remove the test results, if any.
       # This causes warnings to be treated the same as errors.
-      result_file = attempt_dir + '/results.csv'
+      result_file = attempt_dir + "/results.csv"
       if File.exist?(result_file)
         File.delete(result_file)
       end
@@ -180,7 +180,7 @@ class CodeWorker
 
   # -------------------------------------------------------------
   def execute_rubytest(class_name, attempt_dir, pre_lines, answer_lines)
-    return 'Ruby execution is temporarily suspended.'
+    return "Ruby execution is temporarily suspended."
     #    if system("ruby #{class_name}Test.rb",
     #      [:out, :err] => 'err.log',
     #      chdir: attempt_dir)
@@ -194,7 +194,7 @@ class CodeWorker
 
   # -------------------------------------------------------------
   def execute_pythontest(class_name, attempt_dir, pre_lines, answer_lines)
-    return 'Python execution is temporarily suspended.'
+    return "Python execution is temporarily suspended."
     #    if system("python #{class_name}Test.py",
     #      [:out, :err] => 'err.log',
     #      chdir: attempt_dir)

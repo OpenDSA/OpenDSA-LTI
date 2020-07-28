@@ -59,6 +59,5 @@ tasks.todo
 /config/database.yml
 /config/secret.yml
 
-
-.idea/
-.rakeTasks
+*.idea/OpenDSA-LTI.iml
+*.idea/workspace.xml

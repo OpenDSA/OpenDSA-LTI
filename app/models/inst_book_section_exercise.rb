@@ -1,4 +1,4 @@
-class InstBookSectionExercise < ActiveRecord::Base
+class InstBookSectionExercise < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :inst_book
   belongs_to :inst_section

@@ -14,17 +14,20 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
                 :lms_instance_id, :lms_course_code, :lms_course_num,
                 inst_books_attributes: [ :id, :course_offering_id, :user_id, :title, :desc, :template, :_destroy ]
 
-  action_item only: [:edit] do
-    course_offering = CourseOffering.find(params[:id])
-    if current_user.global_role.is_admin?
-      message = course_offering_delete_msg(course_offering)
-      link_to "Delete", { action: :destroy }, method: :delete, data: {confirm: message}
+
+
+    action_item :edit, only: :edit do
+      course_offering = CourseOffering.find(params[:id])
+      if current_user.global_role.is_admin?
+        message = course_offering_delete_msg(course_offering)
+        link_to "Delete", { action: :destroy }, method: :delete, data: {confirm: message}
+      end
     end
-  end
 
-  controller do
 
-    before_filter archived: :index do
+    controller do
+
+    before_action archived: :index do
       params[:q] = {archived_eq: 0} if params[:commit].blank?
     end
 

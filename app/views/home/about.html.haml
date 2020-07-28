@@ -35,14 +35,14 @@
 
 %ul
   %li
-    - url = @config_url + '/ODSA/Books/CS2'
+    - url = @config_url + '/OpenDSA/Books/CS2/index.html'
     %a{ href: url , target: "_blank" }
       Here
     is an example book instance for the data structures component of a
     typical CS2-level course.
 
   %li
-    - url = @config_url + '/ODSA/Books/CS3'
+    - url = @config_url + '/OpenDSA/Books/CS3/index.html'
     %a{ href: url, target: "_blank" }
       Here
     is an example book instance for a typical Data Structures and
@@ -50,7 +50,7 @@
     (that we refer to as "CS3").
 
   %li
-    - url = @config_url + '/ODSA/Books/Everything'
+    - url = @config_url + '/OpenDSA/Books/Everything/index.html'
     %a{ href: url, target: "_blank" }
       Here
     is a book instance that shows all of the exisiting modules,
@@ -84,7 +84,7 @@
     for a class.
 
   = link_to image_tag("Inssort.png", :alt => "Insertion sort module", :width => '400'),
-            "http://opendsa.cs.vt.edu/ODSA/Books/CS3114/html/InsertionSort.html"
+            @config_url + '/OpenDSA/Books/CS3114/html/InsertionSort.html'
 
   %li
     Every algorithm or data structure is illustrated by an interactive
@@ -93,7 +93,7 @@
     and they can control the pacing of the visualization.
 
   = link_to image_tag("insertionsort.png", :alt => "Insertion sort AV", :width => '400'),
-            "http://opendsa.cs.vt.edu/ODSA/AV/Sorting/insertionsortAV.html"
+            @config_url + '/OpenDSA/AV/Sorting/insertionsortAV.html'
 
   %li
     Every module contains interactive assessment activities that give
@@ -101,9 +101,9 @@
     material. There are many hundreds of exercises.
 
   = link_to image_tag("Shellsort_prof.png", :alt => "Shellsort AV", :width => '400'),
-            "http://opendsa.cs.vt.edu/ODSA/AV/Sorting/shellsortPRO.html"
+            @config_url + '/OpenDSA/AV/Sorting/shellsortPRO.html'
   = link_to image_tag("heapsort.png", :alt => "Heapsort AV", :width => '400'),
-            "http://opendsa.cs.vt.edu/ODSA/AV/Sorting/heapsortPRO.html"
+            @config_url + '/OpenDSA/AV/Sorting/heapsortPRO.html'
 
 %p
   We accomplish this through an open-source, creative commons
@@ -133,9 +133,9 @@
   to build interactive exercises.
 
 = link_to image_tag("ka.png", :alt => "Indexing KA Exercise", :width => '400'),
-          "http://opendsa.cs.vt.edu/ODSA/Exercises/Indexing/IndexChoice.html"
+          @config_url + '/OpenDSA/Exercises/Indexing/IndexChoice.html'
 = link_to image_tag("huffman.png", :alt => "Huffman Tree Exercise", :width => '400'),
-          "http://opendsa.cs.vt.edu/ODSA/AV/Binary/huffmanBuildAV.html"
+          @config_url + '/OpenDSA/AV/Binary/huffmanBuildAV.html'
 
 %p
   For more details on our project infrastructure, status, and issues,
@@ -165,7 +165,7 @@
     here.
 
 = link_to image_tag("Shellsort_perf.png", :alt => "Shellsort Performance Activity", :width => '400'),
-          "http://opendsa.cs.vt.edu/ODSA/AV/Sorting/shellsortPerf.html"
+          @config_url + '/OpenDSA/AV/Sorting/shellsortPerf.html'
 
 %p
   See

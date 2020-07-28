@@ -10,6 +10,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   member_action :update_configuration, method: :get do
   end
 
+
   member_action :clone_book, method: :get do
     inst_book = InstBook.find(params[:id])
     title = inst_book.title
@@ -30,15 +31,15 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   collection_action :upload_create, method: :post do
   end
 
-  action_item only: :index do |inst_book|
+  action_item :index, only: :index do |inst_book|
     link_to 'Upload Books', upload_books_admin_inst_books_path(inst_book)
   end
 
-  action_item only: :show  do
-    link_to "Clone", clone_admin_inst_book_path(inst_book)
+  action_item :show, only: :show  do
+    link_to "Clone", clone_book_admin_inst_book_path(inst_book)
   end
 
-  action_item only: [:show, :edit]  do
+  action_item :view, only: [:show, :edit]  do
     message = confirmation_message(inst_book)
     link_to "Delete", { action: :destroy }, method: :delete, data: { confirm: message}
   end

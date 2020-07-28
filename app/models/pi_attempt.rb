@@ -1,4 +1,2 @@
-class PiAttempt < ActiveRecord::Base
-  #~ Relationships ............................................................
-  belongs_to :user
+class PiAttempt < ApplicationRecord
 end

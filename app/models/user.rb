@@ -1,7 +1,7 @@
 # =============================================================================
 # Represents a single user account on the system.
 #
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include Gravtastic
   gravtastic secure: true, default: 'monsterid'
 
@@ -19,7 +19,6 @@ class User < ActiveRecord::Base
   has_many  :inst_books, inverse_of: :user
   has_many  :courses, inverse_of: :user
   has_many  :odsa_exercise_attempts, inverse_of: :user
-  has_many  :pi_attempts, inverse_of: :user
   has_many  :odsa_exercise_progresses, inverse_of: :user
   has_many  :odsa_module_progresses, inverse_of: :user
   has_many  :odsa_book_progresses, inverse_of: :user
@@ -67,7 +66,8 @@ class User < ActiveRecord::Base
   }
 
   scope :alphabetical, -> { order('last_name asc, first_name asc, email asc') }
-  scope :visible_to_user, -> (u) { joins{course_enrollments.outer}.
+
+  scope :visible_to_user, -> (u) { left_outer_joins(:course_enrollments)
     where{ (id == u.id) &
     (course_enrollments.course_role_id != CourseRole::STUDENT_ID) } }
 
@@ -174,7 +174,9 @@ class User < ActiveRecord::Base
   end
 
   def user_display_name
-    first_name + ' ' + last_name + ' - ' + email
+    last_name.blank? ?
+        (first_name.blank? ? email : first_name) :
+        (first_name.blank? ? last_name : (first_name + ' ' + last_name + ' - ' + email))
   end
 
 

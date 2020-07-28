@@ -1,4 +1,4 @@
-class LatePolicy < ActiveRecord::Base
+class LatePolicy < ApplicationRecord
 
   #~ Relationships ............................................................
   has_many :course_offerings, inverse_of: :late_policy

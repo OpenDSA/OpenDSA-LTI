@@ -1,0 +1,61 @@
+stages:
+   - build
+   - deploy
+
+Deploy-Opendsa-EC2-Instance: 
+    before_script:
+# Run ssh-agent (inside the build environment)
+    - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$EC2_SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    type: deploy
+    image: code.vt.edu:5005/tlos/admintools/awscli
+    only:
+        - master
+    tags: 
+        - runner-docker
+    script:
+# Cleaning current directory 
+        - ssh $EC2_USER@$EC2_IP "rm -rf /apps/old/opendsa-lti;
+            find /apps/opendsa-lti -type l -delete;
+            mv /apps/opendsa-lti /apps/old/opendsa-lti;
+            mkdir /apps/opendsa-lti;
+            chmod 775 /apps/opendsa-lti -R;
+            exit"
+# Copying content to instance
+        - scp -r -C ./* $EC2_USER@$EC2_IP:/apps/opendsa-lti/
+# Configuring the Project
+        - ssh $EC2_USER@$EC2_IP "chmod 755 /apps/opendsa-lti/ -R;
+            cd /apps/opendsa-lti/scripts/ && ./start-ec2.sh;
+            exit"
+
+
+Docker-Build-Demo:
+  stage: build
+  only:
+   - demo-2.7.1-6.0.3.1
+  tags:
+   - runner-docker
+  script:
+   - export VERSION=demo-$(cat Version.txt)
+   - echo "Building the app"
+   - docker build -t code.vt.edu:5005/jnajdi/opendsa-lti:$VERSION . --build-arg RAILS_ENV='development'
+   - docker login -u $CI_JOB_USER -p $CI_JOB_TOKEN code.vt.edu:5005
+   - docker push code.vt.edu:5005/jnajdi/opendsa-lti:$VERSION
+
+Deploy-TLOS-DEV-Demo:
+  stage: deploy
+  image: code.vt.edu:5005/tlos/admintools/awscli:latest
+  only:
+   - demo-2.7.1-6.0.3.1
+  tags:
+    - runner-docker
+  script:
+   - export VERSION=demo-$(cat Version.txt)
+   - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_DEV; export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_DEV
+   - echo $VERSION
+   - aws cloudformation update-stack --stack-name opendsa-lti-demo --template-url https://vt-tlos-admintools.s3.amazonaws.com/cftemplates/Applications/DEV/opendsa-lti-dev/opendsa-demo.json --parameters ParameterKey=Version,ParameterValue=$VERSION ParameterKey=CreationDate,ParameterValue=$(date +'%F/%T/%Z')  --capabilities CAPABILITY_IAM --region=us-east-1
+   - aws cloudformation wait stack-update-complete --stack-name opendsa-lti-demo  --region=us-east-1
+

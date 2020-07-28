@@ -21,7 +21,7 @@
 # =============================================================================
 # Represents a single section (or offering) of a course in a specific term.
 #
-class CourseOffering < ActiveRecord::Base
+class CourseOffering < ApplicationRecord
 
   #~ Relationships ............................................................
 
@@ -49,9 +49,11 @@ class CourseOffering < ActiveRecord::Base
   scope :by_date,
     -> { includes(:term).order('terms.starts_on DESC', 'label ASC') }
 
-  scope :managed_by_user, -> (u) { joins{course_enrollments}.
-   where{ course_enrollments.user == u &&
-    course_enrollments.course_role_id == CourseRole::INSTRUCTOR_ID } }
+  scope :managed_by_user, -> (u) {
+    joins(:course_enrollments).
+        where {course_enrollments.user == u &&
+    course_enrollments.course_role_id == CourseRole::INSTRUCTOR_ID }
+  }
 
 
   #~ Validation ...............................................................

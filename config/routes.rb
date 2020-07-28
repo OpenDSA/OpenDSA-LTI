@@ -26,9 +26,9 @@ OpenDSA::Application.routes.draw do
   # get '/odsa_exercise_attempts/get_count' => 'odsa_exercise_attempts#get_count'
 
   post '/pi_attempts' => 'pi_attempts#create'
-  post '/pi_attempts/get_attempts' => 'pi_attempts#get_attempts'
-  post '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
-  post '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
+  get '/pi_attempts/get_attempts' => 'pi_attempts#get_attempts'
+  get '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
+  get '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
   
   #me
   #get '/Display' => 'course_offerings#postData'
@@ -156,7 +156,14 @@ OpenDSA::Application.routes.draw do
   resources :course_offerings, only: [:edit, :update] do
     # post 'enroll' => :enroll, as: :enroll
     # delete 'unenroll' => :unenroll, as: :unenroll
-    match 'upload_roster/:action', controller: 'upload_roster', as: :upload_roster, via: [:get, :post]
+    #
+    get 'upload_roster' => 'upload_roster#index', as: :upload_roster_index
+    post 'upload_roster' => 'upload_roster#upload', as: :upload_roster_upload
+
+
+    # post 'upload_roster' => :upload_roster, as: :organization_create
+    # match 'upload_roster/:action', controller: 'upload_roster', as: :upload_roster, via: [:get, :post]
+
     post 'generate_gradebook' => :generate_gradebook, as: :gradebook
     get 'add_workout' => :add_workout, as: :add_workout
     post 'store_workout/:id' => :store_workout, as: :store_workout

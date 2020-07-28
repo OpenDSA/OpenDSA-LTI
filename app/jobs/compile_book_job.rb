@@ -9,7 +9,7 @@ class CompileBookJob < ProgressJob::Base
   def perform
     update_stage('Compiling OpenDSA book')
     inst_book_json = ApplicationController.new.render_to_string(
-      template: 'inst_books/show.json.jbuilder',
+      template: "inst_books/show.json.jbuilder",
       locals: {:@inst_book => @inst_book, :@extrtool_launch_base_url => @extrtool_launch_base_url},
     )
 

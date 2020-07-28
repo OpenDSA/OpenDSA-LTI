@@ -1,0 +1,42 @@
+.. This file is part of the OpenDSA eTextbook project. See
+.. http://algoviz.org/OpenDSA for more details.
+.. Copyright (c) 2012-2013 by the OpenDSA Project Contributors, and
+.. distributed under an MIT open source license.
+
+.. avmetadata::
+   :author: Cliff Shaffer
+
+.. slideconf::
+   :autoslides: False
+
+================
+Project 1 Design
+================
+
+.. slide:: Generalizing Container Classes
+
+   | Normally for container classes we would want to detach the
+     implementation from the data type. But since the hash function is
+     tied to the key type, we will hard-code the hash tables to the
+     extent that the key type is a String. (But the data type should
+     still be flexible.)
+
+   | The Memory Manager has a byte array (it doesn't know strings)
+
+
+.. slide:: Breaking Down the Project (1)
+
+   | A bad design: Main file (Recordstore.java) initializes program and
+     implements the command processor. Calls hash table to do main
+     operations (which calls memory manager as necessary).
+
+
+.. slide:: Breaking Down the Project (2)
+
+   | A better design:
+   |   Separate logical activities into separate classes (even if a
+       couple of them end up small this time).
+   |   Main class only initializes the program
+   |   Command syntax is done in separate command processor class
+   |   Command semantics are handled in a separate "world" or "database"
+       class. For P1, this has hash table and memory manager objects.

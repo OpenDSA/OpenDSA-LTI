@@ -1,4 +1,5 @@
 class SseController < ApplicationController
+
   include ActionController::Live
 
   # -------------------------------------------------------------

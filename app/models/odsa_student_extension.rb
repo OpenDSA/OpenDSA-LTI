@@ -1,4 +1,4 @@
-class OdsaStudentExtension < ActiveRecord::Base
+class OdsaStudentExtension < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :inst_section
   belongs_to :user

@@ -18,7 +18,7 @@
 #   t.datetime "updated_at"
 # end
 
-class OdsaExerciseAttempt < ActiveRecord::Base
+class OdsaExerciseAttempt < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :user
   belongs_to :inst_book

@@ -4,7 +4,12 @@ class LtiController < ApplicationController
   after_action :allow_iframe, only: [:launch, :resource, :launch_extrtool]
   # the consumer keys/secrets
 
+  require 'oauth/request_proxy/action_controller_request'
+
   def launch
+
+    Rails.logger.info("launch - LtiController")
+
     if params[:lti_message_type] == 'ContentItemSelectionRequest'
       resource()
       return
@@ -14,7 +19,7 @@ class LtiController < ApplicationController
       return
     end
     # must include the oauth proxy object
-    require 'oauth/request_proxy/rack_request'
+
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
     @course_offering = CourseOffering.find_by(id: @inst_book.course_offering_id)
     $oauth_creds = get_oauth_creds(params[:oauth_consumer_key])
@@ -33,10 +38,10 @@ class LtiController < ApplicationController
     file_name = nil
     if params.key?(:custom_module_file_name)
       lms_access_id = LmsAccess.where(consumer_key: params[:oauth_consumer_key]).pluck(:id).first
-      OdsaModuleProgress.get_progress(current_user.id, 
-        params[:custom_inst_chapter_module_id], 
-        params[:custom_inst_book_id], params[:lis_outcome_service_url],
-        params[:lis_result_sourcedid], lms_access_id)
+      OdsaModuleProgress.get_progress(current_user.id,
+                                      params[:custom_inst_chapter_module_id],
+                                      params[:custom_inst_book_id], params[:lis_outcome_service_url],
+                                      params[:lis_result_sourcedid], lms_access_id)
       file_name = params[:custom_module_file_name]
     else
       file_name = params[:custom_section_file_name]
@@ -66,7 +71,7 @@ class LtiController < ApplicationController
 
       @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_book_section_exercise_id=? AND user_id=?",
                                                           request_params['instBookSectionExerciseId'], current_user.id).select(
-        "id, user_id, question_name, request_type,
+          "id, user_id, question_name, request_type,
                                   correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
                                   pe_score, pe_steps_fixed"
       )
@@ -76,7 +81,7 @@ class LtiController < ApplicationController
     else
       @odsa_exercise_attempts = OdsaExerciseAttempt.where("inst_course_offering_exercise_id=? AND user_id=?",
                                                           request_params['instCourseOfferingExerciseId'], current_user.id).select(
-        "id, user_id, question_name, request_type,
+          "id, user_id, question_name, request_type,
                                   correct, worth_credit, time_done, time_taken, earned_proficiency, points_earned,
                                   pe_score, pe_steps_fixed"
       )
@@ -100,8 +105,8 @@ class LtiController < ApplicationController
     end
 
     lti_param = {
-      "lis_outcome_service_url" => "#{launch_params['lis_outcome_service_url']}",
-      "lis_result_sourcedid" => "#{CGI.unescapeHTML(launch_params['lis_result_sourcedid'] || '')}",
+        "lis_outcome_service_url" => "#{launch_params['lis_outcome_service_url']}",
+        "lis_result_sourcedid" => "#{CGI.unescapeHTML(launch_params['lis_result_sourcedid'] || '')}",
     }
 
     # @tp = IMS::LTI::ToolProvider.new(key, $oauth_creds[key], launch_params)
@@ -139,6 +144,11 @@ class LtiController < ApplicationController
   end
 
   def xml_config
+
+    Rails.logger.info("xml_config - LtiController")
+    Rails.logger.info(request)
+    Rails.logger.info(params)
+
     host = request.scheme + "://" + request.host_with_port
     launch_url = host + '/lti/launch'
     tc = IMS::LTI::ToolConfig.new(:title => "OpenDSA", :launch_url => launch_url)
@@ -151,31 +161,31 @@ class LtiController < ApplicationController
     #   :selection_height => 600,
     # })
     tc.set_ext_params('canvas.instructure.com', {
-      'assignment_selection': {
-        'message_type': 'ContentItemSelectionRequest',
-        'url': launch_url,
-        'selection_width': 800,
-        'selection_height': 600
-      },
-      'link_selection': {
-        'message_type': 'ContentItemSelectionRequest',
-        'url': launch_url,
-        'selection_width': 800,
-        'selection_height': 600
-      },
-      'editor_button': {
-        'message_type': 'ContentItemSelectionRequest',
-        'url': launch_url,
-        'selection_width': 800,
-        'selection_height': 600
-      },
-      'icon_url': "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png",
-      'custom_fields': {
-        'custom_canvas_course_id': '$Canvas.course.id',
-        'custom_contact_email_primary': '$Person.email.primary',
-      },
-      # 'selection_height': 800,
-      # 'selection_width': 600
+        'assignment_selection': {
+            'message_type': 'ContentItemSelectionRequest',
+            'url': launch_url,
+            'selection_width': 800,
+            'selection_height': 600
+        },
+        'link_selection': {
+            'message_type': 'ContentItemSelectionRequest',
+            'url': launch_url,
+            'selection_width': 800,
+            'selection_height': 600
+        },
+        'editor_button': {
+            'message_type': 'ContentItemSelectionRequest',
+            'url': launch_url,
+            'selection_width': 800,
+            'selection_height': 600
+        },
+        'icon_url': "#{request.protocol}#{request.host_with_port}/opendsa_logo50.png",
+        'custom_fields': {
+            'custom_canvas_course_id': '$Canvas.course.id',
+            'custom_contact_email_primary': '$Person.email.primary',
+        },
+        # 'selection_height': 800,
+        # 'selection_width': 600
     })
 
     render xml: tc.to_xml(:indent => 2), :content_type => 'text/xml'
@@ -183,7 +193,7 @@ class LtiController < ApplicationController
 
   def resource
     # must include the oauth proxy object
-    require 'oauth/request_proxy/rack_request'
+
     $oauth_creds = get_oauth_creds(params[:oauth_consumer_key])
     if $oauth_creds.blank?
       @message = 'Please make sure the consumer key is set correctly in the OpenDSA tool configuration in the LMS.'
@@ -200,12 +210,12 @@ class LtiController < ApplicationController
       return
     end
 
-    lms_instance = ensure_lms_instance()    
+    lms_instance = ensure_lms_instance()
 
     email = params.key?(:lis_person_contact_email_primary) ?
-      params[:lis_person_contact_email_primary] :
-      params[:oauth_consumer_key]
-    
+                params[:lis_person_contact_email_primary] :
+                params[:oauth_consumer_key]
+
     if !ensure_user(lms_instance) || !(@tp.context_instructor? || current_user.global_role.is_instructor_or_admin?)
       @message = 'OpenDSA: You must be an instructor to perform this action.'
       render 'error'
@@ -219,9 +229,9 @@ class LtiController < ApplicationController
     @lms_instance_id = lms_instance.id
     @organization_id = lms_instance.organization_id
     @course_offering = CourseOffering.find_by(
-      lms_instance_id: lms_instance.id,
-      lms_course_num: @lms_course_num,
-    )
+        lms_instance_id: lms_instance.id,
+        lms_course_num: @lms_course_num,
+        )
     if @course_offering.blank?
       if lms_instance.organization_id.blank?
         @organizations = Organization.all.order(:name)
@@ -239,7 +249,7 @@ class LtiController < ApplicationController
   def content_item_selection
     if !user_signed_in? #|| !current_user.global_role.is_instructor_or_admin?
       render :json => {:status => 'fail', :message => 'OpenDSA: Please ensure third-party cookies are enabled in you browser\'s settings.'}.to_json,
-        :status => :unauthorized
+             :status => :unauthorized
       return
     end
 
@@ -251,23 +261,23 @@ class LtiController < ApplicationController
     course_offering = CourseOffering.find(params[:course_offering_id])
     unless course_offering.is_instructor?(current_user)
       render :json => {:status => 'fail', :message => 'You must be an instructor for the course offering.'}.to_json,
-        :status => :unauthorized
+             :status => :unauthorized
       return
     end
 
     resourceInfo = nil
     resourceUrlId = nil
     launchUrl = request.protocol + request.host_with_port + "/lti/launch"
-    require "addressable/uri"    
+    require "addressable/uri"
     if params['selected'].key?('moduleInfo')
       resourceInfo = {
-        points: params['selected']['moduleSettings']['points'],
-        resource_id: params['selected']['moduleInfo']['id'],
-        title: params['selected']['moduleInfo']['name'],
+          points: params['selected']['moduleSettings']['points'],
+          resource_id: params['selected']['moduleInfo']['id'],
+          title: params['selected']['moduleInfo']['name'],
       }
-      
+
       resourceUrlId = "#{request.protocol}#{request.host_with_port}/inst_modules/#{resourceInfo[:resource_id]}"
-      
+
       uri = Addressable::URI.new
       uri.query_values = {custom_inst_module_id: resourceInfo[:resource_id]}
       launchUrl = launchUrl + '?' + uri.query
@@ -275,15 +285,15 @@ class LtiController < ApplicationController
       exinfo = params['selected']['exerciseInfo']
       exSettings = params['selected']['exerciseSettings']
       resourceInfo = {
-        points: exSettings['points'] || 1,
-        resource_id: exinfo['id'],
-        title: exinfo["name"]
+          points: exSettings['points'] || 1,
+          resource_id: exinfo['id'],
+          title: exinfo["name"]
       }
       resourceUrlId = "#{request.protocol}#{request.host_with_port}/inst_exercise/#{exinfo['id']}"
       uri = Addressable::URI.new
       uri.query_values = {
-        custom_ex_short_name: exinfo['short_name'],
-        custom_ex_settings: exSettings.to_json
+          custom_ex_short_name: exinfo['short_name'],
+          custom_ex_settings: exSettings.to_json
       }
       launchUrl = launchUrl + '?' + uri.query
     end
@@ -304,52 +314,52 @@ class LtiController < ApplicationController
       content_item_params["data"] = params["data"]
     end
     content_item = {
-      "@type": "LtiLinkItem",
-      "mediaType": "application/vnd.ims.lti.v1.ltilink",
-      "icon": {
-        "@id": logoUrl,
-        "width": 50,
-        "height": 50
-      },
-      "title": "OpenDSA: " + resourceInfo[:title],
-      "placementAdvice": {
-        "displayWidth": 950,
-        "displayHeight": params['selected'].key?('moduleInfo') ? 1000 : 750,
-        "presentationDocumentTarget": "iframe"
-      },
-      'url': launchUrl,
-      # "custom": {
-      # }
+        "@type": "LtiLinkItem",
+        "mediaType": "application/vnd.ims.lti.v1.ltilink",
+        "icon": {
+            "@id": logoUrl,
+            "width": 50,
+            "height": 50
+        },
+        "title": "OpenDSA: " + resourceInfo[:title],
+        "placementAdvice": {
+            "displayWidth": 950,
+            "displayHeight": params['selected'].key?('moduleInfo') ? 1000 : 750,
+            "presentationDocumentTarget": "iframe"
+        },
+        'url': launchUrl,
+        # "custom": {
+        # }
     }
     if isGradable
       content_item["lineItem"] = {
-        "@type": "LineItem",
-        "label": "OpenDSA: " + resourceInfo[:title],
-        "reportingMethod": "res:totalScore",
-        "assignedActivity": {
-          "@id": "#{resourceUrlId}",
-          "activityId": "#{resourceInfo[:resource_id]}"
-        },
-        "scoreConstraints": {
-          "@type": "NumericLimits",
-          "normalMaximum": resourceInfo[:points].to_f,
-          "extraCreditMaximum": 0,
-          "totalMaximum": resourceInfo[:points].to_f
-        }
+          "@type": "LineItem",
+          "label": "OpenDSA: " + resourceInfo[:title],
+          "reportingMethod": "res:totalScore",
+          "assignedActivity": {
+              "@id": "#{resourceUrlId}",
+              "activityId": "#{resourceInfo[:resource_id]}"
+          },
+          "scoreConstraints": {
+              "@type": "NumericLimits",
+              "normalMaximum": resourceInfo[:points].to_f,
+              "extraCreditMaximum": 0,
+              "totalMaximum": resourceInfo[:points].to_f
+          }
       }
     end
     content_items = {
-      "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
-      "@graph": [
-        content_item
-      ]
+        "@context": "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
+        "@graph": [
+            content_item
+        ]
     }
     content_item_params["content_items"] = content_items.to_json
 
     require 'lti/oauth'
     oauth_info = OAuth.generate_oauth_params(consumer_key, consumer_secret, return_url,
                                              content_item_params)
-    
+
     render :json => oauth_info.as_json, :status => :ok
   end
 
@@ -380,7 +390,7 @@ class LtiController < ApplicationController
     tokens = req.lis_result_sourcedid.split("_")
     user_id = tokens[0]
     exercise_id = tokens[1]
-    
+
     if req.replace_request? || req.read_request?
       if tokens.size == 3
         context_type = tokens[2]
@@ -419,19 +429,19 @@ class LtiController < ApplicationController
 
     if context_type.blank?
       exercise = InstBookSectionExercise.includes(:inst_exercise, :inst_book, inst_book: [{course_offering: [:term, :course]}])
-      .find_by(id: exercise_id)
+                     .find_by(id: exercise_id)
       course_offering = exercise.inst_book.course_offering
       lis_result_sourcedid = "#{current_user.id}_#{exercise.id}"
       resource_link_id = "#{exercise.id}"
     elsif context_type == 'standalone-module'
       exercise = InstModuleSectionExercise.includes(:inst_exercise, inst_module_version: [{course_offering: [:term, :course]}])
-                                                .find(exercise_id)
+                     .find(exercise_id)
       course_offering = exercise.inst_module_version.course_offering
       lis_result_sourcedid = "#{current_user.id}_#{exercise.id}_#{context_type}"
       resource_link_id = "#{exercise.id}_#{context_type}"
     elsif context_type == 'standalone-exercise'
       exercise = InstCourseOfferingExercise.includes(:inst_exercise, course_offering: [:term, :course])
-                                           .find(exercise_id)
+                     .find(exercise_id)
       course_offering = exercise.course_offering
       lis_result_sourcedid = "#{current_user.id}_#{exercise.id}_#{context_type}"
       resource_link_id = "#{exercise.id}_#{context_type}"
@@ -502,7 +512,7 @@ class LtiController < ApplicationController
   end
 
   def launch_standalone_resource
-    require 'oauth/request_proxy/rack_request'
+
     $oauth_creds = get_oauth_creds(params[:oauth_consumer_key])
     lms_instance = ensure_lms_instance()
     lms_type_name = params[:tool_consumer_info_product_family_code].downcase
@@ -534,21 +544,21 @@ class LtiController < ApplicationController
       else
         course = Course.find_by(organization_id: orgid, number: params[:context_label])
         if course.blank?
-          course = Course.new(name: params[:context_title], 
-            number: params[:context_label], 
-            organization_id: orgid,
-            user_id: current_user.id)
+          course = Course.new(name: params[:context_title],
+                              number: params[:context_label],
+                              organization_id: orgid,
+                              user_id: current_user.id)
           course.save!
         end
       end
       course_offering = CourseOffering.new(
-        course: course,
-        term: term,
-        label: params[:custom_label] || "#{params[:context_title]} - #{params[:context_label]}",
-        lms_instance: lms_instance,
-        lms_course_code: "#{params[:context_title]} - #{params[:context_label]}",
-        lms_course_num: lms_course_num,
-      )
+          course: course,
+          term: term,
+          label: params[:custom_label] || "#{params[:context_title]} - #{params[:context_label]}",
+          lms_instance: lms_instance,
+          lms_course_code: "#{params[:context_title]} - #{params[:context_label]}",
+          lms_course_num: lms_course_num,
+          )
       course_offering.save!
     end
 
@@ -562,11 +572,11 @@ class LtiController < ApplicationController
   end
 
   def launch_standalone_exercise(course_offering, lms_instance)
-    
+
     if params.key?(:custom_inst_course_offering_exercise_id)
       # TODO: ensure that the exercise instance belongs to the course offering
       @course_off_ex = InstCourseOfferingExercise.find_and_update(params[:custom_inst_course_offering_exercise_id],
-        params[:resource_link_id], params[:resource_link_title])
+                                                                  params[:resource_link_id], params[:resource_link_title])
       @ex = @course_off_ex.inst_exercise
     elsif params.key?(:custom_ex_short_name)
       ex_settings = nil
@@ -574,13 +584,13 @@ class LtiController < ApplicationController
         ex_settings = JSON.parse(params[:custom_ex_settings])
       end
       @ex = InstExercise.find_by(short_name: params[:custom_ex_short_name])
-      @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
-        params[:resource_link_id], params[:resource_link_title], @ex, ex_settings)
+      @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id,
+                                                                          params[:resource_link_id], params[:resource_link_title], @ex, ex_settings)
     else
       # Used for older exercises created before workflow was updated. Can likely be removed after a while.
       @ex = InstExercise.find_by(short_name: params[:ex_short_name])
-      @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id, 
-        params[:resource_link_id], params[:resource_link_title], @ex, nil)
+      @course_off_ex = InstCourseOfferingExercise.find_or_create_resource(course_offering.id,
+                                                                          params[:resource_link_id], params[:resource_link_title], @ex, nil)
     end
 
     if lms_instance.has_oauth_creds?()
@@ -588,12 +598,12 @@ class LtiController < ApplicationController
     else
       lms_access_id = LmsAccess.find_by(consumer_key: params[:oauth_consumer_key]).id
     end
-    
+
     OdsaExerciseProgress.get_courseoffex_progress(current_user.id,
-      @course_off_ex.id,
-      params[:lis_outcome_service_url],
-      params[:lis_result_sourcedid],
-      lms_access_id)
+                                                  @course_off_ex.id,
+                                                  params[:lis_outcome_service_url],
+                                                  params[:lis_result_sourcedid],
+                                                  lms_access_id)
 
     if !@ex.av_address.blank?
       @av_address = @course_off_ex.build_av_address(@ex.av_address)
@@ -620,17 +630,17 @@ class LtiController < ApplicationController
     @exercises = {}
     exercise_objs.each do |obj|
       ex_data = {
-        'inst_module_section_exercise_id' => obj.id,
-        'inst_module_version_id' => obj.inst_module_version_id,
-        'inst_module_section_id' => obj.inst_module_section_id,
-        'points' => obj.points,
-        'threshold' => obj.threshold,
-        'required' => obj.required,
-        'options' => obj.options,
-        'short_name' => obj.inst_exercise.short_name,
-        'long_name' => obj.inst_exercise.name,
-        'type' => obj.inst_exercise.ex_type,
-        'learning_tool' => obj.inst_exercise.learning_tool,
+          'inst_module_section_exercise_id' => obj.id,
+          'inst_module_version_id' => obj.inst_module_version_id,
+          'inst_module_section_id' => obj.inst_module_section_id,
+          'points' => obj.points,
+          'threshold' => obj.threshold,
+          'required' => obj.required,
+          'options' => obj.options,
+          'short_name' => obj.inst_exercise.short_name,
+          'long_name' => obj.inst_exercise.name,
+          'type' => obj.inst_exercise.ex_type,
+          'learning_tool' => obj.inst_exercise.learning_tool,
       }
       unless ex_data['learning_tool'].blank?
         extrtool_launch_base_url = request.protocol + request.host_with_port + "/lti/launch_extrtool"
@@ -638,17 +648,17 @@ class LtiController < ApplicationController
       end
       @exercises[ex_data['short_name']] = ex_data
     end
-    
+
     if lms_instance.has_oauth_creds?()
       lms_access_id = nil
     else
       lms_access_id = LmsAccess.find_by(consumer_key: params[:oauth_consumer_key]).id
     end
-    
+
     # ensure module progress exists and update it if necessary
-    mod_prog = OdsaModuleProgress.get_standalone_progress(current_user.id, 
-      @mod_version.id, params[:lis_outcome_service_url],
-      params[:lis_result_sourcedid], lms_access_id)
+    mod_prog = OdsaModuleProgress.get_standalone_progress(current_user.id,
+                                                          @mod_version.id, params[:lis_outcome_service_url],
+                                                          params[:lis_result_sourcedid], lms_access_id)
 
     @section_html = File.read(@mod_version.file_path) and return
   end
@@ -692,13 +702,13 @@ class LtiController < ApplicationController
   def lti_enroll(course_offering)
     role = @tp.context_instructor? ? CourseRole.instructor : CourseRole.student
     if course_offering &&
-       course_offering.can_enroll? &&
-       !course_offering.is_enrolled?(current_user)
+        course_offering.can_enroll? &&
+        !course_offering.is_enrolled?(current_user)
       CourseEnrollment.create(
-        course_offering: course_offering,
-        user: current_user,
-        course_role: role,
-      )
+          course_offering: course_offering,
+          user: current_user,
+          course_role: role,
+          )
     elsif course_offering.is_enrolled?(current_user)
       # check if the user's course role has changed
       ce = CourseEnrollment.find_by(course_offering_id: course_offering.id,
@@ -717,9 +727,9 @@ class LtiController < ApplicationController
     lms_instance = LmsInstance.find_by(url: url)
     if lms_instance.blank?
       lms_instance = LmsInstance.new(
-        url: url,
-        lms_type: LmsType.find_by('lower(name) = :name', name: params[:tool_consumer_info_product_family_code].downcase),
-      )
+          url: url,
+          lms_type: LmsType.find_by('lower(name) = :name', name: params[:tool_consumer_info_product_family_code].downcase),
+          )
       lms_instance.save
     end
     return lms_instance
@@ -769,43 +779,50 @@ class LtiController < ApplicationController
   end
 
   def lti_authorize!
+    Rails.logger.info("lti_authorize! - LtiController")
+
     if $oauth_creds.blank?
       @message = "OpenDSA: No OAuth credentials found"
       return false
     elsif key = params['oauth_consumer_key']
       if secret = $oauth_creds[key]
+
+        launch_path = request.url.split("?")[0]
+
+        require 'lti/message_authenticator'
+        authenticator = IMS::LTI::MessageAuthenticator.new(launch_path, request.request_parameters, secret)
+
+        Rails.logger.info("lti_authorize: valid signature")
+        if !authenticator.valid_signature?
+          @message = "OpenDSA: The OAuth signature was invalid"
+          return false
+        end
         @tp = IMS::LTI::ToolProvider.new(key, secret, params)
+
+        # check if `params['oauth_nonce']` has already been used
+        # Need to be implemented
+
+        #check if the message is too old
+        if DateTime.strptime(request.request_parameters['oauth_timestamp'],'%s') < 60.minutes.ago
+          @message = "OpenDSA: Your request is too old."
+          return false
+        end
+
+        return true
       else
+        @message = "OpenDSA: Consumer key wasn't recognized"
         @tp = IMS::LTI::ToolProvider.new(nil, nil, params)
         @tp.lti_msg = "Your consumer didn't use a recognized key."
         @tp.lti_errorlog = "You did it wrong!"
         @message = "OpenDSA: Consumer key wasn't recognized"
+
         return false
       end
     else
-      @message = "No consumer key"
+      @message = "OpenDSA: No consumer key"
       return false
     end
 
-    if !params.has_key?(:selection_directive)
-      if !@tp.valid_request?(request)
-        @message = "OpenDSA: The OAuth signature was invalid"
-        return false
-      end
-
-      if Time.now.utc.to_i - @tp.request_oauth_timestamp.to_i > 60 * 60
-        @message = "OpenDSA: Your request is too old."
-        return false
-      end
-
-      # this isn't actually checking anything like it should, just want people
-      # implementing real tools to be aware they need to check the nonce
-      if was_nonce_used_in_last_x_minutes?(@tp.request_oauth_nonce, 60)
-        @message = "OpenDSA: Why are you reusing the nonce?"
-        return false
-      end
-    end
-    return true
   end
 
   def get_lms_course_num(lms_type_name, lms_instance)
