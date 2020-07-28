@@ -11,6 +11,7 @@ namespace :db do
     FactoryBot.create(:term400)
     FactoryBot.create(:term500)
     FactoryBot.create(:course)
+    FactoryBot.create(:late_policy)
     FactoryBot.create(:lms_instance)
     offerings = []
     offerings[0] = FactoryBot.create(:course_offering_term_1_tr)
