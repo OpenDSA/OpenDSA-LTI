@@ -1,4 +1,4 @@
-class CreateOdsaUserInteractions < ActiveRecord::Migration
+class CreateOdsaUserInteractions < ActiveRecord::Migration[5.1]
   def change
     create_table :odsa_user_interactions do |t|
       t.integer  "user_id",                       null: false

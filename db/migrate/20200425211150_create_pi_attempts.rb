@@ -1,4 +1,4 @@
-class CreatePiAttempts < ActiveRecord::Migration
+class CreatePiAttempts < ActiveRecord::Migration[5.1]
   def change
     create_table :pi_attempts do |t|
       t.integer :user_id

@@ -1,4 +1,4 @@
-class ChangeOdsaProgressColumnName < ActiveRecord::Migration
+class ChangeOdsaProgressColumnName < ActiveRecord::Migration[5.1]
   def change
     rename_column :odsa_exercise_progresses, :streak, :current_score
     rename_column :odsa_exercise_progresses, :longest_streak, :highest_score

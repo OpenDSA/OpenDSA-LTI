@@ -1,4 +1,4 @@
-class CreateInstModules < ActiveRecord::Migration
+class CreateInstModules < ActiveRecord::Migration[5.1]
   def change
     create_table :inst_modules do |t|
       t.string :path, null: false

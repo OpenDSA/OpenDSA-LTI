@@ -1,4 +1,4 @@
-class ExpandInstCourseOfferingExercisesTable < ActiveRecord::Migration
+class ExpandInstCourseOfferingExercisesTable < ActiveRecord::Migration[5.1]
   def change
     add_column :inst_course_offering_exercises, :points, :decimal, precision: 5, scale: 2, null: false
     add_column :inst_course_offering_exercises, :options, :text, limit: 2147483647

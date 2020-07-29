@@ -1,4 +1,4 @@
-class CreateInstSections < ActiveRecord::Migration
+class CreateInstSections < ActiveRecord::Migration[5.1]
   def change
     create_table :inst_sections do |t|
       t.integer  "inst_module_id",                                   null: false

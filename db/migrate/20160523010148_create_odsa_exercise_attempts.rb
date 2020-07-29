@@ -1,4 +1,4 @@
-class CreateOdsaExerciseAttempts < ActiveRecord::Migration
+class CreateOdsaExerciseAttempts < ActiveRecord::Migration[5.1]
   def change
     create_table :odsa_exercise_attempts do |t|
       t.integer  "user_id", null: false

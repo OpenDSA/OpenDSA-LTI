@@ -1,4 +1,4 @@
-class CreateLatePolicies < ActiveRecord::Migration
+class CreateLatePolicies < ActiveRecord::Migration[5.1]
   def change
     create_table :late_policies do |t|
       t.string :name, null: false

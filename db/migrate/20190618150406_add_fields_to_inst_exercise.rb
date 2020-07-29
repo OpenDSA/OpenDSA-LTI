@@ -1,4 +1,4 @@
-class AddFieldsToInstExercise < ActiveRecord::Migration
+class AddFieldsToInstExercise < ActiveRecord::Migration[5.1]
   def change
 
     add_column :inst_exercises, :av_address, :string, limit: 512

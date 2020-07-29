@@ -1,4 +1,4 @@
-class AddLmsInstanceIdToLmsAccess < ActiveRecord::Migration
+class AddLmsInstanceIdToLmsAccess < ActiveRecord::Migration[5.1]
   def change
     add_column :lms_accesses, :lms_instance_id, :integer
     add_column :lms_accesses, :user_id, :integer

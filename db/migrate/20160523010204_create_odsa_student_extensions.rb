@@ -1,4 +1,4 @@
-class CreateOdsaStudentExtensions < ActiveRecord::Migration
+class CreateOdsaStudentExtensions < ActiveRecord::Migration[5.1]
   def change
     create_table :odsa_student_extensions do |t|
       t.integer  "user_id"

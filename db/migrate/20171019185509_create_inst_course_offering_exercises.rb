@@ -1,4 +1,4 @@
-class CreateInstCourseOfferingExercises < ActiveRecord::Migration
+class CreateInstCourseOfferingExercises < ActiveRecord::Migration[5.1]
   def change
     create_table :inst_course_offering_exercises do |t|
       t.integer :course_offering_id, null: false

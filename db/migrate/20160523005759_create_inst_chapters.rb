@@ -1,4 +1,4 @@
-class CreateInstChapters < ActiveRecord::Migration
+class CreateInstChapters < ActiveRecord::Migration[5.1]
   def change
     create_table :inst_chapters do |t|
       t.integer  "inst_book_id",            null: false
