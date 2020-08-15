@@ -2,8 +2,7 @@
 lock '3.14.1'
 
 set :application, 'OpenDSA-LTI'
-# set :repo_url, 'git://github.com/OpenDSA/OpenDSA-LTI.git'
-set :repo_url, 'git://github.com/awh4kc/OpenDSA-LTI.git'
+set :repo_url, 'git://github.com/OpenDSA/OpenDSA-LTI.git'
 
 # Default branch is :master
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
