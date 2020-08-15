@@ -1,13 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import unittest
 import Factorial
 
 class FactorialTest(unittest.TestCase):
-  f=open('Factorial_Python_results.csv','w') 
+  f=open('Factorial_Python_results.csv','w')
   @classmethod
   def setUpClass(cls):
     pass
-    
+
   @classmethod
   def tearDownClass(cls):
     FactorialTest.f.close()
