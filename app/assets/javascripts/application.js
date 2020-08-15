@@ -18,10 +18,8 @@
 //= require bootstrap-editable
 //= require bootstrap-editable-rails
 //= require js-routes
-//= require codemirror
 //= require bootstrap-wysihtml5
 //= require cocoon
-//= require cm
 //= require counter.js
 //= require data-confirm-modal
 //= require moment
@@ -34,9 +32,9 @@
 $.extend(window, Routes);
 
 //use wysihtml5 rich text editor
-$(document).ready(function() {
+$(document).ready(function () {
 
-    $('.richtexteditor').each(function(i, elem) {
+    $('.richtexteditor').each(function (i, elem) {
         $(elem).wysihtml5({
             "font-styles": false,
             "emphasis": true,
@@ -82,15 +80,15 @@ function percentBar(filled, capacity, id) {
 }
 $.fn.editable.defaults.mode = 'inline';
 
-$(document).ready(function() {
+$(document).ready(function () {
     var clip = new Clipboard('.clipboard-btn');
 
-    clip.on('success', function(e) {
+    clip.on('success', function (e) {
         setTooltip(e.trigger, 'Copied!');
         hideTooltip(e.trigger);
     });
 
-    clip.on('error', function(e) {
+    clip.on('error', function (e) {
         setTooltip(e.trigger, 'Failed!');
         hideTooltip(e.trigger);
     });
@@ -107,7 +105,7 @@ $(document).ready(function() {
     }
 
     function hideTooltip(btn) {
-        setTimeout(function() {
+        setTimeout(function () {
             $(btn).tooltip('hide');
         }, 1000);
     }
