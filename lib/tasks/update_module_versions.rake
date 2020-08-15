@@ -17,6 +17,7 @@ task :update_module_versions => :environment do
     TIMESTAMP = Time.now.strftime('%Y%m%d%H%M%S')
     OUTPUT_DIRECTORY = File.join(OpenDSA::STANDALONE_MODULES_DIRECTORY, TIMESTAMP)
     OUTPUT_DIRECTORY_REL = TIMESTAMP # output directory relative to the build directory
+    REQS = File.join(OpenDSA::OPENDSA_DIRECTORY, 'requirements.txt')
 
     # Steps to generate stand-alone modules
     #- 1. run simple2full.py on reference configs to generate full configurations
@@ -90,8 +91,6 @@ task :update_module_versions => :environment do
 
         require 'open3'
         command = "python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
-        puts "command"
-        puts command
         stdout, stderr, status = Open3.capture3(command)
         unless status.success?
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
@@ -136,9 +135,23 @@ task :update_module_versions => :environment do
         return status.success?
     end
 
+    def initialize_python()
+        puts "Installing pip modules for python3"
+        require 'open3'
+        command = "pip3 install -r #{REQS}"
+        stdout, stderr, status = Open3.capture3(command)
+
+        if status.success?
+            puts "pip modules instalation was SUCCESSFUL."
+        else
+            puts "pip modules installation FAILED."
+        end
+    end
+
     def main()
         puts "Checking for stand-alone modules that need updating."
         initialize_output_directory()
+        initialize_python()
         config = build_config()
         unless config.nil?
             puts "Compiling stand-alone module files. Please wait."
