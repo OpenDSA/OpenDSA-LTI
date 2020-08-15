@@ -5,7 +5,6 @@ gem 'bootstrap-sass', '>= 3.4.1'
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
 gem 'bootstrap-editable-rails'
-gem 'codemirror-rails'
 gem 'font-awesome-rails'
 gem 'formtastic', '~> 3.1'
 gem 'formtastic-bootstrap'
@@ -62,7 +61,7 @@ gem 'oj_mimic_json'
 
 group :assets do
   gem 'sass-rails'
-  gem 'uglifier', '>= 1.3.0'
+  gem 'uglifier', '~> 2.6.1'
   gem 'autoprefixer-rails'
 end
 
@@ -169,3 +168,4 @@ gem 'user_agent_parser' # 2.6.0 or higher requires ruby>=2.4
 gem 'rails_same_site_cookie'
 gem 'rack-cors'
 gem 'simple_oauth', '0.3.1'
+gem 'therubyracer'

@@ -19,7 +19,6 @@
 //= require bootstrap-editable-rails
 //= require js-routes
 //= require codemirror
-//= require codemirror/modes/clike
 //= require bootstrap-wysihtml5
 //= require cocoon
 //= require cm
