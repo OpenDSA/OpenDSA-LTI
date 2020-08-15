@@ -1,11 +1,11 @@
-import { addClass, elt, rmClass } from "../util/dom.js"
-import { on } from "../util/event.js"
-import { scrollGap, paddingVert } from "../measurement/position_measurement.js"
-import { ie, ie_version, mac, mac_geMountainLion } from "../util/browser.js"
-import { updateHeightsInViewport } from "./update_lines.js"
-import { Delayed } from "../util/misc.js"
+import { addClass, elt, rmClass } from "../util/dom.js.js"
+import { on } from "../util/event.js.js"
+import { scrollGap, paddingVert } from "../measurement/position_measurement.js.js"
+import { ie, ie_version, mac, mac_geMountainLion } from "../util/browser.js.js"
+import { updateHeightsInViewport } from "./update_lines.js.js"
+import { Delayed } from "../util/misc.js.js"
 
-import { setScrollLeft, updateScrollTop } from "./scrolling.js"
+import { setScrollLeft, updateScrollTop } from "./scrolling.js.js"
 
 // SCROLLBARS
 
