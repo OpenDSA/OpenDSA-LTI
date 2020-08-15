@@ -20,9 +20,9 @@ task :update_module_versions => :environment do
 
     # Steps to generate stand-alone modules
     #- 1. run simple2full.py on reference configs to generate full configurations
-    #- 2. consolidate full configs into one config, filtering out modules not in 
+    #- 2. consolidate full configs into one config, filtering out modules not in
     #       the OpenDSA::STANDALONE_DIRECTORIES hash
-    #- 3. check which of the modules need to be updated based on the commit hash of 
+    #- 3. check which of the modules need to be updated based on the commit hash of
     #       the commit the module's RST file was last modified in and filter out
     #       modules that don't need updating
     # 4. compile the consolidated configuration (run configure.py with --standalone-modules switch)
@@ -62,7 +62,7 @@ task :update_module_versions => :environment do
             full_config['chapters'].each do |chapter_name, chapter_obj|
                 chapter_obj.each do |module_path, module_obj|
                     sep_index = module_path.index('/')
-                    unless sep_index.nil?   
+                    unless sep_index.nil?
                         module_folder = module_path[0..(sep_index-1)]
                         if OpenDSA::STANDALONE_DIRECTORIES.key?(module_folder) and !modules.key?(module_path)
                             modules[module_path] = module_obj
@@ -84,12 +84,18 @@ task :update_module_versions => :environment do
 
     def process_reference_config(config_file_path)
         puts "Generating full configuration file for reference configuration \"#{config_file_path}\"."
-        
+
         output_file_path = File.join(OUTPUT_DIRECTORY, File.basename(config_file_path))
         script_path = File.join(OpenDSA::OPENDSA_DIRECTORY, 'tools', 'simple2full.py')
+        puts "output_file_path"
+        puts output_file_path
+        puts "script path"
+        puts script_path
 
         require 'open3'
         command = "python #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
+        puts "command"
+        puts command
         stdout, stderr, status = Open3.capture3(command)
         unless status.success?
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
@@ -112,7 +118,7 @@ task :update_module_versions => :environment do
         require 'open3'
         command = "python #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
         stdout, stderr, status = Open3.capture3(command)
-        
+
         if status.success?
             puts "Compilation of stand-alone modules was SUCCESSFUL."
         else
@@ -130,10 +136,10 @@ task :update_module_versions => :environment do
             f.write(stderr)
         end
         puts "stderr log written to \"#{File.expand_path(stderr_path)}\""
-        
+
         return status.success?
     end
-    
+
     def main()
         puts "Checking for stand-alone modules that need updating."
         initialize_output_directory()
