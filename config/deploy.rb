@@ -176,17 +176,6 @@ namespace :deploy do
     end
   end
 
-  # update or create stand-alone module versions
-  after :finishing, 'deploy:update_module_versions' do
-    on roles :all do
-      within release_path do
-        with rails_env: fetch(:rails_env) do
-          execute :rake, 'update_module_versions'
-        end
-      end
-    end
-  end
-
   # reset database to working condition
   after :finishing, 'deploy:reset_database' do
     on roles :all do
@@ -204,6 +193,17 @@ namespace :deploy do
       within release_path do
         with rails_env: fetch(:rails_env) do
           execute :rake, 'db:populate'
+        end
+      end
+    end
+  end
+
+  # update or create stand-alone module versions
+  after :finishing, 'deploy:update_module_versions' do
+    on roles :all do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'update_module_versions'
         end
       end
     end
