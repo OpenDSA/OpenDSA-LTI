@@ -176,9 +176,20 @@ namespace :deploy do
     end
   end
 
+  # reset database to working condition
+  after :finishing, 'deploy:db_updates' do
+    on roles :all, wait: 30 do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'DISABLE_DATABASE_ENVIRONMENT_CHECK=1 db:drop db:create db:schema:load db:seed db:populate'
+        end
+      end
+    end
+  end
+
   # update or create stand-alone module versions
   after :finishing, 'deploy:update_module_versions' do
-    on roles :all do
+    on roles :all, wait:30 do
       within release_path do
         with rails_env: fetch(:rails_env) do
           execute :rake, 'update_module_versions'
