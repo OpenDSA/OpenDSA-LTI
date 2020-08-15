@@ -1,5 +1,5 @@
 # config valid only for Capistrano 3.10.1
-lock '3.11.0'
+lock '3.14.1'
 
 set :application, 'OpenDSA-LTI'
 set :repo_url, 'git://github.com/OpenDSA/OpenDSA-LTI.git'
@@ -38,7 +38,8 @@ set :khan_branch, ENV['khan_branch'] || 'master'
 # Default value for keep_releases is 5
 set :keep_releases, 5
 
-set :linked_files, %w{config/database.yml config/secrets.yml config/application.yml}
+# set :linked_files, %w{config/database.yml config/secrets.yml config/application.yml}
+set :linked_files, %w{config/database.yml config/secrets.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
 
 set :bower_flags, '--quiet --config.interactive=false'
@@ -174,9 +175,31 @@ namespace :deploy do
     end
   end
 
+  # # reset database to working condition
+  # after :finishing, 'deploy:db_updates' do
+  #   on roles :all, wait: 30 do
+  #     within release_path do
+  #       with rails_env: fetch(:rails_env) do
+  #         execute :rake, 'DISABLE_DATABASE_ENVIRONMENT_CHECK=1 RAILS_ENV=production db:schema:load db:seed db:populate'
+  #       end
+  #     end
+  #   end
+  # end
+
+  # # reset database to working condition
+  # after :finishing, 'deploy:db_migrate' do
+  #   on roles :all, wait: 30 do
+  #     within release_path do
+  #       with rails_env: fetch(:rails_env) do
+  #         execute :rake, 'RAILS_ENV=production db:migrate'
+  #       end
+  #     end
+  #   end
+  # end
+
   # update or create stand-alone module versions
   after :finishing, 'deploy:update_module_versions' do
-    on roles :all do
+    on roles :all, wait:30 do
       within release_path do
         with rails_env: fetch(:rails_env) do
           execute :rake, 'update_module_versions'

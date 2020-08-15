@@ -17,12 +17,13 @@ task :update_module_versions => :environment do
     TIMESTAMP = Time.now.strftime('%Y%m%d%H%M%S')
     OUTPUT_DIRECTORY = File.join(OpenDSA::STANDALONE_MODULES_DIRECTORY, TIMESTAMP)
     OUTPUT_DIRECTORY_REL = TIMESTAMP # output directory relative to the build directory
+    HIEROGLYPH = File.join(OpenDSA::OPENDSA_DIRECTORY, 'lib', 'hieroglyph')
 
     # Steps to generate stand-alone modules
     #- 1. run simple2full.py on reference configs to generate full configurations
-    #- 2. consolidate full configs into one config, filtering out modules not in 
+    #- 2. consolidate full configs into one config, filtering out modules not in
     #       the OpenDSA::STANDALONE_DIRECTORIES hash
-    #- 3. check which of the modules need to be updated based on the commit hash of 
+    #- 3. check which of the modules need to be updated based on the commit hash of
     #       the commit the module's RST file was last modified in and filter out
     #       modules that don't need updating
     # 4. compile the consolidated configuration (run configure.py with --standalone-modules switch)
@@ -62,7 +63,7 @@ task :update_module_versions => :environment do
             full_config['chapters'].each do |chapter_name, chapter_obj|
                 chapter_obj.each do |module_path, module_obj|
                     sep_index = module_path.index('/')
-                    unless sep_index.nil?   
+                    unless sep_index.nil?
                         module_folder = module_path[0..(sep_index-1)]
                         if OpenDSA::STANDALONE_DIRECTORIES.key?(module_folder) and !modules.key?(module_path)
                             modules[module_path] = module_obj
@@ -84,12 +85,12 @@ task :update_module_versions => :environment do
 
     def process_reference_config(config_file_path)
         puts "Generating full configuration file for reference configuration \"#{config_file_path}\"."
-        
+
         output_file_path = File.join(OUTPUT_DIRECTORY, File.basename(config_file_path))
         script_path = File.join(OpenDSA::OPENDSA_DIRECTORY, 'tools', 'simple2full.py')
 
         require 'open3'
-        command = "python #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
+        command = "python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
         stdout, stderr, status = Open3.capture3(command)
         unless status.success?
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
@@ -110,9 +111,9 @@ task :update_module_versions => :environment do
         end
 
         require 'open3'
-        command = "python #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
+        command = "python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
         stdout, stderr, status = Open3.capture3(command)
-        
+
         if status.success?
             puts "Compilation of stand-alone modules was SUCCESSFUL."
         else
@@ -130,13 +131,39 @@ task :update_module_versions => :environment do
             f.write(stderr)
         end
         puts "stderr log written to \"#{File.expand_path(stderr_path)}\""
-        
+
         return status.success?
     end
-    
+
+    def initialize_python()
+        puts "Installing pip modules for python3"
+        require 'open3'
+        command = "pip3 install -r requirements.txt"
+        stdout, stderr, status = Open3.capture3(command)
+        unless status.success?
+            puts "FAILED to install pip modules"
+            puts stdout
+            puts stderr
+        end
+    end
+
+    def initialize_hieroglyph()
+        puts "Installing hieroglyph for python"
+        require 'open3'
+        command = "pip3 install -e #{HIEROGLYPH}"
+        stdout, stderr, status = Open3.capture3(command)
+        unless status.success?
+            puts "FAILED to install hieroglyph"
+            puts stdout
+            puts stderr
+        end
+    end
+
     def main()
         puts "Checking for stand-alone modules that need updating."
         initialize_output_directory()
+        initialize_python()
+        initialize_hieroglyph()
         config = build_config()
         unless config.nil?
             puts "Compiling stand-alone module files. Please wait."
