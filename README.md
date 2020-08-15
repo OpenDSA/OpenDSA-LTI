@@ -75,7 +75,7 @@ The following server requirements will be fine for supporting hundreds of users.
   - The first step is to install some dependencies for Ruby.
   ```
   $ sudo apt-get update
-  $ sudo apt-get install -y git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties libffi-dev dkms libxslt-dev libpq-dev python-dev python-pip python-feedvalidator python-sphinx libmariadbclient-dev libevent-dev libsqlite3-dev
+  $ sudo apt-get install -y git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python3-software-properties libffi-dev dkms libxslt-dev libpq-dev python-dev python-pip python-feedvalidator python-sphinx libmariadbclient-dev libevent-dev libsqlite3-dev python3-pip
   ```
   - Next we're going to be installing Ruby using rbenv.
   ```
@@ -87,10 +87,10 @@ The following server requirements will be fine for supporting hundreds of users.
 
   $ git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
   $ echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
-  exec $SHELL
+  $ exec $SHELL
 
-  $ rbenv install 2.3.1
-  $ rbenv global 2.3.1
+  $ rbenv install 2.7.1
+  $ rbenv global 2.7.1
   $ ruby -v
   ```
 
@@ -111,7 +111,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Add Passenger APT repository
   ```
-  $ sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main > /etc/apt/sources.list.d/passenger.list'
+  $ sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger bionic main > /etc/apt/sources.list.d/passenger.list'
   $ sudo apt-get update
   ```
 
@@ -132,7 +132,7 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
   - First, change user from `www-data` to `deploy`
   ```
-  user `deploy`;
+  user deploy;
   worker_processes auto;
   pid /run/nginx.pid;
 
@@ -144,15 +144,10 @@ The following server requirements will be fine for supporting hundreds of users.
   ```
   - Second, point Passenger to the version of Ruby that we're using. Find the following lines in the configuration file
   ```
-  ##
-  # Phusion Passenger
-  ##
-  # Uncomment it if you installed ruby-passenger or ruby-passenger-enterprise
-  ##
+  sudo nano /etc/nginx/conf.d/mod-http-passenger.conf
   ```
-  - Then put the following two lines right after them
+  - Then replace the passenger_ruby line with the one below
   ```
-  passenger_root /usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini;
   passenger_ruby /home/deploy/.rbenv/shims/ruby;
   ```
   - The `passenger_ruby` is the important line here. Once you've changed `passenger_ruby` to use the right version Ruby, you can restart Nginx with the new Passenger configuration.
@@ -179,7 +174,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Now we will create a new database and user `opendsa` for OpenDSA-LTI application. First login to mysql
   ```
-  $ mysql -uroot -p
+  $ sudo mysql -uroot -p
   ```
   - Then create `opendsa` database
   ```
@@ -195,7 +190,10 @@ The following server requirements will be fine for supporting hundreds of users.
   - Node.js is required by Rails assets pipeline.
 
   ```
+  cd ~
   $ sudo apt-get install -y nodejs
+  $ curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh
+  $ sudo bash nodesource_setup.sh
   $ sudo ln -s /usr/bin/nodejs /usr/sbin/node
   $ sudo npm install -g jshint
   $ sudo npm install -g csslint
@@ -208,6 +206,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
   ```
   $ cd
+  $ chown deploy.deploy -R /home/deploy/.config
   $ git clone https://github.com/OpenDSA/OpenDSA.git
   $ cd OpenDSA
   $ make pull
