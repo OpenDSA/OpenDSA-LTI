@@ -187,6 +187,28 @@ namespace :deploy do
     end
   end
 
+  # reset database to working condition
+  after :finishing, 'deploy:reset_database' do
+    on roles :all do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'db:reset'
+        end
+      end
+    end
+  end
+
+  # reset database to working condition
+  after :finishing, 'deploy:populate_database' do
+    on roles :all do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'db:populate'
+        end
+      end
+    end
+  end
+
   # clear cache entries that may now be outdated
   after :finishing, 'deploy:clear_rails_cache' do
     on roles :all do
