@@ -87,13 +87,9 @@ task :update_module_versions => :environment do
 
         output_file_path = File.join(OUTPUT_DIRECTORY, File.basename(config_file_path))
         script_path = File.join(OpenDSA::OPENDSA_DIRECTORY, 'tools', 'simple2full.py')
-        puts "output_file_path"
-        puts output_file_path
-        puts "script path"
-        puts script_path
 
         require 'open3'
-        command = "python #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
+        command = "python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
         puts "command"
         puts command
         stdout, stderr, status = Open3.capture3(command)
