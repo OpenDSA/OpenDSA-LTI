@@ -187,6 +187,13 @@ namespace :deploy do
     end
   end
 
+  # sleep to give db time to finish
+  after :finishing, 'deploy:sleep_db' do
+    on roles :all do
+      execute "sleep 30"
+    end
+  end
+
   # update or create stand-alone module versions
   after :finishing, 'deploy:update_module_versions' do
     on roles :all do
