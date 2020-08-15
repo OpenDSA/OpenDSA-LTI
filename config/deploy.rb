@@ -177,7 +177,7 @@ namespace :deploy do
   end
 
   # reset database to working condition
-  after :finishing, 'deploy:reset_database' do
+  after :finishing, 'deploy:db_updates' do
     on roles :all do
       within release_path do
         with rails_env: fetch(:rails_env) do
