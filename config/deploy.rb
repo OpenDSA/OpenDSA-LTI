@@ -181,18 +181,7 @@ namespace :deploy do
     on roles :all do
       within release_path do
         with rails_env: fetch(:rails_env) do
-          execute :rake, 'DISABLE_DATABASE_ENVIRONMENT_CHECK=1 db:reset'
-        end
-      end
-    end
-  end
-
-  # reset database to working condition
-  after :finishing, 'deploy:populate_database' do
-    on roles :all do
-      within release_path do
-        with rails_env: fetch(:rails_env) do
-          execute :rake, 'db:populate'
+          execute :rake, 'DISABLE_DATABASE_ENVIRONMENT_CHECK=1 db:drop db:create db:schema:load db:seed db:populate'
         end
       end
     end
