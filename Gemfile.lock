@@ -314,6 +314,7 @@ GEM
       activerecord
       kaminari-core (= 1.2.1)
     kaminari-core (1.2.1)
+    libv8 (3.16.14.19)
     link_header (0.0.8)
     log_file (0.0.3)
     loofah (2.5.0)
@@ -426,6 +427,7 @@ GEM
       polyamorous (= 2.3.2)
     rdoc (6.2.1)
     redcarpet (3.5.0)
+    ref (2.0.0)
     regexp_parser (1.7.1)
     remotipart (1.4.4)
     representable (3.0.4)
@@ -490,6 +492,9 @@ GEM
     temple (0.8.2)
     test-unit (3.0.9)
       power_assert
+    therubyracer (0.12.3)
+      libv8 (~> 3.16.14.15)
+      ref
     thin (1.7.2)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -502,8 +507,9 @@ GEM
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     uber (0.1.0)
-    uglifier (4.2.0)
-      execjs (>= 0.3.0, < 3)
+    uglifier (2.6.1)
+      execjs (>= 0.3.0)
+      json (>= 1.8.0)
     user_agent_parser (2.7.0)
     virtus (1.0.5)
       axiom-types (~> 0.1)
@@ -625,10 +631,11 @@ DEPENDENCIES
   sqlite3
   sucker_punch (~> 1.0)
   test-unit (~> 3.0.9)
+  therubyracer
   thin
   truncate_html
   tzinfo
-  uglifier (>= 1.3.0)
+  uglifier (~> 2.6.1)
   user_agent_parser
   wannabe_bool
   whenever
