@@ -139,12 +139,12 @@ task :update_module_versions => :environment do
         puts "Installing pip modules for python3"
         require 'open3'
         command = "pip3 install -r #{REQS}"
+        puts command
         stdout, stderr, status = Open3.capture3(command)
-
-        if status.success?
-            puts "pip modules instalation was SUCCESSFUL."
-        else
-            puts "pip modules installation FAILED."
+        unless status.success?
+            puts "FAILED to install pip modules"
+            puts stdout
+            puts stderr
         end
     end
 
