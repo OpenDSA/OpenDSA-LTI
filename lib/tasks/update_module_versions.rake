@@ -112,7 +112,7 @@ task :update_module_versions => :environment do
         end
 
         require 'open3'
-        command = "python #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
+        command = "python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
         stdout, stderr, status = Open3.capture3(command)
 
         if status.success?
