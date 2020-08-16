@@ -27,7 +27,7 @@ module ExceptionHandler
 
     #Info
     def status
-      @exception  = request.env['action_dispatch.exception']
+      @exception  = env['action_dispatch.exception']
       @status     = ActionDispatch::ExceptionWrapper.new(env, @exception).status_code
       @response   = ActionDispatch::ExceptionWrapper.rescue_responses[@exception.class.name]
     end
