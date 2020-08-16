@@ -27,6 +27,7 @@ module ExceptionHandler
 
     #Info
     def status
+      # here is problem - update gem, request.env or ENV, maybe both lines
       @exception  = env['action_dispatch.exception']
       @status     = ActionDispatch::ExceptionWrapper.new(env, @exception).status_code
       @response   = ActionDispatch::ExceptionWrapper.rescue_responses[@exception.class.name]

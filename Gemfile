@@ -105,6 +105,7 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-cas'
 gem 'cancancan'
 gem 'activeadmin', '~> 2.7'
+# update this gem
 gem 'exception_handler', '~> 0.3.45'
 
 gem 'nokogiri', '1.10.9', require: false
