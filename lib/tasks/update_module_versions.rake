@@ -17,7 +17,6 @@ task :update_module_versions => :environment do
     TIMESTAMP = Time.now.strftime('%Y%m%d%H%M%S')
     OUTPUT_DIRECTORY = File.join(OpenDSA::STANDALONE_MODULES_DIRECTORY, TIMESTAMP)
     OUTPUT_DIRECTORY_REL = TIMESTAMP # output directory relative to the build directory
-    HIEROGLYPH = File.join(OpenDSA::OPENDSA_DIRECTORY, 'lib', 'hieroglyph')
 
     # Steps to generate stand-alone modules
     #- 1. run simple2full.py on reference configs to generate full configurations
@@ -135,35 +134,9 @@ task :update_module_versions => :environment do
         return status.success?
     end
 
-    def initialize_python()
-        puts "Installing pip modules for python3"
-        require 'open3'
-        command = "pip3 install -r requirements.txt"
-        stdout, stderr, status = Open3.capture3(command)
-        unless status.success?
-            puts "FAILED to install pip modules"
-            puts stdout
-            puts stderr
-        end
-    end
-
-    def initialize_hieroglyph()
-        puts "Installing hieroglyph for python"
-        require 'open3'
-        command = "pip3 install -e #{HIEROGLYPH}"
-        stdout, stderr, status = Open3.capture3(command)
-        unless status.success?
-            puts "FAILED to install hieroglyph"
-            puts stdout
-            puts stderr
-        end
-    end
-
     def main()
         puts "Checking for stand-alone modules that need updating."
         initialize_output_directory()
-        initialize_python()
-        initialize_hieroglyph()
         config = build_config()
         unless config.nil?
             puts "Compiling stand-alone module files. Please wait."

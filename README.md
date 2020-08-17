@@ -75,7 +75,7 @@ The following server requirements will be fine for supporting hundreds of users.
   - The first step is to install some dependencies for Ruby.
   ```
   $ sudo apt-get update
-  $ sudo apt-get install -y git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python3-software-properties libffi-dev dkms libxslt-dev libpq-dev python-dev python-pip python-feedvalidator python-sphinx libmariadbclient-dev libevent-dev libsqlite3-dev python3-pip
+  $ sudo apt-get install -y git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python3-software-properties libffi-dev dkms libxslt-dev libpq-dev python-dev python-pip python-feedvalidator python-sphinx libmariadbclient-dev libevent-dev libsqlite3-dev python3-pip python3-venv
   ```
   - Next we're going to be installing Ruby using rbenv.
   ```
@@ -210,6 +210,23 @@ The following server requirements will be fine for supporting hundreds of users.
   $ git clone https://github.com/OpenDSA/OpenDSA.git
   $ cd OpenDSA
   $ make pull
+  ```
+
+  - We also want to set up the python environment for OpenDSA for use by the OpenDSA-LTI application. To do this, we will first set up the environment by running the following commands.
+
+  ```
+  $ cd /home/deploy/OpenDSA
+  $ export PYTHON="python3"
+  $ make venv
+  $ source /home/deploy/OpenDSA/.pyVenv/bin/activate
+  ```
+
+  - Then we want to update our `~/.bashrc` file so we use the virtual environment every time we login. To do this, we will run the following commands.
+
+  ```
+  $ echo 'export PYTHON="python3"' >> ~/.bashrc
+  $ echo 'source /home/deploy/OpenDSA/.pyVenv/bin/activate' >> ~/.bashrc
+  $ exec $SHELL
   ```
 
   - For the next steps, **Switch back to OpenDSA-DevStack terminal**
