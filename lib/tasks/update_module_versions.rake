@@ -141,9 +141,10 @@ task :update_module_versions => :environment do
         stdout, stderr, status = Open3.capture3(command)
 
         if status.success?
+            puts "python SUCCESS"
             puts stdout
         else
-            puts "FAILED"
+            puts "python FAILED"
             puts stderr
         end
     end
