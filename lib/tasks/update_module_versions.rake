@@ -143,6 +143,7 @@ task :update_module_versions => :environment do
         if status.success?
             puts stdout
         else
+            puts "FAILED"
             puts stderr
         end
     end
