@@ -137,7 +137,7 @@ task :update_module_versions => :environment do
 
     def test_python()
         require 'open3'
-        command = "python3 --version"
+        command = "python --version"
         stdout, stderr, status = Open3.capture3(command)
 
         if status.success?
