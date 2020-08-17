@@ -629,7 +629,7 @@ DEPENDENCIES
   thin
   truncate_html
   tzinfo
-  uglifier (>= 1.3.0)
+  uglifier (~> 2.6.1)
   user_agent_parser
   wannabe_bool
   whenever

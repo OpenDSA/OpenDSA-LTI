@@ -135,9 +135,22 @@ task :update_module_versions => :environment do
         return status.success?
     end
 
+    def test_python()
+        require 'open3'
+        command = "python3 --version"
+        stdout, stderr, status = Open3.capture3(command)
+
+        if status.success?
+            puts stdout
+        else
+            puts stderr
+        end
+    end
+
     def main()
         puts "Checking for stand-alone modules that need updating."
         initialize_output_directory()
+        test_python()
         config = build_config()
         unless config.nil?
             puts "Compiling stand-alone module files. Please wait."

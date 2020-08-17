@@ -61,7 +61,7 @@ gem 'oj_mimic_json'
 
 group :assets do
   gem 'sass-rails'
-  gem 'uglifier', '>= 1.3.0'
+  gem 'uglifier', '~> 2.6.1'
   gem 'autoprefixer-rails'
 end
 
