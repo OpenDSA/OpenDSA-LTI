@@ -116,6 +116,7 @@ task :update_module_versions => :environment do
         if status.success?
             puts "Compilation of stand-alone modules was SUCCESSFUL."
         else
+            puts command
             puts "Compilation of stand-alone modules FAILED."
         end
 
