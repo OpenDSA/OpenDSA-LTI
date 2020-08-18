@@ -110,7 +110,7 @@ task :update_module_versions => :environment do
         end
 
         require 'open3'
-        command = "python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
+        command = "source /home/deploy/OpenDSA/.pyVenv/bin/activate; python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
         stdout, stderr, status = Open3.capture3(command)
 
         if status.success?
@@ -137,7 +137,7 @@ task :update_module_versions => :environment do
 
     def test_python()
         require 'open3'
-        command = "python --version"
+        command = "which python"
         stdout, stderr, status = Open3.capture3(command)
 
         if status.success?
