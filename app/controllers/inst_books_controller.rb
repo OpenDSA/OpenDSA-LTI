@@ -48,7 +48,7 @@ class InstBooksController < ApplicationController
 
     output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
     output_file_path = "public/OpenDSA/config/temp/#{output_file}"
-    stdout = %x(python3 #{script_path} #{input_file_path} #{output_file_path})
+    stdout = %x(. /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{input_file_path} #{output_file_path})
 
     hash = JSON.load(File.read(output_file_path))
 

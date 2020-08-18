@@ -89,7 +89,7 @@ task :update_module_versions => :environment do
         script_path = File.join(OpenDSA::OPENDSA_DIRECTORY, 'tools', 'simple2full.py')
 
         require 'open3'
-        command = "python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
+        command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
         stdout, stderr, status = Open3.capture3(command)
         unless status.success?
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
