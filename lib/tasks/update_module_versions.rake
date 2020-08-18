@@ -137,7 +137,7 @@ task :update_module_versions => :environment do
 
     def test_python()
         require 'open3'
-        command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && which python"
+        command = "which python"
         stdout, stderr, status = Open3.capture3(command)
 
         if status.success?
