@@ -1,5 +1,5 @@
 class EmbedController < ApplicationController
-  after_action :allow_iframe, only: [:show]
+  after_action :allow_iframe, only: [:show, :index]
 
   # GET /embed
   # gives a list of embeddable slideshows and exercises

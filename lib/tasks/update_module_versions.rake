@@ -89,7 +89,7 @@ task :update_module_versions => :environment do
         script_path = File.join(OpenDSA::OPENDSA_DIRECTORY, 'tools', 'simple2full.py')
 
         require 'open3'
-        command = "python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
+        command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
         stdout, stderr, status = Open3.capture3(command)
         unless status.success?
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
@@ -110,12 +110,13 @@ task :update_module_versions => :environment do
         end
 
         require 'open3'
-        command = "python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
+        command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
         stdout, stderr, status = Open3.capture3(command)
 
         if status.success?
             puts "Compilation of stand-alone modules was SUCCESSFUL."
         else
+            puts command
             puts "Compilation of stand-alone modules FAILED."
         end
 
@@ -134,9 +135,24 @@ task :update_module_versions => :environment do
         return status.success?
     end
 
+    def test_python()
+        require 'open3'
+        command = "which python"
+        stdout, stderr, status = Open3.capture3(command)
+
+        if status.success?
+            puts "python SUCCESS"
+            puts stdout
+        else
+            puts "python FAILED"
+            puts stderr
+        end
+    end
+
     def main()
         puts "Checking for stand-alone modules that need updating."
         initialize_output_directory()
+        test_python()
         config = build_config()
         unless config.nil?
             puts "Compiling stand-alone module files. Please wait."

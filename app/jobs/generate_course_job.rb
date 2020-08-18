@@ -32,7 +32,7 @@ class GenerateCourseJob < ProgressJob::Base
 
     script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
-    value = %x(python3 #{script_path} #{config_file_path} -b #{build_path})
+    value = %x(. /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path})
     update_progress
   end
 
