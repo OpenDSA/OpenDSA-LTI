@@ -79,7 +79,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       # end
       # File.open(stderr_path, "w") do |f|
       #     f.write(stderr)
-      # end
+      end
       hash = JSON.load(File.read(output_file_path))
       if params.has_key?(:inst_book)
         InstBook.save_data_from_json(hash, current_user, params[:inst_book]["id"])

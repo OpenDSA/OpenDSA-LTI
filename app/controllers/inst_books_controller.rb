@@ -58,7 +58,7 @@ class InstBooksController < ApplicationController
     # end
     # File.open(stderr_path, "w") do |f|
     #     f.write(stderr)
-    # end
+    end
 
     hash = JSON.load(File.read(output_file_path))
 
