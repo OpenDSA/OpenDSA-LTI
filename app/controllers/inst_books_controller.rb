@@ -51,13 +51,13 @@ class InstBooksController < ApplicationController
     require 'open3'
     command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{input_file} #{output_file_path}"
     stdout, stderr, status = Open3.capture3(command)
-    # stdout_path = File.join("#{output_file_path}", 'stdout.log')
-    # stderr_path = File.join("#{output_file_path}", 'stderr.log')
-    # File.open(stdout_path, "w") do |f|
-    #     f.write(stdout)
-    # end
-    # File.open(stderr_path, "w") do |f|
-    #     f.write(stderr)
+    stdout_path = File.join("#{output_file_path}", 'stdout.log')
+    stderr_path = File.join("#{output_file_path}", 'stderr.log')
+    File.open(stdout_path, "w") do |f|
+        f.write(stdout)
+    end
+    File.open(stderr_path, "w") do |f|
+        f.write(stderr)
     end
 
     hash = JSON.load(File.read(output_file_path))
