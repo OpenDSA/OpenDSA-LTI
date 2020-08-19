@@ -51,8 +51,8 @@ class InstBooksController < ApplicationController
     require 'open3'
     command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{input_file} #{output_file_path}"
     stdout, stderr, status = Open3.capture3(command)
-    stdout_path = File.join("#{output_file_path}", 'log', 'inst_controller_stdout.log')
-    stderr_path = File.join("#{output_file_path}", 'log','inst_controller_stderr.log')
+    stdout_path = File.join('/home/deploy', 'inst_controller_stdout.log')
+    stderr_path = File.join('/home/deploy', inst_controller_stderr.log')
     File.open(stdout_path, "w") do |f|
         f.write(stdout)
     end

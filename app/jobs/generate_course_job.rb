@@ -35,8 +35,8 @@ class GenerateCourseJob < ProgressJob::Base
     require 'open3'
     command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
     stdout, stderr, status = Open3.capture3(command)
-    stdout_path = File.join("#{build_path}", 'stdout.log')
-    stderr_path = File.join("#{build_path}", 'stderr.log')
+    stdout_path = File.join('/home/deploy', 'gen_course_stdout.log')
+    stderr_path = File.join('/home/deploy', 'gen_course_stderr.log')
     File.open(stdout_path, "w") do |f|
         f.write(stdout)
     end
