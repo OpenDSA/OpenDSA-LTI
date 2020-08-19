@@ -75,7 +75,7 @@ The following server requirements will be fine for supporting hundreds of users.
   - The first step is to install some dependencies for Ruby.
   ```
   $ sudo apt-get update
-  $ sudo apt-get install -y git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python3-software-properties libffi-dev dkms libxslt-dev libpq-dev python-dev python-pip python-feedvalidator python-sphinx libmariadbclient-dev libevent-dev libsqlite3-dev python3-pip python3-venv
+  $ sudo apt-get install -y git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python3-software-properties libffi-dev dkms libxslt-dev libpq-dev python-dev python-pip python-feedvalidator python-sphinx libmariadbclient-dev libevent-dev libsqlite3-dev python3-pip python3-venv locales-all
   ```
   - Next we're going to be installing Ruby using rbenv.
   ```
@@ -198,6 +198,7 @@ The following server requirements will be fine for supporting hundreds of users.
   $ sudo npm install -g jshint
   $ sudo npm install -g csslint
   $ sudo npm install -g bower
+  $ sudo npm install -g uglify-js
   ```
 
 ### Clone OpenDSA repository in your production server
