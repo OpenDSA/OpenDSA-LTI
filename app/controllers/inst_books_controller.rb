@@ -48,18 +48,18 @@ class InstBooksController < ApplicationController
 
     output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
     output_file_path = "public/OpenDSA/config/temp/#{output_file}"
-    stdout = %x(bash -c "python3 #{script_path} #{input_file_path} #{output_file_path}")
-    # require 'open3'
-    # command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{input_file_path} #{output_file_path}"
-    # stdout, stderr, status = Open3.capture3(command)
-    # stdout_path = File.join('/home/deploy', 'inst_controller_stdout.log')
-    # stderr_path = File.join('/home/deploy', 'inst_controller_stderr.log')
-    # File.open(stdout_path, "w") do |f|
-    #     f.write(stdout)
-    # end
-    # File.open(stderr_path, "w") do |f|
-    #     f.write(stderr)
-    # end
+    # stdout = %x(bash -c "python3 #{script_path} #{input_file_path} #{output_file_path}")
+    require 'open3'
+    command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{input_file_path} #{output_file_path}"
+    stdout, stderr, status = Open3.capture3(command)
+    stdout_path = File.join('/home/deploy', 'inst_controller_stdout.log')
+    stderr_path = File.join('/home/deploy', 'inst_controller_stderr.log')
+    File.open(stdout_path, "w") do |f|
+        f.write(stdout)
+    end
+    File.open(stderr_path, "w") do |f|
+        f.write(stderr)
+    end
 
     hash = JSON.load(File.read(output_file_path))
 

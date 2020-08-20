@@ -32,18 +32,18 @@ class GenerateCourseJob < ProgressJob::Base
 
     script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
-    value = %x(bash -c "python3 #{script_path} #{config_file_path} -b #{build_path}")
-    # require 'open3'
-    # command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
-    # stdout, stderr, status = Open3.capture3(command)
-    # stdout_path = File.join('/home/deploy', 'gen_course_stdout.log')
-    # stderr_path = File.join('/home/deploy', 'gen_course_stderr.log')
-    # File.open(stdout_path, "w") do |f|
-    #     f.write(stdout)
-    # end
-    # File.open(stderr_path, "w") do |f|
-    #     f.write(stderr)
-    # end
+    # value = %x(bash -c "python3 #{script_path} #{config_file_path} -b #{build_path}")
+    require 'open3'
+    command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
+    stdout, stderr, status = Open3.capture3(command)
+    stdout_path = File.join('/home/deploy', 'gen_course_stdout.log')
+    stderr_path = File.join('/home/deploy', 'gen_course_stderr.log')
+    File.open(stdout_path, "w") do |f|
+        f.write(stdout)
+    end
+    File.open(stderr_path, "w") do |f|
+        f.write(stderr)
+    end
     update_progress
   end
 
