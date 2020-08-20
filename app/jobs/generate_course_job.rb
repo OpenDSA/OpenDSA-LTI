@@ -14,7 +14,7 @@ class GenerateCourseJob < ProgressJob::Base
 
   def perform
     update_stage('Generating course in LMS')
-
+    Rails.logger.info('Generating course')
     chapters = InstChapter.where(inst_book_id: @inst_book.id)
     update_progress_max(chapters.count + 1)
     inst_book_compile
