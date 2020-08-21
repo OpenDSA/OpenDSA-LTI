@@ -23,6 +23,8 @@ class GenerateCourseJob < ProgressJob::Base
       template: "inst_books/show.json.jbuilder",
       locals: {:@inst_book => @inst_book, :@extrtool_launch_base_url => @extrtool_launch_base_url},
     )
+    Rails.logger.info('inst_book_json')
+    Rails.logger.info(inst_book_json)
     require 'json'
     config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
     config_file_path = "public/OpenDSA/config/temp/#{config_file}"
@@ -34,6 +36,8 @@ class GenerateCourseJob < ProgressJob::Base
 
     script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
+    Rails.logger.info('build_path')
+    Rails.logger.info(build_path)
     # value = %x(bash -c "python3 #{script_path} #{config_file_path} -b #{build_path}")
     require 'open3'
     command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
@@ -86,6 +90,7 @@ class GenerateCourseJob < ProgressJob::Base
   # -------------------------------------------------------------
   # Create LTI app in canvas course
   def save_lti_app(client, lms_course_id, tool_data)
+    Rails.logger.info('save_lti_app')
     # create LTI tool in canvas if it is not defined
     tool_name = tool_data["tool_name"]
     privacy_level = tool_data["privacy_level"]
@@ -139,6 +144,7 @@ class GenerateCourseJob < ProgressJob::Base
   # -------------------------------------------------------------
   # Create canvas modules that maps to OpenDSA chapters
   def save_lms_course(client, lms_course_id)
+    Rails.logger.info('save_lms_course')
     chapters = InstChapter.where(inst_book_id: @inst_book.id).order('position')
 
     chapters.each do |chapter|
@@ -176,6 +182,7 @@ class GenerateCourseJob < ProgressJob::Base
   # -------------------------------------------------------------
   # For each canvas module, create text items (just a label) that maps to OpenDSA modules
   def save_lms_chapter(client, lms_course_id, chapter)
+    Rails.logger.info('save_lms_chapter')
     modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
 
     module_item_position = 1
@@ -193,6 +200,7 @@ class GenerateCourseJob < ProgressJob::Base
   # in canvas, module item that has external link will map OpenDSA non-gradable module
   def save_module_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
                                    module_item_position)
+    Rails.logger.info('save_module_as_external_tool')
     module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
     if module_name.include? '/'
       module_name = module_name.split('/')[1]
@@ -228,6 +236,7 @@ class GenerateCourseJob < ProgressJob::Base
   # If OpenDSA module is gradable, it has at least one exercise with points greater than zero.
   # in canvas, module item that refer to an assignment will map OpenDSA gradable module
   def save_module_as_assignment(client, lms_course_id, chapter, chapt_module, title, opts, url_opts)
+    Rails.logger.info('save_module_as_assignent')
     uri = Addressable::URI.new
     uri.query_values = url_opts
 
