@@ -50,6 +50,7 @@ class GenerateCourseJob < ProgressJob::Base
   end
 
   def inst_book_compile
+    Rails.logger.info('inst_book_compile')
     lms_instance_id = @inst_book.course_offering.lms_instance['id']
     user_lms_access = LmsAccess.where(lms_instance_id: lms_instance_id).where(user_id: @user_id).first
     @created_LTI_tools = []
@@ -282,6 +283,7 @@ class GenerateCourseJob < ProgressJob::Base
 
   # -------------------------------------------------------------
   def book_path(inst_book)
+    Rails.logger.info('book_path')
     course_offering = CourseOffering.where(:id => inst_book.course_offering_id).first
     term = Term.where(:id => course_offering.term_id).first
     course = Course.where(:id => course_offering.course_id).first
