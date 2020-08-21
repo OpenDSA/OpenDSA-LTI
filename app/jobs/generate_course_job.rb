@@ -26,6 +26,8 @@ class GenerateCourseJob < ProgressJob::Base
     require 'json'
     config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
     config_file_path = "public/OpenDSA/config/temp/#{config_file}"
+    Rails.logger.info('config file path')
+    Rails.logger.info(config_file_path)
     File.open(config_file_path, "w") do |f|
       f.write(inst_book_json)
     end
