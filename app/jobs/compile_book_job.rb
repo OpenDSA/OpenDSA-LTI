@@ -16,12 +16,16 @@ class CompileBookJob < ProgressJob::Base
     require 'json'
     config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
     config_file_path = "public/OpenDSA/config/temp/#{config_file}"
+    Rails.logger.info('config_file_path')
+    Rails.logger.info(config_file_path)
     File.open(config_file_path, "w") do |f|
       f.write(inst_book_json)
     end
 
     script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
+    Rails.logger.info('build_path')
+    Rails.logger.info(build_path)
     # value = %x(bash -c "python3 #{script_path} #{config_file_path} -b #{build_path}")
     require 'open3'
     command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
