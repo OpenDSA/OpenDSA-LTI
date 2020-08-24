@@ -117,7 +117,7 @@ The following server requirements will be fine for supporting hundreds of users.
 
   - Install Passenger & Nginx
   ```
-  $ sudo apt-get install -y nginx-extras passenger
+  $ sudo apt-get install -y nginx-extras passenger libnginx-mod-http-passenger
   ```
 
   - So now we have Nginx and passenger installed. We can manage the Nginx webserver by using the service command:
@@ -207,7 +207,6 @@ The following server requirements will be fine for supporting hundreds of users.
 
   ```
   $ cd
-  $ chown deploy.deploy -R /home/deploy/.config
   $ git clone https://github.com/OpenDSA/OpenDSA.git
   $ cd OpenDSA
   $ make pull

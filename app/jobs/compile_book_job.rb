@@ -26,17 +26,11 @@ class CompileBookJob < ProgressJob::Base
     build_path = book_path(@inst_book)
     Rails.logger.info('build_path')
     Rails.logger.info(build_path)
-    # value = %x(bash -c "python3 #{script_path} #{config_file_path} -b #{build_path}")
     require 'open3'
-    command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
+    command = "bash -c 'python3 #{script_path} #{config_file_path} -b #{build_path}'"
     stdout, stderr, status = Open3.capture3(command)
-    stdout_path = File.join('/home/deploy', 'compile_book_stdout.log')
-    stderr_path = File.join('/home/deploy', 'compile_book_stderr.log')
-    File.open(stdout_path, "w") do |f|
-        f.write(stdout)
-    end
-    File.open(stderr_path, "w") do |f|
-        f.write(stderr)
+    unless status.success?
+      Rails.logger.info(stderr)
     end
     update_progress
   end
