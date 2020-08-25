@@ -2,5 +2,6 @@
 
 FactoryBot.define do
   factory :late_policy do
+    name { "late_10" }
   end
 end

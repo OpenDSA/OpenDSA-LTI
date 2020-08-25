@@ -1,4 +1,4 @@
-class InstBookOwner < ActiveRecord::Base
+class InstBookOwner < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :user
   belongs_to :inst_book

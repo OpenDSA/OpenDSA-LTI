@@ -1,4 +1,4 @@
-class InstChapter < ActiveRecord::Base
+class InstChapter < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :inst_book
   has_many :inst_chapter_modules, dependent: :destroy

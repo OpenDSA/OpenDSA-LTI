@@ -1,4 +1,4 @@
-class InstSection < ActiveRecord::Base
+class InstSection < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :inst_chapter_module
   has_many :inst_book_section_exercises, dependent: :destroy

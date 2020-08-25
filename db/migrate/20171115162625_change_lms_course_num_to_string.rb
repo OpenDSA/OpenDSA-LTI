@@ -1,4 +1,4 @@
-class ChangeLmsCourseNumToString < ActiveRecord::Migration
+class ChangeLmsCourseNumToString < ActiveRecord::Migration[5.1]
   def change
     change_column :course_offerings, :lms_course_num, :string
 

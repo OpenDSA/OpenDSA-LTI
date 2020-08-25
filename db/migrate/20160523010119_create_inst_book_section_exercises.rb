@@ -1,4 +1,4 @@
-class CreateInstBookSectionExercises < ActiveRecord::Migration
+class CreateInstBookSectionExercises < ActiveRecord::Migration[5.1]
   def change
     create_table :inst_book_section_exercises do |t|
       t.integer  "inst_book_id",      null: false

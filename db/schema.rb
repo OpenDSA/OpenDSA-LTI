@@ -12,13 +12,13 @@
 # It's strongly recommended that you check this file into your version control system.
 
 
-ActiveRecord::Schema.define(version: 20200118232324) do
+ActiveRecord::Schema.define(version: 20200425231608) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
     t.text     "body",          limit: 65535
     t.string   "resource_id",   limit: 255,   null: false
     t.string   "resource_type", limit: 255,   null: false
-    t.integer  "author_id",     limit: 4
+    t.bigint  "author_id",     limit: 4
     t.string   "author_type",   limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -29,9 +29,9 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
 
   create_table "course_enrollments", force: :cascade do |t|
-    t.integer "user_id",            limit: 4, null: false
-    t.integer "course_offering_id", limit: 4, null: false
-    t.integer "course_role_id",     limit: 4, null: false
+    t.bigint "user_id",            limit: 4, null: false
+    t.bigint "course_offering_id", limit: 4, null: false
+    t.bigint "course_role_id",     limit: 4, null: false
   end
 
   add_index "course_enrollments", ["course_offering_id"], name: "index_course_enrollments_on_course_offering_id", using: :btree
@@ -40,16 +40,16 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "course_enrollments", ["user_id"], name: "index_course_enrollments_on_user_id", using: :btree
 
   create_table "course_offerings", force: :cascade do |t|
-    t.integer  "course_id",               limit: 4,                   null: false
-    t.integer  "term_id",                 limit: 4,                   null: false
+    t.bigint  "course_id",               limit: 4,                   null: false
+    t.bigint  "term_id",                 limit: 4,                   null: false
     t.string   "label",                   limit: 255,                 null: false
     t.string   "url",                     limit: 255
     t.boolean  "self_enrollment_allowed",             default: true
     t.datetime "created_at"
     t.datetime "updated_at"
     t.date     "cutoff_date"
-    t.integer  "late_policy_id",          limit: 4
-    t.integer  "lms_instance_id",         limit: 4,                   null: false
+    t.bigint  "late_policy_id",          limit: 4
+    t.bigint  "lms_instance_id",         limit: 4,                   null: false
     t.string   "lms_course_code",         limit: 255
     t.string   "lms_course_num",          limit: 255,                 null: false
     t.boolean  "archived",                            default: false
@@ -72,8 +72,8 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   create_table "courses", force: :cascade do |t|
     t.string   "name",            limit: 255, null: false
     t.string   "number",          limit: 255, null: false
-    t.integer  "organization_id", limit: 4,   null: false
-    t.integer  "user_id",         limit: 4,   null: false
+    t.bigint  "organization_id", limit: 4,   null: false
+    t.bigint  "user_id",         limit: 4,   null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "slug",            limit: 255, null: false
@@ -84,8 +84,8 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "courses", ["user_id"], name: "index_courses_on_user_id", using: :btree
 
   create_table "delayed_jobs", force: :cascade do |t|
-    t.integer  "priority",         limit: 4,     default: 0, null: false
-    t.integer  "attempts",         limit: 4,     default: 0, null: false
+    t.bigint  "priority",         limit: 4,     default: 0, null: false
+    t.bigint  "attempts",         limit: 4,     default: 0, null: false
     t.text     "handler",          limit: 65535,             null: false
     t.text     "last_error",       limit: 65535
     t.datetime "run_at"
@@ -96,15 +96,15 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "progress_stage",   limit: 255
-    t.integer  "progress_current", limit: 4,     default: 0
-    t.integer  "progress_max",     limit: 4,     default: 0
+    t.bigint  "progress_current", limit: 4,     default: 0
+    t.bigint  "progress_max",     limit: 4,     default: 0
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
 
   create_table "errors", force: :cascade do |t|
     t.string   "usable_type", limit: 255
-    t.integer  "usable_id",   limit: 4
+    t.bigint  "usable_id",   limit: 4
     t.string   "class_name",  limit: 255
     t.text     "message",     limit: 65535
     t.text     "trace",       limit: 65535
@@ -121,7 +121,7 @@ ActiveRecord::Schema.define(version: 20200118232324) do
 
   create_table "friendly_id_slugs", force: :cascade do |t|
     t.string   "slug",           limit: 255, null: false
-    t.integer  "sluggable_id",   limit: 4,   null: false
+    t.bigint  "sluggable_id",   limit: 4,   null: false
     t.string   "sluggable_type", limit: 50
     t.string   "scope",          limit: 255
     t.datetime "created_at"
@@ -140,7 +140,7 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   end
 
   create_table "identities", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4,   null: false
+    t.bigint  "user_id",    limit: 4,   null: false
     t.string   "provider",   limit: 255, null: false
     t.string   "uid",        limit: 255, null: false
     t.datetime "created_at"
@@ -151,9 +151,9 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "identities", ["user_id"], name: "index_identities_on_user_id", using: :btree
 
   create_table "inst_book_section_exercises", force: :cascade do |t|
-    t.integer  "inst_book_id",     limit: 4,                                                  null: false
-    t.integer  "inst_section_id",  limit: 4,                                                  null: false
-    t.integer  "inst_exercise_id", limit: 4
+    t.bigint  "inst_book_id",     limit: 4,                                                  null: false
+    t.bigint  "inst_section_id",  limit: 4,                                                  null: false
+    t.bigint  "inst_exercise_id", limit: 4
     t.decimal  "points",                              precision: 5, scale: 2,                 null: false
     t.boolean  "required",                                                    default: false
     t.decimal  "threshold",                           precision: 5, scale: 2,                 null: false
@@ -168,8 +168,8 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "inst_book_section_exercises", ["inst_section_id"], name: "inst_book_section_exercises_inst_section_id_fk", using: :btree
 
   create_table "inst_books", force: :cascade do |t|
-    t.integer  "course_offering_id", limit: 4
-    t.integer  "user_id",            limit: 4,                          null: false
+    t.bigint  "course_offering_id", limit: 4
+    t.bigint  "user_id",            limit: 4,                          null: false
     t.string   "title",              limit: 50,                         null: false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -177,33 +177,33 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.string   "desc",               limit: 255
     t.datetime "last_compiled"
     t.text     "options",            limit: 4294967295
-    t.integer  "book_type",          limit: 4
+    t.bigint  "book_type",          limit: 4
   end
 
   add_index "inst_books", ["course_offering_id"], name: "inst_books_course_offering_id_fk", using: :btree
   add_index "inst_books", ["user_id"], name: "inst_books_user_id_fk", using: :btree
 
   create_table "inst_chapter_modules", force: :cascade do |t|
-    t.integer  "inst_chapter_id",     limit: 4, null: false
-    t.integer  "inst_module_id",      limit: 4, null: false
-    t.integer  "module_position",     limit: 4
-    t.integer  "lms_module_item_id",  limit: 4
-    t.integer  "lms_section_item_id", limit: 4
+    t.bigint  "inst_chapter_id",     limit: 4, null: false
+    t.bigint  "inst_module_id",      limit: 4, null: false
+    t.bigint  "module_position",     limit: 4
+    t.bigint  "lms_module_item_id",  limit: 4
+    t.bigint  "lms_section_item_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "lms_assignment_id",   limit: 4
+    t.bigint  "lms_assignment_id",   limit: 4
   end
 
   add_index "inst_chapter_modules", ["inst_chapter_id"], name: "inst_chapter_modules_inst_chapter_id_fk", using: :btree
   add_index "inst_chapter_modules", ["inst_module_id"], name: "inst_chapter_modules_inst_module_id_fk", using: :btree
 
   create_table "inst_chapters", force: :cascade do |t|
-    t.integer  "inst_book_id",            limit: 4,   null: false
+    t.bigint  "inst_book_id",            limit: 4,   null: false
     t.string   "name",                    limit: 100, null: false
     t.string   "short_display_name",      limit: 45
-    t.integer  "position",                limit: 4
-    t.integer  "lms_chapter_id",          limit: 4
-    t.integer  "lms_assignment_group_id", limit: 4
+    t.bigint  "position",                limit: 4
+    t.bigint  "lms_chapter_id",          limit: 4
+    t.bigint  "lms_assignment_group_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -211,8 +211,8 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "inst_chapters", ["inst_book_id"], name: "inst_chapters_inst_book_id_fk", using: :btree
 
   create_table "inst_course_offering_exercises", force: :cascade do |t|
-    t.integer  "course_offering_id",  limit: 4,                                  null: false
-    t.integer  "inst_exercise_id",    limit: 4,                                  null: false
+    t.bigint  "course_offering_id",  limit: 4,                                  null: false
+    t.bigint  "inst_exercise_id",    limit: 4,                                  null: false
     t.string   "resource_link_id",    limit: 255
     t.string   "resource_link_title", limit: 255
     t.datetime "created_at"
@@ -234,8 +234,8 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.datetime "updated_at"
     t.string   "learning_tool", limit: 255
     t.string   "av_address",    limit: 512
-    t.integer  "width",         limit: 4
-    t.integer  "height",        limit: 4
+    t.bigint  "width",         limit: 4
+    t.bigint  "height",        limit: 4
     t.text     "links",         limit: 65535
     t.text     "scripts",       limit: 65535
   end
@@ -243,9 +243,9 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "inst_exercises", ["short_name"], name: "index_inst_exercises_on_short_name", unique: true, using: :btree
 
   create_table "inst_module_section_exercises", force: :cascade do |t|
-    t.integer  "inst_module_version_id", limit: 4,                                             null: false
-    t.integer  "inst_module_section_id", limit: 4,                                             null: false
-    t.integer  "inst_exercise_id",       limit: 4,                                             null: false
+    t.bigint  "inst_module_version_id", limit: 4,                                             null: false
+    t.bigint  "inst_module_section_id", limit: 4,                                             null: false
+    t.bigint  "inst_exercise_id",       limit: 4,                                             null: false
     t.decimal  "points",                               precision: 5, scale: 2,                 null: false
     t.boolean  "required",                                                     default: false
     t.decimal  "threshold",                            precision: 5, scale: 2,                 null: false
@@ -259,7 +259,7 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "inst_module_section_exercises", ["inst_module_version_id"], name: "fk_rails_5c4fc2ff52", using: :btree
 
   create_table "inst_module_sections", force: :cascade do |t|
-    t.integer  "inst_module_version_id", limit: 4,                  null: false
+    t.bigint  "inst_module_version_id", limit: 4,                  null: false
     t.string   "name",                   limit: 255,                null: false
     t.boolean  "show",                               default: true
     t.string   "learning_tool",          limit: 255
@@ -272,12 +272,12 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "inst_module_sections", ["inst_module_version_id"], name: "fk_rails_ff11275e48", using: :btree
 
   create_table "inst_module_versions", force: :cascade do |t|
-    t.integer  "inst_module_id",      limit: 4,                    null: false
+    t.bigint  "inst_module_id",      limit: 4,                    null: false
     t.string   "name",                limit: 255,                  null: false
     t.string   "git_hash",            limit: 255,                  null: false
     t.string   "file_path",           limit: 4096,                 null: false
     t.boolean  "template",                         default: false
-    t.integer  "course_offering_id",  limit: 4
+    t.bigint  "course_offering_id",  limit: 4
     t.string   "resource_link_id",    limit: 255
     t.string   "resource_link_title", limit: 512
     t.datetime "created_at",                                       null: false
@@ -292,25 +292,25 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.string   "name",               limit: 255, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "current_version_id", limit: 4
+    t.bigint  "current_version_id", limit: 4
   end
 
   add_index "inst_modules", ["current_version_id"], name: "fk_rails_73d3622e40", using: :btree
   add_index "inst_modules", ["path"], name: "index_inst_modules_on_path", unique: true, using: :btree
 
   create_table "inst_sections", force: :cascade do |t|
-    t.integer  "inst_module_id",         limit: 4,                   null: false
-    t.integer  "inst_chapter_module_id", limit: 4,                   null: false
+    t.bigint  "inst_module_id",         limit: 4,                   null: false
+    t.bigint  "inst_chapter_module_id", limit: 4,                   null: false
     t.string   "short_display_name",     limit: 50
     t.string   "name",                   limit: 255,                 null: false
-    t.integer  "position",               limit: 4
+    t.bigint  "position",               limit: 4
     t.boolean  "gradable",                           default: false
     t.datetime "soft_deadline"
     t.datetime "hard_deadline"
-    t.integer  "time_limit",             limit: 4
+    t.bigint  "time_limit",             limit: 4
     t.boolean  "show",                               default: true
-    t.integer  "lms_item_id",            limit: 4
-    t.integer  "lms_assignment_id",      limit: 4
+    t.bigint  "lms_item_id",            limit: 4
+    t.bigint  "lms_assignment_id",      limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "learning_tool",          limit: 255
@@ -331,8 +331,8 @@ ActiveRecord::Schema.define(version: 20200118232324) do
 
   create_table "late_policies", force: :cascade do |t|
     t.string   "name",         limit: 255, null: false
-    t.integer  "late_days",    limit: 4,   null: false
-    t.integer  "late_percent", limit: 4,   null: false
+    t.bigint  "late_days",    limit: 4,   null: false
+    t.bigint  "late_percent", limit: 4,   null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -354,8 +354,8 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.string   "access_token",    limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "lms_instance_id", limit: 4,   null: false
-    t.integer  "user_id",         limit: 4,   null: false
+    t.bigint  "lms_instance_id", limit: 4,   null: false
+    t.bigint  "user_id",         limit: 4,   null: false
     t.string   "consumer_key",    limit: 255
     t.string   "consumer_secret", limit: 255
   end
@@ -367,10 +367,10 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.string   "url",             limit: 255, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "lms_type_id",     limit: 4
+    t.bigint  "lms_type_id",     limit: 4
     t.string   "consumer_key",    limit: 255
     t.string   "consumer_secret", limit: 255
-    t.integer  "organization_id", limit: 4
+    t.bigint  "organization_id", limit: 4
   end
 
   add_index "lms_instances", ["lms_type_id"], name: "lms_instances_lms_type_id_fk", using: :btree
@@ -386,8 +386,8 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "lms_types", ["name"], name: "index_lms_types_on_name", unique: true, using: :btree
 
   create_table "odsa_book_progresses", force: :cascade do |t|
-    t.integer  "user_id",              limit: 4,          null: false
-    t.integer  "inst_book_id",         limit: 4,          null: false
+    t.bigint  "user_id",              limit: 4,          null: false
+    t.bigint  "inst_book_id",         limit: 4,          null: false
     t.text     "started_exercises",    limit: 4294967295, null: false
     t.text     "proficient_exercises", limit: 4294967295, null: false
     t.datetime "created_at"
@@ -398,7 +398,7 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "odsa_book_progresses", ["user_id", "inst_book_id"], name: "index_odsa_book_progresses_on_user_id_and_inst_book_id", unique: true, using: :btree
 
   create_table "odsa_bugs", force: :cascade do |t|
-    t.integer  "user_id",        limit: 4,          null: false
+    t.bigint  "user_id",        limit: 4,          null: false
     t.string   "os_family",      limit: 50,         null: false
     t.string   "browser_family", limit: 20,         null: false
     t.string   "title",          limit: 50,         null: false
@@ -409,18 +409,18 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   end
 
   create_table "odsa_exercise_attempts", force: :cascade do |t|
-    t.integer  "user_id",                          limit: 4,                           null: false
-    t.integer  "inst_book_id",                     limit: 4
-    t.integer  "inst_section_id",                  limit: 4
-    t.integer  "inst_book_section_exercise_id",    limit: 4
+    t.bigint  "user_id",                          limit: 4,                           null: false
+    t.bigint  "inst_book_id",                     limit: 4
+    t.bigint  "inst_section_id",                  limit: 4
+    t.bigint  "inst_book_section_exercise_id",    limit: 4
     t.boolean  "worth_credit",                                                         null: false
     t.datetime "time_done",                                                            null: false
-    t.integer  "time_taken",                       limit: 4,                           null: false
-    t.integer  "count_hints",                      limit: 4,                           null: false
+    t.bigint  "time_taken",                       limit: 4,                           null: false
+    t.bigint  "count_hints",                      limit: 4,                           null: false
     t.boolean  "hint_used",                                                            null: false
     t.decimal  "points_earned",                                precision: 5, scale: 2, null: false
     t.boolean  "earned_proficiency",                                                   null: false
-    t.integer  "count_attempts",                   limit: 8,                           null: false
+    t.bigint  "count_attempts",                   limit: 8,                           null: false
     t.string   "ip_address",                       limit: 20,                          null: false
     t.string   "question_name",                    limit: 50,                          null: false
     t.string   "request_type",                     limit: 50
@@ -428,9 +428,9 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.datetime "updated_at"
     t.boolean  "correct"
     t.decimal  "pe_score",                                     precision: 5, scale: 2
-    t.integer  "pe_steps_fixed",                   limit: 4
-    t.integer  "inst_course_offering_exercise_id", limit: 4
-    t.integer  "inst_module_section_exercise_id",  limit: 4
+    t.bigint  "pe_steps_fixed",                   limit: 4
+    t.bigint  "inst_course_offering_exercise_id", limit: 4
+    t.bigint  "inst_module_section_exercise_id",  limit: 4
     t.string   "answer",                           limit: 255
   end
 
@@ -442,25 +442,25 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "odsa_exercise_attempts", ["user_id"], name: "odsa_exercise_attempts_user_id_fk", using: :btree
 
   create_table "odsa_exercise_progresses", force: :cascade do |t|
-    t.integer  "user_id",                          limit: 4,   null: false
-    t.integer  "inst_book_section_exercise_id",    limit: 4
-    t.integer  "current_score",                    limit: 4,   null: false
-    t.integer  "highest_score",                    limit: 4,   null: false
+    t.bigint  "user_id",                          limit: 4,   null: false
+    t.bigint  "inst_book_section_exercise_id",    limit: 4
+    t.bigint  "current_score",                    limit: 4,   null: false
+    t.bigint  "highest_score",                    limit: 4,   null: false
     t.datetime "first_done",                                   null: false
     t.datetime "last_done",                                    null: false
-    t.integer  "total_correct",                    limit: 4,   null: false
-    t.integer  "total_worth_credit",               limit: 4,   null: false
+    t.bigint  "total_correct",                    limit: 4,   null: false
+    t.bigint  "total_worth_credit",               limit: 4,   null: false
     t.datetime "proficient_date",                              null: false
     t.string   "current_exercise",                 limit: 255
     t.string   "correct_exercises",                limit: 255
     t.string   "hinted_exercise",                  limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "inst_course_offering_exercise_id", limit: 4
+    t.bigint  "inst_course_offering_exercise_id", limit: 4
     t.string   "lis_outcome_service_url",          limit: 255
     t.string   "lis_result_sourcedid",             limit: 255
-    t.integer  "lms_access_id",                    limit: 4
-    t.integer  "inst_module_section_exercise_id",  limit: 4
+    t.bigint  "lms_access_id",                    limit: 4
+    t.bigint  "inst_module_section_exercise_id",  limit: 4
   end
 
   add_index "odsa_exercise_progresses", ["inst_book_section_exercise_id"], name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk", using: :btree
@@ -472,20 +472,20 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "odsa_exercise_progresses", ["user_id", "inst_module_section_exercise_id"], name: "index_odsa_ex_prog_on_user_module_sec_ex", unique: true, using: :btree
 
   create_table "odsa_module_progresses", force: :cascade do |t|
-    t.integer  "user_id",                 limit: 4,   null: false
-    t.integer  "inst_book_id",            limit: 4
+    t.bigint  "user_id",                 limit: 4,   null: false
+    t.bigint  "inst_book_id",            limit: 4
     t.datetime "first_done",                          null: false
     t.datetime "last_done",                           null: false
     t.datetime "proficient_date",                     null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "inst_chapter_module_id",  limit: 4
+    t.bigint  "inst_chapter_module_id",  limit: 4
     t.string   "lis_outcome_service_url", limit: 255
     t.string   "lis_result_sourcedid",    limit: 255
     t.float    "current_score",           limit: 24,  null: false
     t.float    "highest_score",           limit: 24,  null: false
-    t.integer  "lms_access_id",           limit: 4
-    t.integer  "inst_module_version_id",  limit: 4
+    t.bigint  "lms_access_id",           limit: 4
+    t.bigint  "inst_module_version_id",  limit: 4
   end
 
   add_index "odsa_module_progresses", ["inst_book_id"], name: "odsa_module_progresses_inst_book_id_fk", using: :btree
@@ -496,13 +496,13 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "odsa_module_progresses", ["user_id", "inst_module_version_id"], name: "index_odsa_mod_prog_on_user_mod_version", unique: true, using: :btree
 
   create_table "odsa_student_extensions", force: :cascade do |t|
-    t.integer  "user_id",         limit: 4
-    t.integer  "inst_section_id", limit: 4, null: false
+    t.bigint  "user_id",         limit: 4
+    t.bigint  "inst_section_id", limit: 4, null: false
     t.datetime "soft_deadline"
     t.datetime "hard_deadline"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "time_limit",      limit: 4
+    t.bigint  "time_limit",      limit: 4
     t.datetime "opening_date"
   end
 
@@ -510,14 +510,14 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "odsa_student_extensions", ["user_id"], name: "odsa_student_extensions_user_id_fk", using: :btree
 
   create_table "odsa_user_interactions", force: :cascade do |t|
-    t.integer  "user_id",                          limit: 4,          null: false
-    t.integer  "inst_book_id",                     limit: 4
-    t.integer  "inst_section_id",                  limit: 4
-    t.integer  "inst_book_section_exercise_id",    limit: 4
+    t.bigint  "user_id",                          limit: 4,          null: false
+    t.bigint  "inst_book_id",                     limit: 4
+    t.bigint  "inst_section_id",                  limit: 4
+    t.bigint  "inst_book_section_exercise_id",    limit: 4
     t.string   "name",                             limit: 50,         null: false
     t.text     "description",                      limit: 4294967295, null: false
     t.datetime "action_time",                                         null: false
-    t.integer  "uiid",                             limit: 8,          null: false
+    t.bigint  "uiid",                             limit: 8,          null: false
     t.string   "browser_family",                   limit: 20,         null: false
     t.string   "browser_version",                  limit: 20,         null: false
     t.string   "os_family",                        limit: 50,         null: false
@@ -526,10 +526,10 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.string   "ip_address",                       limit: 20,         null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "inst_course_offering_exercise_id", limit: 4
-    t.integer  "inst_chapter_module_id",           limit: 4
-    t.integer  "inst_module_version_id",           limit: 4
-    t.integer  "inst_module_section_exercise_id",  limit: 4
+    t.bigint  "inst_course_offering_exercise_id", limit: 4
+    t.bigint  "inst_chapter_module_id",           limit: 4
+    t.bigint  "inst_module_version_id",           limit: 4
+    t.bigint  "inst_module_section_exercise_id",  limit: 4
   end
 
   add_index "odsa_user_interactions", ["inst_book_id"], name: "odsa_user_interactions_inst_book_id_fk", using: :btree
@@ -553,19 +553,19 @@ ActiveRecord::Schema.define(version: 20200118232324) do
   add_index "organizations", ["slug"], name: "index_organizations_on_slug", unique: true, using: :btree
 
   create_table "pi_attempts", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4
+    t.bigint  "user_id",    limit: 4
     t.string   "frame_name", limit: 255
-    t.integer  "question",   limit: 4
-    t.integer  "correct",    limit: 4
+    t.bigint  "question",   limit: 4
+    t.bigint  "correct",    limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
 
   create_table "terms", force: :cascade do |t|
-    t.integer  "season",     limit: 4,   null: false
+    t.bigint  "season",     limit: 4,   null: false
     t.date     "starts_on",              null: false
     t.date     "ends_on",                null: false
-    t.integer  "year",       limit: 4,   null: false
+    t.bigint  "year",       limit: 4,   null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "slug",       limit: 255, null: false
@@ -589,7 +589,7 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          limit: 4,   default: 0,  null: false
+    t.bigint  "sign_in_count",          limit: 4,   default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip",     limit: 255
@@ -601,10 +601,10 @@ ActiveRecord::Schema.define(version: 20200118232324) do
     t.datetime "updated_at"
     t.string   "first_name",             limit: 255
     t.string   "last_name",              limit: 255
-    t.integer  "global_role_id",         limit: 4,                null: false
+    t.bigint  "global_role_id",         limit: 4,                null: false
     t.string   "avatar",                 limit: 255
     t.string   "slug",                   limit: 255,              null: false
-    t.integer  "time_zone_id",           limit: 4
+    t.bigint  "time_zone_id",           limit: 4
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree

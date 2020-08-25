@@ -35,7 +35,10 @@
             %tbody
               - course.course_offerings.each do |o|
                 - lms_course_code = o.lms_course_code
-                - lms_url = o.lms_instance.url
+                - if o.lms_instance
+                  - lms_url = o.lms_instance.url
+                - else
+                  - lms_url = ''
                 - lms_course_num = o.lms_course_num
                 - course_offering_url = lms_url.to_s + "/courses/" + lms_course_num.to_s
                 %tr

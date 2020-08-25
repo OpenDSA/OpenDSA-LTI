@@ -1,4 +1,4 @@
-class AddModuleScoresToOdsaModuleProgresses < ActiveRecord::Migration
+class AddModuleScoresToOdsaModuleProgresses < ActiveRecord::Migration[5.1]
   def change
     add_column :odsa_module_progresses, :lis_outcome_service_url, :string
     add_column :odsa_module_progresses, :lis_result_sourcedid, :string

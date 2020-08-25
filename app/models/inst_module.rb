@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class InstModule < ActiveRecord::Base
+class InstModule < ApplicationRecord
   # ~ Relationships ............................................................
   has_many :inst_chapter_modules
   has_many :inst_sections

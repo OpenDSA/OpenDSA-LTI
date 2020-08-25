@@ -1,4 +1,4 @@
-class AddForeignKeyConstraints < ActiveRecord::Migration
+class AddForeignKeyConstraints < ActiveRecord::Migration[5.1]
   def change
     add_foreign_key :course_enrollments, :course_offerings, dependent: :delete
     add_foreign_key :course_enrollments, :course_roles

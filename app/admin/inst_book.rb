@@ -10,6 +10,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   member_action :update_configuration, method: :get do
   end
 
+
   member_action :clone_book, method: :get do
     inst_book = InstBook.find(params[:id])
     title = inst_book.title
@@ -30,15 +31,15 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   collection_action :upload_create, method: :post do
   end
 
-  action_item only: :index do |inst_book|
+  action_item :index, only: :index do |inst_book|
     link_to 'Upload Books', upload_books_admin_inst_books_path(inst_book)
   end
 
-  action_item only: :show  do
-    link_to "Clone", clone_admin_inst_book_path(inst_book)
+  action_item :show, only: :show  do
+    link_to "Clone", clone_book_admin_inst_book_path(inst_book)
   end
 
-  action_item only: [:show, :edit]  do
+  action_item :view, only: [:show, :edit]  do
     message = confirmation_message(inst_book)
     link_to "Delete", { action: :destroy }, method: :delete, data: { confirm: message}
   end
@@ -68,8 +69,12 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       input_file = params[:form][:file].path
       output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
       output_file_path = "public/OpenDSA/config/temp/#{output_file}"
-      stdout = %x(python #{script_path} #{input_file} #{output_file_path})
-
+      require 'open3'
+      command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{input_file} #{output_file_path}"
+      stdout, stderr, status = Open3.capture3(command)
+      unless status.success?
+        Rails.logger.info(stderr)
+      end
       hash = JSON.load(File.read(output_file_path))
       if params.has_key?(:inst_book)
         InstBook.save_data_from_json(hash, current_user, params[:inst_book]["id"])

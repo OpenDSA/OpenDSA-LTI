@@ -1,13 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import unittest
 import Fibonacci
 
 class FibonacciTest(unittest.TestCase):
-  f=open('Fibonacci_Python_results.csv','w') 
+  f=open('Fibonacci_Python_results.csv','w')
   @classmethod
   def setUpClass(cls):
     pass
-    
+
   @classmethod
   def tearDownClass(cls):
     FibonacciTest.f.close()

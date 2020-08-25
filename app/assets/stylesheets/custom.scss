@@ -48,13 +48,6 @@ html, body { height: 100%; }
 .signin .yamm-content .form-horizontal .form-group { margin-bottom: 5px; }
 .dropdown-menu.signin .btn { margin: 5px 15px; font-size: larger; }
 
-/* Codemirror */
-
-.CodeMirror { height: auto; margin-bottom: 9px; }
-.CodeMirror-scroll { max-height: 400px; }
-/* .practice .CodeMirror { min-height: 18px * 15; } */
-
-
 /* Right sidebar text */
 
 .sidebar h2 {
@@ -109,7 +102,6 @@ html, body { height: 100%; }
   margin-bottom: 0;
   z-index: 1030;
 }
-.debug .CodeMirror { margin-bottom: 0; }
 .navbar .badge { vertical-align: text-top; }
 
 /* Authoring form */

@@ -17,10 +17,10 @@
 FactoryBot.define do
 
   factory :learning_tool do
-    name "code-workout"
-    key "canvas_key"
-    secret "canvas_secret"
-    launch_url "  https://192.168.33.10:9200/lti/launch?from_collection=true"
+    name { "code-workout" }
+    key { "canvas_key" }
+    secret { "canvas_secret" }
+    launch_url { "https://192.168.33.10:9200/lti/launch?from_collection=true" }
   end
 
 end

@@ -1,4 +1,4 @@
-class CreateInstModuleSectionExercises < ActiveRecord::Migration
+class CreateInstModuleSectionExercises < ActiveRecord::Migration[5.1]
   def change
     create_table :inst_module_section_exercises do |t|
       t.integer :inst_module_version_id, null: false

@@ -25,3 +25,9 @@ Rails.application.config.assets.precompile = [
   }, /application.(css|.js)$/,
   %w(*.svg, *.png *.jpg *.jpeg *.gif *.mustache.html, *.ico, clippy.svg),
 ]
+
+# Change how the post body is formatted by default, you can still override by `raw_post`
+# Can be :json, :xml, or a proc that will be passed the params
+#Rails.application.config.request_body_formatter = Proc.new { |params| params }
+
+Rails.application.config.assets.precompile += %w( favicon.ico )

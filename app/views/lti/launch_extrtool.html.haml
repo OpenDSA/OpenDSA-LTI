@@ -2,7 +2,7 @@
     Loading . . .
 
 %form{action: "#{@launch_url}", method: "post", encType: "application/x-www-form-urlencoded", id: "launch_form"}
-    - @launch_data.each do |key, value| 
+    - @launch_data.each do |key, value|
         %input{type: "hidden", name: "#{key}", value: "#{value}"}
 %script
     document.getElementById("launch_form").submit();

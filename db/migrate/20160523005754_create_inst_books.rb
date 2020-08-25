@@ -1,4 +1,4 @@
-class CreateInstBooks < ActiveRecord::Migration
+class CreateInstBooks < ActiveRecord::Migration[5.1]
   def change
     create_table :inst_books do |t|
       t.integer  "course_offering_id",  null: true

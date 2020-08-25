@@ -21,7 +21,7 @@
 # Represents an academic term or semester, which indicates the time period
 # for one or more course offerings.
 #
-class Term < ActiveRecord::Base
+class Term < ApplicationRecord
   extend FriendlyId
   friendly_id :display_name, use: :history
 
@@ -68,7 +68,9 @@ class Term < ActiveRecord::Base
 
   # -------------------------------------------------------------
   def self.season_name(season)
-    SEASONS.rassoc(season).first
+    if season
+      SEASONS.rassoc(season).first
+    end
   end
 
 

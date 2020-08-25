@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # a stand-alone module (i.e. not contained in a book) that is tied directly to a course offering
-class InstModuleVersion < ActiveRecord::Base
+class InstModuleVersion < ApplicationRecord
   belongs_to :inst_module
   belongs_to :course_offering
   has_many   :inst_module_sections, inverse_of: :inst_module_version, dependent: :destroy

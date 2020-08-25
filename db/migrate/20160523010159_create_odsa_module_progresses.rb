@@ -1,4 +1,4 @@
-class CreateOdsaModuleProgresses < ActiveRecord::Migration
+class CreateOdsaModuleProgresses < ActiveRecord::Migration[5.1]
   def change
     create_table :odsa_module_progresses do |t|
       t.integer  "user_id",          null: false

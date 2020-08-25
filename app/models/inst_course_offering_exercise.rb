@@ -1,4 +1,4 @@
-class InstCourseOfferingExercise < ActiveRecord::Base
+class InstCourseOfferingExercise < ApplicationRecord
 
   #~ Relationships ............................................................
   belongs_to :course_offering, inverse_of: :inst_course_offering_exercises

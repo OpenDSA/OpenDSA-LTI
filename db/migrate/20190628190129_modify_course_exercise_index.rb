@@ -1,4 +1,4 @@
-class ModifyCourseExerciseIndex < ActiveRecord::Migration
+class ModifyCourseExerciseIndex < ActiveRecord::Migration[5.1]
   def change
 
     remove_foreign_key :inst_course_offering_exercises, :course_offerings

@@ -1,10 +1,13 @@
-class LmsAccess < ActiveRecord::Base
+class LmsAccess < ApplicationRecord
   #~ Relationships ............................................................
 
   belongs_to :lms_instance, inverse_of: :lms_accesses
   belongs_to :user, inverse_of: :lms_accesses
 
   #~ Validation ...............................................................
+
+  validates_presence_of :lms_instance, :user
+  validates :lms_instance, uniqueness: { scope: :user }
 
   def self.get_oauth_creds(key)
     lms_access = LmsAccess.where(consumer_key: key).first

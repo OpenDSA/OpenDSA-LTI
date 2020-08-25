@@ -1,4 +1,4 @@
-class OdsaExerciseProgress < ActiveRecord::Base
+class OdsaExerciseProgress < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :inst_book_section_exercise
   belongs_to :inst_course_offering_exercise

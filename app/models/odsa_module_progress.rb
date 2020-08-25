@@ -1,4 +1,4 @@
-class OdsaModuleProgress < ActiveRecord::Base
+class OdsaModuleProgress < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :user
   belongs_to :inst_book

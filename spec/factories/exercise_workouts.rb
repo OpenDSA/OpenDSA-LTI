@@ -15,8 +15,8 @@
 
 FactoryBot.define do
   factory :exercise_workout do
-    exercise_id 1
-    workout_id 1
-    points 10
+    exercise_id { 1 }
+    workout_id { 1 }
+    points { 10 }
   end
 end

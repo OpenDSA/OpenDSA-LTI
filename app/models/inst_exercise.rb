@@ -1,4 +1,4 @@
-class InstExercise < ActiveRecord::Base
+class InstExercise < ApplicationRecord
   #~ Relationships ............................................................
   has_many :inst_book_section_exercises
   has_many :inst_course_offering_exercises

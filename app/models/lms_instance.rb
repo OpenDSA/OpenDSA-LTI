@@ -1,4 +1,4 @@
-class LmsInstance < ActiveRecord::Base
+class LmsInstance < ApplicationRecord
   #~ Relationships ............................................................
   has_many  :lms_accesses, inverse_of: :lms_instances
   has_many  :course_offerings, inverse_of: :lms_instance
@@ -8,7 +8,8 @@ class LmsInstance < ActiveRecord::Base
 
   #~ Validation ...............................................................
 
-  validates_presence_of :url
+  validates_presence_of :lms_type, :url, :organization
+  validates :url, uniqueness: true
 
   def self.get_oauth_creds(key)
     lms_instance = LmsInstance.where(consumer_key: key).first

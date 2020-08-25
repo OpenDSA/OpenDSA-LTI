@@ -14,25 +14,35 @@ class GenerateCourseJob < ProgressJob::Base
 
   def perform
     update_stage('Generating course in LMS')
-
     chapters = InstChapter.where(inst_book_id: @inst_book.id)
     update_progress_max(chapters.count + 1)
     inst_book_compile
     update_stage('Compiling OpenDSA book')
     inst_book_json = ApplicationController.new.render_to_string(
-      template: 'inst_books/show.json.jbuilder',
+      template: "inst_books/show.json.jbuilder",
       locals: {:@inst_book => @inst_book, :@extrtool_launch_base_url => @extrtool_launch_base_url},
     )
+    Rails.logger.info('inst_book_json')
+    Rails.logger.info(inst_book_json)
     require 'json'
     config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
     config_file_path = "public/OpenDSA/config/temp/#{config_file}"
+    Rails.logger.info('config file path')
+    Rails.logger.info(config_file_path)
     File.open(config_file_path, "w") do |f|
       f.write(inst_book_json)
     end
 
     script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
-    value = %x(python #{script_path} #{config_file_path} -b #{build_path})
+    Rails.logger.info('build_path')
+    Rails.logger.info(build_path)
+    require 'open3'
+    command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
+    stdout, stderr, status = Open3.capture3(command)
+    unless status.success?
+      Rails.logger.info(stderr)
+    end
     update_progress
   end
 
@@ -58,7 +68,7 @@ class GenerateCourseJob < ProgressJob::Base
       "consumer_key" => consumer_key,
       "consumer_secret" => consumer_secret,
       "launch_url" => @odsa_launch_url,
-      "resource_selection_url" => @odsa_resource_selection_url,
+      "resource_selection_url" => @odsa_resource_selection_url
     }
 
     save_lti_app(client, lms_course_id, tool_data)
@@ -98,7 +108,7 @@ class GenerateCourseJob < ProgressJob::Base
     if tool_name == "OpenDSA-LTI"
       odsa_url_opts = {
         :custom_inst_book_id => @inst_book.id,
-        :custom_course_offering_id => @course_offering.id,
+        :custom_course_offering_id => @course_offering.id
       }
       require "addressable/uri"
       uri = Addressable::URI.new
@@ -111,7 +121,7 @@ class GenerateCourseJob < ProgressJob::Base
       opts[:course_navigation__visibility__] = "admins"
       opts[:course_navigation__default__] = true
       opts[:custom_fields] = {
-        'canvas_api_base_url': '$Canvas.api.baseUrl',
+        'canvas_api_base_url': '$Canvas.api.baseUrl'
       }
     end
 
@@ -202,7 +212,7 @@ class GenerateCourseJob < ProgressJob::Base
     launch_url = @odsa_launch_url + '?' + uri.query
 
     opts = {:module_item__title__ => title,
-            :module_item__type__ => 'ExternalTool',
+            :module_item__type__ => "ExternalTool",
             :module_item__position__ => module_item_position,
             :module_item__external_url__ => launch_url,
             :module_item__indent__ => 0}
@@ -229,7 +239,7 @@ class GenerateCourseJob < ProgressJob::Base
       #   assignment_opts[:assignment__due_at__] = section.soft_deadline.try(:strftime, "%Y-%m-%dT%H:%m:%S%:z")
       # end
 
-      opts[:module_item__type__] = 'Assignment'
+      opts[:module_item__type__] = "Assignment"
       if chapt_module.lms_module_item_id && chapt_module.lms_assignment_id
         opts[:module_item__content_id__] = chapt_module.lms_assignment_id
         assignment_res = client.edit_assignment(lms_course_id, chapt_module.lms_assignment_id, assignment_opts)
@@ -243,7 +253,7 @@ class GenerateCourseJob < ProgressJob::Base
         assignment_opts[:assignment__description__] = title
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
-        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'Assignment', assignment_res['id'], opts)
+        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "Assignment", assignment_res['id'], opts)
         chapt_module.lms_assignment_id = assignment_res['id']
         chapt_module.lms_module_item_id = res['id']
         chapt_module.save!
@@ -253,7 +263,7 @@ class GenerateCourseJob < ProgressJob::Base
       #   res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
       # else
       if !chapt_module.lms_module_item_id
-        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, 'ExternalTool', '', opts)
+        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "ExternalTool", '', opts)
         chapt_module.lms_module_item_id = res['id']
         chapt_module.save!
       end

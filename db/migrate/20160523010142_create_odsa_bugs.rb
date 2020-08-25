@@ -1,4 +1,4 @@
-class CreateOdsaBugs < ActiveRecord::Migration
+class CreateOdsaBugs < ActiveRecord::Migration[5.1]
   def change
     create_table :odsa_bugs do |t|
       t.integer  "user_id",        null: false

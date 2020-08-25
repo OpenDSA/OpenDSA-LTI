@@ -55,7 +55,14 @@ class OdsaExerciseProgressesController < ApplicationController
     end
   end
 
+  #/odsa_exercise_progresses?inst_chapter_module_id=&inst_book_id=
   def show_exercise
+    if current_user.blank?
+      @message = "Error: current user could not be identified"
+      render :error
+      return
+    end
+
     if params.key?(:inst_chapter_module_id)
       show_section()
       return

@@ -4,7 +4,7 @@ Devise.setup do |config|
   # The secret key used by Devise. Devise uses this key to generate
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.
-  config.secret_key = Rails.application.secrets.secret_key_base
+  config.secret_key = Rails.application.secrets[:secret_key_base]
 
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
@@ -107,7 +107,7 @@ Devise.setup do |config|
   config.stretches = Rails.env.test? ? 1 : 10
 
   # Setup a pepper to generate the encrypted password.
-  config.pepper = Rails.application.secrets.devise_pepper
+  config.pepper = Rails.application.secrets[:devise_pepper]
 
   # ==> Configuration for :confirmable
   # A period that the user is allowed to access the website even without
@@ -258,11 +258,11 @@ Devise.setup do |config|
   # Omniauth authentication for Facebook, Gmail etc
   #
     config.omniauth :facebook,
-      Rails.application.secrets.facebook_id,
-      Rails.application.secrets.facebook_secret
+      Rails.application.secrets[:facebook_id],
+      Rails.application.secrets[:facebook_secret]
     config.omniauth :google_oauth2,
-      Rails.application.secrets.google_id,
-      Rails.application.secrets.google_secret
+      Rails.application.secrets[:google_id],
+      Rails.application.secrets[:google_secret]
     config.omniauth :cas,
       url: 'https://auth.vt.edu'
   #

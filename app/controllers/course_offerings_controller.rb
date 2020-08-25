@@ -1,5 +1,5 @@
 class CourseOfferingsController < ApplicationController
-  before_filter :rename_course_offering_id_param
+  before_action :rename_course_offering_id_param
   # load_and_authorize_resource
 
   # -------------------------------------------------------------

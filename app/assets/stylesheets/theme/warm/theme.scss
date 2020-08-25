@@ -1,5 +1,3 @@
-/* codemirror style for this theme */
-@import "theme/cm/aptana";
 @import "font";
 
 .content {
@@ -120,38 +118,6 @@ a:hover, a:focus { color: #247184; }
 /* Thumbnails */
 .thumbnail .title a { color: #247184; }
 .thumbnail .title .xp { background-color: #40312a; color: white; }
-
-
-/* Codemirror */
-
-.CodeMirror {
-  border: 1px solid #6c6f70;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
-  -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
-  -ms-transition: border linear 0.2s, box-shadow linear 0.2s;
-  -o-transition: border linear 0.2s, box-shadow linear 0.2s;
-  transition: border linear 0.2s, box-shadow linear 0.2s;
-}
-
-.field_with_errors .CodeMirror-scroll {
-  border-color: #ce4753;
-}
-
-.CodeMirror-focused {
-  border-color: rgba(82, 168, 236, 0.8);
-  outline: 0;
-  outline: thin dotted \9;
-  /* IE6-9 */
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
-  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
-}
 
 
 /* Right sidebar text */

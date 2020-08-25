@@ -1,4 +1,4 @@
-class InstChapterModule < ActiveRecord::Base
+class InstChapterModule < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :inst_chapter
   belongs_to :inst_module
@@ -42,7 +42,7 @@ class InstChapterModule < ActiveRecord::Base
   def get_bk_sec_exercises()
     InstBookSectionExercise.includes(:inst_exercise)
       .joins(:inst_section)
-      .where(inst_section: {inst_chapter_module_id: self.id})
+      .where(inst_sections: {inst_chapter_module_id: self.id})
   end
 
   # get all exercise progresses for the exercises in this module for the specified user
@@ -57,7 +57,7 @@ class InstChapterModule < ActiveRecord::Base
 
   def total_points
     return InstBookSectionExercise.joins(inst_section: [:inst_chapter_module])
-             .where(inst_section: {inst_chapter_module_id: self.id}).sum(:points)
+             .where(inst_sections: {inst_chapter_module_id: self.id}).sum(:points)
   end
 
   #~ Private instance methods .................................................

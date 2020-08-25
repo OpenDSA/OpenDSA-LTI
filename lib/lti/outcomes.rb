@@ -11,8 +11,8 @@ module LtiOutcomes
         res = tp.post_extended_replace_result!(score: score)
         unless res.success?
             error = Error.new(:class_name => 'post_replace_result_fail',
-                            :message => res.inspect,
-                            :params => self.as_json.to_json)
+                              :message => res.inspect,
+                              :params => self.as_json.to_json)
             error.save!
         end
         return res

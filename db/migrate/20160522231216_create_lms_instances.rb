@@ -1,4 +1,4 @@
-class CreateLmsInstances < ActiveRecord::Migration
+class CreateLmsInstances < ActiveRecord::Migration[5.1]
   def change
     create_table :lms_instances do |t|
       t.string :url, null: false

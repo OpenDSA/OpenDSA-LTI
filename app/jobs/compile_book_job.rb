@@ -9,20 +9,29 @@ class CompileBookJob < ProgressJob::Base
   def perform
     update_stage('Compiling OpenDSA book')
     inst_book_json = ApplicationController.new.render_to_string(
-      template: 'inst_books/show.json.jbuilder',
+      template: "inst_books/show.json.jbuilder",
       locals: {:@inst_book => @inst_book, :@extrtool_launch_base_url => @extrtool_launch_base_url},
     )
 
     require 'json'
     config_file = sanitize_filename('temp_' + @user_id.to_s + '_' + Time.now.getlocal.to_s) + '.json'
     config_file_path = "public/OpenDSA/config/temp/#{config_file}"
+    Rails.logger.info('config_file_path')
+    Rails.logger.info(config_file_path)
     File.open(config_file_path, "w") do |f|
       f.write(inst_book_json)
     end
 
     script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
-    value = %x(python #{script_path} #{config_file_path} -b #{build_path})
+    Rails.logger.info('build_path')
+    Rails.logger.info(build_path)
+    require 'open3'
+    command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
+    stdout, stderr, status = Open3.capture3(command)
+    unless status.success?
+      Rails.logger.info(stderr)
+    end
     update_progress
   end
 

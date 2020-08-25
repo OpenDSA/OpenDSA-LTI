@@ -11,7 +11,7 @@
   <script>
   (function() {
     var TP = {};
-  <% if @tp.outcome_service? %>
+  <% if @outcome_service %>
     TP.outcomeService = true;
     TP.exerciseName = "<%= @ex.short_name %>";
   <% else %>
@@ -20,7 +20,7 @@
 
     TP.toParams = {};
     TP.toParams.launch_params = {};
-  <% @tp.to_params.each do |key, value| %>
+  <% params.each do |key, value| %>
     TP.toParams.launch_params.<%= key %> = "<%= value %>";
   <% end%>
     TP.userEmail = "<%= @user.email %>";

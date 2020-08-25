@@ -1,4 +1,4 @@
-class LmsType < ActiveRecord::Base
+class LmsType < ApplicationRecord
 
   #~ Relationships ............................................................
   has_many :lms_instances, inverse_of: :lms_types

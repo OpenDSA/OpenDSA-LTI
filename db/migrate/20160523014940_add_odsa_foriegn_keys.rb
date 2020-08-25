@@ -1,4 +1,4 @@
-class AddOdsaForiegnKeys < ActiveRecord::Migration
+class AddOdsaForiegnKeys < ActiveRecord::Migration[5.1]
   def change
     add_foreign_key "inst_book_section_exercises", "inst_exercises"
     add_foreign_key "inst_book_section_exercises", "inst_books"
