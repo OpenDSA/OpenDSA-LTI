@@ -787,17 +787,33 @@ class LtiController < ApplicationController
     elsif key = params['oauth_consumer_key']
       if secret = $oauth_creds[key]
 
-        launch_path = request.url.split("?")[0]
-
-        require 'lti/message_authenticator'
-        authenticator = IMS::LTI::MessageAuthenticator.new(launch_path, request.request_parameters, secret)
-
-        Rails.logger.info("lti_authorize: valid signature")
-        if !authenticator.valid_signature?
-          @message = "OpenDSA: The OAuth signature was invalid"
-          return false
-        end
         @tp = IMS::LTI::ToolProvider.new(key, secret, params)
+
+        lms_type_name = params.key?(:tool_consumer_info_product_family_code) ?
+                params[:tool_consumer_info_product_family_code].downcase : 'other'
+
+        if lms_type_name.downcase == 'canvas'
+          require 'lti/message_authenticator'
+          
+          launch_path = request.url.split("?")[0]
+          authenticator = IMS::LTI::MessageAuthenticator.new(launch_path, request.request_parameters, secret)
+
+          Rails.logger.info("lti_authorize: lms_type_name: #{lms_type_name} - authenticator.valid_signature?")
+          if !authenticator.valid_signature?
+            @message = "OpenDSA: The OAuth signature was invalid"
+            Rails.logger.info("lti_authorize: lms_type_name: #{lms_type_name} - OAuth signature: Invalid")
+            return false
+          end
+          Rails.logger.info("lti_authorize: OAuth signature: Valid")
+        else
+          Rails.logger.info("lti_authorize: lms_type_name: #{lms_type_name} - @tp.valid_request?")
+          if !@tp.valid_request?(request)
+            @message = "OpenDSA: The OAuth signature was invalid"
+            Rails.logger.info("lti_authorize: lms_type_name: #{lms_type_name} - OAuth signature: Invalid")
+            return false
+          end
+          Rails.logger.info("lti_authorize: lms_type_name: #{lms_type_name} - OAuth signature: Valid")
+        end
 
         # check if `params['oauth_nonce']` has already been used
         # Need to be implemented
