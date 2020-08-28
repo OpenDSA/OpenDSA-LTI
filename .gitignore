@@ -57,7 +57,6 @@ tasks.todo
 bower_components/
 
 /config/application.yml
-/config/database.yml
 /config/secret.yml
 
 *.idea/OpenDSA-LTI.iml
