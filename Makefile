@@ -13,7 +13,7 @@ up: ## This brings up the app
 up-build: ## This brings up the app with a build
 	docker-compose $(COMPOSE_FILES_PATH) up --build
 
-up-detach: build ## This brings up the app and detaches the shell from the logs
+up-detach: ## This brings up the app and detaches the shell from the logs
 	docker-compose $(COMPOSE_FILES_PATH) up -d
 
 down: ## This takes down the app
@@ -23,6 +23,8 @@ nuke: ## This removes all the volumes as well as taking down the app
 	docker-compose $(COMPOSE_FILES_PATH) down -v
 
 restart: down up ## This restarts the app
+
+hard-restart: down up-build ## This restarts the app with a build
 
 ssh: ## This docker execs you in to the web container
 	docker-compose exec opendsa-lti bash
