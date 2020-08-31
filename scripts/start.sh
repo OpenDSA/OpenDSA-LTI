@@ -47,7 +47,18 @@ echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
 echo "make -f Makefile pull" >> ${OPENDSA_LOG_FILE} 2>&1
-make -f Makefile pull >>  ${OPENDSA_LOG_FILE} 2>&1
+make -f Makefile pull >> ${OPENDSA_LOG_FILE} 2>&1
+echo "-------------------------------------------------------"
+
+echo "-------------------------------------------------------"
+echo "make -f Makefile venv" >> ${OPENDSA_LOG_FILE} 2>&1
+make -f Makefile venv >> ${OPENDSA_LOG_FILE} 2>&1
+sudo mkdir -p /home/deploy/OpenDSA
+sudo cp -r .pyVenv/ /home/deploy/OpenDSA/
+. .pyVenv/bin/activate
+echo "cd /home/deploy/OpenDSA" >> /home/vagrant/.bashrc
+echo ". .pyVenv/bin/activate" >> /home/vagrant/.bashrc
+echo "cd /opendsa-lti" >> /home/vagrant/.bashrc
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
@@ -59,6 +70,10 @@ echo "make allbooks" >> ${OPENDSA_LOG_FILE} 2>&1
 make allbooks >> ${OPENDSA_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
+echo "-------------------------------------------------------"
+echo "make venv"
+make venv
+echo "-------------------------------------------------------"
 
 echo "Copying configuration files"
 # cp "${EFS_DIR}/databasedemo.yml" "${APP_DIR}/config/database.yml" || ERROR_FOUND=true
@@ -99,9 +114,8 @@ RAILS_ENV=${ENVIRONMENT} bundle exec rake db:populate # >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
-echo "RAILS_ENV=$RAILS_ENV bundle exec thin start -p ${PORT}" # >> ${APP_LOG_FILE} 2>&1
-rm -f tmp/pids/server.pid
-RAILS_ENV=${ENVIRONMENT} bundle exec rake thin start -p ${PORT} # >> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT}" # >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT} # >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 # lsof -t -i tcp:${PORT} | xargs kill -9
