@@ -12,10 +12,12 @@ https://localhost:8080
 
 When you are done, you can kill the app with `Ctrl+C` and then run `make down` or `docker-compose down` to clean up the docker environment. There are more commands in the Makefile and running `make help` or opening the Makefile in a text editor will explain what they do.
 
-# Windows
+## Windows
 This guide assumes you are using Docker Desktop for Windows using the WSL2 integration, however it should work using Docker Toolbox as well.
 
 If you are using Powershell or Git Bash will most likely have to run a dos2unix converter (included in Git Bash as dos2unix.exe) on scripts/start.sh and docker-entrypoint.sh prior to running `docker-compose up`
+
+# OLD INSTRUCTIONS
 
 ## Deployment Instructions
 
