@@ -56,9 +56,9 @@ make -f Makefile venv >> ${OPENDSA_LOG_FILE} 2>&1
 sudo mkdir -p /home/deploy/OpenDSA
 sudo cp -r .pyVenv/ /home/deploy/OpenDSA/
 . .pyVenv/bin/activate
-echo "cd /home/deploy/OpenDSA" >> /home/vagrant/.bashrc
-echo ". .pyVenv/bin/activate" >> /home/vagrant/.bashrc
-echo "cd /opendsa-lti" >> /home/vagrant/.bashrc
+echo "cd /home/deploy/OpenDSA" >> /root/.bashrc
+echo ". .pyVenv/bin/activate" >> /root/.bashrc
+echo "cd /opendsa-lti" >> /root/.bashrc
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
@@ -88,22 +88,25 @@ echo "nohup bash -c rake jobs:work" >> ${APP_LOG_FILE} 2>&1
 nohup bash -c "rake jobs:work >> ${APP_LOG_FILE} 2>&1 &"
 echo "-------------------------------------------------------"
 
-# if db doesn't exist
+echo "Setting up database"
+# running every time causes errors - check if db is populated before running
 echo "-------------------------------------------------------"
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:drop" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec rake db:drop >> ${APP_LOG_FILE} 2>&1
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:create" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec rake db:create >> ${APP_LOG_FILE} 2>&1
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:schema:load" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec rake db:schema:load >> ${APP_LOG_FILE} 2>&1
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec rake db:seed >> ${APP_LOG_FILE} 2>&1
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:populate" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec rake db:populate >> ${APP_LOG_FILE} 2>&1
+# echo "RAILS_ENV=$RAILS_ENV bundle exec db:drop" >> ${APP_LOG_FILE} 2>&1
+# RAILS_ENV=${ENVIRONMENT} bundle exec rake db:drop >> ${APP_LOG_FILE} 2>&1
+# echo "RAILS_ENV=$RAILS_ENV bundle exec db:create" >> ${APP_LOG_FILE} 2>&1
+# RAILS_ENV=${ENVIRONMENT} bundle exec rake db:create >> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:schema:load" #>> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:schema:load #>> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" #>> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:seed #>> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:populate" #>> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:populate #>> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
+echo "Starting server"
 echo "-------------------------------------------------------"
 echo "RAILS_ENV=$RAILS_ENV bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT}" >> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT}"
 RAILS_ENV=${ENVIRONMENT} bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT} >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
