@@ -2,7 +2,7 @@
 
 The development environment assumes you have Docker, Docker-Compose, and Make installed.  The environment does not require Make, but it is helpful for running the application.
 
-Docker can be found [here](https://docs.docker.com/get-docker/) and instructions for installing Docker-Compose can be found [here](https://docs.docker.com/compose/install/)
+Docker can be found [here](https://docs.docker.com/get-docker/) and instructions for installing Docker-Compose (if not included with your Docker installation) can be found [here](https://docs.docker.com/compose/install/)
 
 Make can be found in the default package manager on Linux, in Brew on Mac, and through various methods on Windows.
 
@@ -10,7 +10,14 @@ To run OpenDSA-LTI, simply run either `make up` or `docker-compose up` and the a
 
 https://localhost:8080
 
-When you are done, you can kill the app with `Ctrl+C` and then run `make down` or `docker-compose down` to clean up the docker environment. There are more commands in the Makefile and running `make help` will explain what they do.
+When you are done, you can kill the app with `Ctrl+C` and then run `make down` or `docker-compose down` to clean up the docker environment. There are more commands in the Makefile and running `make help` or opening the Makefile in a text editor will explain what they do.
+
+# Windows
+This guide assumes you are using Docker Desktop for Windows using the WSL2 integration, however it should work using Docker Toolbox as well.
+
+If you are using Powershell or Git Bash will most likely have to run a dos2unix converter (included in Git Bash as dos2unix.exe) on scripts/start.sh and docker-entrypoint.sh prior to running `docker-compose up`
+
+## Deployment Instructions
 
 Here we describe how to install [OpenDSA-LTI](https://github.com/OpenDSA/OpenDSA-LTI) on a single Ubuntu Server 14.04.3 LTS 64-bit from scratch.
 
