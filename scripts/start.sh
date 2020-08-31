@@ -60,7 +60,7 @@ make allbooks >> ${OPENDSA_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 
-echo "Copying configuration files from NFS conf directory"
+echo "Copying configuration files"
 # cp "${EFS_DIR}/databasedemo.yml" "${APP_DIR}/config/database.yml" || ERROR_FOUND=true
 cp /opendsa-lti/config/databasedemo.yml /opendsa-lti/config/database.yml || ERROR_FOUND=true
 
@@ -104,8 +104,6 @@ rm -f tmp/pids/server.pid
 RAILS_ENV=${ENVIRONMENT} bundle exec rake thin start -p ${PORT} # >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
-#lsof -t -i tcp:${PORT} | xargs kill -9
-#echo "RAILS_ENV=$RAILS_ENV rails s  -b 0.0.0.0 -p ${PORT}"
-#RAILS_ENV=${ENVIRONMENT} rails s  -b 0.0.0.0 -p ${PORT} >> $APP_LOG_FILE 2>&1
-
-
+# lsof -t -i tcp:${PORT} | xargs kill -9
+# echo "RAILS_ENV=$RAILS_ENV rails s  -b 0.0.0.0 -p ${PORT}"
+# RAILS_ENV=${ENVIRONMENT} rails s  -b 0.0.0.0 -p ${PORT} >> $APP_LOG_FILE 2>&1
