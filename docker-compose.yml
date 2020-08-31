@@ -20,8 +20,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - RAILS_ENV='development'
+        - RAILS_ENV=development
     image: opendsa-lti:latest
+    volumes:
+      - .:/opendsa-lti
+    command: /bin/bash -c "chmod +x ./scripts/start.sh && ./scripts/start.sh"
     networks:
       - db_network
     ports:

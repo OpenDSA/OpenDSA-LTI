@@ -15,6 +15,24 @@ PORT="80"
 
 ERROR_FOUND=false;
 
+echo "-------------------------------------------------------"
+echo "Create the log file"
+touch /opendsa-lti/log/development.log
+echo "-------------------------------------------------------"
+
+echo "-------------------------------------------------------"
+echo "Create database.yml"
+cp /opendsa-lti/config/databasedemo.yml /opendsa-lti/config/database.yml
+echo "-------------------------------------------------------"
+
+echo "-------------------------------------------------------"
+echo "updating permissions" >> ${OPENDSA_LOG_FILE} 2>&1
+# find /opendsa-lti -type d -exec chmod 2775 {} \;
+# find /opendsa-lti -type f -exec chmod 0644 {} \;
+# find ./scripts -type f -exec chmod +x {} \;
+ln -s /opendsa /opendsa-lti/public/OpenDSA
+echo "-------------------------------------------------------"
+
 cd "${OPENDSA_DIR}"
 echo "-------------------------------------------------------"
 echo "checkout python3" >> ${OPENDSA_LOG_FILE} 2>&1
@@ -44,6 +62,7 @@ echo "-------------------------------------------------------"
 
 echo "Copying configuration files from NFS conf directory"
 # cp "${EFS_DIR}/databasedemo.yml" "${APP_DIR}/config/database.yml" || ERROR_FOUND=true
+cp /opendsa-lti/config/databasedemo.yml /opendsa-lti/config/database.yml || ERROR_FOUND=true
 
 if [[ "${ERROR_FOUND}" == true ]]; then exit 1; fi;
 
@@ -55,28 +74,34 @@ nohup bash -c "rake jobs:work >> ${APP_LOG_FILE} 2>&1 &"
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:create" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec db:create >> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:drop" # >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:drop # >> ${APP_LOG_FILE} 2>&1
+echo "-------------------------------------------------------"
+
+echo "-------------------------------------------------------"
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:create" # >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:create # >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
 echo "RAILS_ENV=$RAILS_ENV bundle exec db:schema:load" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec db:schema:load >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:schema:load >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec db:seed >> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" # >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:seed # >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:populate" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec db:populate >> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:populate" # >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:populate # >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
-echo "RAILS_ENV=$RAILS_ENV bundle exec thin start -p ${PORT}" >> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec thin start -p ${PORT} >> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec thin start -p ${PORT}" # >> ${APP_LOG_FILE} 2>&1
+rm -f tmp/pids/server.pid
+RAILS_ENV=${ENVIRONMENT} bundle exec rake thin start -p ${PORT} # >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 #lsof -t -i tcp:${PORT} | xargs kill -9
