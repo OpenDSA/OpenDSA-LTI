@@ -8,10 +8,8 @@ development:
    database: opendsa
    username: opendsa
    password: opendsa
-   host: db
+   host: localhost
    strict: false
-   port: 3306
-   encoding: utf8
 
 # development:
 #   adapter: sqlite3

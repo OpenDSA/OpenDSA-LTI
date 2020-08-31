@@ -43,15 +43,35 @@ echo "-------------------------------------------------------"
 
 
 echo "Copying configuration files from NFS conf directory"
-cp "${EFS_DIR}/databasedemo.yml" "${APP_DIR}/config/database.yml" || ERROR_FOUND=true
+# cp "${EFS_DIR}/databasedemo.yml" "${APP_DIR}/config/database.yml" || ERROR_FOUND=true
 
 if [[ "${ERROR_FOUND}" == true ]]; then exit 1; fi;
 
 
 echo "-------------------------------------------------------"
 cd "${APP_DIR}"
-echo "nohup bash -c rake jobs:work" >> ${APP_LOG_FILE} 2>&1  
+echo "nohup bash -c rake jobs:work" >> ${APP_LOG_FILE} 2>&1
 nohup bash -c "rake jobs:work >> ${APP_LOG_FILE} 2>&1 &"
+echo "-------------------------------------------------------"
+
+echo "-------------------------------------------------------"
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:create" >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec db:create >> ${APP_LOG_FILE} 2>&1
+echo "-------------------------------------------------------"
+
+echo "-------------------------------------------------------"
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:schema:load" >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec db:schema:load >> ${APP_LOG_FILE} 2>&1
+echo "-------------------------------------------------------"
+
+echo "-------------------------------------------------------"
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec db:seed >> ${APP_LOG_FILE} 2>&1
+echo "-------------------------------------------------------"
+
+echo "-------------------------------------------------------"
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:populate" >> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec db:populate >> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
