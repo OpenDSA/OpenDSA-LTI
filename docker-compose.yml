@@ -26,7 +26,6 @@ services:
       - .:/opendsa-lti
     entrypoint: /opendsa-lti/docker-entrypoint.sh
     command: ["./scripts/start.sh"]
-    # command: /bin/bash -c "chmod +x ./scripts/start.sh && ./scripts/start.sh"
     networks:
       - db_network
     ports:

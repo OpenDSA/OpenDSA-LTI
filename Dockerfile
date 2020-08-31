@@ -52,22 +52,6 @@ COPY Gemfile.lock Gemfile.lock
 
 RUN bundle install
 
-# COPY . .
-
-# RUN find /opendsa-lti -type d -exec chmod 2775 {} \;
-# RUN find /opendsa-lti -type f -exec chmod 0644 {} \;
-# RUN find ./scripts -type f -exec chmod +x {} \;
-# RUN ln -s /opendsa /opendsa-lti/public/OpenDSA
-
 EXPOSE 80
-#EXPOSE 3000
-
-# Create the log file
-# RUN touch /opendsa-lti/log/development.log
-
-# Redirecting logs to Dockerlog collector   accesslogs (/proc/1/fd/1)  errorlogs (/proc/self/fd/2)
-#RUN ln -sf /proc/1/fd/1 /opendsa-lti/log/development.log
 
 # CMD ["./scripts/start.sh"]
-
-#CMD tail -f /dev/null & wait
