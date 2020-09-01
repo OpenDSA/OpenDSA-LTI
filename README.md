@@ -1,10 +1,10 @@
 ## Development Environment
 
-The development environment assumes you have Docker, Docker-Compose, and Make installed.  The environment does not require Make, but it is helpful for running the application.
+The development environment assumes you have Docker, Docker-Compose, Git, and Make installed.  The environment does not require Make, but it is helpful for running the application.
 
-Docker can be found [here](https://docs.docker.com/get-docker/) and instructions for installing Docker-Compose (if not included with your Docker installation) can be found [here](https://docs.docker.com/compose/install/)
+Docker can be found [here](https://docs.docker.com/get-docker/) and instructions for installing Docker-Compose (if not included with your Docker installation) can be found [here](https://docs.docker.com/compose/install/). If you are on Windows, see [below](#windows) for further instructions.
 
-Make can be found in the default package manager on Linux, in Brew on Mac, and through various methods on Windows.
+Make can be found in the default package manager on Linux, in Brew on Mac, and [here](http://gnuwin32.sourceforge.net/packages/make.htm) for Windows. For a Windows installation, you should put make in Program Files, NOT Program Files (x86). Then, edit your environment variable PATH to add: C:/Program Files/GnuWin32/bin. If you don’t know how to edit an environment variable on Windows, google for “windows set environment variable”.
 
 To run OpenDSA-LTI, simply run either `make up` or `docker-compose up` and the app will be available at
 
@@ -14,6 +14,12 @@ When you are done, you can kill the app with `Ctrl+C` and then run `make down` o
 
 ## Windows
 This guide assumes you are using Docker Desktop for Windows using the WSL2 integration, however it should work using Docker Toolbox as well.
+
+If your version of Windows is Pro, Enterprise, or Education, you can use [this](https://docs.docker.com/docker-for-windows/install/) link.
+
+If your version of Windows is Home, you can use [this](https://docs.docker.com/docker-for-windows/install-windows-home/) link.
+
+Once you have installed Docker, you should next install Git. On Windows, a good choice is “Git for Windows” at https://git-scm.com/download/win. Use the third option for the path environment: “Use Git and optional Unix tools from the Windows Command Prompt”. Choose “checkout as-is, commit Unix-style line endings”, and then use “MinTTY”.
 
 If you are using Powershell or Git Bash will most likely have to run a dos2unix converter (included in Git Bash as dos2unix.exe) on scripts/start.sh and docker-entrypoint.sh prior to running `docker-compose up`
 
