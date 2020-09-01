@@ -26,6 +26,7 @@ services:
     image: opendsa-lti:latest
     volumes:
       - .:/opendsa-lti
+      - cache:/cache # added to support windows
     entrypoint: /opendsa-lti/docker-entrypoint.sh
     command: ["./scripts/start.sh"]
     networks:
@@ -34,9 +35,12 @@ services:
       - "8080:80"
     depends_on:
       - db
+    environment:
+      - SPROCKETS_CACHE=/cache # added to support windows
 
 networks:
   db_network:
     driver: bridge
 volumes:
   db:
+  cache: # added to support windows
