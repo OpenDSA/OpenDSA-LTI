@@ -62,3 +62,4 @@ bower_components/
 
 *.idea/OpenDSA-LTI.iml
 *.idea/workspace.xml
+*.idea
