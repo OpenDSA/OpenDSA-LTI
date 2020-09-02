@@ -10,9 +10,11 @@ To run OpenDSA-LTI, simply run either `make up` or `docker-compose up` and once 
 
 `RAILS_ENV=development bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p 80`
 
-in the terminal (this may take a few minutes, especially the first time), the app will be available at
+in the terminal, this may take a few minutes, especially the first time, the app will be available at
 
 https://localhost:8080
+
+If you are on Windows, see the section below, you may have to run the dos2unix converter if you are only seeing logs from the db container and not opendsa-lti
 
 Note: we are using self-signed certificates for development and you will have to tell your browser to accept our certificate.
 
@@ -33,7 +35,7 @@ If your version of Windows is Home, you can use [this](https://docs.docker.com/d
 
 Once you have installed Docker, you should next install Git. On Windows, a good choice is “Git for Windows” at https://git-scm.com/download/win. Use the third option for the path environment: “Use Git and optional Unix tools from the Windows Command Prompt”. Choose “checkout as-is, commit Unix-style line endings”, and then use “MinTTY”.
 
-If you are using Powershell or Git Bash will most likely have to run a dos2unix converter (included in Git Bash as dos2unix.exe) on scripts/start.sh and docker-entrypoint.sh prior to running `docker-compose up`
+If you are using Powershell or Git Bash will have to run a dos2unix converter (included in Git Bash as dos2unix.exe) on scripts/start.sh and docker-entrypoint.sh prior to running `docker-compose up`
 
 # OLD INSTRUCTIONS
 
