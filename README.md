@@ -6,11 +6,23 @@ Docker can be found [here](https://docs.docker.com/get-docker/) and instructions
 
 Make can be found in the default package manager on Linux, in Brew on Mac, and [here](http://gnuwin32.sourceforge.net/packages/make.htm) for Windows. For a Windows installation, you should put make in Program Files, NOT Program Files (x86). Then, edit your environment variable PATH to add: C:/Program Files/GnuWin32/bin. If you don’t know how to edit an environment variable on Windows, google for “windows set environment variable”.
 
-To run OpenDSA-LTI, simply run either `make up` or `docker-compose up` and the app will be available at
+To run OpenDSA-LTI, simply run either `make up` or `docker-compose up` and once you see 
+
+`RAILS_ENV=development bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p 80`
+
+in the terminal (this may take a few minutes, especially the first time), the app will be available at
 
 https://localhost:8080
 
+Note: we are using self-signed certificates for development and you will have to tell your browser to accept our certificate.
+
 When you are done, you can kill the app with `Ctrl+C` and then run `make down` or `docker-compose down` to clean up the docker environment. There are more commands in the Makefile and running `make help` or opening the Makefile in a text editor will explain what they do.
+
+Further, here are several important command from the Makefile that allow a user to interact with the application.
+
+The `make ssh` command will ssh you into the docker container and allow you to run commands for the rails app or compile a book within OpenDSA.
+
+The `make ssh-db` command will ssh you into the mysql database running in docker to run any queries or preform any database actions. In addition, the mysql database is exposed at http://localhost:3306 if you want to connect to it using an external tool
 
 ## Windows
 This guide assumes you are using Docker Desktop for Windows using the WSL2 integration, however it should work using Docker Toolbox as well.
