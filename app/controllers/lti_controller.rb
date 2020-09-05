@@ -9,7 +9,7 @@ class LtiController < ApplicationController
   def launch
 
     Rails.logger.info("launch - LtiController")
-
+    # binding.pry
     if params[:lti_message_type] == 'ContentItemSelectionRequest'
       resource()
       return
@@ -370,7 +370,8 @@ class LtiController < ApplicationController
       return
     end
 
-    launch_extrtool_helper(params[:exercise_id], params[:context_type])
+    workout_id = request.query_parameters['workoutId']
+    launch_extrtool_helper(params[:exercise_id], params[:context_type], workout_id)
   end
 
   def grade_passback
@@ -421,7 +422,9 @@ class LtiController < ApplicationController
 
   private
 
-  def launch_extrtool_helper(exercise_id, context_type = nil)
+  def launch_extrtool_helper(exercise_id, context_type = nil, workout_id)
+    # require 'pry'
+    # binding.pry
     exercise = nil
     course_offering = nil
     lis_result_sourcedid = nil
@@ -496,6 +499,7 @@ class LtiController < ApplicationController
     launch_params["custom_course_number"] = course_offering.course.number
     launch_params["custom_label"] = course_offering.label
     launch_params["custom_term"] = course_offering.term.slug
+    launch_params["custom_gym_workout_id"] = workout_id
 
     @tc = IMS::LTI::ToolConsumer.new(tool.key, tool.secret, launch_params)
     @launch_data = @tc.generate_launch_data()
