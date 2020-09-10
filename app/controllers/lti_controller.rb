@@ -499,7 +499,9 @@ class LtiController < ApplicationController
     launch_params["custom_course_number"] = course_offering.course.number
     launch_params["custom_label"] = course_offering.label
     launch_params["custom_term"] = course_offering.term.slug
-    launch_params["custom_gym_workout_id"] = workout_id
+    if workout_id
+      launch_params["custom_gym_workout_id"] = workout_id
+    end
 
     @tc = IMS::LTI::ToolConsumer.new(tool.key, tool.secret, launch_params)
     @launch_data = @tc.generate_launch_data()
