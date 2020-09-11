@@ -22,7 +22,8 @@ echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
 echo "updating permissions" >> ${OPENDSA_LOG_FILE} 2>&1
-ln -s /opendsa /opendsa-lti/public/OpenDSA
+ln -s /opendsa /opendsa-lti/public/OpenDSA || ERROR_FOUND=true
+if [[ "${ERROR_FOUND}" == true ]]; then cp -r /opendsa /opendsa-lti/public/OpenDSA && ERROR_FOUND=false; fi;
 echo "-------------------------------------------------------"
 
 cd "${OPENDSA_DIR}"
