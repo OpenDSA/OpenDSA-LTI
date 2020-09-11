@@ -55,7 +55,7 @@ echo "-------------------------------------------------------"
 echo "Copying configuration files"
 cp /opendsa-lti/config/databasedemo.yml /opendsa-lti/config/database.yml || ERROR_FOUND=true
 
-if [[ "${ERROR_FOUND}" == true ]]; then exit 1; fi;
+#if [[ "${ERROR_FOUND}" == true ]]; then exit 1; fi;
 
 echo "-------------------------------------------------------"
 cd "${APP_DIR}"
