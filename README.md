@@ -12,7 +12,7 @@ To run OpenDSA-LTI, simply run either `make up` or `docker-compose up` and once 
 
 in the terminal, this may take a few minutes, especially the first time, the app will be available at
 
-https://localhost:8080
+https://localhost:8000
 
 If you are on Windows, see the section below, you may have to run the dos2unix converter if you are only seeing logs from the db container and not opendsa-lti
 
