@@ -41,6 +41,7 @@ class InstBook < ApplicationRecord
     options['suppress_todo'] = book_data['suppress_todo'] || true
     options['assumes'] = book_data['assumes'] || "recursion"
     options['dispModComp'] = book_data['dispModComp'] || true
+    options['zeropt_assignments'] = book_data['zeropt_assignments'] || false
     options['glob_exer_options'] = book_data['glob_exer_options'] || {}
 
     if inst_book_id == nil
@@ -209,4 +210,9 @@ class InstBook < ApplicationRecord
   end
 
   #~ Private instance methods .................................................
+  def zeropt?
+    zeropt = "\"zeropt_assignments\":true"
+    return self.options.include? zeropt
+  end
+
 end
