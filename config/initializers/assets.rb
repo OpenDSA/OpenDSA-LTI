@@ -16,6 +16,14 @@ Rails.application.config.assets.version = '1.0'
 Rails.application.config.assets.paths << Rails.root.join('node_modules')
 #Rails.application.config.assets.paths << Rails.root.join('public')
 
+Rails.application.config.assets.configure do |env|
+  env.cache = Sprockets::Cache::FileStore.new(
+    ENV.fetch("SPROCKETS_CACHE", "#{env.root}/tmp/cache/assets"),
+    Rails.application.config.assets.cache_limit,
+    env.logger
+  )
+end
+
 Rails.application.config.assets.precompile = [
   Proc.new { |filename, path|
     (path =~ /app\/assets/ || path =~ /vendor\/assets/) &&

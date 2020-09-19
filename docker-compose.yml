@@ -1,0 +1,45 @@
+version: '3.7'
+services:
+  db:
+    image: mysql:5.7.31
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3307:3306"
+    networks:
+      - db_network
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: opendsa
+      MYSQL_DATABASE: opendsa
+      MYSQL_USER: opendsa
+      MYSQL_PASSWORD: opendsa
+
+  opendsa-lti:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - RAILS_ENV=development
+    image: opendsa-lti:latest
+    volumes:
+      - .:/opendsa-lti
+      - cache:/cache # added to support windows
+    entrypoint: /opendsa-lti/docker-entrypoint.sh
+    command: ["./scripts/start.sh"]
+    networks:
+      - db_network
+    ports:
+      - "8000:80"
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPROCKETS_CACHE=/cache # added to support windows
+
+networks:
+  db_network:
+    driver: bridge
+volumes:
+  db:
+  cache: # added to support windows

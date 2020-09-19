@@ -58,6 +58,8 @@ bower_components/
 
 /config/application.yml
 /config/secret.yml
+/config/database.yml
 
 *.idea/OpenDSA-LTI.iml
 *.idea/workspace.xml
+*.idea
