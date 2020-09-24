@@ -4,9 +4,7 @@ services:
     image: mysql:5.7.31
     command: --default-authentication-plugin=mysql_native_password
     ports:
-      - "3306:3306"
-    expose:
-      - 3306
+      - "3307:3306"
     networks:
       - db_network
     volumes:
@@ -32,7 +30,8 @@ services:
     networks:
       - db_network
     ports:
-      - "8080:80"
+      - "8000:80"
+      - "8080:8080"
     depends_on:
       - db
     environment:

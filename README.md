@@ -12,7 +12,7 @@ To run OpenDSA-LTI, simply run either `make up` or `docker-compose up` and once 
 
 in the terminal, this may take a few minutes, especially the first time, the app will be available at
 
-https://localhost:8080
+https://localhost:8000
 
 If you are on Windows, see the section below, you may have to run the dos2unix converter if you are only seeing logs from the db container and not opendsa-lti
 
@@ -24,7 +24,7 @@ Further, here are several important command from the Makefile that allow a user 
 
 The `make ssh` command will ssh you into the docker container and allow you to run commands for the rails app or compile a book within OpenDSA.
 
-The `make ssh-db` command will ssh you into the mysql database running in docker to run any queries or preform any database actions. In addition, the mysql database is exposed at http://localhost:3306 if you want to connect to it using an external tool
+The `make ssh-db` command will ssh you into the mysql database running in docker to run any queries or preform any database actions. In addition, the mysql database is exposed at http://localhost:3307 if you want to connect to it using an external tool
 
 ## Windows
 This guide assumes you are using Docker Desktop for Windows using the WSL2 integration, however it should work using Docker Toolbox as well.

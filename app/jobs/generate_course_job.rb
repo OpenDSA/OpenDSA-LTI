@@ -189,14 +189,14 @@ class GenerateCourseJob < ProgressJob::Base
   # in canvas, module item that has external link will map OpenDSA non-gradable module
   def save_module_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
                                    module_item_position)
-    module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
+    module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path 
     if module_name.include? '/'
-      module_name = module_name.split('/')[1]
+      module_name = module_name.split('/')[1]  #module_name = IntroOO
     end
     title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
             (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + " "
 
-    module_file_name = module_name
+    module_file_name = module_name #IntroOO
     title = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
 
     odsa_url_opts = {
@@ -223,6 +223,7 @@ class GenerateCourseJob < ProgressJob::Base
   # -------------------------------------------------------------
   # If OpenDSA module is gradable, it has at least one exercise with points greater than zero.
   # in canvas, module item that refer to an assignment will map OpenDSA gradable module
+  # If zeropt_assignments is true, non-gradable modules will also be map to an assignment
   def save_module_as_assignment(client, lms_course_id, chapter, chapt_module, title, opts, url_opts)
     uri = Addressable::URI.new
     uri.query_values = url_opts
@@ -238,7 +239,6 @@ class GenerateCourseJob < ProgressJob::Base
       # if section.soft_deadline
       #   assignment_opts[:assignment__due_at__] = section.soft_deadline.try(:strftime, "%Y-%m-%dT%H:%m:%S%:z")
       # end
-
       opts[:module_item__type__] = "Assignment"
       if chapt_module.lms_module_item_id && chapt_module.lms_assignment_id
         opts[:module_item__content_id__] = chapt_module.lms_assignment_id
@@ -259,14 +259,33 @@ class GenerateCourseJob < ProgressJob::Base
         chapt_module.save!
       end
     else
+      if @inst_book.zeropt?
+        assignment_opts[:assignment__points_possible__] = 0
+        opts[:module_item__type__] = "Assignment"
+        assignment_opts[:assignment__name__] = title
+        assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
+        assignment_opts[:assignment__description__] = title
+        assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
+        opts[:module_item__content_id__] = assignment_res['id']
+        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "Assignment", assignment_res['id'], opts)
+        chapt_module.lms_assignment_id = assignment_res['id']
+        chapt_module.lms_module_item_id = res['id']
+        chapt_module.save!
+      else
+        if !chapt_module.lms_module_item_id
+          res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "ExternalTool", '', opts)
+          chapt_module.lms_module_item_id = res['id']
+          chapt_module.save!
+        end
+      end
       # if section.lms_item_id
       #   res = client.update_module_item(lms_course_id, chapter.lms_chapter_id, section.lms_item_id, opts)
       # else
-      if !chapt_module.lms_module_item_id
-        res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "ExternalTool", '', opts)
-        chapt_module.lms_module_item_id = res['id']
-        chapt_module.save!
-      end
+      # if !chapt_module.lms_module_item_id
+      #   res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "ExternalTool", '', opts)
+      #   chapt_module.lms_module_item_id = res['id']
+      #   chapt_module.save!
+      # end
     end
   end
 
