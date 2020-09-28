@@ -50,6 +50,8 @@ RUN echo "cd /opendsa" >> /root/.bashrc
 RUN echo ". .pyVenv/bin/activate" >> /root/.bashrc
 RUN echo "cd /opendsa-lti" >> /root/.bashrc
 
+COPY requirements.txt requirements.txt
+
 RUN pip3 install -r requirements.txt --ignore-installed
 
 COPY Gemfile Gemfile
