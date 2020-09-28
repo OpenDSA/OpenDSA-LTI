@@ -7,7 +7,7 @@ LTI_BRANCH=$LTI_BRANCH
 OPENDSA_DIR="/opendsa"
 APP_DIR="/opendsa-lti"
 APP_LOG_FILE="/opendsa-lti/log/development.log"
-PORT="80"
+PORT="443"
 
 ERROR_FOUND=false;
 
@@ -86,6 +86,5 @@ echo "Starting server"
 echo "-------------------------------------------------------"
 #echo "RAILS_ENV=$RAILS_ENV bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT}" #>> ${APP_LOG_FILE} 2>&1
 echo "RAILS_ENV=$RAILS_ENV bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT}"
-#RAILS_ENV=${ENVIRONMENT} bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT} #>> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec thin start -p ${PORT} #>> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT} #>> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
