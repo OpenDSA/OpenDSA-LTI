@@ -56,10 +56,10 @@ echo "-------------------------------------------------------"
 #pip install -r requirements.txt --ignore-installed #>> ${OPENDSA_LOG_FILE} 2>&1
 #echo "-------------------------------------------------------"
 
-echo "-------------------------------------------------------"
-echo "make allbooks" #>> ${OPENDSA_LOG_FILE} 2>&1
-bash -c "source /opendsa/.pyVenv/bin/activate && make allbooks" #>> ${OPENDSA_LOG_FILE} 2>&1
-echo "-------------------------------------------------------"
+#echo "-------------------------------------------------------"
+#echo "make allbooks" #>> ${OPENDSA_LOG_FILE} 2>&1
+#bash -c "source /opendsa/.pyVenv/bin/activate && make allbooks" #>> ${OPENDSA_LOG_FILE} 2>&1
+#echo "-------------------------------------------------------"
 
 echo "Copying configuration files"
 cp /opendsa-lti/config/databasedemo.yml /opendsa-lti/config/database.yml || ERROR_FOUND=true
