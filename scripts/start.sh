@@ -58,7 +58,7 @@ echo "-------------------------------------------------------"
 
 echo "-------------------------------------------------------"
 echo "make allbooks" #>> ${OPENDSA_LOG_FILE} 2>&1
-. /home/deploy/OpenDSA/.pyVenv/bin/activate && make allbooks #>> ${OPENDSA_LOG_FILE} 2>&1
+bash -c "source /home/deploy/OpenDSA/.pyVenv/bin/activate && make allbooks" #>> ${OPENDSA_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 echo "Copying configuration files"
