@@ -46,15 +46,9 @@ RUN gem install bundler -v $BUNDLER_VERSION \
 RUN mkdir /opendsa-lti
 WORKDIR /opendsa-lti
 
-COPY Makefile.odsa Makefile
-COPY requirements.txt requirements.txt
-RUN make -f Makefile venv
-RUN mkdir -p /home/deploy/OpenDSA
-RUN cp -r .pyVenv/ /home/deploy/OpenDSA/
-RUN echo "cd /home/deploy/OpenDSA" >> /root/.bashrc
+RUN echo "cd /opendsa" >> /root/.bashrc
 RUN echo ". .pyVenv/bin/activate" >> /root/.bashrc
 RUN echo "cd /opendsa-lti" >> /root/.bashrc
-
 
 RUN pip3 install -r requirements.txt --ignore-installed
 
