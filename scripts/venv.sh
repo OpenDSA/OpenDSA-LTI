@@ -1,4 +1,4 @@
-make -f Makefile venv
+make -f Makefile clean-venv venv
 mkdir -p /home/deploy/OpenDSA
 cp -r .pyVenv/ /home/deploy/OpenDSA/
 . .pyVenv/bin/activate
