@@ -18,7 +18,7 @@ RUN apt-get update -qq \
     && apt-get install -y apt-utils build-essential libpq-dev lsof vim cron curl \
     && apt-get install -y nodejs npm python3-pip git-core zlib1g-dev libssl-dev libreadline-dev libyaml-dev  libevent-dev libsqlite3-dev libsqlite3-dev     libxml2-dev   libxml2  libxslt1-dev   libffi-dev    libxslt-dev   sqlite3   dkms  python-dev python-feedvalidator     python-sphinx   python3-venv \
     && apt-get install -y default-jre \
-    && apt-get upgrade -y \
+    && apt-get upgrade -y
 
 RUN pip3 install --upgrade pip \
     && npm install npm@latest -g  \
