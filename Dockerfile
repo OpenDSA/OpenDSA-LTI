@@ -25,6 +25,10 @@ RUN pip3 install --upgrade pip \
     && npm install uglify-js -g \
     && npm install clean-css-cli -g
 
+# Set default python version to python 3
+RUN rm -f /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
+RUN rm -f /usr/bin/pip && ln -s /usr/bin/pip3 /usr/bin/pip
+
 # install rubygems
 ENV GEM_HOME /usr/local/bundle
 ENV PATH $GEM_HOME/bin:$PATH
