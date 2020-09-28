@@ -43,8 +43,12 @@ RUN mkdir /opendsa-lti
 WORKDIR /opendsa-lti
 
 COPY Makefile Makefile
-COPY ./scripts/venv.sh venv.sh
-RUN bash venv.sh
+RUN make -f Makefile venv
+RUN mkdir -p /home/deploy/OpenDSA
+RUN cp -r .pyVenv/ /home/deploy/OpenDSA/
+RUN echo "cd /home/deploy/OpenDSA" >> /root/.bashrc
+RUN echo ". .pyVenv/bin/activate" >> /root/.bashrc
+RUN echo "cd /opendsa-lti" >> /root/.bashrc
 
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt --ignore-installed
