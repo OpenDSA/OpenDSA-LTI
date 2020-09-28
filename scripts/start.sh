@@ -84,7 +84,8 @@ RAILS_ENV=${ENVIRONMENT} bundle exec rake db:populate #>> ${APP_LOG_FILE} 2>&1
 
 echo "Starting server"
 echo "-------------------------------------------------------"
-echo "RAILS_ENV=$RAILS_ENV bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT}" #>> ${APP_LOG_FILE} 2>&1
+#echo "RAILS_ENV=$RAILS_ENV bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT}" #>> ${APP_LOG_FILE} 2>&1
 echo "RAILS_ENV=$RAILS_ENV bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT}"
-RAILS_ENV=${ENVIRONMENT} bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT} #>> ${APP_LOG_FILE} 2>&1
+#RAILS_ENV=${ENVIRONMENT} bundle exec thin start --ssl --ssl-key-file server.key --ssl-cert-file server.crt -p ${PORT} #>> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec thin start -p ${PORT} #>> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
