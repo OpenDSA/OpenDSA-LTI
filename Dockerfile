@@ -42,7 +42,7 @@ RUN gem install bundler -v $BUNDLER_VERSION \
 RUN mkdir /opendsa-lti
 WORKDIR /opendsa-lti
 
-COPY public/OpenDSA/Makefile Makefile
+COPY Makefile.odsa Makefile
 RUN make -f Makefile venv
 RUN mkdir -p /home/deploy/OpenDSA
 RUN cp -r .pyVenv/ /home/deploy/OpenDSA/
