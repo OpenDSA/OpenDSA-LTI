@@ -72,15 +72,15 @@ echo "nohup bash -c rake jobs:work" >> ${APP_LOG_FILE} 2>&1
 nohup bash -c "rake jobs:work >> ${APP_LOG_FILE} 2>&1 &"
 echo "-------------------------------------------------------"
 
-#echo "Setting up database"
-#echo "-------------------------------------------------------"
-#echo "RAILS_ENV=$RAILS_ENV bundle exec db:schema:load" #>> ${APP_LOG_FILE} 2>&1
-#RAILS_ENV=${ENVIRONMENT} bundle exec rake db:schema:load #>> ${APP_LOG_FILE} 2>&1
-#echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" #>> ${APP_LOG_FILE} 2>&1
-#RAILS_ENV=${ENVIRONMENT} bundle exec rake db:seed #>> ${APP_LOG_FILE} 2>&1
+echo "Setting up database"
+echo "-------------------------------------------------------"
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:schema:load" #>> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:schema:load #>> ${APP_LOG_FILE} 2>&1
+echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" #>> ${APP_LOG_FILE} 2>&1
+RAILS_ENV=${ENVIRONMENT} bundle exec rake db:seed #>> ${APP_LOG_FILE} 2>&1
 echo "RAILS_ENV=$RAILS_ENV bundle exec db:populate" #>> ${APP_LOG_FILE} 2>&1
 RAILS_ENV=${ENVIRONMENT} bundle exec rake db:populate #>> ${APP_LOG_FILE} 2>&1
-#echo "-------------------------------------------------------"
+echo "-------------------------------------------------------"
 
 echo "Starting server"
 echo "-------------------------------------------------------"
