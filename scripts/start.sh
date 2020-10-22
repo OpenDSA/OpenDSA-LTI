@@ -7,7 +7,7 @@ LTI_BRANCH=$LTI_BRANCH
 OPENDSA_DIR="/opendsa"
 APP_DIR="/opendsa-lti"
 APP_LOG_FILE="/opendsa-lti/log/development.log"
-PORT="443"
+PORT="8443"
 
 ERROR_FOUND=false;
 
@@ -36,9 +36,9 @@ cd "${OPENDSA_DIR}"
 echo "-------------------------------------------------------"
 echo "git checkout ${ODSA_BRANCH}"
 git checkout ${ODSA_BRANCH}
-echo "make -f Makefile pull" #>> ${OPENDSA_LOG_FILE} 2>&1
-make -f Makefile pull #>> ${OPENDSA_LOG_FILE} 2>&1
-echo "-------------------------------------------------------"
+#echo "make -f Makefile pull" #>> ${OPENDSA_LOG_FILE} 2>&1
+#make -f Makefile pull #>> ${OPENDSA_LOG_FILE} 2>&1
+#echo "-------------------------------------------------------"
 
 #echo "-------------------------------------------------------"
 #echo "make -f Makefile venv" #>> ${OPENDSA_LOG_FILE} 2>&1
@@ -74,12 +74,12 @@ echo "-------------------------------------------------------"
 
 echo "Setting up database"
 echo "-------------------------------------------------------"
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:schema:load" #>> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec rake db:schema:load #>> ${APP_LOG_FILE} 2>&1
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" #>> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec rake db:seed #>> ${APP_LOG_FILE} 2>&1
-echo "RAILS_ENV=$RAILS_ENV bundle exec db:populate" #>> ${APP_LOG_FILE} 2>&1
-RAILS_ENV=${ENVIRONMENT} bundle exec rake db:populate #>> ${APP_LOG_FILE} 2>&1
+#echo "RAILS_ENV=$RAILS_ENV bundle exec db:schema:load" #>> ${APP_LOG_FILE} 2>&1
+#RAILS_ENV=${ENVIRONMENT} bundle exec rake db:schema:load #>> ${APP_LOG_FILE} 2>&1
+#echo "RAILS_ENV=$RAILS_ENV bundle exec db:seed" #>> ${APP_LOG_FILE} 2>&1
+#RAILS_ENV=${ENVIRONMENT} bundle exec rake db:seed #>> ${APP_LOG_FILE} 2>&1
+#echo "RAILS_ENV=$RAILS_ENV bundle exec db:populate" #>> ${APP_LOG_FILE} 2>&1
+#RAILS_ENV=${ENVIRONMENT} bundle exec rake db:populate #>> ${APP_LOG_FILE} 2>&1
 echo "-------------------------------------------------------"
 
 echo "Starting server"

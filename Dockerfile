@@ -57,7 +57,8 @@ RUN pip3 install -r requirements.txt --ignore-installed
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 
-RUN bundle install
+RUN bundle update
+RUN bundle check || bundle install
 
 EXPOSE 80
 
