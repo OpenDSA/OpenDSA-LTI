@@ -18,6 +18,18 @@ class OdsaUserInteraction < ApplicationRecord
     end
   end
 
+  def self.to_csv
+    #attributes = %w{user_id course name description action_time}
+
+    CSV.generate(headers: true) do |csv|
+      csv << all.first.attributes.map { |a,v| a }
+
+      all.each do |interaction|
+        csv << interaction.attributes.map { |a,v| v }
+      end
+    end
+  end
+
   #~ Constants ................................................................
   #~ Hooks ....................................................................
   #~ Class methods ............................................................

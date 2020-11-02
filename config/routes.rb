@@ -1,4 +1,5 @@
 OpenDSA::Application.routes.draw do
+  get 'book_data_downloads/index'
   root 'home#index'
 
   post 'lti/launch'
@@ -13,7 +14,7 @@ OpenDSA::Application.routes.draw do
 
   resources :odsa_user_interactions
   resources :odsa_exercise_attempts
-  # resources :odsa_exercise_progresses
+  # prof_books :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' => 'odsa_exercise_progresses#show_exercise',
@@ -196,4 +197,7 @@ OpenDSA::Application.routes.draw do
     post '/login' => 'devise/sessions#create', as: :user_session
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session
   end
+
+  resources :prof_books
+  resources :book_data_downloads
 end

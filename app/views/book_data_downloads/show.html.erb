@@ -1,0 +1,18 @@
+<h1><%= @book.title%></h1>
+<p><%= @book.desc%></p>
+<h3>Exercise Attempts</h3>
+<%= link_to '<button type="button">Download Attempts List (CSV)</button>'.html_safe, book_data_downloads_path(type: "attempt", format: :csv) %>
+<br />
+<%= link_to '<button type="button">Download Attempts List (JSON)</button>'.html_safe, book_data_downloads_path(type: "attempt", format: :json) %>
+<h3>Exercise Progresses</h3>
+<%= link_to '<button type="button">Download Progresses List (CSV)</button>'.html_safe, book_data_downloads_path(type: "progress", format: :csv) %>
+<br />
+<%= link_to '<button type="button">Download Progresses List (JSON)</button>'.html_safe, book_data_downloads_path(type: "progress", format: :json) %>
+<h3>Module Progresses</h3>
+<%= link_to '<button type="button">Download Progresses List (CSV)</button>'.html_safe, book_data_downloads_path(type: "md_progress", format: :csv) %>
+<br />
+<%= link_to '<button type="button">Download Progresses List (JSON)</button>'.html_safe, book_data_downloads_path(type: "md_progress", format: :json) %>
+<h3>User Interactions </h3>
+<%= link_to '<button type="button">Download Interactions List (CSV)</button>'.html_safe, book_data_downloads_path(type: "interaction", format: :csv) %>
+<br />
+<%= link_to '<button type="button">Download Interactions List (JSON)</button>'.html_safe, book_data_downloads_path(type: "interaction", format: :json) %>

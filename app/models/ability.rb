@@ -1,6 +1,6 @@
 # =============================================================================
 # The Ability class is used by CanCan to control how users with various roles
-# can access resources in OpenDSA.
+# can access prof_books in OpenDSA.
 #
 class Ability
   include CanCan::Ability

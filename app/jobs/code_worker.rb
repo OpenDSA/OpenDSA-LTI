@@ -1,7 +1,7 @@
 # app/workers/code_worker.rb
 require 'csv'
 require 'fileutils'
-require "#{Rails.root}/usr/resources/config"
+require "#{Rails.root}/usr/prof_books/config"
 
 class CodeWorker
   include SuckerPunch::Job
@@ -46,7 +46,7 @@ class CodeWorker
         FileUtils.mkdir_p(attempt_dir)
       end
       #FileUtils.cp(
-      #  Dir["usr/resources/#{language}/#{prompt.class_name}*.#{lang}"],
+      #  Dir["usr/prof_books/#{language}/#{prompt.class_name}*.#{lang}"],
       #  attempt_dir)
       FileUtils.cp(prompt.test_file_name, attempt_dir)
       File.write(attempt_dir + '/' + prompt.class_name + '.' + lang, code_body)
