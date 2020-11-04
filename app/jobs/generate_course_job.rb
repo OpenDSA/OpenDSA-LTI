@@ -38,7 +38,7 @@ class GenerateCourseJob < ProgressJob::Base
     Rails.logger.info('build_path')
     Rails.logger.info(build_path)
     require 'open3'
-    command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
+    command = ". #{ENV['python_venv_path']} && python3 #{script_path} #{config_file_path} -b #{build_path}"
     stdout, stderr, status = Open3.capture3(command)
     unless status.success?
       Rails.logger.info(stderr)
@@ -189,7 +189,7 @@ class GenerateCourseJob < ProgressJob::Base
   # in canvas, module item that has external link will map OpenDSA non-gradable module
   def save_module_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
                                    module_item_position)
-    module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path 
+    module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
     if module_name.include? '/'
       module_name = module_name.split('/')[1]  #module_name = IntroOO
     end

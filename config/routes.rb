@@ -12,6 +12,7 @@ OpenDSA::Application.routes.draw do
   post 'lti/outcomes', to: 'lti#grade_passback', as: :lti_grade_passback
 
   resources :odsa_user_interactions
+  resources :odsa_user_time_tracking
   resources :odsa_exercise_attempts
   # resources :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
@@ -29,7 +30,7 @@ OpenDSA::Application.routes.draw do
   post '/pi_attempts/get_attempts' => 'pi_attempts#get_attempts'
   post '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
   post '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
-  
+
   #me
   #get '/Display' => 'course_offerings#postData'
   #get '/course_offerings/:id/Display' => 'course_offerings#postData'
