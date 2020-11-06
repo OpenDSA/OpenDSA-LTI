@@ -16,3 +16,6 @@
 <%= link_to '<button type="button">Download Interactions List (CSV)</button>'.html_safe, book_data_downloads_path(type: "interaction", format: :csv) %>
 <br />
 <%= link_to '<button type="button">Download Interactions List (JSON)</button>'.html_safe, book_data_downloads_path(type: "interaction", format: :json) %>
+<br />
+<h2>Download Data by Students</h2>
+<%= link_to '<button type="button">Students of Course</button>'.html_safe, book_users_list_path(@book_id) %>

@@ -1,0 +1,5 @@
+<h1>Students List for Course</h1>
+<h4>Click on individual students to download data associated ONLY with the single student.</h4>
+<% @user_records.each do |user| %>
+  <p><%= link_to user.first_name+" "+user.last_name, book_data_download_book_user_path(@book_id, user.id) %></p>
+<% end %>

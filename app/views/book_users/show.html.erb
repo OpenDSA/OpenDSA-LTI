@@ -1,0 +1,14 @@
+<h1>Data for <%= @user.first_name%> <%= @user.last_name%></h1>
+<h3>Download Exercise Attempts</h3>
+<%= link_to '<button type="button">Download Attemtps List (CSV)</button>'.html_safe, book_data_download_book_user_path(type: "attempt", format: :csv) %>
+<br />
+<%= link_to '<button type="button">Download Attemtps List (JSON)</button>'.html_safe, book_data_download_book_user_path(type: "attempt", format: :json) %>
+<h3>Download Exercise Progresses</h3>
+<%= link_to '<button type="button">Download Progresses List (CSV)</button>'.html_safe, book_data_download_book_user_path(type: "progress", format: :csv) %>
+<br />
+<%= link_to '<button type="button">Download Progresses List (JSON)</button>'.html_safe, book_data_download_book_user_path(type: "progress", format: :json) %>
+<h3>Download User Interactions</h3>
+<%= link_to '<button type="button">Download Interactions List (CSV)</button>'.html_safe, book_data_download_book_user_path(type: "interaction", format: :csv) %>
+<br />
+<%= link_to '<button type="button">Download Interactions List (JSON)</button>'.html_safe, book_data_download_book_user_path(type: "interaction", format: :json) %>
+<br />
