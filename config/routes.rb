@@ -1,5 +1,4 @@
 OpenDSA::Application.routes.draw do
-  get 'book_data_downloads/index'
   root 'home#index'
 
   post 'lti/launch'
@@ -198,6 +197,12 @@ OpenDSA::Application.routes.draw do
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session
   end
 
+  get "user/:user_id/books" => "users#show_books", as: :user_show_book
   resources :prof_books
-  resources :book_data_downloads
+  resources :book_data_downloads, path: '/bdd' do
+    resources :book_users
+  end
+  #get 'book_users/index'
+  #get 'book_data_downloads/index'
+  get "bdd/:id/users" => "book_data_downloads#list_users", as: :book_users_list
 end
