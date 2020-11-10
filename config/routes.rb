@@ -30,6 +30,11 @@ OpenDSA::Application.routes.draw do
   post '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
   post '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
   
+  #used to store student progress
+  #used by grading.js in the front end
+  post '/student_exercise_progress/new_progress' => 'student_exercise_progresses#create'
+  post '/student_exercise_progress/get_progress' => 'student_exercise_progresses#fetch'
+
   #me
   #get '/Display' => 'course_offerings#postData'
   #get '/course_offerings/:id/Display' => 'course_offerings#postData'
