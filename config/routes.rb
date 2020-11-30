@@ -199,7 +199,7 @@ OpenDSA::Application.routes.draw do
 
   get "user/:user_id/books" => "users#show_books", as: :user_show_book
   resources :prof_books
-  resources :book_data_downloads, path: '/bdd' do
+  resources :book_data_downloads, path: '/bdd', param: :book_id do
     resources :book_users
   end
   #get 'book_users/index'

@@ -1,2 +1,0 @@
-module ProfBooksHelper
-end
