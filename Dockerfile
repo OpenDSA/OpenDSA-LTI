@@ -16,12 +16,11 @@ ENV ODSA_ENV='PROD'
 
 RUN apt-get update -qq \
     && apt-get install -y apt-utils build-essential libpq-dev lsof vim cron curl \
-    && apt-get install -y nodejs npm python3-pip git-core zlib1g-dev libssl-dev libreadline-dev libyaml-dev  libevent-dev libsqlite3-dev libsqlite3-dev     libxml2-dev   libxml2  libxslt1-dev   libffi-dev    libxslt-dev   sqlite3   dkms  python-dev python-feedvalidator     python-sphinx   python3-venv \
+    && apt-get install -y nodejs npm python3-pip git-core zlib1g-dev libssl-dev libreadline-dev libyaml-dev libevent-dev libsqlite3-dev libxml2-dev libxml2 libxslt1-dev libffi-dev libxslt-dev sqlite3 dkms python-dev python-feedvalidator python-sphinx \
     && apt-get install -y default-jre \
     && apt-get upgrade -y
 
 RUN pip3 install --upgrade pip \
-    && npm install npm@latest -g  \
     && npm install uglify-js -g \
     && npm install clean-css-cli -g
 
@@ -46,20 +45,17 @@ RUN gem install bundler -v $BUNDLER_VERSION \
 RUN mkdir /opendsa-lti
 WORKDIR /opendsa-lti
 
-RUN echo "cd /opendsa" >> /root/.bashrc
-RUN echo ". .pyVenv/bin/activate" >> /root/.bashrc
 RUN echo "cd /opendsa-lti" >> /root/.bashrc
 
 COPY requirements.txt requirements.txt
 
-RUN pip3 install -r requirements.txt --ignore-installed
+RUN pip3 install -r requirements.txt
 
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 
-RUN bundle update
-RUN bundle check || bundle install
+#RUN bundle update
+#RUN bundle check || bundle install
+RUN bundle install
 
 EXPOSE 80
-
-# CMD ["./scripts/start.sh"]
