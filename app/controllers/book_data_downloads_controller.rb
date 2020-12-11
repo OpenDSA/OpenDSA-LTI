@@ -11,7 +11,6 @@ class BookDataDownloadsController < ApplicationController
       @ex_progresses.concat @progress
     end
     @ex_progresses = OdsaExerciseProgress.where(id: @ex_progresses.map(&:id))
-    @md_progresses = OdsaModuleProgress.where(inst_book_id: @book.id)
     @interactions = OdsaUserInteraction.where(inst_book_id: @book.id)
     @book_id = params[:book_id]
     @attributes_list = Array.new
@@ -35,8 +34,19 @@ class BookDataDownloadsController < ApplicationController
       @ex_progresses.concat @progress
     end
     @ex_progresses = OdsaExerciseProgress.where(id: @ex_progresses.map(&:id))
-    @md_progresses = OdsaModuleProgress.where(inst_book_id: @book.id)
     @interactions = OdsaUserInteraction.where(inst_book_id: @book.id)
+
+    @users = Array.new
+    @users = add_users(@ex_attempts, @users)
+    @users = add_users(@ex_progresses, @users)
+    @users = add_users(@interactions, @users)
+
+    @user_records = Array.new
+    @users.each do |user|
+      @usr = User.find_by_id(user)
+      @user_records.push(@usr)
+    end
+    @user_records = User.where(id: @user_records.map(&:id))
 
     respond_to do |format|
       param_array = Array.new
@@ -55,11 +65,11 @@ class BookDataDownloadsController < ApplicationController
         if(params[:type] == "progress") then
           send_data to_csv([@ex_progresses, param_array]), filename: "exercise-progresses-#{@book.title}.csv"
         end
-        if(params[:type] == "md_progress") then
-          send_data @md_progresses.to_csv, filename: "module-progresses-#{@book.title}.csv"
-        end
         if(params[:type] == "interaction") then
-          send_data ([@interactions, param_array]), filename: "interactions-#{@book.title}.csv"
+          send_data to_csv([@interactions, param_array]), filename: "interactions-#{@book.title}.csv"
+        end
+        if(params[:type] == "usr") then
+          send_data to_csv([@user_records, %w{id email first_name last_name }]), filename: "users-#{@book.title}.csv"
         end
       end
       format.json do
@@ -69,17 +79,18 @@ class BookDataDownloadsController < ApplicationController
         if(params[:type] == "progress") then
           send_data @ex_progresses.to_json(:only => param_array), :type => 'application/json; header=present', filename: "exercises-progresses-#{@book.title}.json"
         end
-        if(params[:type] == "md_progress") then
-          send_data @md_progresses.to_json(:only => param_array), :type => 'application/json; header=present', filename: "module-progresses-#{@book.title}.json"
-        end
         if(params[:type] == "interaction") then
           send_data @interactions.to_json(:only => param_array), :type => 'application/json; header=present', filename: "interactions-#{@book.title}.json"
+        end
+        if(params[:type] == "usr") then
+          send_data @user_records.to_json(:only => %w{id email first_name last_name }), :type => 'application/json; header=present', filename: "user-#{@book.title}.json"
         end
       end
     end
   end
+
   def list_users
-    @book_id = params[:book_id]
+    @book_id = session[:curr_book]
     @ex_attempts = OdsaExerciseAttempt.where(inst_book_id: params[:book_id])
     @book_section_exercise = InstBookSectionExercise.where(inst_book_id: params[:book_id])
     @ex_progresses = Array.new

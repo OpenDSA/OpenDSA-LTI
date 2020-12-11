@@ -23,6 +23,16 @@ module BookDataDownloadsHelper
     return array
   end
 
+  def add_users(records, array)
+    records.each do |record|
+      puts record.user_id
+      unless array.include?(record.user_id)
+        array.push(record.user_id)
+      end
+    end
+    return array
+  end
+
   def attempt_attr_desc
     return {
         "id" => "stores students attempts for KA and PE exercises",

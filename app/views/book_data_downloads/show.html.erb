@@ -140,7 +140,7 @@
     <%= radio_button_tag 'format', 'json'%>JSON
     <br /><br />
     <h4>Tables: </h4>
-    <%= select_tag('type', options_for_select({"Exercise Attempts" => "attempt", "Exercise Progress" => "progress", "User Interaction " => "interaction"}), :prompt=>"Select Table", :onchange => "update_form(this.value)") %>
+    <%= select_tag('type', options_for_select({"Exercise Attempts" => "attempt", "Exercise Progress" => "progress", "User Interaction " => "interaction", "User" => "usr"}), :prompt=>"Select Table", :onchange => "update_form(this.value)") %>
     <br/><br />
     <h4>Columns: </h4>
     <div id="attribute_list">
