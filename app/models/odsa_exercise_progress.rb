@@ -100,6 +100,17 @@ class OdsaExerciseProgress < ApplicationRecord
     return !self.inst_course_offering_exercise_id.blank?
   end
 
+  def self.to_csv
+    #attributes = %w{user course question_name worth_credit time_done time_taken hint_used points_earned}
+
+    CSV.generate(headers: true) do |csv|
+      csv << all.first.attributes.map { |a,v| a }
+
+      all.each do |progress|
+        csv << progress.attributes.map { |a,v| v }
+      end
+    end
+  end
   #~ Private instance methods .................................................
 
 

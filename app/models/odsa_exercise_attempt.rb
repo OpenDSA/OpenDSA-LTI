@@ -248,6 +248,18 @@ class OdsaExerciseAttempt < ApplicationRecord
     end
   end
 
+  def self.to_csv
+    #attributes = %w{user course question_name worth_credit time_done time_taken hint_used points_earned}
+
+    CSV.generate(headers: true) do |csv|
+      csv << all.first.attributes.map { |a,v| a }
+
+      all.each do |attempt|
+        csv << attempt.attributes.map { |a,v| v }
+      end
+    end
+  end
+
   #~ Private instance methods .................................................
 
 end

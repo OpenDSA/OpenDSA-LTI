@@ -1,19 +1,6 @@
 OpenDSA::Application.routes.draw do
   root 'home#index'
 
-  # attempts 
-  get '/attempts/exercise', to: 'attempts#exercise', as: 'exercise'
-  get '/users', to: 'users#index'
-  get "/users/:id", to: "users#show"
-  get "/users/calc/:id", to: "users#calc"
-  get "/attempt/:id", to: "attempts#index"
-  get "/attempt/book/:inst_book_id/user/:user_id", to: "attempts#get_book_user_attempts_information"
-  get "/interations/book/:inst_book_id/user/:user_id", to: "attempts#get_book_user_interation_exercise_total_time"
-  get "/student_attempt/:question_name", to: "attempts#get_exercise_student_attempt"
-  get "/student_attempt/question/:question_name", to: "attempts#get_question_incorrect", as: 'get_question_incorrect'
-  get "/student_attempt/hint/:question_name", to: "attempts#get_question_hint", as: 'get_question_hint'
-
-
   post 'lti/launch'
   post 'lti/assessment'
   get 'lti/xml_config', to: 'lti#xml_config', as: :xml_config
@@ -26,7 +13,7 @@ OpenDSA::Application.routes.draw do
 
   resources :odsa_user_interactions
   resources :odsa_exercise_attempts
-  # resources :odsa_exercise_progresses
+  # prof_books :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' => 'odsa_exercise_progresses#show_exercise',
@@ -43,11 +30,6 @@ OpenDSA::Application.routes.draw do
   post '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
   post '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
   
-  #used to store student progress
-  #used by grading.js in the front end
-  post '/student_exercise_progress/new_progress' => 'student_exercise_progresses#create'
-  post '/student_exercise_progress/get_progress' => 'student_exercise_progresses#fetch'
-
   #me
   #get '/Display' => 'course_offerings#postData'
   #get '/course_offerings/:id/Display' => 'course_offerings#postData'
@@ -214,4 +196,13 @@ OpenDSA::Application.routes.draw do
     post '/login' => 'devise/sessions#create', as: :user_session
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session
   end
+
+  get "user/:user_id/books" => "users#show_books", as: :user_show_book
+  resources :prof_books
+  resources :book_data_downloads, path: '/bdd', param: :book_id do
+    resources :book_users
+  end
+  #get 'book_users/index'
+  #get 'book_data_downloads/index'
+  get "bdd/:id/users" => "book_data_downloads#list_users", as: :book_users_list
 end

@@ -1,0 +1,166 @@
+<h1><%= @book.title%></h1>
+<p><%= @book.desc%></p>
+<h2>Table Preview</h2>
+<h3>Exercise Attempts</h3>
+<div id="table-div"></div>
+<div class="content-table">
+  <table>
+    <thead>
+    <tr>
+      <th>ID &nbsp; &nbsp; &nbsp;</th>
+      <th>User ID</th>
+      <th>Section ID</th>
+      <th>Question Name</th>
+      <th>Request Type</th>
+      <th>Worth Credit</th>
+      <th>Time Done</th>
+      <th>Time Taken</th>
+      <th>Count Hints</th>
+      <th>Hint Used</th>
+      <th>Points Earned</th>
+      <th>Earned Proficiency</th>
+      <th>Count Attempts</th>
+      <th>Correct</th>
+      <th>PE Score</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @ex_attempts[0..5].each do |attempt| %>
+      <tr>
+        <td><%= attempt.id %></td>
+        <td><%= attempt.user_id %></td>
+        <td><%= attempt.inst_section_id %></td>
+        <td><%= attempt.question_name %></td>
+        <td><%= attempt.request_type %></td>
+        <td><%= attempt.worth_credit %></td>
+        <td><%= attempt.time_done %></td>
+        <td><%= attempt.time_taken %></td>
+        <td><%= attempt.count_hints %></td>
+        <td><%= attempt.hint_used %></td>
+        <td><%= attempt.points_earned %></td>
+        <td><%= attempt.earned_proficiency %></td>
+        <td><%= attempt.count_attempts %></td>
+        <td><%= attempt.correct %></td>
+        <td><%= attempt.pe_score %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<h3>Exercise Progresses</h3>
+<div class="content-table">
+  <table>
+    <thead>
+    <tr>
+      <th>ID &nbsp; &nbsp; &nbsp;</th>
+      <th>User ID</th>
+      <th>Section-Exercise ID</th>
+      <th>Current Score</th>
+      <th>Highest Score</th>
+      <th>First Done</th>
+      <th>Last Done</th>
+      <th>Total Correct</th>
+      <th>Total Worth Credit</th>
+      <th>Proficient Date</th>
+      <th>Current Exercise</th>
+      <th>Correct Exercise</th>
+      <th>Hinted Exercise</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @ex_progresses[0..5].each do |progress| %>
+      <tr>
+        <td><%= progress.id %></td>
+        <td><%= progress.user_id %></td>
+        <td><%= progress.inst_book_section_exercise_id %></td>
+        <td><%= progress.current_score %></td>
+        <td><%= progress.highest_score %></td>
+        <td><%= progress.first_done %></td>
+        <td><%= progress.last_done %></td>
+        <td><%= progress.total_correct %></td>
+        <td><%= progress.total_worth_credit %></td>
+        <td><%= progress.proficient_date %></td>
+        <td><%= progress.current_exercise %></td>
+        <td><%= progress.correct_exercises %></td>
+        <td><%= progress.hinted_exercise %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<h3>User Interactions </h3>
+<div class="content-table">
+  <table>
+    <thead>
+    <tr>
+      <th>ID &nbsp; &nbsp; &nbsp;</th>
+      <th>User ID</th>
+      <th>Section ID</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Action Time</th>
+      <th>UIID</th>
+      <th>Browser Family</th>
+      <th>Browser Version</th>
+      <th>OS Family</th>
+      <th>OS Version</th>
+      <th>Device</th>
+      <th>Created At</th>
+      <th>Updated At</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @interactions[0..5].each do |interaction| %>
+      <tr>
+        <td><%= interaction.id %></td>
+        <td><%= interaction.user_id %></td>
+        <td><%= interaction.inst_section_id %></td>
+        <td><%= interaction.name %></td>
+        <td><%= interaction.description %></td>
+        <td><%= interaction.action_time %></td>
+        <td><%= interaction.uiid %></td>
+        <td><%= interaction.browser_family %></td>
+        <td><%= interaction.browser_version %></td>
+        <td><%= interaction.os_family %></td>
+        <td><%= interaction.os_version %></td>
+        <td><%= interaction.device %></td>
+        <td><%= interaction.created_at %></td>
+        <td><%= interaction.updated_at %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<br/>
+<h2>Table Download</h2>
+<div>
+  <%= form_tag book_data_downloads_path(), :method => 'get' do %>
+    <h4>Formats: </h4>
+    <%= radio_button_tag 'format', 'csv'%>CSV
+    <%= radio_button_tag 'format', 'json'%>JSON
+    <br /><br />
+    <h4>Tables: </h4>
+    <%= select_tag('type', options_for_select({"Exercise Attempts" => "attempt", "Exercise Progress" => "progress", "User Interaction " => "interaction", "User" => "usr"}), :prompt=>"Select Table", :onchange => "update_form(this.value)") %>
+    <br/><br />
+    <h4>Columns: </h4>
+    <div id="attribute_list">
+    <% @attributes_list.each do |attribute| %>
+      <%= check_box("#{attribute.first.first}", 'result',{checked: true, :class => "#{attribute.first.second} hidden"}, 1, 0) %>
+        <% if attribute.first.second == "attempt" %>
+          <%= label_tag("#{attribute.first.first}", "#{attribute.first.first}", class: "#{attribute.first.second} hidden", :data => {:toggle=>"tooltip"}, 'data-original-title' => "#{@attempt_desc[attribute.first.first]}", 'data-placement' => 'right') %>
+        <% elsif attribute.first.second == "prog" %>
+          <%= label_tag("#{attribute.first.first}", "#{attribute.first.first}", class: "#{attribute.first.second} hidden", :data => {:toggle=>"tooltip"}, 'data-original-title' => "#{@progress_desc[attribute.first.first]}", 'data-placement' => 'right') %>
+        <% elsif attribute.first.second == "interaction" %>
+          <%= label_tag("#{attribute.first.first}", "#{attribute.first.first}", class: "#{attribute.first.second} hidden", :data => {:toggle=>"tooltip"}, 'data-original-title' => "#{@interaction_desc[attribute.first.first]}", 'data-placement' => 'right') %>
+        <% else %>
+          <%= label_tag("#{attribute.first.first}", "#{attribute.first.first}", class: "#{attribute.first.second} hidden", :data => {:toggle=>"tooltip"}, 'data-original-title' => "placeholder description", 'data-placement' => 'right') %>
+        <% end %>
+      <br class="<%= attribute.first.second %> hidden"/>
+    <% end%>
+    </div>
+    <%= submit_tag "Download", :onclick => "return validate_form();", :data => { disable_with: false } %>
+  <% end %>
+</div>
+<br />
+<h2>Download Data by Students</h2>
+<%= link_to '<button type="button">Students of Course</button>'.html_safe, book_users_list_path(@book.id) %>

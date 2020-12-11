@@ -1,0 +1,21 @@
+# Logfile created on 2020-10-29 23:35:23 -0400 by logger.rb/v1.4.2
+I, [2020-10-29T23:35:31.781285 #688]  INFO -- : 2020-10-29T23:35:31-0400: [Worker(host:a8cd89835cb3 pid:688)] Starting job worker
+I, [2020-10-29T23:35:31.856141 #688]  INFO -- : 2020-10-29T23:35:31-0400: [Worker(host:a8cd89835cb3 pid:688)] Error while reserving job: Mysql2::Error: Table 'opendsa.delayed_jobs' doesn't exist
+I, [2020-10-29T23:54:59.497366 #687]  INFO -- : 2020-10-29T23:54:59-0400: [Worker(host:508cbe91113b pid:687)] Starting job worker
+I, [2020-10-30T12:47:06.612642 #688]  INFO -- : 2020-10-30T12:47:06-0400: [Worker(host:67001f293681 pid:688)] Starting job worker
+I, [2020-10-30T13:01:59.011998 #688]  INFO -- : 2020-10-30T13:01:59-0400: [Worker(host:68a6e37074c5 pid:688)] Starting job worker
+I, [2020-10-30T14:04:43.809610 #688]  INFO -- : 2020-10-30T14:04:43-0400: [Worker(host:be262ecd46dd pid:688)] Starting job worker
+I, [2020-11-04T16:26:53.614475 #459]  INFO -- : 2020-11-04T16:26:53-0500: [Worker(host:be262ecd46dd pid:459)] Starting job worker
+I, [2020-11-04T16:54:45.867378 #433]  INFO -- : 2020-11-04T16:54:45-0500: [Worker(host:be262ecd46dd pid:433)] Starting job worker
+I, [2020-11-04T17:56:48.254083 #686]  INFO -- : 2020-11-04T17:56:48-0500: [Worker(host:85429816b3a8 pid:686)] Starting job worker
+I, [2020-11-04T18:11:12.887822 #687]  INFO -- : 2020-11-04T18:11:12-0500: [Worker(host:df76dea24f36 pid:687)] Starting job worker
+I, [2020-11-04T18:25:40.199028 #433]  INFO -- : 2020-11-04T18:25:40-0500: [Worker(host:df76dea24f36 pid:433)] Starting job worker
+I, [2020-11-05T16:19:50.612109 #455]  INFO -- : 2020-11-05T16:19:50-0500: [Worker(host:df76dea24f36 pid:455)] Starting job worker
+I, [2020-11-05T16:24:36.775770 #434]  INFO -- : 2020-11-05T16:24:36-0500: [Worker(host:df76dea24f36 pid:434)] Starting job worker
+I, [2020-11-06T11:58:10.157665 #686]  INFO -- : 2020-11-06T11:58:10-0500: [Worker(host:64c2e21b3fe3 pid:686)] Starting job worker
+I, [2020-11-11T15:33:54.171293 #458]  INFO -- : 2020-11-11T15:33:54-0500: [Worker(host:64c2e21b3fe3 pid:458)] Starting job worker
+I, [2020-11-12T20:12:33.687163 #451]  INFO -- : 2020-11-12T20:12:33-0500: [Worker(host:64c2e21b3fe3 pid:451)] Starting job worker
+I, [2020-11-17T15:53:35.870412 #448]  INFO -- : 2020-11-17T15:53:35-0500: [Worker(host:64c2e21b3fe3 pid:448)] Starting job worker
+I, [2020-11-24T13:48:38.866180 #448]  INFO -- : 2020-11-24T13:48:38-0500: [Worker(host:64c2e21b3fe3 pid:448)] Starting job worker
+I, [2020-12-07T15:51:18.329823 #454]  INFO -- : 2020-12-07T15:51:18-0500: [Worker(host:64c2e21b3fe3 pid:454)] Starting job worker
+I, [2020-12-10T19:33:27.759250 #452]  INFO -- : 2020-12-10T19:33:27-0500: [Worker(host:64c2e21b3fe3 pid:452)] Starting job worker

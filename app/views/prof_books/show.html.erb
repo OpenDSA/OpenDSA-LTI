@@ -1,0 +1,24 @@
+<% if @usr.respond_to?('each')%>
+  <% @usr.each do |user| %>
+
+    <p><%= user.first_name %>
+      <%= user.last_name %></p>
+  <% end %>
+
+<% else %>
+  <% if @usr.nil? %>
+    <h1>User Does Not Exist</h1>
+  <% else %>
+    <h1><%= @usr.first_name %> <%= @usr.last_name %></h1>
+    <p>Last logged in: <%= @usr.last_sign_in_at %></p>
+
+    <%unless @books.nil?%>
+      <h3>Courses</h3>
+      <% @books.each do |book| %>
+        <p><%= link_to book.title, "/book_data_downloads/#{book.id}" %></p>
+      <% end %>
+    <%end%>
+
+  <%end%>
+
+<% end %>

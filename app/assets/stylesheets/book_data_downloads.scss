@@ -1,0 +1,38 @@
+// Place all the styles related to the book_data_downloads controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: https://sass-lang.com/
+.content-table {
+  overflow-x: scroll;
+  margin: 25px 0;
+  font-size: .9em;
+  white-space: nowrap;
+  border-radius: 5px 5px 0 0;
+}
+
+.content-table thead tr{
+  background-color: #3da2b4;
+  text-align: left;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.content-table th,
+.content-table td {
+  padding: 5px 12px;
+}
+
+.content-table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.content-table tbody tr:nth-of-type(even) {
+  background-color: #ffebcc;
+}
+
+.content-table tbody tr:last-of-type {
+  border-bottom: 2px solid #3da2b4;
+}
+
+.hidden {
+  display: none;
+}

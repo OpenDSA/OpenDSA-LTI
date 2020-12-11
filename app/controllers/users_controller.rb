@@ -40,6 +40,12 @@ class UsersController < InheritedResources::Base
     end
   end
 
+  def show_books
+    @usr = User.find_by_id(@user.id)
+    unless @usr.nil?
+      @books = InstBook.where(user_id: @usr.id)
+    end
+  end
 
   #~ Private instance methods .................................................
   private
@@ -56,5 +62,6 @@ class UsersController < InheritedResources::Base
     def interpolation_options
       { resource_name: @user.display_name }
     end
+
 
 end
