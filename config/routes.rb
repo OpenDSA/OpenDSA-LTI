@@ -1,6 +1,19 @@
 OpenDSA::Application.routes.draw do
   root 'home#index'
 
+  # attempts 
+  get '/attempts/exercise', to: 'attempts#exercise', as: 'exercise'
+  get '/users', to: 'users#index'
+  get "/users/:id", to: "users#show"
+  get "/users/calc/:id", to: "users#calc"
+  get "/attempt/:id", to: "attempts#index"
+  get "/attempt/book/:inst_book_id/user/:user_id", to: "attempts#get_book_user_attempts_information"
+  get "/interations/book/:inst_book_id/user/:user_id", to: "attempts#get_book_user_interation_exercise_total_time"
+  get "/student_attempt/:question_name", to: "attempts#get_exercise_student_attempt"
+  get "/student_attempt/question/:question_name", to: "attempts#get_question_incorrect", as: 'get_question_incorrect'
+  get "/student_attempt/hint/:question_name", to: "attempts#get_question_hint", as: 'get_question_hint'
+
+
   post 'lti/launch'
   post 'lti/assessment'
   get 'lti/xml_config', to: 'lti#xml_config', as: :xml_config
