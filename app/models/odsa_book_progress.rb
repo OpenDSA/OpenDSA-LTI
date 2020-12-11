@@ -52,7 +52,7 @@ class OdsaBookProgress < ApplicationRecord
 
   # Return array of exercises names
   def get_proficient_exercises
-    return self.proficient_exercises.split(',')
+    return self.proficient_exercises.nil? ? [] : self.proficient_exercises.to_s.split(',')
   end
 
   def self.get_progress(user_id, inst_book_id)
