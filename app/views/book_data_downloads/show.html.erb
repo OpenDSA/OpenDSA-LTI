@@ -160,7 +160,6 @@
     </div>
     <%= submit_tag "Download", :onclick => "return validate_form();", :data => { disable_with: false } %>
   <% end %>
+  <br />
+  <br />
 </div>
-<br />
-<h2>Download Data by Students</h2>
-<%= link_to '<button type="button">Students of Course</button>'.html_safe, book_users_list_path(@book.id) %>

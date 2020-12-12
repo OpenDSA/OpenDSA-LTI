@@ -197,11 +197,20 @@ OpenDSA::Application.routes.draw do
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session
   end
 
+  get 'attempts/index', to:'attempts#index', as: "index"
+  get '/attempts/show', to: 'attempts#show', as:'attempts_show'
+  get '/attempts/student_exercise_attempt', to: 'attempts#student_exercise_attempt', as: 'student_exercise_attempt'
+  get '/attempts/exercise', to: 'attempts#exercise', as: 'attempts_exercise'
+  get "/attempt/:id", to: "attempts#index"
+  get "/attempt/book/:inst_book_id/user/:user_id", to: "attempts#get_book_user_attempts_information"
+  get "/interations/book/:inst_book_id/user/:user_id", to: "attempts#get_book_user_interation_exercise_total_time"
+  get "/student_attempt/:question_name", to: "attempts#get_exercise_student_attempt"
+  get "/student_attempt/question/:question_name", to: "attempts#get_question_incorrect", as: 'get_question_incorrect'
+  get "/student_attempt/hint/:question_name", to: "attempts#get_question_hint", as: 'get_question_hint'
+
   get "user/:user_id/books" => "users#show_books", as: :user_show_book
-  resources :prof_books
-  resources :book_data_downloads, path: '/bdd', param: :book_id do
-    resources :book_users
-  end
+
+  resources :book_data_downloads, path: '/bdd', param: :book_id
   #get 'book_users/index'
   #get 'book_data_downloads/index'
   get "bdd/:id/users" => "book_data_downloads#list_users", as: :book_users_list
