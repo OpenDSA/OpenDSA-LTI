@@ -1,0 +1,11 @@
+#main a {
+    color: #007182 !important
+}
+
+#main li.active {
+    color: #676767 !important
+}
+
+.progress-status {
+    color: #007182 !important
+}
