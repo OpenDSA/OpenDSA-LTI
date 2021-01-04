@@ -13,6 +13,16 @@ development:
    port: 3306
    encoding: utf8
 
+production:
+  adapter: mysql2
+  database: opendsa
+  username: opendsa
+  password: <%= ENV['DB_PASSWORD'] %>
+  host: db
+  strict: false
+  port: 3306
+  encoding: utf8
+
 # development:
 #   adapter: sqlite3
 #   database: db/development.sqlite3
