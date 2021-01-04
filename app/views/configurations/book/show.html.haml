@@ -127,19 +127,19 @@
       %label.control-label{for: "#book-title"}
         Title
       .col-xs-6
-        %input.form-control#book-title{type: "text", required: true}
+        %input.form-control#book-title{type: "text", required: true, 'aria-label': 'book title'}
 
     .form-group.border
       %label.control-label{for: "#book-desc"}
         Description
       .col-xs-6
-        %textarea.form-control#book-desc{required: true}
+        %textarea.form-control#book-desc{required: true, 'aria-label': 'description'}
 
     .form-group.border
       %label.control-label{for: "#book-lang"}
         Language
       .col-xs-6
-        %select.form-control#book-lang{required: true}
+        %select.form-control#book-lang{required: true, 'aria-label': 'language'}
           %option{:value => -1, disabled: true, selected: true}
           - OpenDSA::BOOK_LANGUAGES.each do |lang_code, lang_name|
             %option{:value => lang_code}
