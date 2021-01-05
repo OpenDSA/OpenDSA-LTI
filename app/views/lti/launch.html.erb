@@ -19,6 +19,8 @@
     <% if params.key?(:custom_inst_chapter_module_id) %>
       TP.moduleTitle = "<%= params[:custom_module_title] %>";
       TP.instChapterModuleId = "<%= params[:custom_inst_chapter_module_id] %>";
+      TP.instModuleId = "<%= params[:custom_inst_module_id] %>";
+      TP.instChapterId = "<%= params[:custom_inst_chapter_id] %>";
     <% elsif params.key?(:custom_inst_module_id) %>
       TP.moduleTitle = "<%= @mod_version.name %>";
       TP.instModuleVersionId = "<%= @mod_version.id %>";
@@ -37,4 +39,3 @@
 </script>
 
 <%= @section_html.html_safe %>
-

@@ -1,34 +1,33 @@
-(function() {
+(function () {
     var check_completeness, form_alert, handle_submit, init, reset_alert_area, valid_token;
 
-    $(document).ready(function() {
+    $(document).ready(function () {
 
-        $('#organization-select').change(function() {
+        $('#organization-select').change(function () {
             return load_courses();
         });
 
-        $('#lms-instance-select').change(function() {
+        $('#lms-instance-select').change(function () {
             return handle_lms_access();
         });
 
-        $('#lms-access-token').change(function() {
+        $('#lms-access-token').change(function () {
             $("#lms-access-token-check").hide("slow");
             // return handle_access_token();
 
         });
 
-        $('#btn-submit-co').click(function() {
+        $('#btn-submit-co').click(function () {
             $(this).prop('disabled', true);
             return handle_submit();
         });
 
-        $('#display').click(function() {
-            console.log("clicked registered");
+        $('#display').click(function () {
             return handle_select_student();
             //return handle_display();
         });
 
-        $('#inst-book-select').on('change', function() {
+        $('#inst-book-select').on('change', function () {
             var bookId = this[this.selectedIndex].value;
             if (!bookId) return;
             validate_book_config(bookId);
@@ -37,16 +36,16 @@
         init();
     });
 
-    load_courses = function() {
+    load_courses = function () {
         var request = "/courses/" + $('#organization-select').val() + "/search";
 
         var aj = $.ajax({
             url: request,
             type: 'get',
             data: $(this).serialize()
-        }).done(function(data) {
+        }).done(function (data) {
             change_courses(data);
-        }).fail(function(data) {
+        }).fail(function (data) {
             console.log('AJAX request has FAILED');
         });
     };
@@ -75,7 +74,7 @@
     //     }
     // };
 
-    handle_lms_access = function() {
+    handle_lms_access = function () {
         if ($('#lms-instance-select').val()) {
             var request = "/lms_accesses/" + $('#lms-instance-select').val() + "/search";
 
@@ -83,7 +82,7 @@
                 url: request,
                 type: 'get',
                 data: $(this).serialize()
-            }).done(function(data) {
+            }).done(function (data) {
                 if (data) {
                     if (data['access_token'] != null) {
                         $('#lms-access-token').val(data['access_token']);
@@ -104,14 +103,14 @@
                     }
                     $("#lms-access-token-check").show("slow");
                 }
-            }).fail(function(data) {
+            }).fail(function (data) {
                 console.log('AJAX request has FAILED');
             });
         }
     };
 
     //modify the course dropdown
-    change_courses = function(data) {
+    change_courses = function (data) {
         $("#course-select").empty();
         for (i = 0; i < data.length; i++) {
             $("#course-select").append(
@@ -120,18 +119,18 @@
         }
     };
 
-    init = function() {
+    init = function () {
         // $("#lms-access-update-btn").hide();
         $("#lms-access-token-check").hide();
         $("#lms-access-token-desc").hide();
         // $("#lms-access-token-group").hide();
     };
 
-    form_alert = function(messages) {
+    form_alert = function (messages) {
         var alert_list, message, _fn, _i, _len;
         reset_alert_area();
         alert_list = $('#alerts').find('.alert ul');
-        _fn = function(message) {
+        _fn = function (message) {
             return alert_list.append('<li>' + message + '</li>');
         };
         for (_i = 0, _len = messages.length; _i < _len; _i++) {
@@ -141,14 +140,14 @@
         return $('#alerts').css('display', 'block');
     };
 
-    reset_alert_area = function() {
+    reset_alert_area = function () {
         var alert_box;
         $('#alerts').find('.alert').alert('close');
         alert_box = "<div class='alert alert-danger alert-dismissable' role='alert'>" + "<button class='close' data-dismiss='alert' aria-label='Close'><i class='fa fa-times'></i></button>" + "<ul></ul>" + "</div>";
         return $('#alerts').append(alert_box);
     };
 
-    check_completeness = function() {
+    check_completeness = function () {
         var messages;
         messages = [];
         if ($('#lms-instance-select').val() === '') {
@@ -182,11 +181,11 @@
         return messages;
     };
 
-    validate_book_config = function(bookId) {
+    validate_book_config = function (bookId) {
         $.ajax({
             url: '/inst_books/' + bookId + '/validate',
             type: 'get'
-        }).done(function(data) {
+        }).done(function (data) {
             if (data.res.length > 0) {
                 var msg = 'WARNING - the following modules are listed in the selected book configuration but no longer exist on the OpenDSA server:\n';
                 for (var i = 0; i < data.res.length; i++) {
@@ -195,13 +194,13 @@
                 msg += '\n\nIf you create a course using this book configuration, THESE MODULES WILL NOT BE ACCESSIBLE. It is highly recommended that you create/use an updated book configuration.';
                 alert(msg);
             }
-        }).fail(function(error) {
+        }).fail(function (error) {
             console.error('AJAX request has FAILED');
             console.error(error);
         });
     };
 
-    handle_submit = function() {
+    handle_submit = function () {
         var lms_instance_id, lms_course_num, lms_course_code, organization_id, course_id, term_id, label, late_policy_id, inst_book_id, fd, messages, url;
         messages = check_completeness();
         if (messages.length !== 0) {
@@ -237,13 +236,13 @@
             data: fd,
             processData: false,
             contentType: false,
-            success: function(data) {
+            success: function (data) {
                 return window.location.href = data['url'];
             }
         });
     };
-    
-    handle_select_student = function(){
+
+    handle_select_student = function () {
         var messages = check_dis_completeness();
         if (messages.length !== 0) {
             alert(messages);
@@ -255,22 +254,22 @@
             url: request,
             type: 'get',
             data: $(this).serialize()
-        }).done(function(data) {
+        }).done(function (data) {
             if (data.odsa_exercise_progress.length === 0) {
                 var p = '<p style="font-size:24px; align=center;"> Select a student name <p>';
                 $('#log').html(p);
             } else {
                 //$('#log').html(p);
-                $('#log').append("<%= j render(:partial => 'views/lti/show_individual_exercise') %>"); 
-        }
-        change_courses(data);
-        }).fail(function(data) {
+                $('#log').append("<%= j render(:partial => 'views/lti/show_individual_exercise') %>");
+            }
+            change_courses(data);
+        }).fail(function (data) {
             alert("failure")
             console.log('AJAX request has FAILED');
         });
     }
 
-    handle_display = function() {
+    handle_display = function () {
         var messages = check_dis_completeness();
         if (messages.length !== 0) {
             alert(messages);
@@ -283,7 +282,7 @@
             url: request,
             type: 'get',
             data: $(this).serialize()
-        }).done(function(data) {
+        }).done(function (data) {
             if (data.odsa_exercise_progress.length === 0) {
                 var p = '<p style="font-size:24px; align=center;"> You have not Attempted this exercise <p>';
                 $('#log').html(p);
@@ -317,12 +316,12 @@
                 $('#log').html(header);
             }
             change_courses(data);
-        }).fail(function(data) {
+        }).fail(function (data) {
             alert("failure")
             console.log('AJAX request has FAILED');
         });
     };
-    getFieldMember = function(pData, attempts) {
+    getFieldMember = function (pData, attempts) {
         console.dir(pData)
         var member = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.current_score + '</th>';
         member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.highest_score + '</th>';
@@ -334,7 +333,7 @@
         return member;
     }
 
-    buildProgressHeader = function() {
+    buildProgressHeader = function () {
         var elem = '<tr> <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Current Score </th>';
         elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Highest Score </th>';
         elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Tottal Correct </th>';
@@ -344,7 +343,7 @@
         elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th> </tr>';
         return elem
     }
-    getAttemptHeader = function() {
+    getAttemptHeader = function () {
         var head = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Question name </th>';
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Request Type </th>';
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Correct </th>';
@@ -353,7 +352,7 @@
         head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Taken (s)</th>';
         return head;
     }
-    getAttemptMemeber = function(aData, j) {
+    getAttemptMemeber = function (aData, j) {
         var memb = "";
         console.dir(aData.earned_proficiency + " and j = " + j)
         if (aData.earned_proficiency != null && j == 1) {
@@ -371,7 +370,7 @@
 
 
     }
-    check_dis_completeness = function() {
+    check_dis_completeness = function () {
         var messages;
         messages = [];
         var selectbar1 = $('#combobox').find('option:selected').text();

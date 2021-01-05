@@ -38,7 +38,7 @@ class GenerateCourseJob < ProgressJob::Base
     Rails.logger.info('build_path')
     Rails.logger.info(build_path)
     require 'open3'
-    command = ". #{ENV['python_venv_path']} && python3 #{script_path} #{config_file_path} -b #{build_path}"
+    command = ". /home/deploy/OpenDSA/.pyVenv/bin/activate && python3 #{script_path} #{config_file_path} -b #{build_path}"
     stdout, stderr, status = Open3.capture3(command)
     unless status.success?
       Rails.logger.info(stderr)
@@ -202,6 +202,8 @@ class GenerateCourseJob < ProgressJob::Base
     odsa_url_opts = {
       :custom_inst_book_id => @inst_book.id,
       :custom_inst_chapter_module_id => (inst_ch_module.id),
+      :custom_inst_module_id => (inst_ch_module.inst_module_id),
+      :custom_inst_chapter_id => (chapter.id),
       :custom_book_path => book_path(@inst_book),
       :custom_module_file_name => module_file_name,
       :custom_module_title => title,

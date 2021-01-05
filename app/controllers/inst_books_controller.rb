@@ -49,7 +49,7 @@ class InstBooksController < ApplicationController
     output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
     output_file_path = "public/OpenDSA/config/temp/#{output_file}"
     require 'open3'
-    command = ". #{ENV['python_venv_path']} && python3 #{script_path} #{input_file_path} #{output_file_path}"
+    command = ". $(echo $python_venv_path) && python3 #{script_path} #{input_file_path} #{output_file_path}"
     stdout, stderr, status = Open3.capture3(command)
 
     unless status.success?

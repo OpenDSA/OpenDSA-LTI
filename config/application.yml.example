@@ -5,7 +5,8 @@ development:
   email_user_name: 'username@gmail.com'
   email_password: 'email_password'
   host_url: 'https://192.168.33.10:9292'
-  python_venv_path: 'python3.8_venv_path'
+  python_venv_path: '/home/deploy/OpenDSA/.pyVenv/bin/activate'
+  opendsa_branch: 'master'
 
 staging:
   email_address: 'smtp.gmail.com'
@@ -14,7 +15,8 @@ staging:
   email_user_name: 'username@gmail.com'
   email_password: 'email_password'
   host_url: 'host_url'
-  python_venv_path: 'python3.8_venv_path'
+  python_venv_path: '/home/deploy/OpenDSA/.pyVenv/bin/activate'
+  opendsa_branch: 'staging'
 
 production:
   email_address: 'smtp.gmail.com'
@@ -23,4 +25,5 @@ production:
   email_user_name: 'username@gmail.com'
   email_password: 'email_password'
   host_url: 'host_url'
-  python_venv_path: 'python3.8_venv_path'
+  python_venv_path: '/home/deploy/OpenDSA/.pyVenv/bin/activate'
+  opendsa_branch: 'master'

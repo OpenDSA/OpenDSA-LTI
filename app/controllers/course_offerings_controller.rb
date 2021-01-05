@@ -106,7 +106,7 @@ class CourseOfferingsController < ApplicationController
                     @exercise_list[@inst_section_id].push(title)
                   else
                     @exercise_list[@inst_section_id].push(title)
-                    @exercise_list[@inst_section_id].push('attemp_flag')
+                    @exercise_list[@inst_section_id].push('attempt_flag')
                   end
                 end
               end
@@ -144,6 +144,7 @@ class CourseOfferingsController < ApplicationController
     )
   end
 
+  # GET /course_offerings/:id/modules/:inst_chapter_module_id/progresses
   def find_module_progresses
     if current_user.blank?
       render :json => {
@@ -165,7 +166,7 @@ class CourseOfferingsController < ApplicationController
 
     ex_ids = exercises.collect { |ex| ex.id }
 
-    users = CourseEnrollment.where(course_offering_id: course_offering.id, course_role_id: CourseRole::STUDENT_ID).where('users.email != ?', OpenDSA::STUDENT_VIEW_EMAIL).joins(:user).includes(:user).order('users.last_name ASC, users.first_name ASC, users.email ASC').collect { |e| e.user }
+    users = CourseEnrollment.where(course_offering_id: course_offering.id).where('users.email != ?', OpenDSA::STUDENT_VIEW_EMAIL).joins(:user).includes(:user).order('users.id ASC').collect { |e| e.user }
 
     # only includes students who have attempted at least one exercise in the module
     # but also includes exercise attempt and progress data
@@ -176,6 +177,65 @@ class CourseOfferingsController < ApplicationController
       enrollments: enrollments.as_json(include: {user: {include: {odsa_module_progresses: {only: [:current_score, :first_done, :last_done, :highest_score, :id, :proficient_date, :created_at]}, odsa_exercise_progresses: {only: [:id, :inst_book_section_exercise_id, :current_score, :highest_score, :proficient_date]}}, only: [:id, :first_name, :last_name, :email, :odsa_module_progresses]}}),
       students: users.as_json(only: [:id, :first_name, :last_name, :email]),
     }
+  end
+
+  # GET /course_offerings/time_tracking_lookup/:id
+  def get_time_tracking_lookup
+    if current_user.blank?
+      render :json => {
+        message: 'You are not logged in. Please make sure your browser is set to allow third-party cookies',
+      }, :status => :forbidden
+      return
+    end
+
+    course_offering = CourseOffering.find(params[:id])
+    unless course_offering.is_instructor?(current_user) || current_user.global_role.is_admin?
+      render :json => {
+        message: 'You are not an instructor for this course offering. Your user id: ' + current_user.id.to_s,
+      }, :status => :forbidden
+      return
+    end
+
+    users = CourseEnrollment.where(course_offering_id: course_offering.id).joins(:user).includes(:user).order('users.id ASC').collect { |e| e.user }
+
+    instBook = course_offering.odsa_books.first
+    chapters = InstChapterModule.joins("INNER JOIN inst_chapters ON inst_chapters.id = inst_chapter_modules.inst_chapter_id
+                                        INNER JOIN inst_modules ON inst_modules.id = inst_chapter_modules.inst_module_id")
+                                        .where("inst_chapters.inst_book_id=?", instBook.id)
+                                        .select('inst_chapters.id as ch_id,inst_chapters.name as ch_name,inst_chapter_modules.inst_module_id as mod_id, inst_modules.name as mod_name, inst_chapter_modules.lms_assignment_id as assign_id, inst_chapter_modules.id as ch_mod_id')
+                                        .order('inst_chapters.position')
+
+    term = Term.where(id: course_offering.term_id)
+
+    render :json => {
+      users: users.as_json(only: [:id, :first_name, :last_name, :email]),
+      chapters: chapters.as_json(),
+      term: term.as_json(only: [:starts_on, :ends_on, :year, :slug])
+    }
+  end
+
+  # GET /course_offerings/time_tracking_data/:id
+  def get_time_tracking_data
+    if current_user.blank?
+      render :json => {
+        message: 'You are not logged in. Please make sure your browser is set to allow third-party cookies',
+      }, :status => :forbidden
+      return
+    end
+
+    course_offering = CourseOffering.find(params[:id])
+    unless course_offering.is_instructor?(current_user) || current_user.global_role.is_admin?
+      render :json => {
+        message: 'You are not an instructor for this course offering. Your user id: ' + current_user.id.to_s,
+      }, :status => :forbidden
+      return
+    end
+
+    instBook = course_offering.odsa_books.first
+
+    userTimeTrackings = OdsaUserTimeTracking.where(inst_book_id: instBook.id, session_date: params[:date]).select('user_id as usr_id,inst_module_id as mod_id, inst_chapter_id as ch_id, total_time as tt, session_date as dt, sections_time as st')
+
+    render :json => userTimeTrackings.as_json()
   end
 
   # -------------------------------------------------------------
@@ -449,5 +509,5 @@ class CourseOfferingsController < ApplicationController
     params.require(:course_offering).permit(:course_id, :term_id,
                                             :label, :url, :self_enrollment_allowed)
   end
-  
+
 end

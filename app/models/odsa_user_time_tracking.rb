@@ -4,7 +4,8 @@ class OdsaUserTimeTracking < ApplicationRecord
   belongs_to :inst_book
   belongs_to :inst_book_section_exercise
   belongs_to :inst_course_offering_exercise
-  belongs_to :inst_chapter_module
+  belongs_to :inst_module
+  belongs_to :inst_chapter
   belongs_to :inst_module_version
   belongs_to :inst_module_section_exercise
 
