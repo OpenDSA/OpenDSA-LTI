@@ -682,8 +682,9 @@ class LtiController < ApplicationController
     @instBook = @course_offering.odsa_books.first
 
     @chapter_list = InstChapter.includes(inst_chapter_modules: [:inst_module]).where("inst_book_id = ? AND inst_chapter_modules.lms_assignment_id IS NOT NULL", @instBook.id).references(:inst_chapter_modules)
+    @is_admin = current_user.global_role.is_admin?
 
-    render 'show_table.html.haml' and return
+    render 'odsa_tools.html.haml' and return
   end
 
   def ensure_lms_type(type_name)
@@ -794,7 +795,7 @@ class LtiController < ApplicationController
 
         if lms_type_name.downcase == 'canvas'
           require 'lti/message_authenticator'
-          
+
           launch_path = request.url.split("?")[0]
           authenticator = IMS::LTI::MessageAuthenticator.new(launch_path, request.request_parameters, secret)
 
@@ -819,7 +820,7 @@ class LtiController < ApplicationController
         # Need to be implemented
 
         #check if the message is too old
-        if DateTime.strptime(request.request_parameters['oauth_timestamp'],'%s') < 60.minutes.ago
+        if DateTime.strptime(request.request_parameters['oauth_timestamp'],'%s') < 1440.minutes.ago
           @message = "OpenDSA: Your request is too old."
           return false
         end

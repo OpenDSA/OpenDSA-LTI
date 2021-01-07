@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_10_021943) do
+ActiveRecord::Schema.define(version: 2020_10_23_231228) do
 
-  create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
     t.string "resource_id", null: false
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
   end
 
-  create_table "course_enrollments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "course_enrollments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "course_offering_id", null: false
     t.bigint "course_role_id", null: false
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id"], name: "index_course_enrollments_on_user_id"
   end
 
-  create_table "course_offerings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "course_offerings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "course_id", null: false
     t.bigint "term_id", null: false
     t.string "label", null: false
@@ -56,7 +56,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["term_id"], name: "index_course_offerings_on_term_id"
   end
 
-  create_table "course_roles", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "course_roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "can_manage_course", default: false, null: false
     t.boolean "can_manage_assignments", default: false, null: false
@@ -65,7 +65,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.boolean "builtin", default: false, null: false
   end
 
-  create_table "courses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "courses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.string "number", null: false
     t.bigint "organization_id", null: false
@@ -78,7 +78,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id"], name: "index_courses_on_user_id"
   end
 
-  create_table "delayed_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "delayed_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "priority", default: 0, null: false
     t.bigint "attempts", default: 0, null: false
     t.text "handler", null: false
@@ -96,7 +96,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "errors", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "errors", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "usable_type"
     t.bigint "usable_id"
     t.string "class_name"
@@ -112,7 +112,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["created_at"], name: "index_errors_on_created_at"
   end
 
-  create_table "friendly_id_slugs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "friendly_id_slugs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "slug", null: false
     t.bigint "sluggable_id", null: false
     t.string "sluggable_type", limit: 50
@@ -124,14 +124,14 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
   end
 
-  create_table "global_roles", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "global_roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "can_manage_all_courses", default: false, null: false
     t.boolean "can_edit_system_configuration", default: false, null: false
     t.boolean "builtin", default: false, null: false
   end
 
-  create_table "identities", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "identities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "provider", null: false
     t.string "uid", null: false
@@ -141,7 +141,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
-  create_table "inst_book_section_exercises", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_book_section_exercises", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "inst_book_id", null: false
     t.bigint "inst_section_id", null: false
     t.bigint "inst_exercise_id"
@@ -157,7 +157,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["inst_section_id"], name: "inst_book_section_exercises_inst_section_id_fk"
   end
 
-  create_table "inst_books", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_books", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "course_offering_id"
     t.bigint "user_id", null: false
     t.string "title", limit: 50, null: false
@@ -172,7 +172,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id"], name: "inst_books_user_id_fk"
   end
 
-  create_table "inst_chapter_modules", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_chapter_modules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "inst_chapter_id", null: false
     t.bigint "inst_module_id", null: false
     t.bigint "module_position"
@@ -185,7 +185,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["inst_module_id"], name: "inst_chapter_modules_inst_module_id_fk"
   end
 
-  create_table "inst_chapters", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_chapters", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "inst_book_id", null: false
     t.string "name", limit: 100, null: false
     t.string "short_display_name", limit: 45
@@ -197,7 +197,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["inst_book_id"], name: "inst_chapters_inst_book_id_fk"
   end
 
-  create_table "inst_course_offering_exercises", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_course_offering_exercises", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "course_offering_id", null: false
     t.bigint "inst_exercise_id", null: false
     t.string "resource_link_id"
@@ -211,7 +211,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["inst_exercise_id"], name: "inst_course_offering_exercises_inst_exercise_id_fk"
   end
 
-  create_table "inst_exercises", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_exercises", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "short_name", null: false
     t.string "ex_type", limit: 50
@@ -227,7 +227,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["short_name"], name: "index_inst_exercises_on_short_name", unique: true
   end
 
-  create_table "inst_module_section_exercises", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_module_section_exercises", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "inst_module_version_id", null: false
     t.bigint "inst_module_section_id", null: false
     t.bigint "inst_exercise_id", null: false
@@ -242,7 +242,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["inst_module_version_id"], name: "fk_rails_5c4fc2ff52"
   end
 
-  create_table "inst_module_sections", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_module_sections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "inst_module_version_id", null: false
     t.string "name", null: false
     t.boolean "show", default: true
@@ -254,7 +254,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["inst_module_version_id"], name: "fk_rails_ff11275e48"
   end
 
-  create_table "inst_module_versions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_module_versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "inst_module_id", null: false
     t.string "name", null: false
     t.string "git_hash", null: false
@@ -269,7 +269,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["inst_module_id"], name: "fk_rails_7e343b3134"
   end
 
-  create_table "inst_modules", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_modules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "path", null: false
     t.string "name", null: false
     t.datetime "created_at"
@@ -279,7 +279,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["path"], name: "index_inst_modules_on_path", unique: true
   end
 
-  create_table "inst_sections", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "inst_sections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "inst_module_id", null: false
     t.bigint "inst_chapter_module_id", null: false
     t.string "short_display_name", limit: 50
@@ -303,13 +303,13 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["inst_module_id"], name: "inst_sections_inst_module_id_fk"
   end
 
-  create_table "languages", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "languages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "late_policies", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "late_policies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.bigint "late_days", null: false
     t.bigint "late_percent", null: false
@@ -318,7 +318,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["name"], name: "index_late_policies_on_name", unique: true
   end
 
-  create_table "learning_tools", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "learning_tools", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.string "key", null: false
     t.string "secret", null: false
@@ -328,7 +328,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["name"], name: "index_learning_tools_on_name", unique: true
   end
 
-  create_table "lms_accesses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "lms_accesses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "access_token"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -340,7 +340,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id"], name: "lms_accesses_user_id_fk"
   end
 
-  create_table "lms_instances", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "lms_instances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "url", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -353,14 +353,14 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["url"], name: "index_lms_instances_on_url", unique: true
   end
 
-  create_table "lms_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "lms_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["name"], name: "index_lms_types_on_name", unique: true
   end
 
-  create_table "odsa_book_progresses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "odsa_book_progresses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "inst_book_id", null: false
     t.text "started_exercises", size: :long, null: false
@@ -371,7 +371,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id", "inst_book_id"], name: "index_odsa_book_progresses_on_user_id_and_inst_book_id", unique: true
   end
 
-  create_table "odsa_bugs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "odsa_bugs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "os_family", limit: 50, null: false
     t.string "browser_family", limit: 20, null: false
@@ -382,7 +382,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.datetime "updated_at"
   end
 
-  create_table "odsa_exercise_attempts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "odsa_exercise_attempts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "inst_book_id"
     t.bigint "inst_section_id"
@@ -414,7 +414,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id"], name: "odsa_exercise_attempts_user_id_fk"
   end
 
-  create_table "odsa_exercise_progresses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "odsa_exercise_progresses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "inst_book_section_exercise_id"
     t.bigint "current_score", null: false
@@ -443,7 +443,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id", "inst_module_section_exercise_id"], name: "index_odsa_ex_prog_on_user_module_sec_ex", unique: true
   end
 
-  create_table "odsa_module_progresses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "odsa_module_progresses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "inst_book_id"
     t.datetime "first_done", null: false
@@ -466,7 +466,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id", "inst_module_version_id"], name: "index_odsa_mod_prog_on_user_mod_version", unique: true
   end
 
-  create_table "odsa_student_extensions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "odsa_student_extensions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "inst_section_id", null: false
     t.datetime "soft_deadline"
@@ -479,7 +479,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id"], name: "odsa_student_extensions_user_id_fk"
   end
 
-  create_table "odsa_user_interactions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "odsa_user_interactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "inst_book_id"
     t.bigint "inst_section_id"
@@ -510,7 +510,34 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["user_id"], name: "odsa_user_interactions_user_id_fk"
   end
 
-  create_table "organizations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "odsa_user_time_trackings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "inst_book_id"
+    t.bigint "inst_section_id"
+    t.bigint "inst_book_section_exercise_id"
+    t.bigint "inst_course_offering_exercise_id"
+    t.bigint "inst_module_id"
+    t.bigint "inst_chapter_id"
+    t.bigint "inst_module_version_id"
+    t.bigint "inst_module_section_exercise_id"
+    t.string "uuid", limit: 50, null: false
+    t.string "session_date", limit: 50, null: false
+    t.decimal "total_time", precision: 10, scale: 2, null: false
+    t.text "sections_time", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["inst_book_id", "session_date"], name: "index_odsa_user_time_trackings_on_inst_book_id_session_date"
+    t.index ["inst_book_section_exercise_id"], name: "odsa_user_time_tracking_inst_book_section_exercise_id_fk"
+    t.index ["inst_chapter_id"], name: "odsa_user_time_tracking_inst_chapter_id_fk"
+    t.index ["inst_course_offering_exercise_id"], name: "odsa_user_time_tracking_inst_course_offering_exercise_id_fk"
+    t.index ["inst_module_id"], name: "odsa_user_time_tracking_inst_module_id_fk"
+    t.index ["inst_module_section_exercise_id"], name: "odsa_user_time_tracking_inst_module_section_exercise_id_fk"
+    t.index ["inst_module_version_id"], name: "odsa_user_time_tracking_inst_module_version_id_fk"
+    t.index ["inst_section_id"], name: "odsa_user_time_tracking_inst_section_id_fk"
+    t.index ["user_id", "uuid"], name: "index_odsa_user_time_trackings_on_user_id_uuid", unique: true
+  end
+
+  create_table "organizations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -520,7 +547,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
 
-  create_table "pi_attempts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "pi_attempts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id"
     t.string "frame_name"
     t.bigint "question"
@@ -529,16 +556,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "student_exercise_progresses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "exercise_id", null: false
-    t.text "progress"
-    t.decimal "grade", precision: 5, scale: 2, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "terms", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "terms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "season", null: false
     t.date "starts_on", null: false
     t.date "ends_on", null: false
@@ -551,7 +569,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["year", "season"], name: "index_terms_on_year_and_season"
   end
 
-  create_table "time_zones", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "time_zones", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "zone"
     t.string "display_as"
@@ -559,7 +577,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.datetime "updated_at"
   end
 
-  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -589,6 +607,9 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.index ["time_zone_id"], name: "index_users_on_time_zone_id"
   end
 
+  add_foreign_key "course_enrollments", "course_offerings", name: "course_enrollments_course_offering_id_fk", on_delete: :cascade
+  add_foreign_key "course_enrollments", "course_roles", name: "course_enrollments_course_role_id_fk"
+  add_foreign_key "course_enrollments", "users", name: "course_enrollments_user_id_fk", on_delete: :cascade
   add_foreign_key "course_offerings", "courses", name: "course_offerings_course_id_fk", on_delete: :cascade
   add_foreign_key "course_offerings", "late_policies", name: "course_offerings_late_policy_id_fk"
   add_foreign_key "course_offerings", "lms_instances", name: "course_offerings_lms_instance_id_fk"
@@ -645,6 +666,15 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
   add_foreign_key "odsa_user_interactions", "inst_module_versions"
   add_foreign_key "odsa_user_interactions", "inst_sections", name: "odsa_user_interactions_inst_section_id_fk"
   add_foreign_key "odsa_user_interactions", "users", name: "odsa_user_interactions_user_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "inst_book_section_exercises", name: "odsa_user_time_tracking_inst_book_section_exercise_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "inst_books", name: "odsa_user_time_tracking_inst_book_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "inst_chapters", name: "odsa_user_time_tracking_inst_chapter_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "inst_course_offering_exercises", name: "odsa_user_time_tracking_inst_course_offering_exercise_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "inst_module_section_exercises", name: "odsa_user_time_tracking_inst_module_section_exercise_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "inst_module_versions", name: "odsa_user_time_tracking_inst_module_version_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "inst_modules", name: "odsa_user_time_tracking_inst_module_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "inst_sections", name: "odsa_user_time_tracking_inst_section_id_fk"
+  add_foreign_key "odsa_user_time_trackings", "users", name: "odsa_user_time_tracking_user_id_fk"
   add_foreign_key "users", "global_roles", name: "users_global_role_id_fk"
   add_foreign_key "users", "time_zones", name: "users_time_zone_id_fk"
 end

@@ -38,7 +38,7 @@ class GenerateCourseJob < ProgressJob::Base
     Rails.logger.info('build_path')
     Rails.logger.info(build_path)
     require 'open3'
-    command = "python3 #{script_path} #{config_file_path} -b #{build_path}"
+    command = ". $(echo $python_venv_path) && python3 #{script_path} #{config_file_path} -b #{build_path}"
     stdout, stderr, status = Open3.capture3(command)
     unless status.success?
       Rails.logger.info(stderr)
@@ -189,7 +189,7 @@ class GenerateCourseJob < ProgressJob::Base
   # in canvas, module item that has external link will map OpenDSA non-gradable module
   def save_module_as_external_tool(client, lms_course_id, chapter, inst_ch_module,
                                    module_item_position)
-    module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path 
+    module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
     if module_name.include? '/'
       module_name = module_name.split('/')[1]  #module_name = IntroOO
     end
@@ -202,6 +202,8 @@ class GenerateCourseJob < ProgressJob::Base
     odsa_url_opts = {
       :custom_inst_book_id => @inst_book.id,
       :custom_inst_chapter_module_id => (inst_ch_module.id),
+      :custom_inst_module_id => (inst_ch_module.inst_module_id),
+      :custom_inst_chapter_id => (chapter.id),
       :custom_book_path => book_path(@inst_book),
       :custom_module_file_name => module_file_name,
       :custom_module_title => title,

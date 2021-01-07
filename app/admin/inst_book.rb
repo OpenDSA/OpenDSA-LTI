@@ -72,6 +72,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       require 'open3'
       command = "python3 #{script_path} #{input_file} #{output_file_path}"
       stdout, stderr, status = Open3.capture3(command)
+
       unless status.success?
         Rails.logger.info(stderr)
       end

@@ -10,10 +10,6 @@ ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 # Default deploy_to directory is /var/www/my_app
 set :deploy_to, '/home/deploy/OpenDSA-LTI'
 
-# https://stackoverflow.com/a/40061188
-set :opendsa_branch, ENV['opendsa_branch'] || 'master'
-set :khan_branch, ENV['khan_branch'] || 'master'
-
 # Default value for :scm is :git
 # set :scm, :git
 
@@ -135,6 +131,7 @@ set :delayed_job_workers, 2
 
 namespace :deploy do
   desc 'Restart application'
+
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
       # Your restart mechanism here, for example:
@@ -163,14 +160,14 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; git checkout #{fetch(:opendsa_branch)}; make pull;"
+      execute "cd ~/OpenDSA; git checkout $(echo $opendsa_branch); make pull;"
     end
   end
 
   # manually checkout master for khan-exercises repository
   after :finishing, 'deploy:checkout_ka' do
     on roles :all do
-      execute "cd ~/OpenDSA/khan-exercises; git checkout #{fetch(:khan_branch)}; git pull;"
+      execute "cd ~/OpenDSA/khan-exercises; git checkout $(echo $opendsa_branch); git pull;"
     end
   end
 

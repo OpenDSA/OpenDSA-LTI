@@ -21,8 +21,8 @@ require 'capistrano/bundler'
 require 'capistrano/passenger'
 require 'capistrano/rbenv'
 require 'capistrano/delayed_job'
+require 'capistrano/figaro_yml'
 require 'whenever/capistrano'
-
 require "capistrano/scm/git"
 install_plugin Capistrano::SCM::Git
 

@@ -12,6 +12,7 @@ OpenDSA::Application.routes.draw do
   post 'lti/outcomes', to: 'lti#grade_passback', as: :lti_grade_passback
 
   resources :odsa_user_interactions
+  resources :odsa_user_time_tracking
   resources :odsa_exercise_attempts
   # resources :odsa_exercise_progresses
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
@@ -29,11 +30,6 @@ OpenDSA::Application.routes.draw do
   post '/pi_attempts/get_attempts' => 'pi_attempts#get_attempts'
   post '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
   post '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
-  
-  #used to store student progress
-  #used by grading.js in the front end
-  post '/student_exercise_progress/new_progress' => 'student_exercise_progresses#create'
-  post '/student_exercise_progress/get_progress' => 'student_exercise_progresses#fetch'
 
   #me
   #get '/Display' => 'course_offerings#postData'
@@ -93,6 +89,8 @@ OpenDSA::Application.routes.draw do
   get '/course_offerings/new' => 'course_offerings#new', as: :new_course_offerings
   post '/course_offerings' => 'course_offerings#create', as: :create_course_offerings
   get '/course_offerings/:id' => 'course_offerings#show', as: :show_course_offerings
+  get '/course_offerings/time_tracking_lookup/:id' => 'course_offerings#get_time_tracking_lookup', as: :get_time_tracking_lookup
+  get '/course_offerings/time_tracking_data/:id/date/:date' => 'course_offerings#get_time_tracking_data', as: :get_time_tracking_data
   get '/course_offerings/:user_id/:inst_section_id' => 'course_offerings#find_attempts', as: :find_attempts
   get '/course_offerings/:id/modules/:inst_chapter_module_id/progresses' => 'course_offerings#find_module_progresses', as: :find_module_progresses
   get '/course_offerings/:user_id/:id/exercise_list' => 'course_offerings#get_individual_attempt', as: :get_individual_attempt

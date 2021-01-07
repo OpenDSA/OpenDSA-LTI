@@ -8,8 +8,7 @@ task :update_module_versions => :environment do
         'Everything',
         'PL',
         'VisFormalLang',
-        'CT',
-        'CTEX'
+        'CT'
     ]
 
     FULL_CONFIG_FILENAME = '_config.json'
@@ -89,8 +88,9 @@ task :update_module_versions => :environment do
         script_path = File.join(OpenDSA::OPENDSA_DIRECTORY, 'tools', 'simple2full.py')
 
         require 'open3'
-        command = "python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
+        command = ". $(echo $python_venv_path) && python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
         stdout, stderr, status = Open3.capture3(command)
+
         unless status.success?
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
             puts stdout
@@ -110,7 +110,7 @@ task :update_module_versions => :environment do
         end
 
         require 'open3'
-        command = "python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
+        command = ". $(echo $python_venv_path) && python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
         stdout, stderr, status = Open3.capture3(command)
 
         if status.success?

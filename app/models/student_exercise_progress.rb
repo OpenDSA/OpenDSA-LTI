@@ -1,2 +1,0 @@
-class StudentExerciseProgress < ApplicationRecord
-end
