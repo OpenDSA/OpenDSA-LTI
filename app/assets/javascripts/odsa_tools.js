@@ -1,8 +1,8 @@
 $(function () {
-
+  var storeName = `odsaAnalyticsBookId_${ODSA_DATA.inst_book_id}`
   var odsaStore = localforage.createInstance({
-    name: 'OpenDSA_analytics',
-    storeName: 'OpenDSA_analytics'
+    name: storeName,
+    storeName: storeName
   })
 
   // Returns weeks start and end dates
@@ -256,7 +256,7 @@ $(function () {
   // Fetches data form the local store
   function getStoreData(odsaStore, dataPrefix) {
     // Get the most recent store data
-    var dataPrefix = [ODSA_DATA.inst_book_id, dataPrefix].join('_') || ''
+    var dataPrefix = dataPrefix || ''
     var _keys = []
 
     var promise = new Promise((resolve, reject) => {
@@ -298,7 +298,7 @@ $(function () {
   function updateStoreData(odsaStore, dataPrefix, data) {
     // deletes all the store data except the current date
     var currentDate = getTimestamp(new Date, 'yyyymmdd')
-    var dataPrefix = [ODSA_DATA.inst_book_id, dataPrefix].join('_') || ''
+    var dataPrefix = dataPrefix || ''
     var _keys = []
     var promise = new Promise((resolve, reject) => {
       odsaStore.keys()
@@ -328,7 +328,7 @@ $(function () {
 
   // Delete data from the local storage
   function deleteStoreData(odsaStore, dataPrefix) {
-    var dataPrefix = [ODSA_DATA.inst_book_id, dataPrefix].join('_') || ''
+    var dataPrefix = dataPrefix || ''
     var _keys = []
     var promise = new Promise((resolve, reject) => {
       odsaStore.keys()
