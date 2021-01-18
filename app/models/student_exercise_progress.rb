@@ -1,0 +1,2 @@
+class StudentExerciseProgress < ApplicationRecord
+end
