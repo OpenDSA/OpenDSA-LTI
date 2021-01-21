@@ -64,6 +64,9 @@ class OdsaExerciseProgress < ApplicationRecord
   end
 
   def post_course_offering_exercise_score_to_lms()
+    Rails.logger.info("hit course offering ex")
+    Rails.logger.info(self.lis_outcome_service_url)
+    Rails.logger.info(self.lis_result_sourcedid)
     if self.lis_outcome_service_url and self.lis_result_sourcedid
       ex = self.inst_course_offering_exercise
       score = 0
