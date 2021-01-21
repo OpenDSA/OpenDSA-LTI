@@ -9,7 +9,7 @@ class LtiController < ApplicationController
   def launch
 
     Rails.logger.info("launch - LtiController")
-    # binding.pry
+
     if params[:lti_message_type] == 'ContentItemSelectionRequest'
       resource()
       return
@@ -364,7 +364,6 @@ class LtiController < ApplicationController
   end
 
   def launch_extrtool
-    Rails.logger.info("Luanch_extrtool hit")
     if current_user.blank?
       @message = "Error: current user could not be identified"
       render :error
@@ -376,7 +375,6 @@ class LtiController < ApplicationController
   end
 
   def grade_passback
-    Rails.logger.info("Grade_passback hit")
     req = IMS::LTI::OutcomeRequest.from_post_request(request)
     res = IMS::LTI::OutcomeResponse.new
     res.message_ref_identifier = req.message_identifier
@@ -390,7 +388,7 @@ class LtiController < ApplicationController
       res.code_major = 'failure'
       return
     end
-    Rails.logger.info(req.lis_result_sourcedid)
+
     tokens = req.lis_result_sourcedid.split("_")
     user_id = tokens[0]
     exercise_id = tokens[1]
@@ -426,8 +424,6 @@ class LtiController < ApplicationController
   private
 
   def launch_extrtool_helper(exercise_id, context_type = nil, workout_id)
-    # require 'pry'
-    # binding.pry
     exercise = nil
     course_offering = nil
     lis_result_sourcedid = nil

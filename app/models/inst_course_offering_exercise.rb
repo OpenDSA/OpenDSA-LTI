@@ -87,7 +87,6 @@ class InstCourseOfferingExercise < ApplicationRecord
   end
 
   def self.handle_grade_passback(req, res, user_id, inst_course_offering_exercise_id)
-    Rails.logger.info("hit inst course offering ex grade passback")
     ex_progress = OdsaExerciseProgress.find_by(user_id: user_id,
       inst_course_offering_exercise_id: inst_course_offering_exercise_id)
     
