@@ -370,7 +370,8 @@ class LtiController < ApplicationController
       return
     end
 
-    launch_extrtool_helper(params[:exercise_id], params[:context_type])
+    workout_id = request.query_parameters['workoutId']
+    launch_extrtool_helper(params[:exercise_id], params[:context_type], workout_id)
   end
 
   def grade_passback
@@ -387,6 +388,7 @@ class LtiController < ApplicationController
       res.code_major = 'failure'
       return
     end
+
     tokens = req.lis_result_sourcedid.split("_")
     user_id = tokens[0]
     exercise_id = tokens[1]
@@ -421,7 +423,7 @@ class LtiController < ApplicationController
 
   private
 
-  def launch_extrtool_helper(exercise_id, context_type = nil)
+  def launch_extrtool_helper(exercise_id, context_type = nil, workout_id)
     exercise = nil
     course_offering = nil
     lis_result_sourcedid = nil
@@ -496,6 +498,9 @@ class LtiController < ApplicationController
     launch_params["custom_course_number"] = course_offering.course.number
     launch_params["custom_label"] = course_offering.label
     launch_params["custom_term"] = course_offering.term.slug
+    if workout_id
+      launch_params["custom_gym_workout_id"] = workout_id
+    end
 
     @tc = IMS::LTI::ToolConsumer.new(tool.key, tool.secret, launch_params)
     @launch_data = @tc.generate_launch_data()
