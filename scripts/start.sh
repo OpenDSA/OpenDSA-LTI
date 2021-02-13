@@ -19,7 +19,7 @@ echo "Create the log file"
 touch /opendsa-lti/log/development.log
 echo "-------------------------------------------------------"
 echo "Create database.yml"
-cp /opendsa-lti/config/databasedemo.yml /opendsa-lti/config/database.yml
+cp /opendsa-lti/config/database.yml.example /opendsa-lti/config/database.yml
 echo "-------------------------------------------------------"
 echo "updating permissions" #>> ${OPENDSA_LOG_FILE} 2>&1
 rm -rf /opendsa/lti/public/OpenDSA
