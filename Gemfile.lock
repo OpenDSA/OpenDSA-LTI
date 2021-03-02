@@ -387,7 +387,7 @@ GEM
       nio4r (~> 2.0)
     rabl (0.14.3)
       activesupport (>= 2.3.14)
-    rack (2.2.2)
+    rack (2.2.3)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
     rack-test (1.1.0)
@@ -607,7 +607,7 @@ DEPENDENCIES
   pry
   puma (~> 4.3.1)
   rabl
-  rack (= 2.2.2)
+  rack (= 2.2.3)
   rack-cors
   rack-test (= 1.1.0)
   rails (~> 6.0, >= 6.0.3.1)
