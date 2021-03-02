@@ -4,7 +4,7 @@ development:
   email_domain: 'gmail.com'
   email_user_name: 'username@gmail.com'
   email_password: 'email_password'
-  host_url: 'https://192.168.33.10:9292'
+  host_url: 'https://localhost:8443'
   python_venv_path: '/home/deploy/OpenDSA/.pyVenv/bin/activate'
   opendsa_branch: 'master'
 

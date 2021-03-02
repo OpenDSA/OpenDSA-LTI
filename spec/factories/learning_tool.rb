@@ -20,7 +20,7 @@ FactoryBot.define do
     name { "code-workout" }
     key { "canvas_key" }
     secret { "canvas_secret" }
-    launch_url { "https://192.168.33.10:9200/lti/launch?from_collection=true" }
+    launch_url { "https://localhost:9292/lti/launch?from_collection=true" }
   end
 
 end
