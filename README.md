@@ -228,6 +228,12 @@ The following server requirements will be fine for supporting hundreds of users.
   exit
   ```
 
+  - We also need to update the mysql configuration file. Open /etc/mysql/conf.d/mysql.cnf in your text editorand replace the file's contents with the below configuration
+  ```
+[mysql]
+innodb_temp_data_file_path = ibtmp1:12M:autoextend:max:500M
+  ```
+
 ### Install Node.js and bower
 
   - Node.js is required by Rails assets pipeline.
