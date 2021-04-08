@@ -430,7 +430,7 @@ GEM
       i18n
       polyamorous (= 2.3.2)
     rdoc (6.2.1)
-    redcarpet (3.5.0)
+    redcarpet (3.5.1)
     regexp_parser (1.7.1)
     remotipart (1.4.4)
     representable (3.0.4)
