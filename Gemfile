@@ -33,7 +33,7 @@ gem 'loofah', '2.5.0' # Rails 5.2
 gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
 gem 'i18n', '1.8.2'
 gem 'json', '2.3.0'
-gem 'rack', '2.2.2'
+gem 'rack', '2.2.3'
 gem 'rack-test', '1.1.0'
 gem 'rake', '13.0.1'
 
