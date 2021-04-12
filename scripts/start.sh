@@ -30,9 +30,6 @@ echo "-------------------------------------------------------"
 echo "git checkout ${ODSA_BRANCH}"
 git checkout ${ODSA_BRANCH}
 echo "-------------------------------------------------------"
-echo "Copying configuration files"
-cp /opendsa-lti/config/databasedemo.yml /opendsa-lti/config/database.yml || ERROR_FOUND=true
-echo "-------------------------------------------------------"
 cd "${APP_DIR}"
 echo "nohup bash -c rake jobs:work" >> ${APP_LOG_FILE} 2>&1
 nohup bash -c "rake jobs:work >> ${APP_LOG_FILE} 2>&1 &"
