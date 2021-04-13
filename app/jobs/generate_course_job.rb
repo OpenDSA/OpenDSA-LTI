@@ -33,15 +33,17 @@ class GenerateCourseJob < ProgressJob::Base
       f.write(inst_book_json)
     end
 
-    script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
     Rails.logger.info('build_path')
     Rails.logger.info(build_path)
-    require 'open3'
-    command = ". $(echo $python_venv_path) && python3 #{script_path} #{config_file_path} -b #{build_path}"
-    stdout, stderr, status = Open3.capture3(command)
-    unless status.success?
-      Rails.logger.info(stderr)
+    config_path = config_file_path[15..-1] # without the public/OpenDSA
+    build_path_req = build_path[15..-1] # without the public/OpenDSA
+    require 'net/http'
+    uri = URI('https://opendsa-server.localhost.devcom.vt.edu/configure/')
+    res = Net::HTTP.post_form(uri, 'config_file_path' => config_file_path, 'build_path' => build_path_req, 'rake' => false)
+    unless response.kind_of? Net::HTTPSuccess
+      # Rails.logger.info(stderr)
+      Rails.logger.info('check flask log')
     end
     update_progress
   end

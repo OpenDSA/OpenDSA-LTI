@@ -85,16 +85,17 @@ task :update_module_versions => :environment do
         puts "Generating full configuration file for reference configuration \"#{config_file_path}\"."
 
         output_file_path = File.join(OUTPUT_DIRECTORY, File.basename(config_file_path))
-        script_path = File.join(OpenDSA::OPENDSA_DIRECTORY, 'tools', 'simple2full.py')
+        input_path = config_file_path[15..-1] # without the public/OpenDSA
+        output_file = output_file_path[15..-1] # without the public/OpenDSA
+        require 'net/http'
+        uri = URI('https://opendsa-server.localhost.devcom.vt.edu/simple2full/')
+        res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_file_path, 'rake' => true)
 
-        require 'open3'
-        command = ". $(echo $python_venv_path) && python3 #{script_path} #{config_file_path} #{output_file_path} --expanded --verbose"
-        stdout, stderr, status = Open3.capture3(command)
-
-        unless status.success?
+         unless res.kind_of? Net::HTTPSuccess
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
-            puts stdout
-            puts stderr
+            puts "check flask log"
+            # puts stdout
+            # puts stderr
         end
 
         json = File.read(output_file_path)
@@ -108,28 +109,30 @@ task :update_module_versions => :environment do
         File.open(config_file_path, "w") do |f|
             f.write(config.to_json)
         end
+        config_path = config_file_path[15..-1] # without the public/OpenDSA
+        build_path_req = build_path[15..-1] # without the public/OpenDSA
+        require 'net/http'
+        uri = URI('https://opendsa-server.localhost.devcom.vt.edu/configure/')
+        res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => build_path_req, 'rake' => true)
 
-        require 'open3'
-        command = ". $(echo $python_venv_path) && python3 #{script_path} #{config_file_path} --standalone-modules -b #{OUTPUT_DIRECTORY_REL}"
-        stdout, stderr, status = Open3.capture3(command)
-
-        if status.success?
+        if response.kind_of? Net::HTTPSuccess
             puts "Compilation of stand-alone modules was SUCCESSFUL."
         else
             puts "Compilation of stand-alone modules FAILED."
+            puts "check flask log"
         end
 
-        puts "Writing log files..."
-        stdout_path = File.join(OUTPUT_DIRECTORY, 'stdout.log')
-        stderr_path = File.join(OUTPUT_DIRECTORY, 'stderr.log')
-        File.open(stdout_path, "w") do |f|
-            f.write(stdout)
-        end
-        puts "stdout log written to \"#{File.expand_path(stdout_path)}\""
-        File.open(stderr_path, "w") do |f|
-            f.write(stderr)
-        end
-        puts "stderr log written to \"#{File.expand_path(stderr_path)}\""
+        # puts "Writing log files..."
+        # stdout_path = File.join(OUTPUT_DIRECTORY, 'stdout.log')
+        # stderr_path = File.join(OUTPUT_DIRECTORY, 'stderr.log')
+        # File.open(stdout_path, "w") do |f|
+        #     f.write(stdout)
+        # end
+        # puts "stdout log written to \"#{File.expand_path(stdout_path)}\""
+        # File.open(stderr_path, "w") do |f|
+        #     f.write(stderr)
+        # end
+        # puts "stderr log written to \"#{File.expand_path(stderr_path)}\""
 
         return status.success?
     end

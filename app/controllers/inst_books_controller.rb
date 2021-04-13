@@ -40,20 +40,21 @@ class InstBooksController < ApplicationController
   def update
     inst_book = params['inst_book']
 
-    script_path = "public/OpenDSA/tools/simple2full.py"
-
     input_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_input.json'
     input_file_path = "public/OpenDSA/config/temp/#{input_file}"
     File.open(input_file_path, 'w') { |file| file.write(inst_book.to_json) }
+    input_path = input_file_path[15..-1] # without the public/OpenDSA
 
     output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
     output_file_path = "public/OpenDSA/config/temp/#{output_file}"
-    require 'open3'
-    command = ". $(echo $python_venv_path) && python3 #{script_path} #{input_file_path} #{output_file_path}"
-    stdout, stderr, status = Open3.capture3(command)
+    output_path = output_file_path[15..-1] # without the public/OpenDSA
+    require 'net/http'
+    uri = URI('https://opendsa-server.localhost.devcom.vt.edu/simple2full/')
+    res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_path, 'rake' => false)
 
-    unless status.success?
-      Rails.logger.info(stderr)
+    unless res.kind_of? Net::HTTPSuccess
+      # Rails.logger.info(stderr)
+      Rails.logger.info('check flask log')
     end
 
     hash = JSON.load(File.read(output_file_path))
