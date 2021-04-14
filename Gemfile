@@ -170,3 +170,4 @@ gem 'user_agent_parser' # 2.6.0 or higher requires ruby>=2.4
 gem 'rails_same_site_cookie'
 gem 'rack-cors'
 gem 'simple_oauth', '0.3.1'
+gem 'therubyracer'
