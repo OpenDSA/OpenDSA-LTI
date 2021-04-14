@@ -24,7 +24,6 @@ ENV LTI_BRANCH=$LTI_BRANCH
 RUN apt-get update -qq \
     && apt-get install -y apt-utils build-essential lsof vim cron curl \
     && apt-get install -y git zlib1g-dev libssl-dev libreadline-dev libyaml-dev libevent-dev libxml2-dev libxml2 libxslt1-dev libffi-dev libxslt-dev dkms \
-    && apt-get install -y default-jre \
     && apt-get upgrade -y \
     && rm -rf /var/apt/lists/*
 
