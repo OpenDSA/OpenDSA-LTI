@@ -1,29 +1,32 @@
 development:
   email_address: 'smtp.gmail.com'
-  email_port: 587
+  email_port: '587'
   email_domain: 'gmail.com'
   email_user_name: 'username@gmail.com'
   email_password: 'email_password'
-  host_url: 'https://localhost:8443'
-  python_venv_path: '/home/deploy/OpenDSA/.pyVenv/bin/activate'
+  host_url: 'https://opendsa-lti.localhost.devcom.vt.edu'
   opendsa_branch: 'master'
+  config_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/configure/'
+  simple_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/'
 
 staging:
   email_address: 'smtp.gmail.com'
-  email_port: 587
+  email_port: '587'
   email_domain: 'gmail.com'
   email_user_name: 'username@gmail.com'
   email_password: 'email_password'
   host_url: 'host_url'
-  python_venv_path: '/home/deploy/OpenDSA/.pyVenv/bin/activate'
   opendsa_branch: 'staging'
+  config_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/configure/'
+  simple_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/'
 
 production:
   email_address: 'smtp.gmail.com'
-  email_port: 587
+  email_port: '587'
   email_domain: 'gmail.com'
   email_user_name: 'username@gmail.com'
   email_password: 'email_password'
   host_url: 'host_url'
-  python_venv_path: '/home/deploy/OpenDSA/.pyVenv/bin/activate'
   opendsa_branch: 'master'
+  config_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/configure/'
+  simple_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/'

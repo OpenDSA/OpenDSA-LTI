@@ -88,14 +88,12 @@ task :update_module_versions => :environment do
         input_path = config_file_path[15..-1] # without the public/OpenDSA
         output_file = output_file_path[15..-1] # without the public/OpenDSA
         require 'net/http'
-        uri = URI('https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/')
+        uri = URI(ENV["simple_api_link"])
         res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_file_path, 'rake' => true)
 
          unless res.kind_of? Net::HTTPSuccess
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
-            puts "check flask log"
-            # puts stdout
-            # puts stderr
+            Rails.logger.info(res['stderr_compressed'])
         end
 
         json = File.read(output_file_path)
@@ -111,27 +109,15 @@ task :update_module_versions => :environment do
         end
         config_path = config_file_path[15..-1] # without the public/OpenDSA
         require 'net/http'
-        uri = URI('https://opendsa-server.localhost.devcom.vt.edu/api/configure/')
+        uri = URI(ENV["config_api_link"])
         res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => OUTPUT_DIRECTORY_REL, 'rake' => true)
 
         if res.kind_of? Net::HTTPSuccess
             puts "Compilation of stand-alone modules was SUCCESSFUL."
         else
             puts "Compilation of stand-alone modules FAILED."
-            puts "check flask log"
+            Rails.logger.info(res['stderr_compressed'])
         end
-
-        # puts "Writing log files..."
-        # stdout_path = File.join(OUTPUT_DIRECTORY, 'stdout.log')
-        # stderr_path = File.join(OUTPUT_DIRECTORY, 'stderr.log')
-        # File.open(stdout_path, "w") do |f|
-        #     f.write(stdout)
-        # end
-        # puts "stdout log written to \"#{File.expand_path(stdout_path)}\""
-        # File.open(stderr_path, "w") do |f|
-        #     f.write(stderr)
-        # end
-        # puts "stderr log written to \"#{File.expand_path(stderr_path)}\""
 
         return status.success?
     end

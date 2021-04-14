@@ -27,11 +27,10 @@ class CompileBookJob < ProgressJob::Base
     Rails.logger.info(build_path)
     config_path = config_file_path[15..-1] # without the public/OpenDSA
     require 'net/http'
-    uri = URI('https://opendsa-server.localhost.devcom.vt.edu/api/configure/')
+    uri = URI(ENV["config_api_link"])
     res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => build_path, 'rake' => false)
     unless res.kind_of? Net::HTTPSuccess
-      # Rails.logger.info(stderr)
-      Rails.logger.info('check flask log')
+      Rails.logger.info(res['stderr_compressed'])
     end
     update_progress
   end
