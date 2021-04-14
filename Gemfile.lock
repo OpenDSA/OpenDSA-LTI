@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/capistrano/rbenv.git
-  revision: 1fdb93a6dd4a4ab3fb786c995055cf6949daf7a4
-  specs:
-    capistrano-rbenv (2.2.0)
-      capistrano (~> 3.1)
-      sshkit (~> 1.3)
-
-GIT
   remote: https://github.com/net-ssh/net-ssh.git
   revision: d731c11d8bd0feb9d252416611474e1694245272
   specs:
@@ -108,8 +100,6 @@ GEM
       activerecord (>= 4.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    airbrussh (1.4.0)
-      sshkit (>= 1.6.1, != 1.7.0)
     annotate (3.1.1)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 14.0)
@@ -136,36 +126,6 @@ GEM
     browser (4.2.0)
     builder (3.2.4)
     cancancan (3.1.0)
-    capistrano (3.14.1)
-      airbrussh (>= 1.0.0)
-      i18n
-      rake (>= 10.0.0)
-      sshkit (>= 1.9.0)
-    capistrano-bower (1.1.0)
-      capistrano (~> 3.0)
-    capistrano-bundler (2.0.1)
-      capistrano (~> 3.1)
-    capistrano-figaro-yml (1.0.5)
-      capistrano (~> 3.1)
-      sshkit (~> 1.2, >= 1.2.0)
-    capistrano-passenger (0.2.0)
-      capistrano (~> 3.0)
-    capistrano-rails (1.6.1)
-      capistrano (~> 3.1)
-      capistrano-bundler (>= 1.1, < 3)
-    capistrano-rake (0.2.0)
-      capistrano (>= 3.0)
-    capistrano3-delayed-job (1.7.6)
-      capistrano (~> 3.0, >= 3.0.0)
-      daemons (~> 1.3)
-    capybara (3.33.0)
-      addressable
-      mini_mime (>= 0.1.3)
-      nokogiri (~> 1.8)
-      rack (>= 1.6.0)
-      rack-test (>= 0.6.3)
-      regexp_parser (~> 1.5)
-      xpath (~> 3.2)
     celluloid (0.17.4)
       celluloid-essentials
       celluloid-extras
@@ -206,9 +166,6 @@ GEM
     daemons (1.3.1)
     data-confirm-modal (1.6.3)
       railties (>= 3.0)
-    debase (0.2.4.1)
-      debase-ruby_core_source (>= 0.10.2)
-    debase-ruby_core_source (0.10.9)
     declarative (0.0.20)
     declarative-option (0.1.0)
     delayed_job (4.1.8)
@@ -228,7 +185,6 @@ GEM
     equalizer (0.0.11)
     erubi (1.10.0)
     erubis (2.7.0)
-    eventmachine (1.2.7)
     exception_handler (0.3.45)
     execjs (2.7.0)
     factory_bot (6.1.0)
@@ -341,8 +297,6 @@ GEM
     multipart-post (2.1.1)
     mustache (1.1.1)
     mysql2 (0.5.3)
-    net-scp (3.0.0)
-      net-ssh (>= 2.6.5, < 7.0.0)
     nio4r (2.5.5)
     nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
@@ -353,8 +307,6 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
-    oj (3.10.8)
-    oj_mimic_json (1.0.1)
     omniauth (1.9.1)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
@@ -433,7 +385,6 @@ GEM
     rdoc (6.2.1)
     redcarpet (3.5.0)
     ref (2.0.0)
-    regexp_parser (1.7.1)
     remotipart (1.4.4)
     representable (3.0.4)
       declarative (< 0.1.0)
@@ -461,8 +412,6 @@ GEM
       rspec-mocks (~> 3.9)
       rspec-support (~> 3.9)
     rspec-support (3.9.3)
-    ruby-debug-ide (0.7.2)
-      rake (>= 0.8.1)
     ruby-graphviz (1.2.5)
       rexml
     ruby_parser (3.14.2)
@@ -488,10 +437,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sqlite3 (1.4.2)
-    sshkit (1.21.0)
-      net-scp (>= 1.1.2)
-      net-ssh (>= 2.8.0)
     sucker_punch (1.6.0)
       celluloid (~> 0.17.2)
     temple (0.8.2)
@@ -500,10 +445,6 @@ GEM
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
-    thin (1.7.2)
-      daemons (~> 1.0, >= 1.0.9)
-      eventmachine (~> 1.0, >= 1.0.4)
-      rack (>= 1, < 3)
     thor (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
@@ -528,8 +469,6 @@ GEM
     websocket-extensions (0.1.5)
     whenever (1.0.0)
       chronic (>= 0.6.3)
-    xpath (3.2.0)
-      nokogiri (~> 1.8)
     zeitwerk (2.4.2)
 
 PLATFORMS
@@ -552,16 +491,6 @@ DEPENDENCIES
   bootstrap3-datetimepicker-rails (~> 4.14.30)
   browser
   cancancan
-  capistrano
-  capistrano-bower
-  capistrano-bundler
-  capistrano-figaro-yml (~> 1.0.2)
-  capistrano-passenger
-  capistrano-rails
-  capistrano-rake
-  capistrano-rbenv!
-  capistrano3-delayed-job (~> 1.0)
-  capybara
   clipboard-rails
   cocoon
   coffee-rails (~> 5.0)
@@ -570,7 +499,6 @@ DEPENDENCIES
   csv_shaper
   daemons
   data-confirm-modal
-  debase
   delayed_job_active_record
   devise (~> 4.7.1)
   exception_handler (~> 0.3.45)
@@ -603,8 +531,6 @@ DEPENDENCIES
   nokogiri (= 1.10.9)
   oauth (= 0.5.4)
   oauth2 (= 1.4.4)
-  oj
-  oj_mimic_json
   omniauth
   omniauth-cas
   omniauth-facebook
@@ -628,16 +554,13 @@ DEPENDENCIES
   request-log-analyzer
   responders
   rspec-rails (>= 3.4.2)
-  ruby-debug-ide
   sass-rails
   sdoc
   simple_oauth (= 0.3.1)
   sprockets (= 3.7.2)
-  sqlite3
   sucker_punch (~> 1.0)
   test-unit (~> 3.0.9)
   therubyracer
-  thin
   truncate_html
   tzinfo
   uglifier (~> 4.2)
