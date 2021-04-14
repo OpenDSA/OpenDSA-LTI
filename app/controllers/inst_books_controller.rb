@@ -49,7 +49,7 @@ class InstBooksController < ApplicationController
     output_file_path = "public/OpenDSA/config/temp/#{output_file}"
     output_path = output_file_path[15..-1] # without the public/OpenDSA
     require 'net/http'
-    uri = URI('https://opendsa-server.localhost.devcom.vt.edu/simple2full/')
+    uri = URI('https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/')
     res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_path, 'rake' => false)
 
     unless res.kind_of? Net::HTTPSuccess

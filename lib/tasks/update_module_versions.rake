@@ -88,7 +88,7 @@ task :update_module_versions => :environment do
         input_path = config_file_path[15..-1] # without the public/OpenDSA
         output_file = output_file_path[15..-1] # without the public/OpenDSA
         require 'net/http'
-        uri = URI('https://opendsa-server.localhost.devcom.vt.edu/simple2full/')
+        uri = URI('https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/')
         res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_file_path, 'rake' => true)
 
          unless res.kind_of? Net::HTTPSuccess
@@ -110,12 +110,11 @@ task :update_module_versions => :environment do
             f.write(config.to_json)
         end
         config_path = config_file_path[15..-1] # without the public/OpenDSA
-        build_path_req = build_path[15..-1] # without the public/OpenDSA
         require 'net/http'
-        uri = URI('https://opendsa-server.localhost.devcom.vt.edu/configure/')
-        res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => build_path_req, 'rake' => true)
+        uri = URI('https://opendsa-server.localhost.devcom.vt.edu/api/configure/')
+        res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => OUTPUT_DIRECTORY_REL, 'rake' => true)
 
-        if response.kind_of? Net::HTTPSuccess
+        if res.kind_of? Net::HTTPSuccess
             puts "Compilation of stand-alone modules was SUCCESSFUL."
         else
             puts "Compilation of stand-alone modules FAILED."
