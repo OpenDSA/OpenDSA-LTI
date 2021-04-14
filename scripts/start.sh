@@ -23,8 +23,7 @@ cp /opendsa-lti/config/database.yml.example /opendsa-lti/config/database.yml
 echo "-------------------------------------------------------"
 echo "updating permissions" #>> ${OPENDSA_LOG_FILE} 2>&1
 rm -rf /opendsa/lti/public/OpenDSA
-ln -s /opendsa /opendsa-lti/public/OpenDSA || ERROR_FOUND=true
-if [[ "${ERROR_FOUND}" == true ]]; then cp -r /opendsa /opendsa-lti/public/OpenDSA && ERROR_FOUND=false; fi;
+ln -s /opendsa /opendsa-lti/public/OpenDSA
 cd "${OPENDSA_DIR}"
 echo "-------------------------------------------------------"
 echo "git checkout ${ODSA_BRANCH}"
