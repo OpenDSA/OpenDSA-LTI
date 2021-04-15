@@ -22,9 +22,8 @@ ENV ODSA_BRANCH=$ODSA_BRANCH
 ENV LTI_BRANCH=$LTI_BRANCH
 
 RUN apt-get update -qq \
-    && apt-get install -y apt-utils build-essential lsof vim cron curl \
-    && apt-get install -y git zlib1g-dev libssl-dev libreadline-dev libyaml-dev libevent-dev libxml2-dev libxml2 libxslt1-dev libffi-dev libxslt-dev dkms \
-    && apt-get upgrade -y \
+    && apt-get install -y apt-utils build-essential vim cron curl git \
+    && apt-get install -y zlib1g-dev libssl-dev libreadline-dev libyaml-dev libevent-dev libxml2-dev libxml2 libxslt1-dev libffi-dev libxslt-dev dkms \
     && rm -rf /var/apt/lists/*
 
 RUN gem install bundler -v $BUNDLER_VERSION \
