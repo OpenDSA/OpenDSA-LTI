@@ -1,4 +1,4 @@
-FROM ruby:2.7.1
+FROM docker.io/bitnami/ruby:2.7
 
 MAINTAINER Jihane Najdi <jnajdi@vt.edu>
 
@@ -21,9 +21,11 @@ ENV RAILS_ENV=$RAILS_ENV
 ENV ODSA_BRANCH=$ODSA_BRANCH
 ENV LTI_BRANCH=$LTI_BRANCH
 
+# shared-mime-info temporary due to mimemagic issues
 RUN apt-get update -qq \
-    && apt-get install -y apt-utils build-essential cron curl git \
-    && apt-get install -y zlib1g-dev libssl-dev libreadline-dev libyaml-dev libevent-dev libxml2 libxslt1-dev libffi-dev libxslt-dev dkms \
+    && apt-get install -y apt-utils build-essential cron \
+    && apt-get install -y libyaml-dev libevent-dev libxml2 libffi-dev libxslt-dev \
+    && apt-get install -y shared-mime-info \
     && rm -rf /var/apt/lists/*
 
 RUN gem install bundler -v $BUNDLER_VERSION \
