@@ -22,8 +22,8 @@ ENV ODSA_BRANCH=$ODSA_BRANCH
 ENV LTI_BRANCH=$LTI_BRANCH
 
 RUN apt-get update -qq \
-    && apt-get install -y apt-utils build-essential vim cron curl git \
-    && apt-get install -y zlib1g-dev libssl-dev libreadline-dev libyaml-dev libevent-dev libxml2-dev libxml2 libxslt1-dev libffi-dev libxslt-dev dkms \
+    && apt-get install -y apt-utils build-essential cron curl git \
+    && apt-get install -y zlib1g-dev libssl-dev libreadline-dev libyaml-dev libevent-dev libxml2 libxslt1-dev libffi-dev libxslt-dev dkms \
     && rm -rf /var/apt/lists/*
 
 RUN gem install bundler -v $BUNDLER_VERSION \
@@ -37,6 +37,7 @@ WORKDIR /opendsa-lti
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 
-RUN bundle install
+RUN bundle config build.nokogiri --use-system-libraries
+RUN bundle check || bundle install
 
 EXPOSE 80
