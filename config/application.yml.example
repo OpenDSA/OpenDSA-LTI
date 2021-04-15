@@ -6,8 +6,8 @@ development:
   email_password: 'email_password'
   host_url: 'https://opendsa-lti.localhost.devcom.vt.edu'
   opendsa_branch: 'master'
-  config_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/configure/'
-  simple_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/'
+  config_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/configure/'
+  simple_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/simple2full/'
 
 staging:
   email_address: 'smtp.gmail.com'
@@ -17,8 +17,8 @@ staging:
   email_password: 'email_password'
   host_url: 'host_url'
   opendsa_branch: 'staging'
-  config_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/configure/'
-  simple_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/'
+  config_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/configure/'
+  simple_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/simple2full/'
 
 production:
   email_address: 'smtp.gmail.com'
@@ -28,5 +28,5 @@ production:
   email_password: 'email_password'
   host_url: 'host_url'
   opendsa_branch: 'master'
-  config_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/configure/'
-  simple_api_link: 'https://opendsa-server.localhost.devcom.vt.edu/api/simple2full/'
+  config_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/configure/'
+  simple_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/simple2full/'
