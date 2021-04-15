@@ -157,3 +157,4 @@ gem 'rack-cors'
 gem 'simple_oauth', '0.3.1'
 gem 'therubyracer'
 gem 'ffi' # speed up sassc install
+gem 'sassc', '2.1.0'
