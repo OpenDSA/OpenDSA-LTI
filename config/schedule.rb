@@ -23,9 +23,10 @@ env :PATH, ENV['PATH']
 set :output, "/home/deploy/OpenDSA-LTI/current/log/cron_log.log"
 every :reboot do
   command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production bin/delayed_job -n 2 start"
-  command "cd /home/deploy/OpenPOP && ./runservers.sh"
 end
 
 every 1.day, :at => '5:00 am' do
   command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production bin/delayed_job -n 2 restart"
+  command "ps aux | grep puma | awk '{print $2}' | xargs kill -9"
+  command "cd /home/deploy/OpenPOP && ./runprod.sh"
 end

@@ -63,3 +63,6 @@ bower_components/
 *.idea/OpenDSA-LTI.iml
 *.idea/workspace.xml
 *.idea
+
+# For OpenDSA-Devstack to manage docker build order
+devstackPlaceholder.md
