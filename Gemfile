@@ -38,7 +38,7 @@ gem 'rack-test', '1.1.0'
 gem 'rake', '13.0.1'
 
 gem 'truncate_html'
-gem 'puma', '~> 4.3.1'
+gem 'puma', '~> 4.3.6'
 gem 'tzinfo' # For timezone support
 
 # Bootstrap Datepicker
@@ -53,11 +53,10 @@ gem 'daemons'
 gem 'delayed_job_active_record'
 gem 'progress_job'
 
-
 # For JSON support
 gem 'rabl'
 gem 'oj'
-gem 'oj_mimic_json'
+# gem 'oj_mimic_json'
 
 group :assets do
   gem 'sass-rails'
@@ -73,7 +72,6 @@ group :development, :test do
   gem 'annotate'
   gem 'rails-erd', github: 'voormedia/rails-erd'
   gem 'pry'
-  gem 'thin'
   gem 'request-log-analyzer'
   # gem 'byebug'
   gem 'debase'
@@ -170,3 +168,8 @@ gem 'user_agent_parser' # 2.6.0 or higher requires ruby>=2.4
 gem 'rails_same_site_cookie'
 gem 'rack-cors'
 gem 'simple_oauth', '0.3.1'
+# gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
+# gem 'log4r', '~> 1.0', '>= 1.0.6'
+gem 'jwt', '~> 2.2', '>= 2.2.2'
+gem 'json-jwt', '~> 1.13.0'
+gem 'rack-cors'

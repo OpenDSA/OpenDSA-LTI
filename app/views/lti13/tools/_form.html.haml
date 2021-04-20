@@ -1,0 +1,18 @@
+= bootstrap_form_with(model: [:lti, @tool], local: true) do |f|
+  - if @tool.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@tool.errors.count, "error")
+        prohibited this tool from being saved:
+      %ul
+        - @tool.errors.full_messages.each do |message|
+          %li= message
+
+  = f.text_field :name, id: :tool_name
+  = f.text_field :client_id, id: :tool_client_id
+  = f.text_area :private_key, id: :tool_private_key
+  = f.text_field :deployment_id, id: :tool_deployment_id
+  = f.text_field :keyset_url, id: :tool_keyset_url
+  = f.text_field :oauth2_url, id: :oauth2_url
+  = f.text_field :platform_oidc_auth_url
+  = f.submit

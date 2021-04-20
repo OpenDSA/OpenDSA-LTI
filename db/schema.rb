@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_10_021943) do
+ActiveRecord::Schema.define(version: 2021_04_17_182850) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "namespace"
@@ -348,6 +348,12 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.string "consumer_key"
     t.string "consumer_secret"
     t.bigint "organization_id"
+    t.string "client_id"
+    t.text "private_key"
+    t.text "public_key"
+    t.string "keyset_url"
+    t.string "oauth2_url"
+    t.string "platform_oidc_auth_url"
     t.index ["lms_type_id"], name: "lms_instances_lms_type_id_fk"
     t.index ["organization_id"], name: "lms_instances_organization_id_fk"
     t.index ["url"], name: "index_lms_instances_on_url", unique: true
