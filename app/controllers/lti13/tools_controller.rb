@@ -71,6 +71,7 @@ class Lti13::ToolsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_tool
       @lms_instance =  LmsInstance.find_by(id: params[:id])
+      Rails.logger.info "@lms_instance: #{@lms_instance.attributes.inspect}"
       render json: { error: 'LMS Instance not found' }, status: :not_found unless @lms_instance
     end
 
