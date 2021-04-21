@@ -3,6 +3,7 @@ class Lti13::LaunchesController < ApplicationController
   before_action :set_tool
   # before_action :set_launch, only: %i[show edit update destroy]
   skip_before_action only: :create
+  after_action :allow_iframe, only: [:create]
 
   # GET /launches
   # GET /launches.json
@@ -91,4 +92,9 @@ class Lti13::LaunchesController < ApplicationController
     def launch_params
       params.require(:launch).permit(:jwt, :decoded_jwt, :tool_id, :state)
     end
+
+    def allow_iframe
+      response.headers.except! 'X-Frame-Options'
+    end
+
 end
