@@ -40,6 +40,13 @@ class Lti13::LaunchesController < ApplicationController
     # - check the cookie value is equal as was sent in the login initiaiton redirect
     # - send the content back as html
     if params[:id_token]&.present?
+      if params[:state]&.present?
+        # TODO: FIXME verify the state coming form the platform first
+        @decoded_payload = Jwt::Payload.new(params[:state]).call
+        tool_id = @decoded_payload['tool_id']
+        @lms_instance = LmsInstance.find_by(id: tool_id.to_i)
+      end
+
       @decoded_header = Jwt::Header.new(params[:id_token]).call
       kid = @decoded_header['kid']
 
