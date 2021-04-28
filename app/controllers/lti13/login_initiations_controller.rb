@@ -21,7 +21,7 @@ class Lti13::LoginInitiationsController < ApplicationController
 
   private
     def set_tool
-      @lms_instance = LmsInstance.find_by(url: params[:iss], client_id: params[:client_id])
+      @lms_instance = LmsInstance.find_by(issuer: params[:iss], client_id: params[:client_id])
       render json: { error: 'Tool not found' }, status: :not_found unless @lms_instance
     end
 
