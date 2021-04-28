@@ -79,7 +79,7 @@ class Lti13::LaunchesController < ApplicationController
 
   private
     def set_tool
-      @lms_instance = LmsInstance.find_by(id: 2)
+      @lms_instance = LmsInstance.find_by(id: 3)
       render json: { error: 'Tool not found' }, status: :not_found unless @lms_instance
     end
 
