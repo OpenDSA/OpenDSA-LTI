@@ -18,6 +18,7 @@
 //= require bootstrap-editable
 //= require bootstrap-editable-rails
 //= require js-routes
+//= require bootstrap-wysihtml5
 //= require cocoon
 //= require counter.js
 //= require data-confirm-modal
