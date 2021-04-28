@@ -116,9 +116,8 @@ gem 'gravtastic'      # For Gravatar integration
 gem 'js-routes'       # Route helpers in Javascript
 gem 'awesome_print'   # For debugging/logging output
 
-
 #gems for rich text editing
-gem 'bootstrap-wysihtml5-rails'
+# gem 'bootstrap-wysihtml5-rails'
 
 #gem for improved WHERE querying
 #gem 'squeel'

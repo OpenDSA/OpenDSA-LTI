@@ -5,8 +5,8 @@
     %meta{name: 'google', content: 'notranslate'}
     %title ReferenceTool
     = csrf_meta_tags
-    = stylesheet_link_tag 'lti13', media: 'all'
-    = javascript_include_tag 'lti13'
+    = (stylesheet_link_tag 'lti13').gsub('="', "=\"#{ root_url }").html_safe
+    = (javascript_include_tag 'lti13').gsub('="', "=\"#{ root_url }").html_safe
   %body
     .container
       = yield
