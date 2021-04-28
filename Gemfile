@@ -172,3 +172,8 @@ gem 'simple_oauth', '0.3.1'
 # gem 'log4r', '~> 1.0', '>= 1.0.6'
 gem 'jwt', '~> 2.2', '>= 2.2.2'
 gem 'json-jwt', '~> 1.13.0'
+# TODO: to be removed later, used only to test lti13 layout
+gem 'bootstrap', '~> 4.5.0'
+gem 'bootstrap_form', '~> 4.5.0'
+gem 'bootstrap-will_paginate'
+gem 'selectize-rails', '~> 0.12.6'
