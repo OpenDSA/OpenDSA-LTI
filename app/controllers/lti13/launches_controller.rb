@@ -1,5 +1,5 @@
 class Lti13::LaunchesController < ApplicationController
-  layout 'lti', only: [:create]
+  layout 'lti13', only: [:create]
   before_action :set_tool
   # before_action :set_launch, only: %i[show edit update destroy]
   skip_before_action only: :create
