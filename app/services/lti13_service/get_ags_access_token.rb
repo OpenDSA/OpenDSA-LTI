@@ -34,9 +34,7 @@ module Lti13Service
         scope:  "#{Rails.configuration.lti_claims_and_scopes['ags_scope_line_item']}"\
                 " #{Rails.configuration.lti_claims_and_scopes['ags_scope_result']}"\
                 " #{Rails.configuration.lti_claims_and_scopes['ags_scope_score']}"\
-                " #{Rails.configuration.lti_claims_and_scopes['proctoring_access_token_scope']}"\
-                " #{Rails.configuration.lti_claims_and_scopes['names_and_roles_scope']}"\
-                " #{Rails.configuration.lti_claims_and_scopes['proctoring_access_token_scope']}",
+                " #{Rails.configuration.lti_claims_and_scopes['names_and_roles_scope']}",
         client_assertion: client_assertion
       }
     end
