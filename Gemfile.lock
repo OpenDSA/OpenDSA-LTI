@@ -135,8 +135,6 @@ GEM
     bootstrap-sass (3.4.1)
       autoprefixer-rails (>= 5.2.1)
       sassc (>= 2.0.0)
-    bootstrap-will_paginate (1.0.0)
-      will_paginate
     bootstrap-wysihtml5-rails (0.3.3.8)
       railties (>= 3.0)
     bootstrap3-datetimepicker-rails (4.14.30)
@@ -534,7 +532,6 @@ GEM
     websocket-extensions (0.1.5)
     whenever (1.0.0)
       chronic (>= 0.6.3)
-    will_paginate (3.3.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.4.2)
@@ -556,7 +553,6 @@ DEPENDENCIES
   bootstrap (~> 4.5.0)
   bootstrap-editable-rails
   bootstrap-sass (>= 3.4.1)
-  bootstrap-will_paginate
   bootstrap-wysihtml5-rails
   bootstrap3-datetimepicker-rails (~> 4.14.30)
   bootstrap_form (~> 4.5.0)
