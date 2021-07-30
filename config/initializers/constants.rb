@@ -78,13 +78,6 @@ module OpenDSA
       "label": "Java (Generic)",
       "lang": "java",
     },
-    "Processing": {
-      "ext": [
-        "pde",
-      ],
-      "label": "Processing",
-      "lang": "java",
-    },
     "C++": {
       "ext": [
         "cpp",
