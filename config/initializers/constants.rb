@@ -21,6 +21,7 @@ module OpenDSA
     "Graph" => "Graphs",
     "Hashing" => "Hashing",
     "Indexing" => "Indexing",
+    "IntroToSoftwareDesign" => "Intro to Software Design",
     "NP" => "Limits to Computing",
     "List" => "Linear Structures",
     "Bounds" => "Lower Bounds",
