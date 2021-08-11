@@ -8,7 +8,8 @@ task :update_module_versions => :environment do
         'Everything',
         'PL',
         'VisFormalLang',
-        'CT'
+        'CT',
+        'IntroToSoftwareDesign'
     ]
 
     FULL_CONFIG_FILENAME = '_config.json'
