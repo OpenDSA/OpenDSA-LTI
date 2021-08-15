@@ -160,7 +160,7 @@ namespace :deploy do
   # pull the latest from OpenDSA repository
   after :finishing, 'deploy:pull_opendsa' do
     on roles :all do
-      execute "cd ~/OpenDSA; git checkout $(echo $opendsa_branch); make pull;"
+      execute "cd ~/OpenDSA; git checkout $(echo $opendsa_branch); git pull;"
     end
   end
 
