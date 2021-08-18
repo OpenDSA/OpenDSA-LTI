@@ -65,16 +65,17 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     end
 
     def upload_create
-      script_path = "public/OpenDSA/tools/simple2full.py"
       input_file = params[:form][:file].path
       output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
       output_file_path = "public/OpenDSA/config/temp/#{output_file}"
-      require 'open3'
-      command = ". $(echo $python_venv_path) && python3 #{script_path} #{input_file} #{output_file_path}"
-      stdout, stderr, status = Open3.capture3(command)
+      output_path = output_file_path[15..-1] # without the public/OpenDSA
+      input_path = input_file[15..-1] # without the public/OpenDSA
+      require 'net/http'
+      uri = URI(ENV["simple_api_link"])
+      res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_path, 'rake' => false)
 
-      unless status.success?
-        Rails.logger.info(stderr)
+      unless res.kind_of? Net::HTTPSuccess
+        Rails.logger.info(res['stderr_compressed'])
       end
       hash = JSON.load(File.read(output_file_path))
       if params.has_key?(:inst_book)
