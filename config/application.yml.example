@@ -28,5 +28,5 @@ production:
   email_password: 'email_password'
   host_url: 'host_url'
   opendsa_branch: 'master'
-  config_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/configure/'
-  simple_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/simple2full/'
+  config_api_link: 'http://opendsa:8080/api/configure/'
+  simple_api_link: 'http://opendsa:8080/api/simple2full/'
