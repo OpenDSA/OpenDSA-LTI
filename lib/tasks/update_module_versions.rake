@@ -90,7 +90,7 @@ task :update_module_versions => :environment do
         output_file = output_file_path[15..-1] # without the public/OpenDSA
         require 'net/http'
         uri = URI(ENV["simple_api_link"])
-        res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_file_path, 'rake' => true)
+        res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_file, 'rake' => true)
 
          unless res.kind_of? Net::HTTPSuccess
             puts "FAILED to generate full configuration file for \"#{config_file_path}\"."
