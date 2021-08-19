@@ -1,0 +1,27 @@
+# This is a placeholder compose.yml file for the DevStack.  It is NOT functional as a compose file in any way.
+# However, the 'extends' element of the DevStack's docker-compose.yml needs to find a valid compose file here. 
+# Do NOT commit this file to any repository except OpendDSA-DevStack.  
+
+# During the 'setup' service of DevStack, the cloning and creation of each sub-project is designed to delete this file.
+# If you see this file within the sub-project folder you are trying to run, then DevStack has not run the setup yet.  
+# To run DevStack's setup for your sub-project:  `docker-compose run setup make <<sub-project-name>>`
+
+# This file is also part of the .gitignore of DevStack, so changes to it are not added (unless using the --force option).
+
+version: '3.7'
+services:
+  opendsa:
+    build:
+      context: .
+  opendsa-lti:
+    build:
+      context: .
+  code-workout:
+    build:
+      context: .
+  openpop:
+    build:
+      context: .
+  proxy:
+    build:
+      context: .
