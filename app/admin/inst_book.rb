@@ -65,7 +65,11 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     end
 
     def upload_create
-      input_file = params[:form][:file].path
+      uploaded_file = params[:form][:file]
+      File.open(Rails.root.join('public', 'OpenDSA', 'config', 'temp', uploaded_file.original_filename), 'wb') do |file|
+        file.write(uploaded_file.read)
+      end
+      input_file = "public/OpenDSA/config/temp/#{uploaded_file.original_filename}"
       output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
       output_file_path = "public/OpenDSA/config/temp/#{output_file}"
       output_path = output_file_path[15..-1] # without the public/OpenDSA
