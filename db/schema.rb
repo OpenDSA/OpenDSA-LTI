@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_10_021943) do
+ActiveRecord::Schema.define(version: 2021_04_18_071954) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "namespace"
@@ -406,6 +406,7 @@ ActiveRecord::Schema.define(version: 2020_11_10_021943) do
     t.bigint "inst_course_offering_exercise_id"
     t.bigint "inst_module_section_exercise_id"
     t.string "answer"
+    t.integer "question_id"
     t.index ["inst_book_id"], name: "odsa_exercise_attempts_inst_book_id_fk"
     t.index ["inst_book_section_exercise_id"], name: "odsa_exercise_attempts_inst_book_section_exercise_id_fk"
     t.index ["inst_course_offering_exercise_id"], name: "odsa_exercise_attempts_inst_course_offering_exercise_id_fk"

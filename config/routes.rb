@@ -24,12 +24,16 @@ OpenDSA::Application.routes.draw do
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
   post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_pe'
   post '/odsa_exercise_attempts/ae' => 'odsa_exercise_attempts#create_ae'
+  post '/odsa_exercise_attempts/pi' => 'odsa_exercise_attempts#create_pi'
+  post '/odsa_exercise_attempts/get_attempts' => 'odsa_exercise_attempts#get_attempts'
+  post '/odsa_exercise_attempts/get_checkpoint' => 'odsa_exercise_attempts#get_checkpoint'
+  post '/odsa_exercise_attempts/get_progress' => 'odsa_exercise_attempts#get_progress'
   # get '/odsa_exercise_attempts/get_count' => 'odsa_exercise_attempts#get_count'
 
-  post '/pi_attempts' => 'pi_attempts#create'
-  post '/pi_attempts/get_attempts' => 'pi_attempts#get_attempts'
-  post '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
-  post '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
+  # post '/pi_attempts' => 'pi_attempts#create'
+  # post '/pi_attempts/get_attempts' => 'pi_attempts#get_attempts'
+  # post '/pi_attempts/get_checkpoint' => 'pi_attempts#get_checkpoint'
+  # post '/pi_attempts/get_progress' => 'pi_attempts#get_progress'
 
   #used to store student progress
   #used by grading.js in the front end
