@@ -21,7 +21,6 @@
 #  fk_rails_9b61737c9f  (inst_exercise_id)
 #  fk_rails_b320810099  (inst_module_section_id)
 #
-# an \exercise in a stand-alone module
 class InstModuleSectionExercise < ApplicationRecord
 
   belongs_to :inst_module_version, inverse_of: :inst_module_section_exercises
