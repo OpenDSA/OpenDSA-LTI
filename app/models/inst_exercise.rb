@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: inst_exercises
+#
+#  id            :bigint           not null, primary key
+#  name          :string(255)
+#  short_name    :string(255)      not null
+#  ex_type       :string(50)
+#  description   :string(255)
+#  created_at    :datetime
+#  updated_at    :datetime
+#  learning_tool :string(255)
+#  av_address    :string(512)
+#  width         :bigint
+#  height        :bigint
+#  links         :text(65535)
+#  scripts       :text(65535)
+#
+# Indexes
+#
+#  index_inst_exercises_on_short_name  (short_name) UNIQUE
+#
 class InstExercise < ApplicationRecord
   #~ Relationships ............................................................
   has_many :inst_book_section_exercises
