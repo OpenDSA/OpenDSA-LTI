@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: inst_course_offering_exercises
+#
+#  id                  :bigint           not null, primary key
+#  course_offering_id  :bigint           not null
+#  inst_exercise_id    :bigint           not null
+#  resource_link_id    :string(255)
+#  resource_link_title :string(255)
+#  created_at          :datetime
+#  updated_at          :datetime
+#  threshold           :decimal(5, 2)    not null
+#  points              :decimal(5, 2)    not null
+#  options             :text(4294967295)
+#
+# Indexes
+#
+#  index_inst_course_offering_exercises_on_course_offering_res  (course_offering_id,resource_link_id,inst_exercise_id) UNIQUE
+#  inst_course_offering_exercises_inst_exercise_id_fk           (inst_exercise_id)
+#
 class InstCourseOfferingExercise < ApplicationRecord
 
   #~ Relationships ............................................................
