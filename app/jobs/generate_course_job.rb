@@ -191,12 +191,12 @@ class GenerateCourseJob < ProgressJob::Base
                                    module_item_position)
     module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
     if module_name.include? '/'
-      module_name = module_name.split('/')[1]  #module_name = IntroOO
+      module_name = module_name.split('/')[1]
     end
     title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
             (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + " "
 
-    module_file_name = module_name #IntroOO
+    module_file_name = module_name
     title = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
 
     odsa_url_opts = {

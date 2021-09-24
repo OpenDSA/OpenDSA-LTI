@@ -757,6 +757,13 @@
     return settings;
   }
 
+  /* Gets the Max Toc Depth settings (max-toc-depth) */
+  function globalMaxTocDepthSettings(toolName) {
+    return {
+        points: Number.parseInt($("#max-toc-depth").val())
+    };
+  }
+
   /* Gets the default settings for sections */
   function globalSectionSettings() {
     return {
@@ -800,7 +807,8 @@
       glob_ka_options: globalKaSettings(),
       glob_pe_options: globalPeSettings(),
       glob_ff_options: globalFfSettings(),
-      glob_extr_options: globalExtrSettings()
+      glob_extr_options: globalExtrSettings(),
+      max_toc_depth: globalMaxTocDepthSettings()
     };
   }
 
@@ -999,6 +1007,9 @@
         case "glob_extr_options":
           setGlobExtrOptions(config.glob_extr_options);
           break;
+        case "max_toc_depth":
+          $("#max-toc-depth").val(config.max_toc_depth);
+          break;
         case "chapters":
           //loadChapters(config.chapters, config.lang);
           break;
@@ -1061,6 +1072,9 @@
               break;
             case "glob_exer_options":
               setGlobExerOptions(config.glob_exer_options);
+              break;
+            case "max_toc_depth":
+              $("max-toc-depth").val(config.max_toc_depth);
               break;
             case "chapters":
               config.chapters = convertChapters(config.chapters);
