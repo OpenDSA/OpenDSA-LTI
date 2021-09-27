@@ -288,7 +288,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.0.2)
-    mini_portile2 (2.4.0)
+    mini_portile2 (2.6.1)
     minitest (5.14.4)
     momentjs-rails (2.20.1)
       railties (>= 3.1)
@@ -298,8 +298,9 @@ GEM
     mustache (1.1.1)
     mysql2 (0.5.3)
     nio4r (2.5.5)
-    nokogiri (1.10.9)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.12.5)
+      mini_portile2 (~> 2.6.1)
+      racc (~> 1.4)
     oauth (0.5.4)
     oauth2 (1.4.4)
       faraday (>= 0.8, < 2.0)
@@ -342,6 +343,7 @@ GEM
       nio4r (~> 2.0)
     rabl (0.14.3)
       activesupport (>= 2.3.14)
+    racc (1.5.2)
     rack (2.2.2)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
@@ -529,7 +531,7 @@ DEPENDENCIES
   mustache (~> 1.0)
   mysql2
   net-ssh!
-  nokogiri (= 1.10.9)
+  nokogiri (= 1.12.5)
   oauth (= 0.5.4)
   oauth2 (= 1.4.4)
   omniauth
