@@ -12,6 +12,8 @@ development:
    strict: false
    port: 3306
    encoding: utf8
+   pool: 26
+   timeout: 10000
 
 production:
   adapter: mysql2
@@ -22,6 +24,8 @@ production:
   strict: false
   port: 3306
   encoding: utf8
+  pool: 26
+  timeout: 10000
 
 # development:
 #   adapter: sqlite3
