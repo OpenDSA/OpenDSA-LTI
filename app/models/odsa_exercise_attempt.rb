@@ -85,6 +85,8 @@ class OdsaExerciseAttempt < ApplicationRecord
       update_pe_exercise_progress
     elsif self.request_type === 'AE'
       update_ae_exercise_progress
+    elsif self.request_type === 'PI'
+      update_pi_exercise_progress
     else
       update_ka_exercise_progress
     end
@@ -199,6 +201,7 @@ class OdsaExerciseAttempt < ApplicationRecord
       self.earned_proficiency = true
       if hasBook
         self.points_earned = inst_book_section_exercise.points
+        Rails.logger.info(inst_book_section_exercise.points)
       elsif has_standalone_module
         self.points_earned = inst_module_section_exercise.points
       else
@@ -264,6 +267,59 @@ class OdsaExerciseAttempt < ApplicationRecord
       exercise_progress.save!
       if hasBook
         module_progress.update_proficiency(inst_exercise)
+        book_progress.update_proficiency(exercise_progress)
+      elsif has_standalone_module
+        module_progress.update_proficiency(inst_module_section_exercise)
+      end
+    else
+      exercise_progress.save!
+    end
+  end
+
+  def update_pi_exercise_progress
+    Rails.logger.info("update_pi_exercise_progress")
+    hasBook = !inst_book_section_exercise_id.blank?
+    has_standalone_module = !inst_module_section_exercise_id.blank?
+    if hasBook
+      Rails.logger.info("update_pi_exercise_progress -> hasBook")
+      @inst_chapter_module = inst_book_section_exercise.get_chapter_module
+      inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
+      book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
+      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
+    elsif has_standalone_module
+      inst_exercise = InstExercise.find(inst_module_section_exercise.inst_exercise_id)
+      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
+    else
+      inst_exercise = InstExercise.find(inst_course_offering_exercise.inst_exercise_id)
+    end
+    exercise_progress = self.get_exercise_progress
+    exercise_progress.first_done ||= DateTime.now
+    exercise_progress.last_done = DateTime.now
+    if hasBook
+      Rails.logger.info("update_pi_exercise_progress -> hasBook 2222")
+      book_progress.update_started(inst_exercise)
+    end
+    if self.correct
+      self.earned_proficiency = true
+      if hasBook
+        self.points_earned = inst_book_section_exercise.points
+        Rails.logger.info(inst_book_section_exercise.points)
+      elsif has_standalone_module
+        self.points_earned = inst_module_section_exercise.points
+      else
+        self.points_earned = inst_course_offering_exercise.points
+      end
+      self.save!
+      exercise_progress['total_correct'] += 1
+      exercise_progress['total_worth_credit'] += 1
+      exercise_progress['current_score'] = self.points_earned
+      exercise_progress['highest_score'] = self.points_earned
+      exercise_progress.proficient_date ||= DateTime.now
+      exercise_progress.save!
+      if hasBook
+        Rails.logger.info("update_pi_exercise_progress -> update_module_progress_procifiency")
+        module_progress.update_proficiency(inst_exercise)
+        Rails.logger.info("update_pi_exercise_progress -> update_book_progress_procifiency")
         book_progress.update_proficiency(exercise_progress)
       elsif has_standalone_module
         module_progress.update_proficiency(inst_module_section_exercise)
