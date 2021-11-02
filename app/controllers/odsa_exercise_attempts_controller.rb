@@ -432,12 +432,12 @@ class OdsaExerciseAttemptsController < ApplicationController
       inst_exercise = InstExercise.find_by(short_name: params[:exercise])
       inst_section = InstSection.find_by(inst_chapter_module_id: params[:inst_chapter_module_id])
       inst_book_section_exercise = InstBookSectionExercise.where(
-        "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
-        params[:inst_book_id], inst_section.id, inst_exercise.id
+        "inst_book_id=? and inst_exercise_id=?",
+        params[:inst_book_id], inst_exercise.id
       ).first
       if inst_book_section_exercise.blank?
         respond_to do |format|
-          msg = {:status => "fail", :message => "Fail!"}
+          msg = {:status => "fail", :message => "Inst Book Section Exercise is blank"}
           format.json { render :json => msg }
         end
         return
@@ -532,13 +532,13 @@ class OdsaExerciseAttemptsController < ApplicationController
                    }
           }
         else
-          msg = {:status => "fail1234", :message => "Fail!"}
+          msg = {:status => "fail", :message => "Fail to save exercise attempt!"}
           format.json { render :json => msg }
         end
       end
     else
       respond_to do |format|
-        msg = {:status => "fail5678", :message => "Fail!"}
+        msg = {:status => "fail", :message => "Fail to retreive inst book info!"}
         format.json { render :json => msg }
       end
     end
