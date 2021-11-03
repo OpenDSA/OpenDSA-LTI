@@ -74,6 +74,7 @@ class InstExercise < ApplicationRecord
       book_sec_ex.inst_exercise_id = ex.id
       book_sec_ex.points = exercise_obj['points'] || 0
       book_sec_ex.required = exercise_obj['required'] || false
+      book_sec_ex.partial_credit = exercise_obj['partial_credit'] || false
       book_sec_ex.threshold = 100
     else # OpenDSA exercise
       book_sec_ex.inst_exercise_id = ex.id
@@ -81,6 +82,7 @@ class InstExercise < ApplicationRecord
       book_sec_ex.points = exercise_obj['points'] || 0
       book_sec_ex.required = exercise_obj['required'] || false
       book_sec_ex.threshold = exercise_obj['threshold'] || 5
+      book_sec_ex.partial_credit = exercise_obj['partial_credit'] || false
       book_sec_ex.options = exercise_obj['exer_options'].to_json
       if !exercise_obj.is_a?(Hash)
         book_sec_ex.type = 'dgm'
@@ -104,7 +106,7 @@ class InstExercise < ApplicationRecord
     end
     return nil
   end
-  
+
   def self.embed_url(host, short_name)
     return "#{host}/embed/#{short_name}"
   end
@@ -114,7 +116,7 @@ class InstExercise < ApplicationRecord
     if !av_address.blank?
       return "<iframe src=\"#{url}\" height=\"#{height || 950}\" width=\"100%\" scrolling=\"no\"></iframe>"
     end
-    return "<iframe src=\"#{url}\" height=\"600\" width=\"100%\"></iframe>"    
+    return "<iframe src=\"#{url}\" height=\"600\" width=\"100%\"></iframe>"
   end
 
   #~ Instance methods .........................................................
@@ -126,6 +128,6 @@ class InstExercise < ApplicationRecord
   def embed_code(host)
     return InstExercise.embed_code(host, self.av_address, self.height)
   end
-  
+
   #~ Private instance methods .................................................
 end

@@ -74,6 +74,7 @@ class InstModuleSectionExercise < ApplicationRecord
     )
     inst_mod_sec_ex.points = json['points'] || 0
     inst_mod_sec_ex.required = json['required'] || false
+    inst_mod_sec_ex.partial_credit = json['partial_credit'] || false
     inst_mod_sec_ex.threshold = if json['type'] == 'pe'
                                   json['threshold'] || 1
                                 elsif json['type'] == 'ae'
@@ -92,10 +93,10 @@ class InstModuleSectionExercise < ApplicationRecord
   def self.handle_grade_passback(req, _res, user_id, inst_module_section_exercise_id)
     ex_progress = OdsaExerciseProgress.find_by(user_id: user_id,
                                                inst_module_section_exercise_id: inst_module_section_exercise_id)
-                                               
+
     if req.replace_request?
       # set a new score for the user
-            
+
       score = Float(req.score.to_s)
 
       if score < 0.0 || score > 1.0
@@ -128,7 +129,7 @@ class InstModuleSectionExercise < ApplicationRecord
       res.score = ex_progress.blank? ? 0 : ex_progress.highest_score
       res.code_major = 'success'
     end
-    
+
     return res
   end
 

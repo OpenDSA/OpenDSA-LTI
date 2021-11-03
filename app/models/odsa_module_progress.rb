@@ -159,7 +159,7 @@ class OdsaModuleProgress < ApplicationRecord
       end
 
       require 'lti/outcomes'
-      res = LtiOutcomes.post_score_to_consumer(self.highest_score, 
+      res = LtiOutcomes.post_score_to_consumer(self.highest_score,
                                                self.lis_outcome_service_url,
                                                self.lis_result_sourcedid,
                                                consumer_key,
@@ -179,8 +179,12 @@ class OdsaModuleProgress < ApplicationRecord
     bk_sec_exs.each do |ex|
       total_points += ex.points
       prog = exercise_progresses.detect { |p| p.inst_book_section_exercise_id == ex.id }
-      if !prog.blank? and prog.proficient?
-        score += ex.points
+      if !prog.blank?
+        if prog.proficient?
+          score += ex.points
+        elsif ex.partial_credit
+          score += ex.points * prog.highest_score / 100.0
+        end
       end
     end
     if (total_points == 0)
@@ -201,13 +205,13 @@ class OdsaModuleProgress < ApplicationRecord
   def update_standalone_proficiency(inst_module_section_exercise)
     # find all exercises in the module
     # find exercises the user has achieved proficiency on
-    
+
     mod_sec_exs = self.inst_module_version.inst_module_section_exercises || []
     module_exercises = mod_sec_exs.collect { |ex| ex.id } || []
     exercise_progresses = OdsaExerciseProgress.joins(:inst_module_section_exercise)
       .where("inst_module_section_exercises.inst_module_version_id = #{self.inst_module_version_id} AND user_id = #{self.user_id}")
     proficient_exercises = exercise_progresses.select{ |ep| ep.proficient? }
-                                              .collect{ |ep| ep.inst_module_section_exercise_id } || [] 
+                                              .collect{ |ep| ep.inst_module_section_exercise_id } || []
 
     self.first_done ||= DateTime.now
     self.last_done = DateTime.now
