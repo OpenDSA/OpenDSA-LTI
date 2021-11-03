@@ -263,8 +263,12 @@ class OdsaModuleProgress < ApplicationRecord
     mod_sec_exs.each do |ex|
       total_points += ex.points
       prog = exercise_progresses.detect { |p| p.inst_module_section_exercise_id == ex.id }
-      if !prog.blank? and prog.proficient?
-        score += ex.points
+      if !prog.blank?
+        if prog.proficient?
+          score += ex.points
+        elsif ex.partial_credit
+          score += ex.points * prog.highest_score / 100.0
+        end
       end
     end
     if (total_points == 0)
