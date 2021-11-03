@@ -487,7 +487,7 @@ class OdsaExerciseAttemptsController < ApplicationController
       end
 
       already_proficient = exercise_progress.proficient?
-      
+
       exercise_attempt = OdsaExerciseAttempt.new(
         inst_book_id: params[:inst_book_id],
         user: current_user,
@@ -496,6 +496,7 @@ class OdsaExerciseAttemptsController < ApplicationController
         inst_course_offering_exercise: inst_course_offering_exercise,
         inst_module_section_exercise: inst_module_section_exercise,
         correct: params[:correct],
+        finished_frame: params[:finishedFrame],
         time_done: Time.now,
         question_name: params[:exercise],
         question_id: params[:question_id],
