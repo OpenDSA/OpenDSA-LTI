@@ -299,7 +299,7 @@ class OdsaExerciseAttempt < ApplicationRecord
       Rails.logger.info("update_pi_exercise_progress -> hasBook 2222")
       book_progress.update_started(inst_exercise)
     end
-    if self.correct
+    if self.correct and self.finished_frame
       self.earned_proficiency = true
       if hasBook
         self.points_earned = inst_book_section_exercise.points
