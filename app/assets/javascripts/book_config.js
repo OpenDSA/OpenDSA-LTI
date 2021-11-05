@@ -61,6 +61,7 @@
     addChapterDialog,
     renameChapterDialog,
     exSettingsDialog;
+  var glob_extr_options_nonedit = {};
 
   var changesMade = false;
 
@@ -740,19 +741,21 @@
     will be returned. */
   function globalExtrSettings(toolName) {
     if (toolName) {
-      return {
-        points: Number.parseFloat($("#glob-" + toolName + "-points").val())
-      };
+      var tool_glob_settings = glob_extr_options_nonedit[toolName];
+      if (tool_glob_settings == null)
+      {
+        tool_glob_settings = {};
+      }
+      tool_glob_settings['points'] =
+        Number.parseFloat($("#glob-" + toolName + "-points").val());
+      return tool_glob_settings;
     }
 
-    var settings = {
-      points: Number.parseFloat($("#glob-extr-points").val())
-    };
+    var settings = glob_extr_options_nonedit;
+    settings['points'] = Number.parseFloat($("#glob-extr-points").val());
     for (var i = 0; i < ODSA.learningTools.length; i++) {
       var tool = ODSA.learningTools[i];
-      settings[tool.name] = {
-        points: Number.parseFloat($("#glob-" + tool.name + "-points").val())
-      };
+      settings[tool.name] = globalExtrSettings(tool.name);
     }
     return settings;
   }
@@ -953,6 +956,7 @@
   /* Loads the settings from the specified configuration. Used to load
   minimal configurations, such as  */
   function loadConfiguration(config) {
+    // alert(JSON.stringify(config));
     $("#book-config-form")[0].reset();
     for (var key in config) {
       switch (key) {
@@ -1026,7 +1030,7 @@
     );
   }
 
-  /* Loads a 'full' configuration file that includes the settings for 
+  /* Loads a 'full' configuration file that includes the settings for
      all exercises, and no global exercise settings. An example
      of this is a configuration pulled from the database. */
   function loadFullConfiguration(config) {
@@ -1316,6 +1320,7 @@
     var url = $("#reference-config").val();
     $.ajax({
       url: url,
+      cache: false,
       success: function(data, txtStatus, xhr) {
         loadConfiguration(data);
       },
@@ -1344,6 +1349,7 @@
     var url = "/inst_books/configurations/" + bookId;
     $.ajax({
       url: url,
+      cache: false,
       success: function(data, txtStatus, xhr) {
         loadFullConfiguration(data);
       },
@@ -1433,6 +1439,7 @@
 
   /* Sets the global external tool options */
   function setGlobExtrOptions(options) {
+    glob_extr_options_nonedit = options;
     for (var option in options) {
       var value = options[option];
       if (option === "points") {
