@@ -29,6 +29,20 @@
 	    allowInputToggle: true,
       format: "YYYY-MM-DD HH:MM"
     });
+
+   });
+  /*
+   * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
+   */
+   $(document).on('focus', '.chapterTimemodal', function() {
+    $(this).datetimepicker({
+      // showClose: true,
+      sideBySide: true,
+      keepInvalid: true,
+      allowInputToggle: true,
+      // format: "YYYY-MM-DD HH:MM"
+      format: 'L LT'
+    });
    });
 
   /*
@@ -81,9 +95,15 @@
    * modal.
    */
   $(document).on('click', '#chapterSubmit', function() {
+    // var chapter = window.jsonFile['chapters'][$('#chapterSoft').attr('data-chapter')]
+    // window.jsonFile['chapters'][$("#chapterSoft").attr("data-chapter")].append("due_date", "0000-00-00 00:00:00");
+    // chapter['due_date'] = "0000-00-00 00:00:00"
+    // window.jsonFile['chapters'][$('#chapterSoft').attr('data-chapter')] = chapter;
+    // console.log(window.jsonFile['chapters'][$('#chapterSoft').attr('data-chapter')])
     var chapterTitle = $('#chapterSoft').attr('data-chapter');
-    var checkChapter = '[data-chapter=\"' + chapterTitle + '\"]';
-    $(checkChapter + '[data-type="soft"]').val($('#chapterSoft').val());
+    // var checkChapter = '[data-chapter=\"' + chapterTitle + '\"]'; // [data-chapter="Preface]"
+    // $(checkChapter + '[data-type="soft"]').val($('#chapterSoft').val()); // data-chapter="Preface"
+    $('[data-key=\"' + chapterTitle +'\"]').attr('data-value', "0000-00-00 00:00:00");
     //$(checkChapter + '[data-type="hard"]').val($('#chapterHard').val());
   });
 
@@ -565,7 +585,6 @@
     json += "\n}";
 
     json = json.replace(/"sections": "null"/g, "\"sections\": {}");
-
     return json;
   }
 
@@ -647,9 +666,13 @@
    * Function to send configuration to server.
    */
   var handleSubmit = function() {
-    var messages,
-      bookConfig = JSON.parse(buildJSON()),
-      url = "/inst_books/update";
+    var messages;
+    console.log(window.jsonFile);
+    console.log(buildJSON())
+    // var bookConfig = JSON.parse(buildJSON());
+    var bookConfig = window.jsonFile;
+    var url = "/inst_books/update";
+    console.log(bookConfig);
 
     messages = check_completeness();
     if (messages.length !== 0) {
@@ -657,7 +680,6 @@
       $('#odsa-submit-co').prop('disabled', false);
       return;
     }
-
     jQuery.ajax({
       url: url,
       type: "POST",

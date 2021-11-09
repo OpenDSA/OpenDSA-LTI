@@ -42,11 +42,13 @@ class InstBooksController < ApplicationController
 
     input_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_input.json'
     input_file_path = "public/OpenDSA/config/temp/#{input_file}"
+    Rails.logger.info(inst_book.to_json);
     File.open(input_file_path, 'w') { |file| file.write(inst_book.to_json) }
     input_path = input_file_path[15..-1] # without the public/OpenDSA
 
     output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
     output_file_path = "public/OpenDSA/config/temp/#{output_file}"
+    File.open(output_file_path, 'w') { |file| file.write(inst_book.to_json) }
     output_path = output_file_path[15..-1] # without the public/OpenDSA
     require 'net/http'
     uri = URI(ENV["simple_api_link"])

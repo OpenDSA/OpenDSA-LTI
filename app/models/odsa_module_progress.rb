@@ -78,7 +78,7 @@ class OdsaModuleProgress < ApplicationRecord
 
     # Comparing two floats.
     # Only send score to LMS if the score has increased.
-    if (self.highest_score - old_score).abs > 0.001
+    if (self.highest_score - old_score).abs > 0.001 && datetime
       res = post_score_to_lms()
       unless res.blank?
         # res will be null if this module isn't linked to an LMS assignment
