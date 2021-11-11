@@ -89,7 +89,7 @@ class OdsaModuleProgress < ApplicationRecord
   end
 
   #~ Instance methods .........................................................
-  def update_proficiency(inst_exercise)
+  def update_proficiency(inst_exercise, force_send = false)
     if self.inst_module_version_id
       # standalone module
       return update_standalone_proficiency(inst_exercise)
@@ -108,7 +108,7 @@ class OdsaModuleProgress < ApplicationRecord
 
     # Comparing two floats.
     # Only send score to LMS if the score has increased.
-    if (self.highest_score - old_score).abs > 0.001
+    if force_send || (self.highest_score - old_score).abs > 0.001
       res = post_score_to_lms()
       unless res.blank?
         # res will be null if this module isn't linked to an LMS assignment

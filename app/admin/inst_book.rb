@@ -30,6 +30,8 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
 
   member_action :update_configuration, method: :get do
   end
+  member_action :resend_scores, method: :get do
+  end
 
 
   member_action :clone_book, method: :get do
@@ -77,6 +79,18 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       end
       @inst_book = InstBook.find(params[:id])
       render 'upload_books'
+    end
+
+    def resend_scores
+      if authorized? :update_configuration
+        @job = Delayed::Job.enqueue ResendScoresJob.new(
+          current_user.id, params[:id])
+        flash[:success] = "Started job to resend all score passbacks for " +
+          "all users in all modules for the selected book instance."
+      else
+        flash[:error] = "not authorized"
+      end
+      redirect_to admin_inst_books_path
     end
 
     def upload_books
@@ -153,8 +167,10 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       end
       links += link_to "Clone", clone_book_admin_inst_book_path(inst_book)
       if authorized? :update_configuration, inst_book
+        links += ' '
         links += link_to "Update Configuration", update_configuration_admin_inst_book_path(inst_book)
         links += ' '
+        links += link_to "Re-send Scores", resend_scores_admin_inst_book_path(inst_book)
       end
       links
     end
