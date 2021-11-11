@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_03_025921) do
+ActiveRecord::Schema.define(version: 2021_11_10_211559) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb3", force: :cascade do |t|
     t.string "namespace"
@@ -153,6 +153,7 @@ ActiveRecord::Schema.define(version: 2021_11_03_025921) do
     t.boolean "type"
     t.text "options", size: :long
     t.boolean "partial_credit", default: false
+    t.text "json", limit: 65535
     t.index ["inst_book_id"], name: "inst_book_section_exercises_inst_book_id_fk"
     t.index ["inst_exercise_id"], name: "inst_book_section_exercises_inst_exercise_id_fk"
     t.index ["inst_section_id"], name: "inst_book_section_exercises_inst_section_id_fk"

@@ -51,7 +51,7 @@ class InstBookSectionExercise < ApplicationRecord
         inst_book_section_exercise_id: inst_book_section_exercise_id)
     if req.replace_request?
       # set a new score for the user
-            
+
       score = Float(req.score.to_s)
 
       if score < 0.0 || score > 1.0
@@ -103,6 +103,7 @@ class InstBookSectionExercise < ApplicationRecord
     book_section_exercise.required = self.required
     book_section_exercise.threshold = self.threshold
     book_section_exercise.options = self.options
+    book_section_exercise.json = self.json
     book_section_exercise.save
   end
 

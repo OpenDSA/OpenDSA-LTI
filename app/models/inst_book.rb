@@ -172,8 +172,11 @@ class InstBook < ApplicationRecord
                             exercises = inst_section.inst_book_section_exercises
                             if !exercises.empty?
                               for inst_book_section_exercise in exercises
-                                exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
+                                exercise_name = inst_exercise.short_name
                                 json.set! exercise_name do
+                                  if !inst_book_section_exercise.json.blank?
+                                    json.merge! inst_book_section_exercise.json
+                                  end
                                   json.set! :required, inst_book_section_exercise.required
                                   json.set! :points, inst_book_section_exercise.points.to_f
                                   json.set! :threshold, inst_book_section_exercise.threshold.to_f
