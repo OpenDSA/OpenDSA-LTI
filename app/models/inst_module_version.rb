@@ -21,7 +21,6 @@
 #  fk_rails_7e343b3134                            (inst_module_id)
 #  index_inst_module_versions_on_course_resource  (course_offering_id,resource_link_id) UNIQUE
 #
-# a stand-alone module (i.e. not contained in a book) that is tied directly to a course offering
 class InstModuleVersion < ApplicationRecord
   belongs_to :inst_module
   belongs_to :course_offering
