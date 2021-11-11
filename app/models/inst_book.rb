@@ -124,6 +124,8 @@ class InstBook < ApplicationRecord
     return missing_modules
   end
 
+  # FIXME: shouldn't this method be removed? It appears to be out-dated?
+  # FIXME: the real code is now in views/inst_books/show.json.builder
   def to_builder
     Jbuilder.new do |json|
       json.set! :inst_book_id, self.id
@@ -175,13 +177,14 @@ class InstBook < ApplicationRecord
                                 exercise_name = inst_exercise.short_name
                                 json.set! exercise_name do
                                   if !inst_book_section_exercise.json.blank?
-                                    json.merge! inst_book_section_exercise.json
+                                    json.merge! JSON.parse(inst_book_section_exercise.json)
                                   end
                                   json.set! :required, inst_book_section_exercise.required
                                   json.set! :points, inst_book_section_exercise.points.to_f
                                   json.set! :threshold, inst_book_section_exercise.threshold.to_f
                                   options = inst_book_section_exercise.options
                                   if options != nil && options != "null"
+                                    # FIXME: shouldn't eval() here be JSON.parse()?
                                     json.set! :exer_options, eval(options)
                                   end
                                 end

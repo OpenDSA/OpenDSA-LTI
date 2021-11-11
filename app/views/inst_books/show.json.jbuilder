@@ -60,6 +60,9 @@ json.chapters do
                       for inst_book_section_exercise in exercises
                         exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
                         json.set! exercise_name do
+                          if !inst_book_section_exercise.json.blank?
+                            json.merge! JSON.parse(inst_book_section_exercise.json)
+                          end
                           json.set! :id, inst_book_section_exercise.id
                           json.set! :long_name, InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.name
                           json.set! :required, inst_book_section_exercise.required
@@ -68,6 +71,7 @@ json.chapters do
                           json.set! :options, inst_book_section_exercise.options
                           options = inst_book_section_exercise.options
                           if options != nil && options != "null"
+                            # FIXME: shouldn't eval() here be JSON.parse()?
                             json.set! :exer_options, eval(options)
                           end
                         end
