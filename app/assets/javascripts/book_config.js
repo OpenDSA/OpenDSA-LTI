@@ -62,6 +62,7 @@
     renameChapterDialog,
     exSettingsDialog;
   var glob_extr_options_nonedit = {};
+  var glob_ka_options_nonedit = {};
 
   var changesMade = false;
 
@@ -702,11 +703,15 @@
 
   /* Gets the global Khan-Academy Exercise settings (glob_ka_options) */
   function globalKaSettings() {
-    return {
-      required: $("#glob-ka-required").is(":checked"),
-      points: Number.parseFloat($("#glob-ka-points").val()),
-      threshold: Number.parseInt($("#glob-ka-threshold").val())
-    };
+    ka_settings = glob_ka_options_nonedit;
+    if (ka_settings == null)
+    {
+      ka_settings = {};
+    }
+    ka_settings['required'] = $("#glob-ka-required").is(":checked");
+    ka_settings['points'] = Number.parseFloat($("#glob-ka-points").val());
+    ka_settings['threshold'] = Number.parseInt($("#glob-ka-threshold").val());
+    return ka_settings;
   }
 
   /* Gets the global Frame settings (glob_ff_options) */
@@ -1403,6 +1408,7 @@
 
   /* Sets the global Khan-Academy exercise options */
   function setGlobKaOptions(options) {
+    glob_ka_options_nonedit = options;
     for (var option in options) {
       var value = options[option];
       if (typeof value === "boolean") {
