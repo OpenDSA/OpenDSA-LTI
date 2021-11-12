@@ -35,6 +35,8 @@
 #  index_users_on_time_zone_id          (time_zone_id)
 #
 class User < ApplicationRecord
+  # Represents a single user account on the system.
+
   include Gravtastic
   gravtastic secure: true, default: 'monsterid'
 

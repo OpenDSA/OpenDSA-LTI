@@ -107,18 +107,14 @@ class OdsaModuleProgress < ApplicationRecord
     update_score(bk_sec_exs)
 
     # Comparing two floats.
-    # Only send score to LMS if the score has increased.
-    if force_send || (self.highest_score - old_score).abs > 0.001
+    # Only send score to LMS if the score has increased, or previous
+    # passback was not performed or unsuccessful
+    if force_send or
+      self.last_passback.nil? or
+      self.inst_book.last_compiled.nil? or   # should never happen, NPE guard
+      (self.last_passback < self.inst_book.last_compiled) or
+      self.highest_score > old_score
       res = post_score_to_lms()
-      unless res.blank?
-        # res will be null if this module isn't linked to an LMS assignment
-        unless res.success?
-          # Failed to post score to LMS.
-          # Keep old score so that if the student attempts the exercise again
-          # we will try to send the new score again.
-          self.highest_score = old_score
-        end
-      end
     end
     self.save!
 
@@ -165,7 +161,18 @@ class OdsaModuleProgress < ApplicationRecord
                                                self.lis_result_sourcedid,
                                                consumer_key,
                                                consumer_secret)
+      if res.success?
+        self.last_passback = self.last_done
+      else
+        # passback failed, so clear timestamp of last successful passback
+        self.last_passback = nil
+      end
       return res
+    else
+      # Passback not attempted, so clear timestamp of last successful passback
+      self.last_passback = nil
+      # explicitly set return value to indicate no passback happened
+      return nil
     end
   end
 
@@ -221,17 +228,10 @@ class OdsaModuleProgress < ApplicationRecord
 
     # Comparing two floats.
     # Only send score to LMS if the score has increased.
-    if (self.highest_score - old_score).abs > 0.001
+    if self.last_passback.nil? or
+      self.highest_score > old_score
+
       res = post_score_to_lms()
-      unless res.blank?
-        # res will be null if this module isn't linked to an LMS assignment
-        unless res.success?
-          # Failed to post score to LMS.
-          # Keep old score so that if the student attempts the exercise again
-          # we will try to send the new score again.
-          self.highest_score = old_score
-        end
-      end
     end
     self.save!
 

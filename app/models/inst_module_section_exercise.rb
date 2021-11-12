@@ -23,6 +23,7 @@
 #  fk_rails_b320810099  (inst_module_section_id)
 #
 class InstModuleSectionExercise < ApplicationRecord
+  # an exercise in a stand-alone module
 
   belongs_to :inst_module_version, inverse_of: :inst_module_section_exercises
   belongs_to :inst_module_section, inverse_of: :inst_module_section_exercises

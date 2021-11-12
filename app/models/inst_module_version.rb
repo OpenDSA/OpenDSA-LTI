@@ -22,6 +22,9 @@
 #  index_inst_module_versions_on_course_resource  (course_offering_id,resource_link_id) UNIQUE
 #
 class InstModuleVersion < ApplicationRecord
+  # a stand-alone module (i.e. not contained in a book) that is tied
+  # directly to a course offering
+
   belongs_to :inst_module
   belongs_to :course_offering
   has_many   :inst_module_sections, inverse_of: :inst_module_version, dependent: :destroy
@@ -43,7 +46,7 @@ class InstModuleVersion < ApplicationRecord
       elsif instmod.name != json['long_name']
         instmod.name = json['long_name']
       end
-  
+
       version = InstModuleVersion.new(
         inst_module_id: instmod.id,
         name: json['long_name'],
@@ -60,14 +63,14 @@ class InstModuleVersion < ApplicationRecord
       instmod.current_version_id = version.id
       instmod.save!
     end
-    
+
     return version
   end
 
   def clone(course_offering, resource_link_id, resource_link_title)
     imv = nil
-    
-    InstModuleVersion.transaction do 
+
+    InstModuleVersion.transaction do
       imv = InstModuleVersion.new(
         inst_module_id: self.inst_module_id,
         name: self.name,
@@ -79,7 +82,7 @@ class InstModuleVersion < ApplicationRecord
         resource_link_title: resource_link_title,
       )
       imv.save!
-      
+
       inst_module_sections.each do |ims|
         inst_mod_sect = ims.clone(imv)
       end
