@@ -153,7 +153,7 @@ ActiveRecord::Schema.define(version: 2021_11_10_211559) do
     t.boolean "type"
     t.text "options", size: :long
     t.boolean "partial_credit", default: false
-    t.text "json", limit: 65535
+    t.text "json"
     t.index ["inst_book_id"], name: "inst_book_section_exercises_inst_book_id_fk"
     t.index ["inst_exercise_id"], name: "inst_book_section_exercises_inst_exercise_id_fk"
     t.index ["inst_section_id"], name: "inst_book_section_exercises_inst_section_id_fk"
