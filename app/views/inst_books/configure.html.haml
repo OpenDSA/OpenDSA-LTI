@@ -9,10 +9,6 @@
   .col-xs-9.alert-msg#alerts{style: 'display: none;'}
 
 %form.form-horizontal{method: "post", id: 'book-config-form'}
-  .form-group
-    .col-xs-4
-      = submit_tag 'Save Book', name: 'Save Book', id: "odsa-submit-co", class: "btn btn-primary", title: 'Save Book Confirmation.', data: {confirm: 'Do you want to continue?'}
-      = submit_tag 'Undo Changes', name: 'Undo Changes', id: "odsa-reset-co", class: "btn btn-primary", title: 'Undo Book Confirmation.', data: {confirm: 'Do you want to continue?'}
   .form-group 
     .col-xs-4
       #submit-button-container

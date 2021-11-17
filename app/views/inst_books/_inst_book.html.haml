@@ -55,22 +55,6 @@
       - form_name = 'compile_book_' + inst_book.id.to_s
       = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=compile_book', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
         = submit_tag "Compile Book", name: form_name, class: "btn btn-primary", title: 'Compile book confirmation.', data: {confirm: "The book compilation process will regenerate the book pages on the OpenDSA server. Assignments due dates and points in Canvas course won't be affected by this action. Do you want to continue?"}
--inst_book.inst_chapters.each do |chapter|
-  %tr
-    %td= chapter.name
-    %td
-      = text_field_tag 'chapterSoft', nil, class: 'datetimepicker chapterTimemodal', data: {toggle: 'modal', target: '#chapterDue'}
-      /#chapterDue.modal.fade
-      /  .modal-dialog
-      /  .modal-content
-      /    .modal-header
-      /      %button.close{"data-dismiss" => "modal"} &times;
-      /      %h2.modal-title Chapter Due Date
-      /    .modal-body{ style: "height: 300px;" }
-      /      Due Date:
-      /      %input#chapterSoft.datetimepicker.chapterTimemodal
-      /    .modal-footer
-      /      %button#chapterSubmit.btn.btn-default{"data-dismiss" => "modal"} Submit
  
 /- form do |f|
 /  - f.semantic_errors
