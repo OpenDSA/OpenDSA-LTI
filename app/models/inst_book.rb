@@ -63,6 +63,7 @@ class InstBook < ApplicationRecord
     options['assumes'] = book_data['assumes'] || "recursion"
     options['dispModComp'] = book_data['dispModComp'] || true
     options['zeropt_assignments'] = book_data['zeropt_assignments'] || false
+    options['include_tree_view'] = book_data['include_tree_view'] || false
     options['glob_exer_options'] = book_data['glob_exer_options'] || {}
 
     if inst_book_id == nil
@@ -234,6 +235,11 @@ class InstBook < ApplicationRecord
   def zeropt?
     zeropt = "\"zeropt_assignments\":true"
     return self.options.include? zeropt
+  end
+
+  def tree_view?
+    tree_view = "\"include_tree_view\":true"
+    return self.options.include? tree_view
   end
 
 end
