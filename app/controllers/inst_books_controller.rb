@@ -38,30 +38,55 @@ class InstBooksController < ApplicationController
 
   # POST /inst_books/update
   def update
-    inst_book = params['inst_book']
+    if params['deadlines']
+      inst_book = params['inst_book']
+      chapters = inst_book['chapters']
+      chapters.each do |key, modules|
+        ch = InstChapter.where("inst_book_id = ? AND name = ?", inst_book['inst_book_id'], key).first
+        modules.each do |name, deadline|
+          due_date = nil
+          if (deadline != "undefined") 
+            due_date = Time.strptime(deadline, "%m/%d/%Y %I:%M %P").strftime("%Y-%m-%d %H:%M")
+          end
+          md = InstModule.where("name = ?", name).first
+          inst_chap_module = InstChapterModule.where("inst_chapter_id = ? AND inst_module_id = ?", ch.id, md.id).first
+          inst_chap_module.update(due_dates: due_date)
+        end
+      end
 
-    input_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_input.json'
-    input_file_path = "public/OpenDSA/config/temp/#{input_file}"
-    File.open(input_file_path, 'w') { |file| file.write(inst_book.to_json) }
-    input_path = input_file_path[15..-1] # without the public/OpenDSA
+      respond_to do |format|
+        msg = {:status => "success", :message => "Modules due dates has been set successfully!"}
+        format.json { render :json => msg }
+      end
 
-    output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
-    output_file_path = "public/OpenDSA/config/temp/#{output_file}"
-    output_path = output_file_path[15..-1] # without the public/OpenDSA
-    require 'net/http'
-    uri = URI(ENV["simple_api_link"])
-    res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_path, 'rake' => false)
-    unless res.kind_of? Net::HTTPSuccess
-      Rails.logger.info(res['stderr_compressed'])
-    end
+    else
+      inst_book = params['inst_book']
 
-    hash = JSON.load(File.read(output_file_path))
+      input_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_input.json'
+      input_file_path = "public/OpenDSA/config/temp/#{input_file}"
+      Rails.logger.info(inst_book.to_json);
+      File.open(input_file_path, 'w') { |file| file.write(inst_book.to_json) }
+      input_path = input_file_path[15..-1] # without the public/OpenDSA
 
-    InstBook.save_data_from_json(hash, current_user, inst_book['inst_book_id'])
+      output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
+      output_file_path = "public/OpenDSA/config/temp/#{output_file}"
+      File.open(output_file_path, 'w') { |file| file.write(inst_book.to_json) }
+      output_path = output_file_path[15..-1] # without the public/OpenDSA
+      require 'net/http'
+      uri = URI(ENV["simple_api_link"])
+      res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_path, 'rake' => false)
+      unless res.kind_of? Net::HTTPSuccess
+        Rails.logger.info(res['stderr_compressed'])
+      end
 
-    respond_to do |format|
-      msg = {:status => "success", :message => "Book configuration uploaded successfully!"}
-      format.json { render :json => msg }
+      hash = JSON.load(File.read(output_file_path))
+
+      InstBook.save_data_from_json(hash, current_user, inst_book['inst_book_id'])
+
+      respond_to do |format|
+        msg = {:status => "success", :message => "Book configuration uploaded successfully!"}
+        format.json { render :json => msg }
+      end
     end
   end
 
