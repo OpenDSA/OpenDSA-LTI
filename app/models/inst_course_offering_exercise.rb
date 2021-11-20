@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: inst_course_offering_exercises
+#
+#  id                  :bigint           not null, primary key
+#  course_offering_id  :bigint           not null
+#  inst_exercise_id    :bigint           not null
+#  resource_link_id    :string(255)
+#  resource_link_title :string(255)
+#  created_at          :datetime
+#  updated_at          :datetime
+#  threshold           :decimal(5, 2)    not null
+#  points              :decimal(5, 2)    not null
+#  options             :text(4294967295)
+#
+# Indexes
+#
+#  index_inst_course_offering_exercises_on_course_offering_res  (course_offering_id,resource_link_id,inst_exercise_id) UNIQUE
+#  inst_course_offering_exercises_inst_exercise_id_fk           (inst_exercise_id)
+#
 class InstCourseOfferingExercise < ApplicationRecord
 
   #~ Relationships ............................................................
@@ -30,7 +50,7 @@ class InstCourseOfferingExercise < ApplicationRecord
         points = settings.delete('points') || 1
         threshold = settings.delete('threshold')
         unless threshold
-          threshold = ex.ex_type == 'ka' ? 5 : 1  
+          threshold = ex.ex_type == 'ka' ? 5 : 1
         end
         settings.delete('isGradable')
         settings.delete('required')
@@ -45,8 +65,22 @@ class InstCourseOfferingExercise < ApplicationRecord
         points: points,
         options: optionsJson,
       )
-      course_off_ex.save!
+    elsif settings
+      # Update values if settings hash is provided
+      points = settings.delete('points') || 1
+      threshold = settings.delete('threshold')
+      unless threshold
+        threshold = ex.ex_type == 'ka' ? 5 : 1
+      end
+      settings.delete('isGradable')
+      settings.delete('required')
+      optionsJson = settings.to_json
+
+      course_off_ex.points = points
+      course_off_ex.threshold = threshold
+      course_off_ex.options = optionsJson
     end
+    course_off_ex.save!
     return course_off_ex
   end
 
@@ -89,10 +123,10 @@ class InstCourseOfferingExercise < ApplicationRecord
   def self.handle_grade_passback(req, res, user_id, inst_course_offering_exercise_id)
     ex_progress = OdsaExerciseProgress.find_by(user_id: user_id,
       inst_course_offering_exercise_id: inst_course_offering_exercise_id)
-    
+
     if req.replace_request?
       # set a new score for the user
-            
+
       score = Float(req.score.to_s)
 
       if score < 0.0 || score > 1.0
@@ -123,7 +157,7 @@ class InstCourseOfferingExercise < ApplicationRecord
       res.score = ex_progress.blank? ? 0 : ex_progress.highest_score
       res.code_major = 'success'
     end
-    
+
     return res
   end
 
