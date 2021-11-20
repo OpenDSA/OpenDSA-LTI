@@ -275,13 +275,12 @@
   var datepick = function(value, parent, mod, chapter) {
     //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
-    var html = "<div class='col-sm-3 input-group date datetimepicker'>";
+    var html = "<div class='col-sm-3 input-group date datetimepicker' style='float: right'>";
     html += "<input class=\"form-control date-input\" data-source=\" Chapter: " + chapter + ", Module: " + mod + ", Section: " + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
     html += "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
     html += "</div>";
     return html;
   }
-
   /*
    * Function to check if a given input is not a radio button.
    */
@@ -414,8 +413,8 @@
 
     var hSource = "<ul class=\"odsa_ul\">" +
        "<li class='odsa_li' hidden> <a data-key=\"inst_book_id\"> instance book id: </a> <input id=\"book_id\" value=\"{{inst_book_id}}\"> </li>" +
-       "<li class='odsa_li'> <a data-key=\"title\"> title: </a> <div id=\"book_title\" style=\"display: inline\"> {{title}} </div>  </li>" +
-       "<li class='odsa_li'> <a data-key=\"desc\">description: </a> <div id=\"book_desc\" style=\"display: inline\"> {{desc}} </div> </li>" +
+       "<li class='odsa_li'> <a data-key=\"title\"> Title: </a> <div id=\"book_title\" style=\"display: inline\"> {{title}} </div>  </li>" +
+       "<li class='odsa_li'> <a data-key=\"desc\">Description: </a> <div id=\"book_desc\" style=\"display: inline\"> {{desc}} </div> </li>" +
        "</ul>";
     var hTemplate = Handlebars.compile(hSource);
     var hhtml = hTemplate(data);
@@ -507,7 +506,7 @@
           "<li class=\"odsa_li\">" + // Chapter Line Item
             "{{#unless ../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
             "<a data-key=\"{{@key}}\" class=\"chapter-list\"> Chapter: </strong> {{@key}} </a>" + // Chapter Title
-            "{{#if ../last_compiled}} {{dropdown @key false}} {{else}} {{dropdown @key true}} {{/if}}" + // Dropdown Menu
+            // "{{#if ../last_compiled}} {{dropdown @key false}} {{else}} {{dropdown @key true}} {{/if}}" + // Dropdown Menu
             "{{#if ../last_compiled}} <ul style=\"list-style: inside\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Modules Sortable
             "{{#each .}}" + // Open Modules
               "{{#if long_name}}" + // Check Module Name

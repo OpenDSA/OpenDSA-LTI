@@ -26,13 +26,13 @@ li.odsa_li a {
 }
 
 li.odsa_li a span {
-	padding: 5px;
+	padding: 0px;
 }
 
 li.odsa_li {
 	border: none !important;
-	padding: 15px;
-	margin: 10px;
+	padding: 10px;
+	margin: 5px;
 	width: 90%;
 }
 
@@ -58,9 +58,8 @@ button.odsa_button {
 
 div.datetimepicker {
 	display: inline-block;
-	width: 50%;
 	height: 20px;
-	margin: 10px 5px 10px 5px;
+	margin: -10px 5px 10px 5px;
 }
 
 input.date-input {
@@ -105,7 +104,7 @@ span.input-group-addon {
 	padding: 20px;
 }
 
-.dropdown {
+/* .dropdown {
 	float: right;
 	width: 160px;
 	display: inline-block;
@@ -113,7 +112,7 @@ span.input-group-addon {
 
 .dropdown button {
 	width: 100% !important;
-}
+} */
 
 .modal-body input {
   width: 13%;
