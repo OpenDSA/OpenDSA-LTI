@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: courses
+#
+#  id              :bigint           not null, primary key
+#  name            :string(255)      not null
+#  number          :string(255)      not null
+#  organization_id :bigint           not null
+#  user_id         :bigint           not null
+#  created_at      :datetime
+#  updated_at      :datetime
+#  slug            :string(255)      not null
+#
+# Indexes
+#
+#  index_courses_on_organization_id  (organization_id)
+#  index_courses_on_slug             (slug)
+#  index_courses_on_user_id          (user_id)
+#
 ActiveAdmin.register Course, sort_order: :created_at_asc do
   includes :organization, :user
 

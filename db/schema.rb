@@ -152,6 +152,8 @@ ActiveRecord::Schema.define(version: 2021_11_16_040517) do
     t.datetime "updated_at"
     t.boolean "type"
     t.text "options", size: :long
+    t.boolean "partial_credit", default: false
+    t.text "json"
     t.index ["inst_book_id"], name: "inst_book_section_exercises_inst_book_id_fk"
     t.index ["inst_exercise_id"], name: "inst_book_section_exercises_inst_exercise_id_fk"
     t.index ["inst_section_id"], name: "inst_book_section_exercises_inst_section_id_fk"
@@ -238,6 +240,7 @@ ActiveRecord::Schema.define(version: 2021_11_16_040517) do
     t.text "options"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "partial_credit", default: false
     t.index ["inst_exercise_id"], name: "fk_rails_9b61737c9f"
     t.index ["inst_module_section_id"], name: "fk_rails_b320810099"
     t.index ["inst_module_version_id"], name: "fk_rails_5c4fc2ff52"
@@ -461,6 +464,7 @@ ActiveRecord::Schema.define(version: 2021_11_16_040517) do
     t.float "highest_score", null: false
     t.integer "lms_access_id"
     t.integer "inst_module_version_id"
+    t.datetime "last_passback", null: false
     t.index ["inst_book_id"], name: "odsa_module_progresses_inst_book_id_fk"
     t.index ["inst_chapter_module_id"], name: "odsa_module_progresses_inst_chapter_module_id_fk"
     t.index ["inst_module_version_id"], name: "fk_rails_38a9ac7560"

@@ -16,8 +16,9 @@
 #
 #  fk_rails_ff11275e48  (inst_module_version_id)
 #
-# a section in a stand-alone module
 class InstModuleSection < ApplicationRecord
+  # a section in a stand-alone module
+
   belongs_to :inst_module_version
   has_many :inst_module_section_exercises, dependent: :destroy
 
@@ -55,7 +56,7 @@ class InstModuleSection < ApplicationRecord
     self.inst_module_section_exercises.each do |imse|
       imse.clone(inst_module_version, ims)
     end
-    
+
     return ims
   end
 
