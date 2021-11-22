@@ -90,7 +90,7 @@ class OdsaExerciseProgress < ApplicationRecord
     now = DateTime.now
     if new_score > self.highest_score
       self.highest_score = new_score
-      if new_score == 100
+      if new_score == 100    # FIXME: Shouldn't this use the threshold?
         self.proficient_date = now
       end
     end
@@ -118,7 +118,7 @@ class OdsaExerciseProgress < ApplicationRecord
       end
 
       require 'lti/outcomes'
-      res = LtiOutcomes.post_score_to_consumer(score, 
+      res = LtiOutcomes.post_score_to_consumer(score,
                                                self.lis_outcome_service_url,
                                                self.lis_result_sourcedid,
                                                consumer_key,
