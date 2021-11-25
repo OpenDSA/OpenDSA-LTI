@@ -43,17 +43,19 @@ class InstBooksController < ApplicationController
       chapters = inst_book['chapters']
       chapters.each do |key, modules|
         ch = InstChapter.where("inst_book_id = ? AND name = ?", inst_book['inst_book_id'], key).first
+        module_pos = 1
         modules.each do |name, deadline|
           due_date = nil
           if (deadline != "undefined") 
             due_date = Time.strptime(deadline, "%m/%d/%Y %I:%M %P").strftime("%Y-%m-%d %H:%M")
           end
           md = InstModule.where("name = ?", name).first
-          inst_chap_module = InstChapterModule.where("inst_chapter_id = ? AND inst_module_id = ?", ch.id, md.id).first
+          inst_chap_module = InstChapterModule.where("inst_chapter_id = ? AND module_position = ?", ch.id, module_pos).first
           inst_chap_module.update(due_dates: due_date)
+          module_pos = module_pos + 1
         end
       end
-
+      
       respond_to do |format|
         msg = {:status => "success", :message => "Modules due dates has been set successfully!"}
         format.json { render :json => msg }
