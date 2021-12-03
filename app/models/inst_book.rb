@@ -124,6 +124,8 @@ class InstBook < ApplicationRecord
     return missing_modules
   end
 
+  # FIXME: shouldn't this method be removed? It appears to be out-dated?
+  # FIXME: the real code is now in views/inst_books/show.json.builder
   def to_builder
     Jbuilder.new do |json|
       json.set! :inst_book_id, self.id
@@ -166,19 +168,26 @@ class InstBook < ApplicationRecord
                           if learning_tool
                             exercise = inst_section.inst_book_section_exercises.first
                             json.set! inst_section.resource_name do
+                              if !exercise.json.blank?
+                                json.merge! JSON.parse(exercise.json)
+                              end
                               json.set! :points, exercise.points.to_f
                             end
                           else
                             exercises = inst_section.inst_book_section_exercises
                             if !exercises.empty?
                               for inst_book_section_exercise in exercises
-                                exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
+                                exercise_name = inst_exercise.short_name
                                 json.set! exercise_name do
+                                  if !inst_book_section_exercise.json.blank?
+                                    json.merge! JSON.parse(inst_book_section_exercise.json)
+                                  end
                                   json.set! :required, inst_book_section_exercise.required
                                   json.set! :points, inst_book_section_exercise.points.to_f
                                   json.set! :threshold, inst_book_section_exercise.threshold.to_f
                                   options = inst_book_section_exercise.options
                                   if options != nil && options != "null"
+                                    # FIXME: shouldn't eval() here be JSON.parse()?
                                     json.set! :exer_options, eval(options)
                                   end
                                 end

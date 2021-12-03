@@ -252,7 +252,7 @@ class GenerateCourseJob < ProgressJob::Base
       else
         assignment_opts[:assignment__name__] = title
         assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
-        assignment_opts[:assignment__description__] = title
+        assignment_opts[:assignment__description__] = ''
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "Assignment", assignment_res['id'], opts)
@@ -266,7 +266,7 @@ class GenerateCourseJob < ProgressJob::Base
         opts[:module_item__type__] = "Assignment"
         assignment_opts[:assignment__name__] = title
         assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
-        assignment_opts[:assignment__description__] = title
+        assignment_opts[:assignment__description__] = ''
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "Assignment", assignment_res['id'], opts)

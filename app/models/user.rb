@@ -34,10 +34,9 @@
 #  index_users_on_slug                  (slug) UNIQUE
 #  index_users_on_time_zone_id          (time_zone_id)
 #
-# =============================================================================
-# Represents a single user account on the system.
-#
 class User < ApplicationRecord
+  # Represents a single user account on the system.
+
   include Gravtastic
   gravtastic secure: true, default: 'monsterid'
 
