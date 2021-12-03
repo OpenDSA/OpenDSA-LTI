@@ -168,7 +168,7 @@ class InstBook < ApplicationRecord
                           if learning_tool
                             exercise = inst_section.inst_book_section_exercises.first
                             json.set! inst_section.resource_name do
-                              if !exercise.json.blank?
+                              if exercise && !exercise.json.blank?
                                 json.merge! JSON.parse(exercise.json)
                               end
                               json.set! :points, exercise.points.to_f
