@@ -170,8 +170,8 @@ class InstBook < ApplicationRecord
                             json.set! inst_section.resource_name do
                               if exercise && !exercise.json.blank?
                                 json.merge! JSON.parse(exercise.json)
+                                json.set! :points, exercise.points.to_f
                               end
-                              json.set! :points, exercise.points.to_f
                             end
                           else
                             exercises = inst_section.inst_book_section_exercises

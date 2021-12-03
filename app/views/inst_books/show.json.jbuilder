@@ -51,11 +51,11 @@ json.chapters do
                     exercise = inst_section.inst_book_section_exercises.first
                     if exercise && !exercise.json.blank?
                       json.merge! JSON.parse(exercise.json)
+                      json.set! :points, exercise.points.to_f
                     end
                     json.set! :learning_tool, learning_tool
                     json.set! :resource_type, inst_section.resource_type
                     json.set! :resource_name, inst_section.resource_name
-                    json.set! :points, exercise.points.to_f
                     json.set! :launch_url, "#{@extrtool_launch_base_url}/#{exercise.id}"
                   else
                     exercises = inst_section.inst_book_section_exercises
