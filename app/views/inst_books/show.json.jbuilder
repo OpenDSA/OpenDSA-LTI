@@ -49,7 +49,7 @@ json.chapters do
                   learning_tool = inst_section.learning_tool
                   if learning_tool
                     exercise = inst_section.inst_book_section_exercises.first
-                    if !exercise.json.blank?
+                    if exercise && !exercise.json.blank?
                       json.merge! JSON.parse(exercise.json)
                     end
                     json.set! :learning_tool, learning_tool
