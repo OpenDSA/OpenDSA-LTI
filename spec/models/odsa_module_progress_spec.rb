@@ -17,6 +17,7 @@
 #  highest_score           :float(24)        not null
 #  lms_access_id           :bigint
 #  inst_module_version_id  :bigint
+#  last_passback           :datetime         not null
 #
 # Indexes
 #

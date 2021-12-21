@@ -13,6 +13,8 @@
 #  updated_at       :datetime
 #  type             :boolean
 #  options          :text(4294967295)
+#  partial_credit   :boolean          default(FALSE)
+#  json             :text(65535)
 #
 # Indexes
 #

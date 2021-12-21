@@ -17,6 +17,7 @@
 #  highest_score           :float(24)        not null
 #  lms_access_id           :bigint
 #  inst_module_version_id  :bigint
+#  last_passback           :datetime         not null
 #
 # Indexes
 #
@@ -88,7 +89,7 @@ class OdsaModuleProgress < ApplicationRecord
   end
 
   #~ Instance methods .........................................................
-  def update_proficiency(inst_exercise)
+  def update_proficiency(inst_exercise, force_send = false)
     if self.inst_module_version_id
       # standalone module
       return update_standalone_proficiency(inst_exercise)
@@ -106,18 +107,14 @@ class OdsaModuleProgress < ApplicationRecord
     update_score(bk_sec_exs)
 
     # Comparing two floats.
-    # Only send score to LMS if the score has increased.
-    if (self.highest_score - old_score).abs > 0.001
+    # Only send score to LMS if the score has increased, or previous
+    # passback was not performed or unsuccessful
+    if force_send or
+      self.last_passback.nil? or
+      self.inst_book.last_compiled.nil? or   # should never happen, NPE guard
+      (self.last_passback < self.inst_book.last_compiled) or
+      self.highest_score > old_score
       res = post_score_to_lms()
-      unless res.blank?
-        # res will be null if this module isn't linked to an LMS assignment
-        unless res.success?
-          # Failed to post score to LMS.
-          # Keep old score so that if the student attempts the exercise again
-          # we will try to send the new score again.
-          self.highest_score = old_score
-        end
-      end
     end
     self.save!
 
@@ -159,12 +156,23 @@ class OdsaModuleProgress < ApplicationRecord
       end
 
       require 'lti/outcomes'
-      res = LtiOutcomes.post_score_to_consumer(self.highest_score, 
+      res = LtiOutcomes.post_score_to_consumer(self.highest_score,
                                                self.lis_outcome_service_url,
                                                self.lis_result_sourcedid,
                                                consumer_key,
                                                consumer_secret)
+      if res.success?
+        self.last_passback = self.last_done
+      else
+        # passback failed, so clear timestamp of last successful passback
+        self.last_passback = nil
+      end
       return res
+    else
+      # Passback not attempted, so clear timestamp of last successful passback
+      self.last_passback = nil
+      # explicitly set return value to indicate no passback happened
+      return nil
     end
   end
 
@@ -179,8 +187,12 @@ class OdsaModuleProgress < ApplicationRecord
     bk_sec_exs.each do |ex|
       total_points += ex.points
       prog = exercise_progresses.detect { |p| p.inst_book_section_exercise_id == ex.id }
-      if !prog.blank? and prog.proficient?
-        score += ex.points
+      if !prog.blank?
+        if prog.proficient?
+          score += ex.points
+        elsif ex.partial_credit
+          score += ex.points * prog.highest_score / 100.0
+        end
       end
     end
     if (total_points == 0)
@@ -201,13 +213,13 @@ class OdsaModuleProgress < ApplicationRecord
   def update_standalone_proficiency(inst_module_section_exercise)
     # find all exercises in the module
     # find exercises the user has achieved proficiency on
-    
+
     mod_sec_exs = self.inst_module_version.inst_module_section_exercises || []
     module_exercises = mod_sec_exs.collect { |ex| ex.id } || []
     exercise_progresses = OdsaExerciseProgress.joins(:inst_module_section_exercise)
       .where("inst_module_section_exercises.inst_module_version_id = #{self.inst_module_version_id} AND user_id = #{self.user_id}")
     proficient_exercises = exercise_progresses.select{ |ep| ep.proficient? }
-                                              .collect{ |ep| ep.inst_module_section_exercise_id } || [] 
+                                              .collect{ |ep| ep.inst_module_section_exercise_id } || []
 
     self.first_done ||= DateTime.now
     self.last_done = DateTime.now
@@ -216,17 +228,10 @@ class OdsaModuleProgress < ApplicationRecord
 
     # Comparing two floats.
     # Only send score to LMS if the score has increased.
-    if (self.highest_score - old_score).abs > 0.001
+    if self.last_passback.nil? or
+      self.highest_score > old_score
+
       res = post_score_to_lms()
-      unless res.blank?
-        # res will be null if this module isn't linked to an LMS assignment
-        unless res.success?
-          # Failed to post score to LMS.
-          # Keep old score so that if the student attempts the exercise again
-          # we will try to send the new score again.
-          self.highest_score = old_score
-        end
-      end
     end
     self.save!
 
@@ -259,8 +264,12 @@ class OdsaModuleProgress < ApplicationRecord
     mod_sec_exs.each do |ex|
       total_points += ex.points
       prog = exercise_progresses.detect { |p| p.inst_module_section_exercise_id == ex.id }
-      if !prog.blank? and prog.proficient?
-        score += ex.points
+      if !prog.blank?
+        if prog.proficient?
+          score += ex.points
+        elsif ex.partial_credit
+          score += ex.points * prog.highest_score / 100.0
+        end
       end
     end
     if (total_points == 0)
