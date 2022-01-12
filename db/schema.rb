@@ -410,6 +410,7 @@ ActiveRecord::Schema.define(version: 2021_11_10_211559) do
     t.bigint "inst_module_section_exercise_id"
     t.string "answer"
     t.integer "question_id"
+    t.boolean "finished_frame"
     t.index ["inst_book_id"], name: "odsa_exercise_attempts_inst_book_id_fk"
     t.index ["inst_book_section_exercise_id"], name: "odsa_exercise_attempts_inst_book_section_exercise_id_fk"
     t.index ["inst_course_offering_exercise_id"], name: "odsa_exercise_attempts_inst_course_offering_exercise_id_fk"

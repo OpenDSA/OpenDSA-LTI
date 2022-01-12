@@ -808,6 +808,7 @@
       suppress_todo: $("#suppress-todo").is(":checked"),
       dispModComp: $("#disp-mod-comp").is(":checked"),
       zeropt_assignments: $("#zeropt-assignments").is(":checked"),
+      include_tree_view: $("#include_tree_view").is(":checked"),
       tabbed_codeinc: $("#tabbed-codeinc").is(":checked"),
       narration_enabled: $("#narration-enabled").is(":checked"),
       glob_exer_options: globalExerSettings(),
@@ -992,6 +993,9 @@
         case "zeropt_assignments":
           $("#zeropt-assignments").prop("checked", config.zeropt_assignments);
           break;
+        case "include_tree_view":
+          $("#include_tree_view").prop("checked", config.include_tree_view);
+          break;
         case "tabbed_codeinc":
           $("#tabbed-codeinc").prop("checked", config.tabbed_codeinc);
           break;
@@ -1072,6 +1076,9 @@
               break;
             case "zeropt_assignments":
               $("#zeropt-assignments").prop("checked", config.zeropt_assignments);
+              break;
+            case "include_tree_view":
+              $("#include_tree_view").prop("checked", config.include_tree_view);
               break;
             case "tabbed_codeinc":
               $("#tabbed-codeinc").prop("checked", config.tabbed_codeinc);
