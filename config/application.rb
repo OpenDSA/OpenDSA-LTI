@@ -21,6 +21,7 @@ module OpenDSA
     # config.i18n.default_locale = :de
     config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif *.ico)
     config.assets.precompile += %w( split.min.js )
+    config.assets.precompile += %w( inst_books.js )
     # config.assets.paths << Rails.root.join('vendor', 'assets', 'bower_components')
 
     # Custom directories with classes and modules you want to be autoloadable.

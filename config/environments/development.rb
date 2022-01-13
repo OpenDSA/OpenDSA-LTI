@@ -56,7 +56,7 @@ OpenDSA::Application.configure do
   config.assets.initialize_on_precompile = true
 
   # config.middleware.use LogFile::Display
-  config.log_level = :debug
+  config.log_level = :info
 
   # config.log_formatter = proc do |severity, datetime, progname, msg|
   #   if severity == 'DEBUG' && msg.blank?

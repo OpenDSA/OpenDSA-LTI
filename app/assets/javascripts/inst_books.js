@@ -29,19 +29,34 @@
 	    allowInputToggle: true,
       format: "YYYY-MM-DD HH:MM"
     });
+
+   });
+  /*
+   * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
+   */
+   $(document).on('focus', '.chapterTimemodal', function() {
+    $(this).datetimepicker({
+      // showClose: true,
+      sideBySide: true,
+      keepInvalid: true,
+      allowInputToggle: true,
+      // format: "YYYY-MM-DD HH:MM"
+      format: 'L LT'
+    });
    });
 
   /*
    * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
    */
   $(document).on('click', '.input-group-addon', function() {
-    $(this).parent().css("position", "relative");
+    // $(this).parent().css("position", "relative");
     $(this).parent().datetimepicker({
-      showClose: true,
+      // showClose: true,
       sideBySide: true,
-	    keepInvalid: true,
-	    allowInputToggle: true,
-      format: "YYYY-MM-DD HH:MM"
+      keepInvalid: true,
+      allowInputToggle: true,
+      // format: "YYYY-MM-DD HH:MM"
+      format: 'L LT'
     });
 	$(this).parent().data("DateTimePicker").show();
   });
@@ -81,9 +96,15 @@
    * modal.
    */
   $(document).on('click', '#chapterSubmit', function() {
+    // var chapter = window.jsonFile['chapters'][$('#chapterSoft').attr('data-chapter')]
+    // window.jsonFile['chapters'][$("#chapterSoft").attr("data-chapter")].append("due_date", "0000-00-00 00:00:00");
+    // chapter['due_date'] = "0000-00-00 00:00:00"
+    // window.jsonFile['chapters'][$('#chapterSoft').attr('data-chapter')] = chapter;
+    // console.log(window.jsonFile['chapters'][$('#chapterSoft').attr('data-chapter')])
     var chapterTitle = $('#chapterSoft').attr('data-chapter');
-    var checkChapter = '[data-chapter=\"' + chapterTitle + '\"]';
-    $(checkChapter + '[data-type="soft"]').val($('#chapterSoft').val());
+    // var checkChapter = '[data-chapter=\"' + chapterTitle + '\"]'; // [data-chapter="Preface]"
+    // $(checkChapter + '[data-type="soft"]').val($('#chapterSoft').val()); // data-chapter="Preface"
+    $('[data-key=\"' + chapterTitle +'\"]').attr('data-value', "0000-00-00 00:00:00");
     //$(checkChapter + '[data-type="hard"]').val($('#chapterHard').val());
   });
 
@@ -254,13 +275,12 @@
   var datepick = function(value, parent, mod, chapter) {
     //var html = "<input class=\"datetimepicker\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\"/>";
 
-    var html = "<div class='col-sm-3 input-group date datetimepicker'>";
+    var html = "<div class='col-sm-3 input-group date datetimepicker' style='float: right'>";
     html += "<input class=\"form-control date-input\" data-source=\" Chapter: " + chapter + ", Module: " + mod + ", Section: " + parent + "\" data-chapter=\"" + chapter + "\" data-type=\"soft\" type=\"text\" value=\"" + value + "\" />";
     html += "<span class='input-group-addon'><span class='glyphicon glyphicon-calendar'></span></span>";
     html += "</div>";
     return html;
   }
-
   /*
    * Function to check if a given input is not a radio button.
    */
@@ -301,17 +321,17 @@
       }
     });
 
-	Handlebars.registerHelper('dropdown', function(key, canDelete) {
-		var html = "<div class=\"dropdown instDropdown\">";
-		html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
-		html += "<ul class=\"dropdown-menu pull-right\">";
-		html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"" + key + "\" class=\"chapterLoad\">Set Due Dates</a></li>";
-		if(canDelete) {
-			html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
-		}
-		html += "</ul></div>";
-		return new Handlebars.SafeString(html);
-	});
+    Handlebars.registerHelper('dropdown', function(key, canDelete) {
+      var html = "<div class=\"dropdown instDropdown\">";
+      html += "<button class=\"odsa_button ui-button ui-corner-all dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\"><span class=\"glyphicon glyphicon-cog\"></span></button>";
+      html += "<ul class=\"dropdown-menu pull-right\">";
+      html += "<li class=\"due-date\"><a data-toggle=\"modal\" data-target=\"#chapterDue\" data-chapter=\"" + key + "\" class=\"chapterLoad\">Set Due Dates</a></li>";
+      if(canDelete) {
+        html += "<li class=\"remove\"><a>Delete Chapter</a></li>";
+      }
+      html += "</ul></div>";
+      return new Handlebars.SafeString(html);
+    });
 
     Handlebars.registerHelper('keyCheck', function(key) {
       if (key == "long_name") {
@@ -368,6 +388,15 @@
       }
     });
 
+    Handlebars.registerHelper('moduleCheck', function(key, value, parent, mod, chapter) {
+      if (key == "module") {
+        if (typeof(value) === "object") {
+          value = window.jsonFile['chapters'][chapter]['due_dates'];
+        }
+        return new Handlebars.SafeString(datepick(value, parent, mod, chapter));
+      } 
+    });
+
     Handlebars.registerHelper('exCheck', function(key, value, parent, parentOb, section, mod, chapter) {
       if (key == "points") {
         return new Handlebars.SafeString("<input class=\"points\" data-source=\" Chapter: " + chapter + ", Module: " + mod.long_name + ", Section: " + section + ", Exercise: " + parentOb.long_name + "\" value=\"" + value + "\">");
@@ -383,9 +412,9 @@
     });
 
     var hSource = "<ul class=\"odsa_ul\">" +
-       "<li class='odsa_li' hidden> <a data-key=\"inst_book_id\"> instance book id: </a> <input value=\"{{inst_book_id}}\"> </li>" +
-       "<li class='odsa_li'> <a data-key=\"title\"> title: </a> <input id=\"book-title\" value=\"{{title}}\"> </li>" +
-       "<li class='odsa_li'> <a data-key=\"desc\">description: </a> <input id=\"book-desc\" value=\"{{desc}}\"> </li>" +
+       "<li class='odsa_li' hidden> <a data-key=\"inst_book_id\"> instance book id: </a> <input id=\"book_id\" value=\"{{inst_book_id}}\"> </li>" +
+       "<li class='odsa_li'> <a data-key=\"title\"> Title: </a> <div id=\"book_title\" style=\"display: inline\"> {{title}} </div>  </li>" +
+       "<li class='odsa_li'> <a data-key=\"desc\">Description: </a> <div id=\"book_desc\" style=\"display: inline\"> {{desc}} </div> </li>" +
        "</ul>";
     var hTemplate = Handlebars.compile(hSource);
     var hhtml = hTemplate(data);
@@ -409,60 +438,81 @@
     var ohtml = oTemplate(data);
     $('#options').html(ohtml);
 
+    // var cSource = "<h1> Chapters: </h1>" + // Header
+    //   "{{#if last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Chapters Sortable
+    //     "{{#each chapters}}" + // Open Chapters
+    //       "<li class=\"odsa_li\">" + // Chapter Line Item
+    //         "{{#unless ../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
+    //         "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> <strong> Chapter: </strong> {{@key}} </a>" + // Chapter Title
+    //         "{{#if ../last_compiled}} {{dropdown @key false}} {{else}} {{dropdown @key true}} {{/if}}" + // Dropdown Menu
+    //         "{{#if ../last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Modules Sortable
+    //         "{{#each .}}" + // Open Modules
+    //           "{{#if long_name}}" + // Check Module Name
+    //           "<li class=\"odsa_li\">" + // Module Line item
+    //           "{{#unless ../../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
+    //           "<a data-key=\"{{@key}}\"> {{#if sections}} <span class=\"glyphicon glyphicon-chevron-right\"></span> {{/if}} <strong> Module: </strong> {{long_name}} </a>" + // Module Title
+    //             "<ul class=\"odsa_ul\">" + // Module Data
+    //               "<li class=\"odsa_li\" hidden> <a data-key=\"long_name\"></a> <input value=\"{{long_name}}\"> </li>" + // Module Long Name
+    //               "{{#if sections}}" + // Has Sections
+    //                 "<li class=\"odsa_li\">" + // Module Sections
+    //                 "<a data-key=\"sections\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> Sections </a>" + // Section Header
+    //                   "<ul class=\"odsa_ul\">" + // Section List
+    //                   "{{#each sections}}" + // Open Sections
+    //                     "<li class=\"odsa_li\">" + // Section Line item
+    //                       "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> {{@key}} </a>" + // Section Name
+    //                       "<ul class=\"odsa_ul\">" + // Section Data
+    //                       "{{#each .}}" + // Open Section Data
+    //                         "{{#if long_name}}" + // If Exercise
+    //                           "<li class=\"odsa_li\">" + // Exercise Line item
+    //                             "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> <strong> Exercise: </strong> {{long_name}} </a>" + // Exercise Title
+    //                             "<ul class=\"odsa_ul\">" + // Exercise Data
+    //                             "{{#each .}}" + // Open Exercise Data
+    //                               "<li class=\"odsa_li {{sameLine @key}}\" {{hideExer @key}}> <a data-key=\"{{@key}}\">" + // Exercise Data Line Item
+    //                                 "{{keyCheck @key}}: </a> {{exCheck @key this @../key @../this @../../key @../../../this @../../../../key}}" + // Exercise Data Item
+    //                               "</li>" + // Close Exercise Data line Item
+    //                             "{{/each}}" + // Close Exercise Data
+    //                             "</ul>" + // Close Exercise Data
+    //                           "</li>" + // Close Exercise Line Item
+    //                         "{{else}}" + // If Not Exercise
+    //                           "<li {{hideSec @key}}>" + // Section Data Line Item
+    //                             "<a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{secCheck @key this @../key @../../../this @../../../key}}" + // Section Data Item
+    //                           "</li>" + // Close Section Data Line Item
+    //                         "{{/if}}" + // Close Exercise If
+    //                       "{{/each}}" + // Close Section Data
+    //                       "</ul>" + // Close Section Data
+    //                     "</li>" + // Close Section Line Item
+    //                   "{{/each}}" + // Close Sections
+    //                   "</ul>" + // Close Sections
+    //                 "</li>" + // Close Module Sections
+    //               "{{else}}" + // No Sections
+    //                 "<li class=\"odsa_li\" hidden>" + //Module Sections
+    //                   "<a data-key=\"sections\"> </a>" + // Section Header
+    //                   "<ul class=\"odsa_ul\">" + // Section List
+    //                   "</ul>" + // Close Section List
+    //                 "</li>" + // Close Module Sections
+    //               "{{/if}}" + // Close Section Header If
+    //             "</ul>" + // Close Module Data
+    //           "</li>" + // Close Module Line Item
+    //           "{{/if}}" + // Close Check Module Name
+    //         "{{/each}}" + // Close Modules
+    //         "</ul>" + // Close Modules
+    //       "</li>" + // Close Chapter Line Item
+    //     "{{/each}}" + // Close chapters
+    //     "</ul>"; // Close Chapters
+
     var cSource = "<h1> Chapters: </h1>" + // Header
-      "{{#if last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Chapters Sortable
+      "{{#if last_compiled}} <ul style=\"list-style: none\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Chapters Sortable
         "{{#each chapters}}" + // Open Chapters
           "<li class=\"odsa_li\">" + // Chapter Line Item
             "{{#unless ../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
-            "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> <strong> Chapter: </strong> {{@key}} </a>" + // Chapter Title
-            "{{#if ../last_compiled}} {{dropdown @key false}} {{else}} {{dropdown @key true}} {{/if}}" + // Dropdown Menu
-            "{{#if ../last_compiled}} <ul class=\"odsa_ul odsa_collapse\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Modules Sortable
+            "<a data-key=\"{{@key}}\" class=\"chapter-list\"> Chapter: </strong> {{@key}} </a>" + // Chapter Title
+            // "{{#if ../last_compiled}} {{dropdown @key false}} {{else}} {{dropdown @key true}} {{/if}}" + // Dropdown Menu
+            "{{#if ../last_compiled}} <ul style=\"list-style: inside\"> {{else}} <ul class=\"odsa_ul odsa_collapse odsa_sortable\"> {{/if}}" + // Modules Sortable
             "{{#each .}}" + // Open Modules
               "{{#if long_name}}" + // Check Module Name
               "<li class=\"odsa_li\">" + // Module Line item
-                "{{#unless ../../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
-                "<a data-key=\"{{@key}}\"> {{#if sections}} <span class=\"glyphicon glyphicon-chevron-right\"></span> {{/if}} <strong> Module: </strong> {{long_name}} </a>" + // Module Title
-                "<ul class=\"odsa_ul\">" + // Module Data
-                  "<li class=\"odsa_li\" hidden> <a data-key=\"long_name\"></a> <input value=\"{{long_name}}\"> </li>" + // Module Long Name
-                  "{{#if sections}}" + // Has Sections
-                    "<li class=\"odsa_li\">" + // Module Sections
-                    "<a data-key=\"sections\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> Sections </a>" + // Section Header
-                      "<ul class=\"odsa_ul\">" + // Section List
-                      "{{#each sections}}" + // Open Sections
-                        "<li class=\"odsa_li\">" + // Section Line item
-                          "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> {{@key}} </a>" + // Section Name
-                          "<ul class=\"odsa_ul\">" + // Section Data
-                          "{{#each .}}" + // Open Section Data
-                            "{{#if long_name}}" + // If Exercise
-                              "<li class=\"odsa_li\">" + // Exercise Line item
-                                "<a data-key=\"{{@key}}\"> <span class=\"glyphicon glyphicon-chevron-right\"></span> <strong> Exercise: </strong> {{long_name}} </a>" + // Exercise Title
-                                "<ul class=\"odsa_ul\">" + // Exercise Data
-                                "{{#each .}}" + // Open Exercise Data
-                                  "<li class=\"odsa_li {{sameLine @key}}\" {{hideExer @key}}> <a data-key=\"{{@key}}\">" + // Exercise Data Line Item
-                                    "{{keyCheck @key}}: </a> {{exCheck @key this @../key @../this @../../key @../../../this @../../../../key}}" + // Exercise Data Item
-                                  "</li>" + // Close Exercise Data line Item
-                                "{{/each}}" + // Close Exercise Data
-                                "</ul>" + // Close Exercise Data
-                              "</li>" + // Close Exercise Line Item
-                            "{{else}}" + // If Not Exercise
-                              "<li {{hideSec @key}}>" + // Section Data Line Item
-                                "<a data-key=\"{{@key}}\"> {{keyCheck @key}}: </a> {{secCheck @key this @../key @../../../this @../../../key}}" + // Section Data Item
-                              "</li>" + // Close Section Data Line Item
-                            "{{/if}}" + // Close Exercise If
-                          "{{/each}}" + // Close Section Data
-                          "</ul>" + // Close Section Data
-                        "</li>" + // Close Section Line Item
-                      "{{/each}}" + // Close Sections
-                      "</ul>" + // Close Sections
-                    "</li>" + // Close Module Sections
-                  "{{else}}" + // No Sections
-                    "<li class=\"odsa_li\" hidden>" + //Module Sections
-                      "<a data-key=\"sections\"> </a>" + // Section Header
-                      "<ul class=\"odsa_ul\">" + // Section List
-                      "</ul>" + // Close Section List
-                    "</li>" + // Close Module Sections
-                  "{{/if}}" + // Close Section Header If
-                "</ul>" + // Close Module Data
+              "{{#unless ../../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
+              "<a class=\"module-list\" data-key=\"{{@key}}\"> {{#if sections}} {{/if}} {{long_name}} {{moduleCheck \"module\" due_dates @../key @../key @../key}} </a>" + // Module Title
               "</li>" + // Close Module Line Item
               "{{/if}}" + // Close Check Module Name
             "{{/each}}" + // Close Modules
@@ -545,27 +595,50 @@
     var json = "{\n";
     var spacing = "  ";
 
-    var header = $('#heading').html();
-    var headerArray = prepArray(header);
-    json += decode(headerArray);
-    json += ",";
+    // var header = $('#heading').html();
+    // var headerArray = prepArray(header);
+    // json += decode(headerArray);
+    // json += ",";
+
+    json += "\"inst_book_id\": " + $('#book_id').val() + ",\n";
+    json += "\"title\": \"" + $('#book_title').text() + "\",\n";
+    json += "\"desc\": \"" + $('#book_desc').text() + "\",\n";
 
     var options = $('#options').html();
     var optionArray = prepArray(options);
     json += decode(optionArray);
     json += ",";
 
-    var chapters = $('#chapters').html();
-    var chapterArray = prepArray(chapters);
+    // var chapters = $('#chapters').html();
+    // var chapterArray = prepArray(chapters);
 
-    json += spacing + "\"chapters\": ";
-    json += decode(chapterArray);
+    // json += spacing + "\"chapters\": {\n";
+    // json += decode(chapterArray);
+    // json += "\n" + spacing + "}";
+
+    json += spacing + "\"chapters\": {\n";
+    $(".chapter-list").each(function( i ) {
+      json += spacing + spacing + "\"" + $(this).attr("data-key") + "\": {\n"
+      modules = $(this).parent().find(".module-list")
+      modules.each(function( index ) {
+        json += spacing + spacing + spacing + "\"" + $(this).text().trim() + "\": " + "\"" + $(this).find("input").val() + "\""
+        if (index != modules.size() - 1) {
+          json += ",\n"
+        }
+      })
+      if (i != $(".chapter-list").size() - 1) {
+        json += spacing + spacing + "\n},\n"
+      }
+      else {
+        json += spacing + spacing + "\n}\n"
+      }
+    })
+      
     json += "\n" + spacing + "}";
-
+    
     json += "\n}";
-
+    
     json = json.replace(/"sections": "null"/g, "\"sections\": {}");
-
     return json;
   }
 
@@ -647,9 +720,9 @@
    * Function to send configuration to server.
    */
   var handleSubmit = function() {
-    var messages,
-      bookConfig = JSON.parse(buildJSON()),
-      url = "/inst_books/update";
+    var messages;
+    var bookConfig = JSON.parse(buildJSON());
+    var url = "/inst_books/update";
 
     messages = check_completeness();
     if (messages.length !== 0) {
@@ -658,11 +731,12 @@
       return;
     }
 
-    jQuery.ajax({
+    jQuery.ajax({ // Cache == false
       url: url,
       type: "POST",
       data: JSON.stringify({
-        'inst_book': bookConfig
+        'inst_book': bookConfig,
+        'deadlines': true
       }),
       contentType: "application/json; charset=utf-8",
       datatype: "json",
@@ -676,6 +750,7 @@
         form_alert(['Error occurred!'], 'danger');
       }
     });
+    
   };
 
   /*
@@ -730,8 +805,8 @@
 	  }
     })
     $('.form-control').each(function(index, element) {
-      if(!(/^\d\d\d\d-\d\d-\d\d \d\d:\d\d$/.test($(element).val())) && $(element).val() != 'null') {
-        messages.push('Dates must be in the format YYYY-MM-DD HH:MM SOURCE: ' + $(element).attr('data-source'));
+      if(!(/^\d\d\/\d\d\/\d\d\d\d \d\d:\d\d ([AaPp][Mm])$/.test($(element).val())) && $(element).val() != 'undefined') {
+        messages.push('Dates must be in the format YYYY/MM/DD HH:MM SOURCE: ' + $(element).attr('data-source'));
         return false;
       }
     })
