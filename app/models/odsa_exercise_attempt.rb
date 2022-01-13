@@ -63,7 +63,7 @@ class OdsaExerciseAttempt < ApplicationRecord
   #~ Instance methods .........................................................
   def update_exercise_progress
     @inst_chapter_module = inst_book_section_exercise.get_chapter_module
-    if @inst_chapter_module.due_dates > Time.now
+    if @inst_chapter_module.due_dates.nil? or @inst_chapter_module.due_dates > Time.now
       if self.request_type === 'PE'
         update_pe_exercise_progress
       elsif self.request_type === 'AE'
