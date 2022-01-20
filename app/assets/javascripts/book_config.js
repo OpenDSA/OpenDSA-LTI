@@ -1023,6 +1023,9 @@
         case "max_toc_depth":
           $("#max-toc-depth").val(config.max_toc_depth);
           break;
+        case "due_dates":
+          $("#due_dates").val(null);
+          break;
         case "chapters":
           //loadChapters(config.chapters, config.lang);
           break;
@@ -1091,6 +1094,9 @@
               break;
             case "max_toc_depth":
               $("max-toc-depth").val(config.max_toc_depth);
+              break;
+            case "due_dates":
+              $("#due_dates").val(null);
               break;
             case "chapters":
               config.chapters = convertChapters(config.chapters);
