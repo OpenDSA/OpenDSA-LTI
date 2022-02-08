@@ -29,7 +29,9 @@ ActiveAdmin.register User do
   form do |f|
     f.semantic_errors
     f.inputs do
-      f.input :global_role
+      if current_user.global_role.is_admin?
+        f.input :global_role
+      end
       f.input :last_name
       f.input :first_name
       f.input :email
