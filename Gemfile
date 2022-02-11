@@ -38,7 +38,7 @@ gem 'rack-test', '1.1.0'
 gem 'rake', '13.0.1'
 
 gem 'truncate_html'
-gem 'puma', '~> 4.3.1'
+gem 'puma', '~> 4.3.11'
 gem 'tzinfo' # For timezone support
 
 # Bootstrap Datepicker
