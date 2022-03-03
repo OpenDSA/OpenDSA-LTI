@@ -1033,13 +1033,20 @@
         //
       }
     }
-    initializeJsTree(
-      ODSA.availableModules[config.lang].children,
-      config.chapters,
-      function() {
-        hideLoadingOverlay();
-      }
-    );
+    // Try catch Block that detects an incorrectly formatted Json File
+    try {
+      initializeJsTree(
+        ODSA.availableModules[config.lang].children,
+        config.chapters,
+        function () {
+          hideLoadingOverlay();
+        }
+      );
+    }
+    catch (error) {
+      alert("Incorrectly Formatted Json File");
+      hideLoadingOverlay();
+    }
   }
 
   /* Loads a 'full' configuration file that includes the settings for
