@@ -802,6 +802,11 @@
       build_dir: "Books",
       code_dir: "SourceCode/",
       lang: $("#book-lang").val(),
+      theme: $("#theme").val(),
+      html_theme_options: JSON.parse($("#html_theme_options").val()),
+      html_js_files: $("#html_js_files").val() != "" ?  JSON.parse($("#html_js_files").val()) : null,
+      html_css_files: $("#html_css_files").val() != "" ?  JSON.parse($("#html_css_files").val()) : null,
+      chapter_name: $("#chapter_name").val(),
       code_lang: selectedCodeLanguages(),
       build_JSAV: $("#build-jsav").is(":checked"),
       build_cmap: $("#build-cmap").is(":checked"),
@@ -978,6 +983,21 @@
         case "lang":
           $("#book-lang").val(config.lang);
           break;
+        case "theme":
+          $("#theme").val(config.theme);
+          break;
+        case "html_theme_options":
+          $("#html_theme_options").val(JSON.stringify(config.html_theme_options));
+          break;
+        case "chapter_name":
+          $("#chapter_name").val(config.chapter_name);
+          break;
+        case "html_js_files":
+          $("#html_js_files").val(JSON.stringify(config.html_js_files));
+          break;
+        case "html_css_files":
+          $("#html_css_files").val(JSON.stringify(config.html_css_files));
+          break;
         case "build_JSAV":
           $("#build-jsav").prop("checked", config.build_JSAV);
           break;
@@ -1071,6 +1091,21 @@
               break;
             case "lang":
               $("#book-lang").val(config.lang);
+              break;
+            case "theme":
+              $("#theme").val(config.theme);
+              break;
+            case "html_theme_options":
+              $("#html_theme_options").val(JSON.stringify(config.html_theme_options));
+              break;
+            case "chapter_name":
+              $("#chapter_name").val(config.chapter_name);
+              break;
+            case "html_js_files":
+              $("#html_js_files").val(JSON.stringify(config.html_js_files));
+              break;
+            case "html_css_files":
+              $("#html_css_files").val(JSON.stringify(config.html_css_files));
               break;
             case "build_JSAV":
               $("#build-jsav").prop("checked", config.build_JSAV);
