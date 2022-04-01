@@ -123,6 +123,15 @@
   %h2
     Book Settings
   %form.form-horizontal{method: "post", id: 'book-config-form'}
+    -# Lets hide some config params we need to persist when the file is uploaded, but
+    -# which aren't editable in the UI....yet.
+
+    %input.form-control#theme{type: "hidden"}
+    %input.form-control#html_theme_options{type: "hidden"}
+    %input.form-control#html_js_files{type: "hidden"}
+    %input.form-control#html_css_files{type: "hidden"}
+    %input.form-control#chapter_name{type: "hidden"}
+
     .form-group.border
       %label.control-label{for: "#book-title"}
         Title
@@ -275,7 +284,7 @@
       .col-xs-6.col-md-5
         .form-group
           %label.control-label{for: 'max-toc-depth'}
-            Points:
+            Levels:
           .col-xs-8
             %input{type: "number", min: 1, value: 3, step: 1, id: "max-toc-depth", required: true}
 

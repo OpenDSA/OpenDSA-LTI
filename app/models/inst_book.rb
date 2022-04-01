@@ -56,6 +56,11 @@ class InstBook < ApplicationRecord
     options['code_dir'] = book_data['code_dir'] || "SourceCode/"
     options['lang'] = book_data['lang'] || "en"
     options['code_lang'] = book_data['code_lang'] || {}
+    options['theme'] = book_data['theme'] || "haiku"
+    options['html_theme_options'] = book_data['html_theme_options'] ||{}
+    options['chapter_name'] = book_data['chapter_name'] || "Chapter"
+    options['html_js_files'] = book_data['html_js_files'] || []
+    options['html_css_files'] = book_data['html_css_files'] || []
     options['build_JSAV'] = book_data['build_JSAV'] || false
     options['tabbed_codeinc'] = book_data['tabbed_codeinc'] || true
     options['build_cmap'] = book_data['build_cmap'] || false
@@ -180,7 +185,7 @@ class InstBook < ApplicationRecord
                             exercises = inst_section.inst_book_section_exercises
                             if !exercises.empty?
                               for inst_book_section_exercise in exercises
-                                exercise_name = inst_exercise.short_name
+                                exercise_name = inst_book_section_exercise.inst_exercise.short_name
                                 json.set! exercise_name do
                                   if !inst_book_section_exercise.json.blank?
                                     json.merge! JSON.parse(inst_book_section_exercise.json)
