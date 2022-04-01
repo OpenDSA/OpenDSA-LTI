@@ -63,6 +63,10 @@ module OpenDSA
     "sv" => "Svenska",
   }
 
+  BOOK_THEMES = {
+    "haiku" => "haiku",
+    "hachibee" => "hachibee"
+  }
   # coding languages OpenDSA has examples in
   CODE_LANGUAGES = {
     "Java": {
