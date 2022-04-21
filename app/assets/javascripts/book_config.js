@@ -803,7 +803,7 @@
       code_dir: "SourceCode/",
       lang: $("#book-lang").val(),
       theme: $("#theme").val(),
-      html_theme_options: JSON.parse($("#html_theme_options").val()),
+      html_theme_options: $("#html_theme_options").val() != "" ? JSON.parse($("#html_theme_options").val()) : null,
       html_js_files: $("#html_js_files").val() != "" ?  JSON.parse($("#html_js_files").val()) : null,
       html_css_files: $("#html_css_files").val() != "" ?  JSON.parse($("#html_css_files").val()) : null,
       chapter_name: $("#chapter_name").val(),
