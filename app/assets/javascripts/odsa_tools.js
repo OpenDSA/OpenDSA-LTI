@@ -1138,7 +1138,7 @@ $(function () {
     var plotlyBoxLayout = {
       title: "Total time students spend on OpenDSA materials per week.",
       updatemenus: updatemenus,
-      yaxis: {
+      discriminationDifficultyYAxis: {
         title: "Reading time in mins.",
         autorange: true,
         showgrid: true,
@@ -1703,7 +1703,7 @@ $(function () {
         },
         type: "date",
       },
-      yaxis: {
+      discriminationDifficultyYAxis: {
         autorange: true,
         type: "linear",
       },
@@ -1844,7 +1844,7 @@ $(function () {
     var plotlyBarLayout = {
       title: "Students total reading time.",
       updatemenus: updatemenus,
-      yaxis: {
+      discriminationDifficultyYAxis: {
         title: "Reading time in mins.",
         autorange: true,
         showgrid: true,
@@ -2214,7 +2214,7 @@ $(function () {
     var plotlySecBarLayout = {
       title: "Please select a module to show time tracking for its sections.",
       updatemenus: updatemenus,
-      yaxis: {
+      discriminationDifficultyYAxis: {
         title: "Reading time in mins.",
         autorange: true,
         showgrid: true,
@@ -3303,36 +3303,43 @@ $(function () {
     [1.5, 1.6],
   ];
 
-  xAxis = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
-  yAxis = [];
-  var SaHyunMindata = [];
+  discriminationDifficultyXAxis = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
+  discriminationDifficultyYAxis = [];
+  var discriminationDifficultyData = [];
+
   for (let i = 0; i < discriminationDifficultyArray.length; i++) {
     let discrimationDifficultyPair = discriminationDifficultyArray[i];
-    console.log(discrimationDifficultyPair);
 
-    let a = discrimationDifficultyPair[0];
-    let b = discrimationDifficultyPair[1];
+    let thisDiscriminationValue = discrimationDifficultyPair[0];
+    let thisDifficultyValue = discrimationDifficultyPair[1];
 
     for (let j = -4; j <= 4; j++) {
-      var yAxisValue = 1 / (1 + Math.pow(Math.E, -a * (j - b)));
-      yAxis.push(yAxisValue);
+      var discriminationDifficultyYAxisValue =
+        1 /
+        (1 +
+          Math.pow(
+            Math.E,
+            -thisDiscriminationValue * (j - thisDifficultyValue)
+          ));
+      discriminationDifficultyYAxis.push(discriminationDifficultyYAxisValue);
     }
 
-    console.log(yAxis);
-
-    //Added This - SaHyunMin - 20220313
-    var SaHyunMinTestingLineGraph = {
-      x: xAxis,
-      y: yAxis,
+    var discriminationDifficultyGraph = {
+      x: discriminationDifficultyXAxis,
+      y: discriminationDifficultyYAxis,
       type: "scatter",
     };
 
-    SaHyunMindata.push(SaHyunMinTestingLineGraph);
-    Plotly.newPlot("SaHyunMinGraph", SaHyunMindata);
-    yAxis = [];
+    discriminationDifficultyData.push(discriminationDifficultyGraph);
+    Plotly.newPlot(
+      "discriminationDifficultyGraph",
+      discriminationDifficultyData
+    );
+
+    discriminationDifficultyYAxis = [];
   }
   // //Added This - SaHyunMin - 20220313
-  // var SaHyunMinTestingLineGraph = {
+  // var discriminationDifficultyGraph = {
 
   //     x: [1, 2, 3, 4],
   //     y: [10, 15, 13, 17],
@@ -3341,8 +3348,8 @@ $(function () {
   // };
 
   // //Added This - SaHyunMin - 20220313
-  // var SaHyunMindata = [SaHyunMinTestingLineGraph];
-  // Plotly.newPlot('SaHyunMinGraph', SaHyunMindata);
+  // var discriminationDifficultyData = [discriminationDifficultyGraph];
+  // Plotly.newPlot('SaHyunMinGraph', discriminationDifficultyData);
 
   init();
 });
