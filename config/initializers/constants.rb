@@ -64,8 +64,8 @@ module OpenDSA
   }
 
   BOOK_THEMES = {
-    "haiku" => "haiku",
-    "hachibee" => "hachibee"
+    "haiku" => "Haiku",
+    "hachibee" => "Hachibee",
   }
   # coding languages OpenDSA has examples in
   CODE_LANGUAGES = {

@@ -153,6 +153,34 @@
           - OpenDSA::BOOK_LANGUAGES.each do |lang_code, lang_name|
             %option{:value => lang_code}
               #{lang_name}
+    
+
+    .form-group.border
+      %label.control-label{for: "#chap-iden"}
+        Chapter Identifier
+      .col-xs-6
+        %input.form-control#chap-iden{required: true}
+    
+    .form-group.border
+      %label.control-label{for: "#book-theme"}
+        Theme
+      .col-xs-6
+        %select.form-control#book-theme{required: false}
+          %option{:value => -1, disabled: true, selected: true}
+          - OpenDSA::BOOK_THEMES.each do |theme_name, label_name|
+            %option{:value => theme_name}
+              #{label_name}
+    .form-group.border
+      %label.control-label{for: "html-css-files"}
+        HTML CSS Files
+      .col-xs-6
+        %input.form-control#html-css-files{required:false}
+    
+    .form-group.border
+      %label.control-label{for: "html-js-files"}
+        HTML JS Files
+      .col-xs-6
+        %input.form-control#html-js-files{required:false}
 
     .form-group.border
       %label.control-label{for: "#code-langs"}
@@ -205,6 +233,11 @@
             Threshold:
           .col-xs-8
             %input{type: "number", min: 1, value: 5, step: 1, id: "glob-ka-threshold", required: true}
+        .form-group
+          %label.control-label{for: "glob-ka-partial_credit"}
+            Partial Points:
+          .col-xs-8
+            %input.align-checkbox{type: "checkbox", id: "glob-ka-partial_credit"}
 
     .form-group.border
       %label.control-label{}
@@ -277,7 +310,17 @@
               Points:
             .col-xs-8
               %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-#{tool.name}-points", required: true}
-
+          .form-group
+            %label.control-label{for: "glob-#{tool.name}-partial_credit"}
+              Partial Points:
+            .col-xs-8
+              %input.align-checkbox{type: "checkbox", id: "glob-#{tool.name}-partial_credit"}
+          .form-group
+            %label.control-label{for: "glob-#{tool.name}-enable_scrolling"}
+              Enable Scrolling:
+            .col-xs-8
+              %input.align-checkbox{type: "checkbox", id: "glob-#{tool.name}-enable_scrolling"}
+              
     .form-group.border
       %label.control-label{}
         Maximum TOC Depth Options

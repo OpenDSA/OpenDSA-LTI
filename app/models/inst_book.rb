@@ -193,6 +193,9 @@ class InstBook < ApplicationRecord
                                   json.set! :required, inst_book_section_exercise.required
                                   json.set! :points, inst_book_section_exercise.points.to_f
                                   json.set! :threshold, inst_book_section_exercise.threshold.to_f
+                                  json.set! :partial_credit, inst_book_section_exercise.partial_credit
+                                  json.set! :enable_scrolling, inst_book_section_exercise.enable_scrolling
+
                                   options = inst_book_section_exercise.options
                                   if options != nil && options != "null"
                                     # FIXME: shouldn't eval() here be JSON.parse()?
