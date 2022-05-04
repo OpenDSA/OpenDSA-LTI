@@ -2886,7 +2886,64 @@ $(function () {
     });
 
   })
+  //SaHyunMin call to Meena's program
+  var settings = {
+    url: "https://opendsa.localhost.devcom.vt.edu/api/irtcurve/",
+    method: "POST",
+    timeout: 0,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify({
+      bookID: ODSA_DATA.inst_book_id,
+    }),
+  };
+  $.ajax(settings).done(function (response) {
+    console.log(response);
+  });
 
-  init()
+  var discriminationDifficultyArray = [
+    [1.1, 1.2],
+    [1.3, 1.4],
+    [1.5, 1.6],
+  ];
 
+  discriminationDifficultyXAxis = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
+  discriminationDifficultyYAxis = [];
+  var discriminationDifficultyData = [];
+
+  for (let i = 0; i < discriminationDifficultyArray.length; i++) {
+    let discrimationDifficultyPair = discriminationDifficultyArray[i];
+
+    let thisDiscriminationValue = discrimationDifficultyPair[0];
+    let thisDifficultyValue = discrimationDifficultyPair[1];
+
+    for (let j = -4; j <= 4; j++) {
+      var discriminationDifficultyYAxisValue =
+        1 /
+        (1 +
+          Math.pow(
+            Math.E,
+            -thisDiscriminationValue * (j - thisDifficultyValue)
+          ));
+      discriminationDifficultyYAxis.push(discriminationDifficultyYAxisValue);
+    }
+
+    var discriminationDifficultyGraph = {
+      x: discriminationDifficultyXAxis,
+      y: discriminationDifficultyYAxis,
+      type: "scatter",
+      name: `disrimination ${thisDiscriminationValue}, difficulty ${thisDifficultyValue}`,
+    };
+
+    discriminationDifficultyData.push(discriminationDifficultyGraph);
+    Plotly.newPlot(
+      "discriminationDifficultyGraph",
+      discriminationDifficultyData
+    );
+
+    discriminationDifficultyYAxis = [];
+  }
+
+  init();
 });
