@@ -2886,9 +2886,9 @@ $(function () {
     });
 
   })
-  //SaHyunMin call to Meena's program
-  var settings = {
-    url: "https://opendsa.localhost.devcom.vt.edu/api/irtcurve/",
+
+  var disc_diff_call = {
+    url: "http://opendsa:8080/api/irtcurve/",
     method: "POST",
     timeout: 0,
     headers: {
@@ -2898,15 +2898,18 @@ $(function () {
       bookID: ODSA_DATA.inst_book_id,
     }),
   };
-  $.ajax(settings).done(function (response) {
+  $.ajax(disc_diff_call).done(function (response) {
     console.log(response);
   });
 
-  var discriminationDifficultyArray = [
-    [1.1, 1.2],
-    [1.3, 1.4],
-    [1.5, 1.6],
-  ];
+  var parsed_response = JSON.parse(response);
+  var discriminationDifficultyArray = parsed_response.stdout_compressed
+
+  // var discriminationDifficultyArray = [
+  //   [1.1, 1.2],
+  //   [1.3, 1.4],
+  //   [1.5, 1.6],
+  // ];
 
   discriminationDifficultyXAxis = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
   discriminationDifficultyYAxis = [];
