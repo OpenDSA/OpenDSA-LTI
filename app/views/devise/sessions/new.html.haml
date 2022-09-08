@@ -10,4 +10,5 @@
 
   = f.actions do
     = f.submit 'Sign in', class: 'btn btn-primary'
+    = button_link 'Forgot your password?', new_password_path(resource_name)
     / = render 'devise/shared/links'
