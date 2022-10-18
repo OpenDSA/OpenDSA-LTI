@@ -104,7 +104,7 @@ gem 'cancancan'
 gem 'activeadmin', '~> 2.7'
 gem 'exception_handler', '~> 0.3.45'
 
-gem 'nokogiri', '1.10.9', require: false
+gem 'nokogiri', '1.13.9', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 
