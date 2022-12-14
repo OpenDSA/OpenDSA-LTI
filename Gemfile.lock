@@ -276,7 +276,7 @@ GEM
     libv8 (3.16.14.19)
     link_header (0.0.8)
     log_file (0.0.3)
-    loofah (2.5.0)
+    loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -524,7 +524,7 @@ DEPENDENCIES
   jstree-rails-4 (~> 3.2, >= 3.2.1)
   kaminari
   log_file
-  loofah (= 2.5.0)
+  loofah (= 2.19.1)
   momentjs-rails (>= 2.9.0)
   mustache (~> 1.0)
   mysql2

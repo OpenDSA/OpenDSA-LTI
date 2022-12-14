@@ -29,7 +29,7 @@ gem 'acts-as-taggable-on'
 gem 'representable'
 gem 'redcarpet'
 
-gem 'loofah', '2.5.0' # Rails 5.2
+gem 'loofah', '2.19.1' # Rails 5.2
 gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
 gem 'i18n', '1.8.2'
 gem 'json', '2.3.0'
