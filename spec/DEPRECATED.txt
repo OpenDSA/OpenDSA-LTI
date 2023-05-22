@@ -1,0 +1,4 @@
+# DEPRECATED 
+# Entire folder ./spec is deprecated
+# Created by rspec
+# not used in OpenDSA-lti

@@ -1,3 +1,4 @@
+# DEPRECATED 
 # Load DSL and Setup Up Stages
 require 'capistrano/setup'
 

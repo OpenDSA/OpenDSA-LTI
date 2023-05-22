@@ -1,3 +1,7 @@
+# DEPRECATED = Used by Capistrano, replaced by Docker functions
+#            = See docker-compose files
+
+
 Title: teenSum
 
 Language: Java

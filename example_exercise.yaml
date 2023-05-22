@@ -1,3 +1,6 @@
+# DEPRECATED = Used by Capistrano, replaced by Docker functions
+#            = See docker-compose files
+
 ---
 - external_id: if-else-mcq
   is_public: false

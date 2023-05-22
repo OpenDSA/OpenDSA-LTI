@@ -1,3 +1,6 @@
+# DEPRECATED = Used by Capistrano, replaced by Docker functions
+#            = See docker-compose files
+
 set :stage, :production
 
 # Simple Role Syntax

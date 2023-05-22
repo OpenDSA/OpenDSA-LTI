@@ -1,3 +1,6 @@
+# DEPRECATED = Used by Capistrano, replaced by Docker functions
+#            = See docker-compose files
+
 # config valid only for Capistrano 3.10.1
 lock '3.14.1'
 

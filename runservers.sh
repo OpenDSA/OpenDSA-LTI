@@ -1,3 +1,6 @@
+# DEPRECATED = Used by Capistrano, replaced by Docker functions
+#            = See docker-compose files
+
 # OpenDSA content server
 cd /vagrant/OpenDSA
 sudo lsof -t -i tcp:8080 | xargs kill -9
