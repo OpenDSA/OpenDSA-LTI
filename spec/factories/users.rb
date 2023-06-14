@@ -42,6 +42,7 @@ FactoryBot.define do
    last_name  { 'Hokie' }
    email      { 'hokie@opendsa.org' }
    password   { 'hokiehokie' }
+   time_zone_id { 1 }
 #    password_confirmation 'hokiehokie'
    global_role { GlobalRole.regular_user }
 
@@ -50,6 +51,10 @@ FactoryBot.define do
 
      factory :instructor_user do
        global_role { GlobalRole.instructor }
+     end
+
+     factory :researcher_user do
+      global_role { GlobalRole.researcher }
      end
 
      factory :admin do

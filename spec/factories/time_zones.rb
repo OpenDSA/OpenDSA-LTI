@@ -14,8 +14,8 @@
 
 FactoryBot.define do
   factory :time_zone do
-    name { "MyString" }
-    zone { "MyString" }
-    display_as { "MyString" }
+    name { "America/New_York" }
+    zone { "UTC -05:00" }
+    display_as { "UTC -05:00(New York)" }
   end
 end
