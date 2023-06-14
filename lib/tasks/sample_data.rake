@@ -10,9 +10,11 @@ namespace :db do
     FactoryBot.create(:term300)
     FactoryBot.create(:term400)
     FactoryBot.create(:term500)
+    FactoryBot.create(:time_zone)
+    FactoryBot.create(:lms_instance)
+    admin = FactoryBot.create(:admin)
     FactoryBot.create(:course)
     FactoryBot.create(:late_policy)
-    FactoryBot.create(:lms_instance)
     offerings = []
     offerings[0] = FactoryBot.create(:course_offering_term_1_tr)
     offerings[1] = FactoryBot.create(:course_offering_term_1_mwf)
@@ -21,11 +23,14 @@ namespace :db do
     offerings[4] = FactoryBot.create(:course_offering_term_3_tr)
     offerings[5] = FactoryBot.create(:course_offering_term_3_mwf)
 
-    admin = FactoryBot.create(:admin)
     teacher = FactoryBot.create(:instructor_user,
           first_name: 'Ima',
           last_name:  'Teacher',
           email:      "example-1@railstutorial.org")
+    researcher = FactoryBot.create(:researcher_user,
+          first_name: 'Ima',
+          last_name:  'Researcher',
+          email:      'example-01@railstutorial.org')
 
 
     students = []
@@ -47,32 +52,17 @@ namespace :db do
         course_offering: c,
         course_role: CourseRole.instructor)
 
+      FactoryBot.create(:course_enrollment,
+        user: researcher,
+        course_offering: c,
+        course_role: CourseRole.instructor)
+
       50.times do |n|
         FactoryBot.create(:course_enrollment,
           user: students[n],
           course_offering: c)
       end
     end
-  end
-
-  desc "Reset database and then fill it with Summer I 2015 data"
-  task populate_su15: [:environment] do
-    FactoryBot.create(:organization)
-    FactoryBot.create(:term,
-       season: 200,
-       starts_on: "2015-05-25",
-       ends_on: "2015-07-07",
-       year: 2015)
-    FactoryBot.create(:course)
-    c = FactoryBot.create(:course_offering,
-      self_enrollment_allowed: true,
-      url: 'http://moodle.cs.vt.edu/course/view.php?id=282',
-      label: '60396'
-      )
-    FactoryBot.create(:course_enrollment,
-      user: FactoryBot.create(:admin),
-      course_offering: c,
-      course_role: CourseRole.instructor)
   end
 
   desc "Drop, create, and migrate"

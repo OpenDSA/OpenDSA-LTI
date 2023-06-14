@@ -72,6 +72,7 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
   after_create :auto_enroll_instructor
 
   index do
+    selectable_column
     id_column
     column :course, sortable: 'courses.display_name' do |c|
       link_to c.course.number_and_org, admin_course_path(c.course)

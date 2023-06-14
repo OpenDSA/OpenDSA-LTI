@@ -21,36 +21,36 @@
 FactoryBot.define do
 
   factory :term do
-    year { 2016 }
+    year { 2023 }
 
     factory :term100 do
       season { 100 }
-      starts_on { "2016-01-01" }
-      ends_on { "2016-05-31" }
+      starts_on { "2023-01-01" }
+      ends_on { "2023-05-31" }
     end
 
     factory :term200 do
       season { 200 }
-      starts_on { "2016-06-01" }
-      ends_on { "2016-07-15" }
+      starts_on { "2023-06-01" }
+      ends_on { "2023-07-15" }
     end
 
     factory :term300 do
       season { 300 }
-      starts_on { "2016-07-16" }
-      ends_on { "2016-08-15" }
+      starts_on { "2023-07-16" }
+      ends_on { "2023-08-15" }
     end
 
     factory :term400 do
       season { 400 }
-      starts_on { "2016-08-16" }
-      ends_on { "2016-12-15" }
+      starts_on { "2023-08-16" }
+      ends_on { "2023-12-15" }
     end
 
     factory :term500 do
       season { 500 }
-      starts_on { "2016-12-16" }
-      ends_on { "2016-12-31" }
+      starts_on { "2023-12-16" }
+      ends_on { "2023-12-31" }
     end
   end
 end

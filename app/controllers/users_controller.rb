@@ -3,7 +3,7 @@ class UsersController < InheritedResources::Base
 
   #~ Action methods ...........................................................
   def show
-    if @user.global_role.is_instructor? or @user.global_role.is_admin?
+    if @user.global_role.is_instructor? or @user.global_role.is_admin? or @user.global_role.is_researcher?
       @creds = current_user.get_lms_creds
     end
   end

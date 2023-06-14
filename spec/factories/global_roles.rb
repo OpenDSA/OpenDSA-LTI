@@ -26,6 +26,13 @@ FactoryBot.define do
   	builtin { false }
   end
 
+  factory :global_role_researcher do
+    name { "Researcher"}
+    can_manage_all_courses { false }
+    can_edit_system_configuration { false }
+    builtin { false }
+  end
+
   factory :global_role_user do
   	name { "Regular User" }
  	  can_manage_all_courses { false }

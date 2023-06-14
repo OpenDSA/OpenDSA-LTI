@@ -216,7 +216,7 @@ class LtiController < ApplicationController
                 params[:lis_person_contact_email_primary] :
                 params[:oauth_consumer_key]
 
-    if !ensure_user(lms_instance) || !(@tp.context_instructor? || current_user.global_role.is_instructor_or_admin?)
+    if !ensure_user(lms_instance) || !(@tp.context_instructor? || current_user.global_role.is_instructor_or_admin_or_researcher?)
       @message = 'OpenDSA: You must be an instructor to perform this action.'
       render 'error'
       return
@@ -247,7 +247,7 @@ class LtiController < ApplicationController
   end
 
   def content_item_selection
-    if !user_signed_in? #|| !current_user.global_role.is_instructor_or_admin?
+    if !user_signed_in? #|| !current_user.global_role.is_instructor_or_admin_or_researcher?
       render :json => {:status => 'fail', :message => 'OpenDSA: Please ensure third-party cookies are enabled in you browser\'s settings.'}.to_json,
              :status => :unauthorized
       return

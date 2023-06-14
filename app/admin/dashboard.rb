@@ -4,7 +4,7 @@ ActiveAdmin.register_page 'Dashboard' do
 
   content title: 'Administrator Dashboard' do
 
-    panel 'Recent Errrors' do
+    panel 'Recent Errors' do
       table_for Error.order('created_at desc').first(6) do
         column :class_name
         column(:message) do |e|

@@ -67,7 +67,24 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     link_to "Delete", { action: :destroy }, method: :delete, data: { confirm: message}
   end
 
+  collection_action :compile, method: :get do
+    end
+
+  action_item :compile do
+    link_to "Update OpenDSA Repository", compile_admin_inst_books_path()
+  end
+
   controller do
+    def compile
+      if authorized? :update_configuration
+        success = `cd /opendsa && git pull`
+        flash[:success] = "Updated OpenDSA Repository"
+      else
+        flash[:error] = "not authorized"
+      end
+      redirect_to admin_inst_books_path
+    end
+
     def scoped_collection
       InstBook.joins(:course_offering).where('course_offerings.archived = false').
       union(InstBook.where("template = ? or course_offering_id is null", 1))
@@ -94,7 +111,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     end
 
     def upload_books
-      if !current_user.global_role.is_admin? and !current_user.global_role.is_instructor?
+      if !current_user.global_role.is_admin? and !current_user.global_role.is_instructor? and !current_user.global_role.is_researcher?
         redirect_to admin_inst_books_path
       end
     end

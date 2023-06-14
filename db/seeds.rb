@@ -56,6 +56,10 @@ GlobalRole.create!(name:         'Regular User',
   can_edit_system_configuration: false,
   can_manage_all_courses:        false)
 
+GlobalRole.create!(name:         'Researcher',
+  builtin:                       true,
+  can_edit_system_configuration: false,
+  can_manage_all_courses:        false)
 
 # ---------------------------------------------------------------
 # Create the default course roles. The order of these must match the
