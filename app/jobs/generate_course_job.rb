@@ -48,6 +48,7 @@ class GenerateCourseJob < ProgressJob::Base
 
   def inst_book_compile
     lms_instance_id = @inst_book.course_offering.lms_instance['id']
+    client_id = @inst_book.course_offering.lms_instance['client_id']
     user_lms_access = LmsAccess.where(lms_instance_id: lms_instance_id).where(user_id: @user_id).first
     @created_LTI_tools = []
     require 'pandarus'
@@ -68,8 +69,11 @@ class GenerateCourseJob < ProgressJob::Base
       "consumer_key" => consumer_key,
       "consumer_secret" => consumer_secret,
       "launch_url" => @odsa_launch_url,
-      "resource_selection_url" => @odsa_resource_selection_url
+      "resource_selection_url" => @odsa_resource_selection_url,
+      "client_id" => client_id
     }
+
+    Rails.logger.info(tool_data)
 
     save_lti_app(client, lms_course_id, tool_data)
 
@@ -97,6 +101,7 @@ class GenerateCourseJob < ProgressJob::Base
     end
 
     opts = {:url => launch_url}
+    opts[:client_id] = tool_data[:client_id]
     if tool_data.key?("resource_selection_url")
       opts[:resource_selection__enabled__] = true
       opts[:resource_selection__url__] = tool_data["resource_selection_url"]

@@ -1,6 +1,7 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
+# require "log4r"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -35,5 +36,10 @@ module OpenDSA
     #  OpenSSL::SSL.const_set(:VERIFY_PEER, OpenSSL::SSL::VERIFY_NONE)
     #  puts 'SSL DISABLED'
     #end
+
+    # config.logger = Logger.new(STDOUT)
+    # config.logger = Log4r::Logger.new("Application Log")
+    config.lti_claims_and_scopes = config_for(:lti_claims_and_scopes)
+    config.caliper_store = config_for(:caliper_store)
   end
 end

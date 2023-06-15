@@ -1,0 +1,177 @@
+.row
+  .col-md-12
+    .card
+      .card-header
+        Launch Status
+      .card-body
+        %blockquote.blockquote.mb-0
+          %p{style: 'color: green;'}
+            %i.fa.fa-check-square.fa-lg
+            Valid
+          %p
+            Launch was successfuly received by Reference Tool.
+          %p{style: 'color: #dc3545;'}
+            %i.fa.fa-exclamation-triangle.fa-sm
+            0 Errors below.
+          %p{style: 'color: #ffc107;'}
+            %i.fa.fa-exclamation-circle.fa-sm
+            0 Warnings below.
+      .card-footer.text-muted
+        JWT:
+        %pre
+          = @launch.jwt
+  %br
+
+.row
+  .col-md-4
+    .card.border-success.mb-3{:style => "max-width: 18rem;"}
+      .card-header JWT Decode + Authorization
+      .card-body
+        %h5.card-title Success
+        %p.card-text JWT was decoded correctly with the kid (Key ID) and public key provided by the Platform.
+
+    .card.border-danger.mb-3{:style => "max-width: 18rem;"}
+      .card-header Missing Required Attributes
+      .card-body
+        %h5.card-title Following attributes are required but were not sent:
+        %p.card-text
+          %ul
+            %li No Missing Attributes
+
+    .card.border-warning.mb-3{:style => "max-width: 18rem;"}
+      .card-header Warnings
+      .card-body
+        %h5.card-title Following issues should be fixed:
+        %p.card-text
+          %ul
+            %li No Issues to Fix.
+
+    .card.bg-light.mb-3{style: 'max-width: 18rem;'}
+      .card-header Assignment and Grade Service
+      .card-body
+        - if assignment_and_grades_launch?(@launch.decoded_jwt) && @access_token
+          %p.card-text This will post a score from this Tool back to the Platform. Response will be evaluated and output will appear below.
+          %button.btn.btn-info#send_score{type: 'button'} Submit Score to Platform
+        - else
+          %p.card-text Missing OAuth2 URL on Tool (required for acccess token) or this launch did not include a Assignments and Grade Service claim.
+
+    #grade_service_response.mb-3{style: 'max-width: 18rem;'}
+
+    .card.bg-light.mb-3{style: 'max-width: 18rem;'}
+      .card-header Deep Linking
+      .card-body
+        - if deep_link_launch?(@launch.decoded_jwt)
+          %p.card-text This will redirect to a UI to select your Deep Links that will be posted back to Platform. You will be redirected to Platform afterwards.
+          = link_to 'Select Deep Links', lti_tool_deep_link_launch_path(@tool, @launch.id), class: 'btn btn-info'
+        - else
+          %p.card-text This request was not a Deep Linking request.
+
+    .card.bg-light.mb-3{style: 'max-width: 18rem;'}
+      .card-header Names and Role Provisioning Service
+      .card-body
+        - if names_and_roles_launch?(@launch.decoded_jwt) && @access_token
+          %p.card-text This will post a request from this Tool back to the Platform for Names and Roles. Response will be evaluated and output will appear below.
+          %button.btn.btn-info#request_names_and_roles{type: 'button'} Request Names and Roles
+        - else
+          %p.card-text Missing OAuth2 URL on Tool (required for acccess token) or this launch did not include a Names and Roles Provisioning Service claim.
+
+    #names_and_roles_response.mb-3{style: 'max-width: 18rem;'}
+
+    .card.bg-light.mb-3{style: 'max-width: 18rem;'}
+      .card-header Proctoring Services
+      .card-body
+        - if proctoring_launch?(@launch.decoded_jwt)
+          %p.card-text For the purposes of this example the Proctoring Tool starts an audio/video conference with the candidate and asks them to present government issued id and the candidate offers their passport to the webcam.  A live Proctor validates that the given and family names on the passport match those in the Start Proctoring message and that the passport photo is a good likeness of the person presenting the document! Satisfied that the candidate’s environment is secure the Proctoring Tool issues the Start Assessment message (click below)
+          = form_tag proctoring_url(@launch.decoded_jwt), method: :post, authenticity_token: false do
+            = hidden_field_tag :JWT, proctoring_jwt(@launch)
+            = submit_tag 'Start Assessment', class: 'btn btn-info'
+        - else
+          %p.card-text Missing OAuth2 URL on Tool (required for acccess token) or this launch did not include Proctoring Services claims.
+
+  .col-md-8
+    - if @access_token
+      .card
+        .card-header
+          Pre-fetched OAuth2 Access Token:
+        .card-body
+          %pre
+            %code
+              = JSON.pretty_generate(@access_token)
+
+    - if @launch.state
+      .card
+        .card-header
+          OIDC State
+        .card-body
+          %pre
+            %code
+              = JSON.pretty_generate(@launch.state)
+
+    .card
+      .card-header
+        JWT Header
+      .card-body
+        %pre
+          %code
+            = JSON.pretty_generate(Jwt::Header.new(@launch.jwt).call)
+
+    .card
+      .card-header
+        Security Details
+      .card-body
+        %pre
+          %code
+            = JSON.pretty_generate(security_code_block(@launch.decoded_jwt))
+
+    .card
+      .card-header
+        Data not in Claims
+      .card-body
+        %pre
+          %code
+            = JSON.pretty_generate(non_claim_security_code_block(@launch.decoded_jwt))
+
+    .card
+      .card-header
+        Claims
+      .card-body
+        %pre
+          %code
+            = JSON.pretty_generate(claims_code_block(@launch.decoded_jwt))
+
+- if @access_token
+  :javascript
+    $(document).ready(function(event){
+      $('#send_score').click(function(){
+         data = { "launch_id": #{@launch.id}, "access_token": "#{@access_token['access_token']}" }
+         $.ajax({
+            type: "post",
+            url: "/lti/services/send_score",
+            dataType: "json",
+            data: data,
+            success: function(response) {
+              $('#grade_service_response').prepend('<div class="card border-success mb-3"><div class="card-header">Score Service Response</div><div class="card-body"><p class="card-text"><pre>' + JSON.stringify(response,null,2) + '</pre></p></div></div></div>');
+            },
+            error: function(request, status, error) {
+              $('#grade_service_response').prepend('<div class="card border-danger mb-3"><div class="card-header">Score Service Response</div><div class="card-body"><p class="card-text">This was a bad request and the response returned from the platform is: <br /><b>' + status + ' - ' + error + '</b></p></div></div></div>');
+            }
+        })
+        return false;
+      });
+      $('#request_names_and_roles').click(function(){
+         data = { "launch_id": #{@launch.id}, "access_token": "#{@access_token['access_token']}" }
+         $.ajax({
+            type: "post",
+            url: "/lti/services/request_names_and_roles",
+            dataType: "json",
+            data: data,
+            success: function(response) {
+              $('#names_and_roles_response').prepend('<div class="card border-success mb-3"><div class="card-header">Names and Roles Response</div><div class="card-body"><p class="card-text"><pre>' + JSON.stringify(response,null,2) + '</pre></p></div></div></div>');
+            },
+            error: function(request, status, error) {
+              $('#names_and_roles_response').prepend('<div class="card border-danger mb-3"><div class="card-header">Names and Roles Response</div><div class="card-body"><p class="card-text">This was a bad request and the response returned from the platform is: <br /><b>' + status + ' - ' + error + '</b></p></div></div></div>');
+            }
+        })
+        return false;
+      });
+    });

@@ -100,6 +100,9 @@ GEM
       activerecord (>= 4.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
+    aes_key_wrap (1.1.0)
+    airbrussh (1.4.0)
+      sshkit (>= 1.6.1, != 1.7.0)
     annotate (3.1.1)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 14.0)
@@ -113,6 +116,11 @@ GEM
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
     bcrypt (3.1.15)
+    bindata (2.4.8)
+    bootstrap (4.5.3)
+      autoprefixer-rails (>= 9.1.0)
+      popper_js (>= 1.14.3, < 2)
+      sassc-rails (>= 2.0.0)
     bootstrap-editable-rails (0.0.9)
       railties (>= 3.1)
       sass-rails
@@ -123,6 +131,9 @@ GEM
       railties (>= 3.0)
     bootstrap3-datetimepicker-rails (4.14.30)
       momentjs-rails (>= 2.8.1)
+    bootstrap_form (4.5.0)
+      actionpack (>= 5.2)
+      activemodel (>= 5.2)
     browser (4.2.0)
     builder (3.2.4)
     cancancan (3.1.0)
@@ -259,8 +270,12 @@ GEM
       railties (>= 4)
       sprockets-rails
     json (2.3.0)
+    json-jwt (1.13.0)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      bindata
     jstree-rails-4 (3.3.8)
-    jwt (2.2.1)
+    jwt (2.2.2)
     kaminari (1.2.1)
       activesupport (>= 4.1.0)
       kaminari-actionview (= 1.2.1)
@@ -307,6 +322,7 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
+    oj (3.11.5)
     omniauth (1.9.1)
       hashie (>= 3.4.6)
       rack (>= 1.6.2, < 3)
@@ -331,6 +347,7 @@ GEM
       virtus (>= 1.0.3)
     polyamorous (2.3.2)
       activerecord (>= 5.2.1)
+    popper_js (1.16.0)
     power_assert (1.2.0)
     progress_job (0.0.4)
       delayed_job
@@ -338,9 +355,9 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.5)
-    puma (4.3.5)
+    puma (4.3.7)
       nio4r (~> 2.0)
-    rabl (0.14.3)
+    rabl (0.14.4)
       activesupport (>= 2.3.14)
     rack (2.2.2)
     rack-cors (1.1.1)
@@ -428,6 +445,7 @@ GEM
       tilt
     sdoc (1.1.0)
       rdoc (>= 5.0)
+    selectize-rails (0.12.6)
     sexp_processor (4.15.0)
     simple_oauth (0.3.1)
     sprockets (3.7.2)
@@ -485,10 +503,12 @@ DEPENDENCIES
   annotate
   autoprefixer-rails
   awesome_print
+  bootstrap (~> 4.5.0)
   bootstrap-editable-rails
   bootstrap-sass (>= 3.4.1)
   bootstrap-wysihtml5-rails
   bootstrap3-datetimepicker-rails (~> 4.14.30)
+  bootstrap_form (~> 4.5.0)
   browser
   cancancan
   clipboard-rails
@@ -521,7 +541,9 @@ DEPENDENCIES
   jquery-ui-rails
   js-routes
   json (= 2.3.0)
+  json-jwt (~> 1.13.0)
   jstree-rails-4 (~> 3.2, >= 3.2.1)
+  jwt (~> 2.2, >= 2.2.2)
   kaminari
   log_file
   loofah (= 2.5.0)
@@ -532,6 +554,7 @@ DEPENDENCIES
   nokogiri (= 1.10.9)
   oauth (= 0.5.4)
   oauth2 (= 1.4.4)
+  oj
   omniauth
   omniauth-cas
   omniauth-facebook
@@ -539,7 +562,7 @@ DEPENDENCIES
   pandarus (~> 0.6.7)
   progress_job
   pry
-  puma (~> 4.3.1)
+  puma (~> 4.3.6)
   rabl
   rack (= 2.2.2)
   rack-cors
@@ -558,6 +581,7 @@ DEPENDENCIES
   sass-rails
   sassc (= 2.1.0)
   sdoc
+  selectize-rails (~> 0.12.6)
   simple_oauth (= 0.3.1)
   sprockets (= 3.7.2)
   sucker_punch (~> 1.0)
@@ -571,4 +595,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   2.1.4
+   2.2.16

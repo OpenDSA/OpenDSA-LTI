@@ -4,3 +4,4 @@ require 'rails_extensions'
 
 # Initialize the Rails application.
 OpenDSA::Application.initialize!
+

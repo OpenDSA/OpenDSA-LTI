@@ -14,7 +14,6 @@
         $('#lms-access-token').change(function() {
             $("#lms-access-token-check").hide("slow");
             // return handle_access_token();
-
         });
 
         $('#btn-submit-co').click(function() {
