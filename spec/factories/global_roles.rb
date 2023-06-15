@@ -2,8 +2,8 @@
 #
 # Table name: global_roles
 #
-#  id                            :integer          not null, primary key
-#  name                          :string(255)      default(""), not null
+#  id                            :bigint           not null, primary key
+#  name                          :string(255)      not null
 #  can_manage_all_courses        :boolean          default(FALSE), not null
 #  can_edit_system_configuration :boolean          default(FALSE), not null
 #  builtin                       :boolean          default(FALSE), not null
@@ -24,6 +24,13 @@ FactoryBot.define do
   	can_manage_all_courses { false }
   	can_edit_system_configuration { false }
   	builtin { false }
+  end
+
+  factory :global_role_researcher do
+    name { "Researcher"}
+    can_manage_all_courses { false }
+    can_edit_system_configuration { false }
+    builtin { false }
   end
 
   factory :global_role_user do

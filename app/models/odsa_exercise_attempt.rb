@@ -1,22 +1,42 @@
-# create_table "odsa_exercise_attempts", force: true do |t|
-#   t.integer  "user_id",                                                          null: false
-#   t.integer  "inst_book_id",                                                     null: false
-#   t.integer  "inst_section_id",                                                  null: false
-#   t.integer  "inst_book_section_exercise_id",                                    null: false
-#   t.boolean  "worth_credit",                                                          null: false
-#   t.datetime "time_done",                                                        null: false
-#   t.integer  "time_taken",                                                       null: false
-#   t.integer  "count_hints",                                                      null: false
-#   t.boolean  "hint_used",                                                        null: false
-#   t.decimal  "points_earned",                            precision: 5, scale: 2, null: false
-#   t.boolean  "earned_proficiency",                                               null: false
-#   t.integer  "count_attempts",                limit: 8,                          null: false
-#   t.string   "ip_address",                    limit: 20,                         null: false
-#   t.string   "question_name",                 limit: 50,                         null: false
-#   t.string   "request_type",                  limit: 50
-#   t.datetime "created_at"
-#   t.datetime "updated_at"
-# end
+# == Schema Information
+#
+# Table name: odsa_exercise_attempts
+#
+#  id                               :bigint           not null, primary key
+#  user_id                          :bigint           not null
+#  inst_book_id                     :bigint
+#  inst_section_id                  :bigint
+#  inst_book_section_exercise_id    :bigint
+#  worth_credit                     :boolean          not null
+#  time_done                        :datetime         not null
+#  time_taken                       :bigint           not null
+#  count_hints                      :bigint           not null
+#  hint_used                        :boolean          not null
+#  points_earned                    :decimal(5, 2)    not null
+#  earned_proficiency               :boolean          not null
+#  count_attempts                   :bigint           not null
+#  ip_address                       :string(20)       not null
+#  question_name                    :string(50)       not null
+#  request_type                     :string(50)
+#  created_at                       :datetime
+#  updated_at                       :datetime
+#  correct                          :boolean
+#  pe_score                         :decimal(5, 2)
+#  pe_steps_fixed                   :bigint
+#  inst_course_offering_exercise_id :bigint
+#  inst_module_section_exercise_id  :bigint
+#  answer                           :string(255)
+#  question_id                      :integer
+#
+# Indexes
+#
+#  fk_rails_6944f2321b                                         (inst_module_section_exercise_id)
+#  odsa_exercise_attempts_inst_book_id_fk                      (inst_book_id)
+#  odsa_exercise_attempts_inst_book_section_exercise_id_fk     (inst_book_section_exercise_id)
+#  odsa_exercise_attempts_inst_course_offering_exercise_id_fk  (inst_course_offering_exercise_id)
+#  odsa_exercise_attempts_inst_section_id_fk                   (inst_section_id)
+#  odsa_exercise_attempts_user_id_fk                           (user_id)
+#
 
 class OdsaExerciseAttempt < ApplicationRecord
   #~ Relationships ............................................................
@@ -42,12 +62,31 @@ class OdsaExerciseAttempt < ApplicationRecord
   #~ Class methods ............................................................
   #~ Instance methods .........................................................
   def update_exercise_progress
-    if self.request_type === 'PE'
-      update_pe_exercise_progress
-    elsif self.request_type === 'AE'
-      update_ae_exercise_progress
+    hasBook = !inst_book_section_exercise_id.blank?
+
+    if hasBook
+      @inst_chapter_module = inst_book_section_exercise.get_chapter_module
+      if @inst_chapter_module.due_dates.nil? or @inst_chapter_module.due_dates > Time.now
+        if self.request_type === 'PE'
+          update_pe_exercise_progress
+        elsif self.request_type === 'AE'
+          update_ae_exercise_progress
+        elsif self.request_type === 'PI'
+          update_pi_exercise_progress
+        else
+          update_ka_exercise_progress
+        end
+      end
     else
-      update_ka_exercise_progress
+      if self.request_type === 'PE'
+        update_pe_exercise_progress
+      elsif self.request_type === 'AE'
+        update_ae_exercise_progress
+      elsif self.request_type === 'PI'
+        update_pi_exercise_progress
+      else
+        update_ka_exercise_progress
+      end
     end
   end
 
@@ -160,6 +199,7 @@ class OdsaExerciseAttempt < ApplicationRecord
       self.earned_proficiency = true
       if hasBook
         self.points_earned = inst_book_section_exercise.points
+        Rails.logger.info(inst_book_section_exercise.points)
       elsif has_standalone_module
         self.points_earned = inst_module_section_exercise.points
       else
@@ -225,6 +265,59 @@ class OdsaExerciseAttempt < ApplicationRecord
       exercise_progress.save!
       if hasBook
         module_progress.update_proficiency(inst_exercise)
+        book_progress.update_proficiency(exercise_progress)
+      elsif has_standalone_module
+        module_progress.update_proficiency(inst_module_section_exercise)
+      end
+    else
+      exercise_progress.save!
+    end
+  end
+
+  def update_pi_exercise_progress
+    Rails.logger.info("update_pi_exercise_progress")
+    hasBook = !inst_book_section_exercise_id.blank?
+    has_standalone_module = !inst_module_section_exercise_id.blank?
+    if hasBook
+      Rails.logger.info("update_pi_exercise_progress -> hasBook")
+      @inst_chapter_module = inst_book_section_exercise.get_chapter_module
+      inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
+      book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
+      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
+    elsif has_standalone_module
+      inst_exercise = InstExercise.find(inst_module_section_exercise.inst_exercise_id)
+      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
+    else
+      inst_exercise = InstExercise.find(inst_course_offering_exercise.inst_exercise_id)
+    end
+    exercise_progress = self.get_exercise_progress
+    exercise_progress.first_done ||= DateTime.now
+    exercise_progress.last_done = DateTime.now
+    if hasBook
+      Rails.logger.info("update_pi_exercise_progress -> hasBook 2222")
+      book_progress.update_started(inst_exercise)
+    end
+    if self.correct and self.finished_frame
+      self.earned_proficiency = true
+      if hasBook
+        self.points_earned = inst_book_section_exercise.points
+        Rails.logger.info(inst_book_section_exercise.points)
+      elsif has_standalone_module
+        self.points_earned = inst_module_section_exercise.points
+      else
+        self.points_earned = inst_course_offering_exercise.points
+      end
+      self.save!
+      exercise_progress['total_correct'] += 1
+      exercise_progress['total_worth_credit'] += 1
+      exercise_progress['current_score'] = self.points_earned
+      exercise_progress['highest_score'] = self.points_earned
+      exercise_progress.proficient_date ||= DateTime.now
+      exercise_progress.save!
+      if hasBook
+        Rails.logger.info("update_pi_exercise_progress -> update_module_progress_procifiency")
+        module_progress.update_proficiency(inst_exercise)
+        Rails.logger.info("update_pi_exercise_progress -> update_book_progress_procifiency")
         book_progress.update_proficiency(exercise_progress)
       elsif has_standalone_module
         module_progress.update_proficiency(inst_module_section_exercise)

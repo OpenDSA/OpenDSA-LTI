@@ -21,6 +21,7 @@ module OpenDSA
     "Graph" => "Graphs",
     "Hashing" => "Hashing",
     "Indexing" => "Indexing",
+    "IntroToSoftwareDesign" => "Intro to Software Design",
     "NP" => "Limits to Computing",
     "List" => "Linear Structures",
     "Bounds" => "Lower Bounds",
@@ -62,6 +63,10 @@ module OpenDSA
     "sv" => "Svenska",
   }
 
+  BOOK_THEMES = {
+    "haiku" => "Haiku",
+    "hachibee" => "Hachibee",
+  }
   # coding languages OpenDSA has examples in
   CODE_LANGUAGES = {
     "Java": {
@@ -76,13 +81,6 @@ module OpenDSA
         "java",
       ],
       "label": "Java (Generic)",
-      "lang": "java",
-    },
-    "Processing": {
-      "ext": [
-        "pde",
-      ],
-      "label": "Processing",
       "lang": "java",
     },
     "C++": {

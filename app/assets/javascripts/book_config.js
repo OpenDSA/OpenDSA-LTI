@@ -61,6 +61,8 @@
     addChapterDialog,
     renameChapterDialog,
     exSettingsDialog;
+  var glob_extr_options_nonedit = {};
+  var glob_ka_options_nonedit = {};
 
   var changesMade = false;
 
@@ -701,11 +703,15 @@
 
   /* Gets the global Khan-Academy Exercise settings (glob_ka_options) */
   function globalKaSettings() {
-    return {
-      required: $("#glob-ka-required").is(":checked"),
-      points: Number.parseFloat($("#glob-ka-points").val()),
-      threshold: Number.parseInt($("#glob-ka-threshold").val())
-    };
+    ka_settings = glob_ka_options_nonedit;
+    if (ka_settings == null)
+    {
+      ka_settings = {};
+    }
+    ka_settings['required'] = $("#glob-ka-required").is(":checked");
+    ka_settings['points'] = Number.parseFloat($("#glob-ka-points").val());
+    ka_settings['threshold'] = Number.parseInt($("#glob-ka-threshold").val());
+    return ka_settings;
   }
 
   /* Gets the global Frame settings (glob_ff_options) */
@@ -740,21 +746,30 @@
     will be returned. */
   function globalExtrSettings(toolName) {
     if (toolName) {
-      return {
-        points: Number.parseFloat($("#glob-" + toolName + "-points").val())
-      };
+      var tool_glob_settings = glob_extr_options_nonedit[toolName];
+      if (tool_glob_settings == null)
+      {
+        tool_glob_settings = {};
+      }
+      tool_glob_settings['points'] =
+        Number.parseFloat($("#glob-" + toolName + "-points").val());
+      return tool_glob_settings;
     }
 
-    var settings = {
-      points: Number.parseFloat($("#glob-extr-points").val())
-    };
+    var settings = glob_extr_options_nonedit;
+    settings['points'] = Number.parseFloat($("#glob-extr-points").val());
     for (var i = 0; i < ODSA.learningTools.length; i++) {
       var tool = ODSA.learningTools[i];
-      settings[tool.name] = {
-        points: Number.parseFloat($("#glob-" + tool.name + "-points").val())
-      };
+      settings[tool.name] = globalExtrSettings(tool.name);
     }
     return settings;
+  }
+
+  /* Gets the Max Toc Depth settings (max-toc-depth) */
+  function globalMaxTocDepthSettings(toolName) {
+    return {
+        points: Number.parseInt($("#max-toc-depth").val())
+    };
   }
 
   /* Gets the default settings for sections */
@@ -787,12 +802,18 @@
       build_dir: "Books",
       code_dir: "SourceCode/",
       lang: $("#book-lang").val(),
+      theme: $("#theme").val(),
+      html_theme_options: $("#html_theme_options").val() != "" ? JSON.parse($("#html_theme_options").val()) : null,
+      html_js_files: $("#html_js_files").val() != "" ?  JSON.parse($("#html_js_files").val()) : null,
+      html_css_files: $("#html_css_files").val() != "" ?  JSON.parse($("#html_css_files").val()) : null,
+      chapter_name: $("#chapter_name").val(),
       code_lang: selectedCodeLanguages(),
       build_JSAV: $("#build-jsav").is(":checked"),
       build_cmap: $("#build-cmap").is(":checked"),
       suppress_todo: $("#suppress-todo").is(":checked"),
       dispModComp: $("#disp-mod-comp").is(":checked"),
       zeropt_assignments: $("#zeropt-assignments").is(":checked"),
+      include_tree_view: $("#include_tree_view").is(":checked"),
       tabbed_codeinc: $("#tabbed-codeinc").is(":checked"),
       narration_enabled: $("#narration-enabled").is(":checked"),
       glob_exer_options: globalExerSettings(),
@@ -800,7 +821,8 @@
       glob_ka_options: globalKaSettings(),
       glob_pe_options: globalPeSettings(),
       glob_ff_options: globalFfSettings(),
-      glob_extr_options: globalExtrSettings()
+      glob_extr_options: globalExtrSettings(),
+      max_toc_depth: globalMaxTocDepthSettings()
     };
   }
 
@@ -945,6 +967,7 @@
   /* Loads the settings from the specified configuration. Used to load
   minimal configurations, such as  */
   function loadConfiguration(config) {
+    // alert(JSON.stringify(config));
     $("#book-config-form")[0].reset();
     for (var key in config) {
       switch (key) {
@@ -960,6 +983,21 @@
         case "lang":
           $("#book-lang").val(config.lang);
           break;
+        case "theme":
+          $("#theme").val(config.theme);
+          break;
+        case "html_theme_options":
+          $("#html_theme_options").val(JSON.stringify(config.html_theme_options));
+          break;
+        case "chapter_name":
+          $("#chapter_name").val(config.chapter_name);
+          break;
+        case "html_js_files":
+          $("#html_js_files").val(JSON.stringify(config.html_js_files));
+          break;
+        case "html_css_files":
+          $("#html_css_files").val(JSON.stringify(config.html_css_files));
+          break;
         case "build_JSAV":
           $("#build-jsav").prop("checked", config.build_JSAV);
           break;
@@ -974,6 +1012,9 @@
           break;
         case "zeropt_assignments":
           $("#zeropt-assignments").prop("checked", config.zeropt_assignments);
+          break;
+        case "include_tree_view":
+          $("#include_tree_view").prop("checked", config.include_tree_view);
           break;
         case "tabbed_codeinc":
           $("#tabbed-codeinc").prop("checked", config.tabbed_codeinc);
@@ -999,6 +1040,12 @@
         case "glob_extr_options":
           setGlobExtrOptions(config.glob_extr_options);
           break;
+        case "max_toc_depth":
+          $("#max-toc-depth").val(config.max_toc_depth);
+          break;
+        case "due_dates":
+          $("#due_dates").val(null);
+          break;
         case "chapters":
           //loadChapters(config.chapters, config.lang);
           break;
@@ -1006,16 +1053,23 @@
         //
       }
     }
-    initializeJsTree(
-      ODSA.availableModules[config.lang].children,
-      config.chapters,
-      function() {
-        hideLoadingOverlay();
-      }
-    );
+    // Try catch Block that detects an incorrectly formatted Json File
+    try {
+      initializeJsTree(
+        ODSA.availableModules[config.lang].children,
+        config.chapters,
+        function () {
+          hideLoadingOverlay();
+        }
+      );
+    }
+    catch (error) {
+      alert("Incorrectly Formatted Json File");
+      hideLoadingOverlay();
+    }
   }
 
-  /* Loads a 'full' configuration file that includes the settings for 
+  /* Loads a 'full' configuration file that includes the settings for
      all exercises, and no global exercise settings. An example
      of this is a configuration pulled from the database. */
   function loadFullConfiguration(config) {
@@ -1038,6 +1092,21 @@
             case "lang":
               $("#book-lang").val(config.lang);
               break;
+            case "theme":
+              $("#theme").val(config.theme);
+              break;
+            case "html_theme_options":
+              $("#html_theme_options").val(JSON.stringify(config.html_theme_options));
+              break;
+            case "chapter_name":
+              $("#chapter_name").val(config.chapter_name);
+              break;
+            case "html_js_files":
+              $("#html_js_files").val(JSON.stringify(config.html_js_files));
+              break;
+            case "html_css_files":
+              $("#html_css_files").val(JSON.stringify(config.html_css_files));
+              break;
             case "build_JSAV":
               $("#build-jsav").prop("checked", config.build_JSAV);
               break;
@@ -1053,6 +1122,9 @@
             case "zeropt_assignments":
               $("#zeropt-assignments").prop("checked", config.zeropt_assignments);
               break;
+            case "include_tree_view":
+              $("#include_tree_view").prop("checked", config.include_tree_view);
+              break;
             case "tabbed_codeinc":
               $("#tabbed-codeinc").prop("checked", config.tabbed_codeinc);
               break;
@@ -1061,6 +1133,12 @@
               break;
             case "glob_exer_options":
               setGlobExerOptions(config.glob_exer_options);
+              break;
+            case "max_toc_depth":
+              $("max-toc-depth").val(config.max_toc_depth);
+              break;
+            case "due_dates":
+              $("#due_dates").val(null);
               break;
             case "chapters":
               config.chapters = convertChapters(config.chapters);
@@ -1302,6 +1380,7 @@
     var url = $("#reference-config").val();
     $.ajax({
       url: url,
+      cache: false,
       success: function(data, txtStatus, xhr) {
         loadConfiguration(data);
       },
@@ -1330,6 +1409,7 @@
     var url = "/inst_books/configurations/" + bookId;
     $.ajax({
       url: url,
+      cache: false,
       success: function(data, txtStatus, xhr) {
         loadFullConfiguration(data);
       },
@@ -1383,6 +1463,7 @@
 
   /* Sets the global Khan-Academy exercise options */
   function setGlobKaOptions(options) {
+    glob_ka_options_nonedit = options;
     for (var option in options) {
       var value = options[option];
       if (typeof value === "boolean") {
@@ -1419,6 +1500,7 @@
 
   /* Sets the global external tool options */
   function setGlobExtrOptions(options) {
+    glob_extr_options_nonedit = options;
     for (var option in options) {
       var value = options[option];
       if (option === "points") {

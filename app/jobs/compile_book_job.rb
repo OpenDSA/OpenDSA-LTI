@@ -22,15 +22,15 @@ class CompileBookJob < ProgressJob::Base
       f.write(inst_book_json)
     end
 
-    script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
     Rails.logger.info('build_path')
     Rails.logger.info(build_path)
-    require 'open3'
-    command = ". $(echo $python_venv_path) && python3 #{script_path} #{config_file_path} -b #{build_path}"
-    stdout, stderr, status = Open3.capture3(command)
-    unless status.success?
-      Rails.logger.info(stderr)
+    config_path = config_file_path[15..-1] # without the public/OpenDSA
+    require 'net/http'
+    uri = URI(ENV["config_api_link"])
+    res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => build_path, 'rake' => false)
+    unless res.kind_of? Net::HTTPSuccess
+      Rails.logger.info(res['stderr_compressed'])
     end
     update_progress
   end

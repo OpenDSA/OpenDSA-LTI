@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: inst_books
+#
+#  id                 :bigint           not null, primary key
+#  course_offering_id :bigint
+#  user_id            :bigint           not null
+#  title              :string(50)       not null
+#  created_at         :datetime
+#  updated_at         :datetime
+#  template           :boolean          default(FALSE)
+#  desc               :string(255)
+#  last_compiled      :datetime
+#  options            :text(4294967295)
+#  book_type          :bigint
+#
+# Indexes
+#
+#  inst_books_course_offering_id_fk  (course_offering_id)
+#  inst_books_user_id_fk             (user_id)
+#
 ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   filter :template
   includes :course_offering, :user
@@ -8,6 +29,8 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   permit_params :template, :title, :desc, :course_offering_id, :user_id, :book_type
 
   member_action :update_configuration, method: :get do
+  end
+  member_action :resend_scores, method: :get do
   end
 
 
@@ -44,7 +67,24 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     link_to "Delete", { action: :destroy }, method: :delete, data: { confirm: message}
   end
 
+  collection_action :compile, method: :get do
+    end
+
+  action_item :compile do
+    link_to "Update OpenDSA Repository", compile_admin_inst_books_path()
+  end
+
   controller do
+    def compile
+      if authorized? :update_configuration
+        success = `cd /opendsa && git pull`
+        flash[:success] = "Updated OpenDSA Repository"
+      else
+        flash[:error] = "not authorized"
+      end
+      redirect_to admin_inst_books_path
+    end
+
     def scoped_collection
       InstBook.joins(:course_offering).where('course_offerings.archived = false').
       union(InstBook.where("template = ? or course_offering_id is null", 1))
@@ -58,23 +98,40 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       render 'upload_books'
     end
 
+    def resend_scores
+      if authorized? :update_configuration
+        @job = Delayed::Job.enqueue ResendScoresJob.new(
+          current_user.id, params[:id])
+        flash[:success] = "Started job to resend all score passbacks for " +
+          "all users in all modules for the selected book instance."
+      else
+        flash[:error] = "not authorized"
+      end
+      redirect_to admin_inst_books_path
+    end
+
     def upload_books
-      if !current_user.global_role.is_admin? and !current_user.global_role.is_instructor?
+      if !current_user.global_role.is_admin? and !current_user.global_role.is_instructor? and !current_user.global_role.is_researcher?
         redirect_to admin_inst_books_path
       end
     end
 
     def upload_create
-      script_path = "public/OpenDSA/tools/simple2full.py"
-      input_file = params[:form][:file].path
+      uploaded_file = params[:form][:file]
+      File.open(Rails.root.join('public', 'OpenDSA', 'config', 'temp', uploaded_file.original_filename), 'wb') do |file|
+        file.write(uploaded_file.read)
+      end
+      input_file = "public/OpenDSA/config/temp/#{uploaded_file.original_filename}"
       output_file = sanitize_filename('temp_' + current_user.id.to_s + '_' + Time.now.getlocal.to_s) + '_full.json'
       output_file_path = "public/OpenDSA/config/temp/#{output_file}"
-      require 'open3'
-      command = ". $(echo $python_venv_path) && python3 #{script_path} #{input_file} #{output_file_path}"
-      stdout, stderr, status = Open3.capture3(command)
+      output_path = output_file_path[15..-1] # without the public/OpenDSA
+      input_path = input_file[15..-1] # without the public/OpenDSA
+      require 'net/http'
+      uri = URI(ENV["simple_api_link"])
+      res = Net::HTTP.post_form(uri, 'input_path' => input_path, 'output_path' => output_path, 'rake' => false)
 
-      unless status.success?
-        Rails.logger.info(stderr)
+      unless res.kind_of? Net::HTTPSuccess
+        Rails.logger.info(res['stderr_compressed'])
       end
       hash = JSON.load(File.read(output_file_path))
       if params.has_key?(:inst_book)
@@ -127,8 +184,10 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
       end
       links += link_to "Clone", clone_book_admin_inst_book_path(inst_book)
       if authorized? :update_configuration, inst_book
+        links += ' '
         links += link_to "Update Configuration", update_configuration_admin_inst_book_path(inst_book)
         links += ' '
+        links += link_to "Re-send Scores", resend_scores_admin_inst_book_path(inst_book)
       end
       links
     end

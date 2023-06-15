@@ -426,7 +426,8 @@ innodb_temp_data_file_path = ibtmp1:12M:autoextend:max:500M
           server_name prod_server_name;
           ssl_certificate /etc/nginx/ssl/nginx.crt;
           ssl_certificate_key /etc/nginx/ssl/nginx.key;
-
+          
+          charset UTF-8;
           passenger_enabled on;
           rails_env    production;
           root         /home/deploy/OpenDSA-LTI/current/public;

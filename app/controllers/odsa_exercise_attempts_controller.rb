@@ -417,6 +417,134 @@ class OdsaExerciseAttemptsController < ApplicationController
     end
   end
 
+  def create_pi
+    unless user_logged_in?
+      return
+    end
+    
+    hasBook = params.key?(:inst_book_id)
+    is_standalone_module = params.key?(:inst_module_version_id)
+    if params.key?(:inst_book_section_exercise_id)
+      inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
+      threshold = inst_book_section_exercise.threshold
+    elsif hasBook
+      inst_book = InstBook.find_by(id: params[:inst_book_id])
+      inst_exercise = InstExercise.find_by(short_name: params[:exercise])
+      inst_section = InstSection.find_by(inst_chapter_module_id: params[:inst_chapter_module_id])
+      inst_book_section_exercise = InstBookSectionExercise.where(
+        "inst_book_id=? and inst_exercise_id=?",
+        params[:inst_book_id], inst_exercise.id
+      ).first
+      if inst_book_section_exercise.blank?
+        respond_to do |format|
+          msg = {:status => "fail", :message => "Inst Book Section Exercise is blank"}
+          format.json { render :json => msg }
+        end
+        return
+      end
+      threshold = inst_book_section_exercise.threshold
+    elsif is_standalone_module
+      inst_exercise = InstExercise.find_by(short_name: params[:exercise])
+      inst_module_section_exercise = InstModuleSectionExercise.find_by(
+                                                        inst_exercise_id: inst_exercise.id, 
+                                                        inst_module_version_id: params[:inst_module_version_id])
+      threshold = inst_module_section_exercise.threshold
+    else
+      inst_course_offering_exercise = InstCourseOfferingExercise.find_by(
+        id: params[:inst_course_offering_exercise_id],
+      )
+      threshold = inst_course_offering_exercise.threshold
+    end
+
+    if inst_book_section_exercise != nil or inst_course_offering_exercise != nil or inst_module_section_exercise != nil
+      if hasBook
+        unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
+                                                    inst_book_section_exercise_id=?",
+                                                              current_user.id,
+                                                              inst_book_section_exercise.id).first
+          exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                                                       inst_book_section_exercise: inst_book_section_exercise)
+          exercise_progress.save
+        end
+      elsif is_standalone_module
+        unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
+                                                      inst_module_section_exercise_id=?",
+                                                              current_user.id,
+                                                              inst_module_section_exercise.id).first
+          exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                          inst_module_section_exercise: inst_module_section_exercise)
+          exercise_progress.save
+        end
+      else
+        unless exercise_progress = OdsaExerciseProgress.where("user_id=? and
+                                                    inst_course_offering_exercise_id=?",
+                                                              current_user.id,
+                                                              inst_course_offering_exercise.id).first
+          exercise_progress = OdsaExerciseProgress.new(user: current_user,
+                                                       inst_course_offering_exercise: inst_course_offering_exercise)
+          exercise_progress.save
+        end
+      end
+
+      already_proficient = exercise_progress.proficient?
+
+      exercise_attempt = OdsaExerciseAttempt.new(
+        inst_book_id: params[:inst_book_id],
+        user: current_user,
+        inst_section: inst_section,
+        inst_book_section_exercise: inst_book_section_exercise,
+        inst_course_offering_exercise: inst_course_offering_exercise,
+        inst_module_section_exercise: inst_module_section_exercise,
+        correct: params[:correct],
+        finished_frame: params[:finishedFrame],
+        time_done: Time.now,
+        question_name: params[:exercise],
+        question_id: params[:question_id],
+        request_type: params[:request_type],
+        ip_address: request.ip,
+      )
+
+      respond_to do |format|
+        if exercise_attempt.save
+          if hasBook
+            exercise_progress = OdsaExerciseProgress.where(
+              "user_id=? and inst_book_section_exercise_id=?",
+              current_user.id,
+              inst_book_section_exercise.id
+            ).first
+          elsif is_standalone_module
+            exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
+              inst_module_section_exercise_id: inst_module_section_exercise.id)
+          else
+            exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
+              inst_course_offering_exercise_id: inst_course_offering_exercise.id)
+          end
+          if !already_proficient and exercise_progress.proficient? and 
+            exercise_progress.has_inst_course_offering_exercise?()
+            
+            exercise_progress.post_course_offering_exercise_score_to_lms()
+          end
+          format.json {
+            render :json => {
+                     :exercise_progress => exercise_progress,
+                     :threshold => threshold,
+                     :was_proficient => already_proficient,
+                     :is_proficient => exercise_progress.proficient?,
+                   }
+          }
+        else
+          msg = {:status => "fail", :message => "Fail to save exercise attempt!"}
+          format.json { render :json => msg }
+        end
+      end
+    else
+      respond_to do |format|
+        msg = {:status => "fail", :message => "Fail to retreive inst book info!"}
+        format.json { render :json => msg }
+      end
+    end
+  end
+
   def get_count
     practiced_ex = OdsaExerciseAttempt.count(:conditions => "request_type <> 'hint'") + OpenDSA::EXERCISES_SOLVED
 
@@ -425,6 +553,32 @@ class OdsaExerciseAttemptsController < ApplicationController
     end
   end
 
+  # POST /pi_attempts/get_attempts
+  def get_attempts
+    attempts = OdsaExerciseAttempt.where(user_id: current_user.id, question_name: params[:question_name], question_id: params[:question_id]).count
+    result = {"result" => attempts}
+    respond_to do |format|
+      format.json {render json: result}
+    end
+  end
+
+  # POST /pi_attempts/get_checkpoint
+  def get_checkpoint
+    checkpoint = OdsaExerciseAttempt.where(user_id: current_user.id, question_name: params[:question_name]).maximum("question_id")
+    result = {"result" => checkpoint}
+    respond_to do |format|
+      format.json {render json: result}
+    end
+  end
+
+  # POST /pi_attempts/get_progress
+  def get_progress
+    progress = OdsaExerciseAttempt.where(user_id: current_user.id, question_name: params[:question_name], correct: 1).maximum("question")
+    result = {"result" => progress}
+    respond_to do |format|
+      format.json {render json: result}
+    end
+  end
   #~ Private instance methods .................................................
 
   private

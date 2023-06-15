@@ -2,16 +2,16 @@
 #
 # Table name: errors
 #
-#  id          :integer          not null, primary key
+#  id          :bigint           not null, primary key
 #  usable_type :string(255)
-#  usable_id   :integer
+#  usable_id   :bigint
 #  class_name  :string(255)
-#  message     :text
-#  trace       :text
-#  target_url  :text
-#  referer_url :text
-#  params      :text
-#  user_agent  :text
+#  message     :text(65535)
+#  trace       :text(65535)
+#  target_url  :text(65535)
+#  referer_url :text(65535)
+#  params      :text(65535)
+#  user_agent  :text(65535)
 #  created_at  :datetime
 #  updated_at  :datetime
 #

@@ -2,7 +2,7 @@
 #
 # Table name: time_zones
 #
-#  id         :integer          not null, primary key
+#  id         :bigint           not null, primary key
 #  name       :string(255)
 #  zone       :string(255)
 #  display_as :string(255)
@@ -14,8 +14,8 @@
 
 FactoryBot.define do
   factory :time_zone do
-    name { "MyString" }
-    zone { "MyString" }
-    display_as { "MyString" }
+    name { "America/New_York" }
+    zone { "UTC -05:00" }
+    display_as { "UTC -05:00(New York)" }
   end
 end

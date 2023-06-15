@@ -67,24 +67,22 @@ end
 gem 'mysql2'
 
 group :development, :test do
-  gem 'sqlite3'
   gem 'rspec-rails', '>=3.4.2'
   gem 'annotate'
   gem 'rails-erd', github: 'voormedia/rails-erd'
   gem 'pry'
   gem 'request-log-analyzer'
-  # gem 'byebug'
-  gem 'debase'
-  gem 'ruby-debug-ide'
+  # gem 'debase'
+  # gem 'ruby-debug-ide'
 end
 
 gem 'faker'
 gem 'factory_bot_rails'
 gem 'log_file'
 
-group :test do
-  gem 'capybara'
-end
+# group :test do
+#   gem 'capybara'
+# end
 
 group :production, :staging do
 
@@ -103,7 +101,6 @@ gem 'omniauth-google-oauth2'
 gem 'omniauth-cas'
 gem 'cancancan'
 gem 'activeadmin', '~> 2.7'
-# update this gem
 gem 'exception_handler', '~> 0.3.45'
 
 gem 'nokogiri', '1.10.9', require: false
@@ -128,16 +125,6 @@ gem 'cocoon'
 # For handling converting to booleans
 gem 'wannabe_bool'
 
-# Gems for deployment.
-gem 'capistrano3-delayed-job', '~> 1.0'
-gem 'capistrano-bower'
-gem 'capistrano'
-gem 'capistrano-figaro-yml', '~> 1.0.2'
-gem 'capistrano-bundler'
-gem 'capistrano-rails'
-gem 'capistrano-rbenv', github: "capistrano/rbenv"
-gem 'capistrano-passenger'
-gem 'capistrano-rake', require: false
 gem 'net-ssh', :github => 'net-ssh/net-ssh'
 
 #for multi-color progress bar
@@ -161,18 +148,17 @@ gem "mustache", "~> 1.0"
 gem "whenever", :require => false
 
 #for setting SameSite=None to cookies generated
-#gem 'user_agent_parser', '< 2.5.2' # 2.6.0 or higher requires ruby>=2.4
 gem 'user_agent_parser' # 2.6.0 or higher requires ruby>=2.4
 
 gem 'rails_same_site_cookie'
 gem 'rack-cors'
 gem 'simple_oauth', '0.3.1'
-# gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
-# gem 'log4r', '~> 1.0', '>= 1.0.6'
+gem 'therubyracer'
+gem 'ffi' # speed up sassc install
+gem 'sassc', '2.1.0'
 gem 'jwt', '~> 2.2', '>= 2.2.2'
 gem 'json-jwt', '~> 1.13.0'
 # TODO: to be removed later, used only to test lti13 layout
 gem 'bootstrap', '~> 4.5.0'
 gem 'bootstrap_form', '~> 4.5.0'
-# gem 'bootstrap-will_paginate'
 gem 'selectize-rails', '~> 0.12.6'

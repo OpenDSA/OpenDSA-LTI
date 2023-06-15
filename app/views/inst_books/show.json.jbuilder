@@ -19,16 +19,17 @@ json.chapters do
     json.set! chapter_name do
       json.set! :lms_chapter_id, inst_chapter.lms_chapter_id
       json.set! :lms_assignment_group_id, inst_chapter.lms_assignment_group_id
-
+      
       for inst_chapter_module in inst_chapter.inst_chapter_modules.order('module_position')
         module_path = InstModule.where(:id => inst_chapter_module.inst_module_id).first.path
-
+        
         # module Object
         json.set! module_path do
           json.set! :lms_module_item_id, inst_chapter_module.lms_module_item_id
           json.set! :lms_section_item_id, inst_chapter_module.lms_section_item_id
           json.set! :lms_assignment_id, inst_chapter_module.lms_assignment_id
           json.set! :long_name, InstModule.where(:id => inst_chapter_module.inst_module_id).first.name
+          json.set! :due_dates, inst_chapter_module.due_dates.try(:strftime, "%m/%d/%Y %I:%M %P")
 
           # sections
           json.sections do
@@ -48,27 +49,35 @@ json.chapters do
 
                   learning_tool = inst_section.learning_tool
                   if learning_tool
+                    exercise = inst_section.inst_book_section_exercises.first
+                    if exercise
+                      if !exercise.json.blank?
+                        json.merge! JSON.parse(exercise.json)
+                      end
+                      json.set! :points, exercise.points.to_f
+                      json.set! :launch_url, "#{@extrtool_launch_base_url}/#{exercise.id}"
+                    end
                     json.set! :learning_tool, learning_tool
                     json.set! :resource_type, inst_section.resource_type
                     json.set! :resource_name, inst_section.resource_name
-                    exercise = inst_section.inst_book_section_exercises.first
-                    json.set! :points, exercise.points.to_f
-                    json.set! :launch_url, "#{@extrtool_launch_base_url}/#{exercise.id}"
                   else
                     exercises = inst_section.inst_book_section_exercises
                     if !exercises.empty?
-                      for inst_book_section_exercise in exercises
+                      exercises.each do |inst_book_section_exercise|
                         exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
                         json.set! exercise_name do
+                          if !inst_book_section_exercise.json.blank?
+                            json.merge! JSON.parse(inst_book_section_exercise.json)
+                          end
                           json.set! :id, inst_book_section_exercise.id
                           json.set! :long_name, InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.name
                           json.set! :required, inst_book_section_exercise.required
                           json.set! :points, inst_book_section_exercise.points.to_f
                           json.set! :threshold, inst_book_section_exercise.threshold.to_f
-                          json.set! :options, inst_book_section_exercise.options
                           options = inst_book_section_exercise.options
-                          if options != nil && options != "null"
-                            json.set! :exer_options, eval(options)
+                          if !options.blank? && options != "null"
+                            # FIXME: shouldn't eval() here be JSON.parse()?
+                            json.set! :exer_options, JSON.parse(options)
                           end
                         end
                       end

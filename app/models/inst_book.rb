@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: inst_books
+#
+#  id                 :bigint           not null, primary key
+#  course_offering_id :bigint
+#  user_id            :bigint           not null
+#  title              :string(50)       not null
+#  created_at         :datetime
+#  updated_at         :datetime
+#  template           :boolean          default(FALSE)
+#  desc               :string(255)
+#  last_compiled      :datetime
+#  options            :text(4294967295)
+#  book_type          :bigint
+#
+# Indexes
+#
+#  inst_books_course_offering_id_fk  (course_offering_id)
+#  inst_books_user_id_fk             (user_id)
+#
 #~ Relationships ............................................................
 #~ Validation ...............................................................
 #~ Constants ................................................................
@@ -35,6 +56,11 @@ class InstBook < ApplicationRecord
     options['code_dir'] = book_data['code_dir'] || "SourceCode/"
     options['lang'] = book_data['lang'] || "en"
     options['code_lang'] = book_data['code_lang'] || {}
+    options['theme'] = book_data['theme'] || "haiku"
+    options['html_theme_options'] = book_data['html_theme_options'] ||{}
+    options['chapter_name'] = book_data['chapter_name'] || "Chapter"
+    options['html_js_files'] = book_data['html_js_files'] || []
+    options['html_css_files'] = book_data['html_css_files'] || []
     options['build_JSAV'] = book_data['build_JSAV'] || false
     options['tabbed_codeinc'] = book_data['tabbed_codeinc'] || true
     options['build_cmap'] = book_data['build_cmap'] || false
@@ -42,6 +68,7 @@ class InstBook < ApplicationRecord
     options['assumes'] = book_data['assumes'] || "recursion"
     options['dispModComp'] = book_data['dispModComp'] || true
     options['zeropt_assignments'] = book_data['zeropt_assignments'] || false
+    options['include_tree_view'] = book_data['include_tree_view'] || false
     options['glob_exer_options'] = book_data['glob_exer_options'] || {}
 
     if inst_book_id == nil
@@ -103,6 +130,8 @@ class InstBook < ApplicationRecord
     return missing_modules
   end
 
+  # FIXME: shouldn't this method be removed? It appears to be out-dated?
+  # FIXME: the real code is now in views/inst_books/show.json.builder
   def to_builder
     Jbuilder.new do |json|
       json.set! :inst_book_id, self.id
@@ -145,19 +174,31 @@ class InstBook < ApplicationRecord
                           if learning_tool
                             exercise = inst_section.inst_book_section_exercises.first
                             json.set! inst_section.resource_name do
-                              json.set! :points, exercise.points.to_f
+                              if exercise
+                                if !exercise.json.blank?
+                                  json.merge! JSON.parse(exercise.json)
+                                end
+                                json.set! :points, exercise.points.to_f
+                              end
                             end
                           else
                             exercises = inst_section.inst_book_section_exercises
                             if !exercises.empty?
                               for inst_book_section_exercise in exercises
-                                exercise_name = InstExercise.where(:id => inst_book_section_exercise.inst_exercise_id).first.short_name
+                                exercise_name = inst_book_section_exercise.inst_exercise.short_name
                                 json.set! exercise_name do
+                                  if !inst_book_section_exercise.json.blank?
+                                    json.merge! JSON.parse(inst_book_section_exercise.json)
+                                  end
                                   json.set! :required, inst_book_section_exercise.required
                                   json.set! :points, inst_book_section_exercise.points.to_f
                                   json.set! :threshold, inst_book_section_exercise.threshold.to_f
+                                  json.set! :partial_credit, inst_book_section_exercise.partial_credit
+                                  json.set! :enable_scrolling, inst_book_section_exercise.enable_scrolling
+
                                   options = inst_book_section_exercise.options
                                   if options != nil && options != "null"
+                                    # FIXME: shouldn't eval() here be JSON.parse()?
                                     json.set! :exer_options, eval(options)
                                   end
                                 end
@@ -213,6 +254,11 @@ class InstBook < ApplicationRecord
   def zeropt?
     zeropt = "\"zeropt_assignments\":true"
     return self.options.include? zeropt
+  end
+
+  def tree_view?
+    tree_view = "\"include_tree_view\":true"
+    return self.options.include? tree_view
   end
 
 end

@@ -38,6 +38,7 @@ class Ability
 
         process_global_role user
         process_instructor user
+        process_researcher user
         process_courses user
       end
     end
@@ -88,6 +89,34 @@ class Ability
     end
 
     if user.global_role.is_instructor?
+      # Everyone can manage their own LMS access_token
+      can :create, LmsAccess
+      can [:read, :index, :update, :destroy], LmsAccess, user_id: user.id
+
+      can :manage, CourseEnrollment do |enrollment|
+        enrollment.course_offering.is_manager? user
+      end
+
+      can [:create, :read], InstBook
+      can [:create, :read], Term
+      can [:create, :read], LatePolicy
+      can [:update, :destroy], InstBook, user_id: user.id
+      can [:create, :read], Organization
+      can :manage, Course, user_id: user.id
+      can :manage, CourseEnrollment, user_id: user.id
+      # Everyone can upload and compile his book
+      can [:compile, :configure, :configuration], InstBook
+    end
+  end
+
+  # -------------------------------------------------------------
+  def process_researcher(user)
+    if user.global_role.is_researcher? &&
+      !user.global_role.can_manage_all_courses?
+      can [:create], CourseOffering
+    end
+
+    if user.global_role.is_researcher?
       # Everyone can manage their own LMS access_token
       can :create, LmsAccess
       can [:read, :index, :update, :destroy], LmsAccess, user_id: user.id

@@ -33,15 +33,15 @@ class GenerateCourseJob < ProgressJob::Base
       f.write(inst_book_json)
     end
 
-    script_path = "public/OpenDSA/tools/configure.py"
     build_path = book_path(@inst_book)
     Rails.logger.info('build_path')
     Rails.logger.info(build_path)
-    require 'open3'
-    command = ". $(echo $python_venv_path) && python3 #{script_path} #{config_file_path} -b #{build_path}"
-    stdout, stderr, status = Open3.capture3(command)
-    unless status.success?
-      Rails.logger.info(stderr)
+    config_path = config_file_path[15..-1] # without the public/OpenDSA
+    require 'net/http'
+    uri = URI(ENV["config_api_link"])
+    res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => build_path, 'rake' => false)
+    unless res.kind_of? Net::HTTPSuccess
+      Rails.logger.info(res['stderr_compressed'])
     end
     update_progress
   end
@@ -196,12 +196,12 @@ class GenerateCourseJob < ProgressJob::Base
                                    module_item_position)
     module_name = InstModule.where(:id => inst_ch_module.inst_module_id).first.path
     if module_name.include? '/'
-      module_name = module_name.split('/')[1]  #module_name = IntroOO
+      module_name = module_name.split('/')[1]
     end
     title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
             (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + " "
 
-    module_file_name = module_name #IntroOO
+    module_file_name = module_name
     title = title + InstModule.where(:id => inst_ch_module.inst_module_id).first.name
 
     odsa_url_opts = {
@@ -257,7 +257,7 @@ class GenerateCourseJob < ProgressJob::Base
       else
         assignment_opts[:assignment__name__] = title
         assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
-        assignment_opts[:assignment__description__] = title
+        assignment_opts[:assignment__description__] = ''
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "Assignment", assignment_res['id'], opts)
@@ -271,7 +271,7 @@ class GenerateCourseJob < ProgressJob::Base
         opts[:module_item__type__] = "Assignment"
         assignment_opts[:assignment__name__] = title
         assignment_opts[:assignment__assignment_group_id__] = chapter.lms_assignment_group_id
-        assignment_opts[:assignment__description__] = title
+        assignment_opts[:assignment__description__] = ''
         assignment_res = client.create_assignment(lms_course_id, title, assignment_opts)
         opts[:module_item__content_id__] = assignment_res['id']
         res = client.create_module_item(lms_course_id, chapter.lms_chapter_id, "Assignment", assignment_res['id'], opts)

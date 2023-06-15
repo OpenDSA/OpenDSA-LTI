@@ -1,6 +1,24 @@
-
-# a section in a stand-alone module
+# == Schema Information
+#
+# Table name: inst_module_sections
+#
+#  id                     :bigint           not null, primary key
+#  inst_module_version_id :bigint           not null
+#  name                   :string(255)      not null
+#  show                   :boolean          default(TRUE)
+#  learning_tool          :string(255)
+#  resource_type          :string(255)
+#  resource_name          :string(255)
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#
+# Indexes
+#
+#  fk_rails_ff11275e48  (inst_module_version_id)
+#
 class InstModuleSection < ApplicationRecord
+  # a section in a stand-alone module
+
   belongs_to :inst_module_version
   has_many :inst_module_section_exercises, dependent: :destroy
 
@@ -38,7 +56,7 @@ class InstModuleSection < ApplicationRecord
     self.inst_module_section_exercises.each do |imse|
       imse.clone(inst_module_version, ims)
     end
-    
+
     return ims
   end
 

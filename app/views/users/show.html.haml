@@ -18,7 +18,7 @@
   %strong Email:
   = link_to @user.email, 'mailto:' + @user.email
 
-- if @user.global_role.is_instructor? or @user.global_role.is_admin?
+- if @user.global_role.is_instructor? or @user.global_role.is_admin? or @user.global_role.is_researcher?
   - consumer_key, consumer_secret = @creds.first
 
   .row
@@ -43,6 +43,6 @@
 
 - if can? :update, @user
   = button_link 'Edit', edit_user_path(@user)
-- if @user.global_role.is_instructor? or @user.global_role.is_admin?
+- if @user.global_role.is_instructor? or @user.global_role.is_admin? or @user.global_role.is_researcher?
   = button_link 'Update Access Token', "/admin/lms_accesses"
 = button_link 'Back', root_path

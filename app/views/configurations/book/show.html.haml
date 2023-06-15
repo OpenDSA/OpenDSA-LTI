@@ -123,6 +123,15 @@
   %h2
     Book Settings
   %form.form-horizontal{method: "post", id: 'book-config-form'}
+    -# Lets hide some config params we need to persist when the file is uploaded, but
+    -# which aren't editable in the UI....yet.
+
+    %input.form-control#theme{type: "hidden"}
+    %input.form-control#html_theme_options{type: "hidden"}
+    %input.form-control#html_js_files{type: "hidden"}
+    %input.form-control#html_css_files{type: "hidden"}
+    %input.form-control#chapter_name{type: "hidden"}
+
     .form-group.border
       %label.control-label{for: "#book-title"}
         Title
@@ -269,6 +278,16 @@
             .col-xs-8
               %input{type: "number", min: 0, value: 1, step: 0.01, id: "glob-#{tool.name}-points", required: true}
 
+    .form-group.border
+      %label.control-label{}
+        Maximum TOC Depth Options
+      .col-xs-6.col-md-5
+        .form-group
+          %label.control-label{for: 'max-toc-depth'}
+            Levels:
+          .col-xs-8
+            %input{type: "number", min: 1, value: 3, step: 1, id: "max-toc-depth", required: true}
+
     .form-group
       %label.control-label{for: "#other-options"}
         Other Options
@@ -301,6 +320,10 @@
           %input{type: "checkbox", name: "zeropt-assignments", id: "zeropt-assignments"}
           %label{for: "zeropt-assignments"}
             Zero point assignments
+        .col-sm-6
+          %input{type: "checkbox", name: "include_tree_view", id: "include_tree_view"}
+          %label{for: "include_tree_view"}
+            Include TreeView
 
     %div{id: "book-content-container"}
       %h2
@@ -321,7 +344,7 @@
             <i class="fa fa-file-o"></i> Section
           %span.col-sm-8.col-xs-12
             <b>PE</b> Proficiency Exercise
-          %span.col-sm-8.col-xs-12
+          %span.col-sm-8.col-sm-offset-4.col-xs-12
             <b>AE</b> Automated Exercise
           %span.col-sm-8.col-sm-offset-4.col-xs-12
             <b>FF</b> Frame

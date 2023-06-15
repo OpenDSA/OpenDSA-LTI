@@ -2,8 +2,8 @@
 #
 # Table name: course_roles
 #
-#  id                         :integer          not null, primary key
-#  name                       :string(255)      default(""), not null
+#  id                         :bigint           not null, primary key
+#  name                       :string(255)      not null
 #  can_manage_course          :boolean          default(FALSE), not null
 #  can_manage_assignments     :boolean          default(FALSE), not null
 #  can_grade_submissions      :boolean          default(FALSE), not null
