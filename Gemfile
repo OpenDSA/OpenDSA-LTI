@@ -104,7 +104,7 @@ gem 'cancancan'
 gem 'activeadmin', '~> 2.7'
 gem 'exception_handler', '~> 0.3.45'
 
-gem 'nokogiri', '1.10.9', require: false
+gem 'nokogiri', '1.15.2', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 
@@ -155,6 +155,8 @@ gem 'user_agent_parser' # 2.6.0 or higher requires ruby>=2.4
 gem 'rails_same_site_cookie'
 gem 'rack-cors'
 gem 'simple_oauth', '0.3.1'
-gem 'therubyracer'
+# gem "libv8"
+# gem 'libv8-node'
+gem 'mini_racer'
 gem 'ffi' # speed up sassc install
 gem 'sassc', '2.1.0'

@@ -13,7 +13,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Setting the default opendsa Makefile variable ODSA_ENV to 'PROD'
 ENV ODSA_ENV='PROD'
 
-ENV BUNDLER_VERSION 2.1.4
+ENV BUNDLER_VERSION 2.4.14
 
 ENV RAILS_ENV=$RAILS_ENV
 ENV ODSA_BRANCH=$ODSA_BRANCH
@@ -34,7 +34,7 @@ WORKDIR /opendsa-lti
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 
-RUN bundle config build.nokogiri --use-system-libraries
-RUN bundle install -j4
+RUN bundle lock --add-platform x86_64-linux
+RUN bundle install
 
 EXPOSE 80
