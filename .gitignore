@@ -54,7 +54,6 @@ tasks.todo
 
 # if using bower-rails ignore default bower_components path bower.json files
 /vendor/assets/bower_components
-/vendor/bundle
 bower_components/
 
 /config/application.yml
