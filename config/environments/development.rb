@@ -85,5 +85,11 @@ OpenDSA::Application.configure do
   # end
 
   config.active_job.queue_adapter = :delayed_job
+
   config.assets.enabled = false
+
+
 end
+
+# Rails.logger.level = Logger::DEBUG
+# Rails.logger = Logger.new(STDOUT)

@@ -38,7 +38,7 @@ gem 'rack-test', '1.1.0'
 gem 'rake', '13.0.1'
 
 gem 'truncate_html'
-gem 'puma', '~> 4.3.6'
+gem 'puma', '~> 4.3.1'
 gem 'tzinfo' # For timezone support
 
 # Bootstrap Datepicker
@@ -53,9 +53,10 @@ gem 'daemons'
 gem 'delayed_job_active_record'
 gem 'progress_job'
 
+
 # For JSON support
 gem 'rabl'
-gem 'oj'
+# gem 'oj'
 # gem 'oj_mimic_json'
 
 group :assets do
@@ -103,7 +104,7 @@ gem 'cancancan'
 gem 'activeadmin', '~> 2.7'
 gem 'exception_handler', '~> 0.3.45'
 
-gem 'nokogiri', '1.10.9', require: false
+gem 'nokogiri', '1.15.2', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 
@@ -112,6 +113,7 @@ gem 'remotipart'      # Adds support for remote mulitpart forms (file uploads)
 gem 'gravtastic'      # For Gravatar integration
 gem 'js-routes'       # Route helpers in Javascript
 gem 'awesome_print'   # For debugging/logging output
+
 
 #gems for rich text editing
 gem 'bootstrap-wysihtml5-rails'
@@ -153,12 +155,8 @@ gem 'user_agent_parser' # 2.6.0 or higher requires ruby>=2.4
 gem 'rails_same_site_cookie'
 gem 'rack-cors'
 gem 'simple_oauth', '0.3.1'
-gem 'therubyracer'
+# gem "libv8"
+# gem 'libv8-node'
+gem 'mini_racer'
 gem 'ffi' # speed up sassc install
 gem 'sassc', '2.1.0'
-gem 'jwt', '~> 2.2', '>= 2.2.2'
-gem 'json-jwt', '~> 1.13.0'
-# TODO: to be removed later, used only to test lti13 layout
-gem 'bootstrap', '~> 4.5.0'
-gem 'bootstrap_form', '~> 4.5.0'
-gem 'selectize-rails', '~> 0.12.6'
