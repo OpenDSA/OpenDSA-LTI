@@ -56,7 +56,7 @@ gem 'progress_job'
 
 # For JSON support
 gem 'rabl'
-# gem 'oj'
+gem 'oj'
 # gem 'oj_mimic_json'
 
 group :assets do
@@ -160,3 +160,11 @@ gem 'simple_oauth', '0.3.1'
 gem 'mini_racer'
 gem 'ffi' # speed up sassc install
 gem 'sassc', '2.1.0'
+
+# LTI 1.3
+gem 'jwt', '~> 2.2', '>= 2.2.2'
+gem 'json-jwt', '~> 1.13.0'
+# TODO: to be removed later, used only to test lti13 layout
+gem 'bootstrap', '~> 4.5.0'
+gem 'bootstrap_form', '~> 4.5.0'
+gem 'selectize-rails', '~> 0.12.6'

@@ -208,4 +208,15 @@ OpenDSA::Application.routes.draw do
     post '/login' => 'devise/sessions#create', as: :user_session
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session
   end
+
+  namespace :lti13 do
+    resources :login_initiations, only: %i[index create]
+    resources :launches
+    resources :deep_link_launches, only: %i[create show] do
+      post 'launch'
+    end
+  end
+  get 'lti13/:id/.well-known/jwks', to: 'lti13/tools#jwks', as: 'lti13_tool_jwks'
+
+
 end

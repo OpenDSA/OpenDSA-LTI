@@ -1,0 +1,27 @@
+
+%p
+  %i A user would normally be redirected to Platform automatically, for reference implementation purposes we stop to inspect the request that will be sent after clicking performing launch. Click button below to perform launch back to Platform.
+= form_tag @form_url, method: :post, id: 'deep_link_post', authenticity_token: false do
+  = hidden_field_tag :JWT, @deep_link_jwt.signed_jwt
+  = submit_tag "Post Deep Links to Platform", class: 'btn btn-primary'
+
+%br
+
+%p
+  %b JWT that will be sent:
+  %pre
+    %code
+      = @deep_link_jwt.signed_jwt
+
+%p
+  %b JWT attributes in request:
+  %pre
+    %code
+      = JSON.pretty_generate(@deep_link_jwt.jwt)
+
+// If we wanted to auto-submit (as would normally be done)
+// we instead stop for inspection (ref implementation would only do this)
+// :javascript
+//   $(document).ready(function () {
+//     $('#deep_link_post').submit();
+// });
