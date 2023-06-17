@@ -21,7 +21,7 @@ ENV LTI_BRANCH=$LTI_BRANCH
 
 # shared-mime-info temporary due to mimemagic issues
 RUN apt-get update -qq \
-  && apt-get install -y apt-utils build-essential cron \
+  && apt-get install -y apt-utils build-essential patch cron python2 zlib1g-dev liblzma-dev \
   && apt-get install -y libyaml-dev libevent-dev libxml2 libffi-dev libxslt-dev libmariadb-dev-compat libmariadb-dev \
   && apt-get install -y shared-mime-info \
   && rm -rf /var/apt/lists/*
@@ -35,6 +35,6 @@ COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
 
 RUN bundle lock --add-platform x86_64-linux
-RUN bundle install
+RUN bundle install -j4
 
 EXPOSE 80
