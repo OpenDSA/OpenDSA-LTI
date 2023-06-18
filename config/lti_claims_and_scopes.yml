@@ -1,0 +1,54 @@
+# can account for multiple environments, if we wanted to use diff env for specs being worked on
+defaults: &defaults
+  lti_version: 'https://purl.imsglobal.org/spec/lti/claim/version'
+  launch_presentation: 'https://purl.imsglobal.org/spec/lti/claim/launch_presentation'
+  deployment_id: 'https://purl.imsglobal.org/spec/lti/claim/deployment_id'
+  context_claim: 'https://purl.imsglobal.org/spec/lti/claim/context'
+  resource_link_claim: 'https://purl.imsglobal.org/spec/lti/claim/resource_link'
+  tool_platform_claim: 'https://purl.imsglobal.org/spec/lti/claim/tool_platform'
+  ags_claim: 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'
+  ags_scope_line_item: 'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'
+  ags_scope_result: 'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly'
+  ags_scope_score: 'https://purl.imsglobal.org/spec/lti-ags/scope/score'
+  message_type: 'https://purl.imsglobal.org/spec/lti/claim/message_type'
+  custom_claim: 'https://purl.imsglobal.org/spec/lti/claim/custom'
+  extension_claim: 'http://www.ExamplePlatformVendor.com/session'
+  roles_claim: 'https://purl.imsglobal.org/spec/lti/claim/roles'
+  student_scope: 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+  instructor_scope: 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor'
+  learner_scope: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
+  mentor_scope: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor'
+  mentor_claim: 'https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor'
+  mentor_role_scope: 'a62c52c02ba262003f5e'
+  lis_claim: 'https://purl.imsglobal.org/spec/lti/claim/lis'
+  target_link_uri_claim: 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri'
+  deep_linking_claim: 'https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings'
+  deep_linking_data_claim: 'https://purl.imsglobal.org/spec/lti-dl/claim/data'
+  deep_linking_tool_msg_claim: 'https://purl.imsglobal.org/spec/lti-dl/claim/msg'
+  deep_linking_tool_log_claim: 'https://purl.imsglobal.org/spec/lti-dl/claim/log'
+  content_item_claim: 'https://purl.imsglobal.org/spec/lti-dl/claim/content_items'
+  names_and_roles_claim: 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'
+  names_and_roles_service_versions: ['2.0']
+  names_and_roles_scope: 'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly'
+  # for LTI caliper service specification specifically
+  caliper_claim: 'https://purl.imsglobal.org/spec/lti-ces/claim/caliper-endpoint-service'
+  caliper_scope: 'https://purl.imsglobal.org/spec/lti-ces/v1p0/scope/send'
+  tool_launch_caliper_context: 'http://purl.imsglobal.org/ctx/caliper/v1p1/ToolLaunchProfile-extension'
+  tool_use_caliper_context: 'http://purl.imsglobal.org/ctx/caliper/v1p1'
+  # for LTI proctoring service specification specifically
+  attempt_number_claim: 'https://purl.imsglobal.org/spec/lti-ap/claim/attempt_number'
+  start_assessment_url_claim: 'https://purl.imsglobal.org/spec/lti-ap/claim/start_assessment_url'
+  session_claim_data_claim: 'https://purl.imsglobal.org/spec/lti-ap/claim/session_data'
+  proctoring_settings_claim: 'https://purl.imsglobal.org/spec/lti-ap/claim/proctoring_settings'
+  proctoring_acs: 'https://purl.imsglobal.org/spec/lti-ap/claim/acs'
+  proctoring_access_token_scope: 'https://purl.imsglobal.org/spec/lti-ap/scope/control.all'
+  proctoring_verified_user: 'https://purl.imsglobal.org/spec/lti-ap/claim/verified_user'
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults

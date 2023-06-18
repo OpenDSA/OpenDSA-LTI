@@ -1,0 +1,1 @@
+json.merge! @lms_instance.to_jwk
