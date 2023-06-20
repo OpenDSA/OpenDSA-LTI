@@ -8,6 +8,7 @@ development:
   opendsa_branch: 'master'
   config_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/configure/'
   simple_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/simple2full/'
+  irt_curve_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/irtcurve/'
 
 staging:
   email_address: 'smtp.gmail.com'
@@ -19,6 +20,7 @@ staging:
   opendsa_branch: 'staging'
   config_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/configure/'
   simple_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/simple2full/'
+  irt_curve_api_link: 'https://opendsa.localhost.devcom.vt.edu/api/irtcurve/'
 
 production:
   email_address: 'smtp.gmail.com'
@@ -30,3 +32,4 @@ production:
   opendsa_branch: 'master'
   config_api_link: 'http://opendsa:8080/api/configure/'
   simple_api_link: 'http://opendsa:8080/api/simple2full/'
+  irt_curve_api_link: 'http://opendsa:8080/api/irtcurve/'

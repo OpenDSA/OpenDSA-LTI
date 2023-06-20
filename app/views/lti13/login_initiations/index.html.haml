@@ -1,0 +1,77 @@
+.row
+  .col-md-12
+    .jumbotron
+      %h2.display-6
+        Make Authentication Request back to Platform
+        %i= @tool.name
+
+.row
+  .col-md-6
+    .card.text-white.bg-success
+      .card-header LTI Spec Notes
+      .card-body The parameters can either be...
+  .col-md-6
+    .card.text-white.bg-info
+      .card-header OpenID Connect Spec Notes
+      .card-body https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
+
+.row
+  .col-md-12
+    .card
+      .card-header Paremeters Recieved from Platform
+      .card-body
+        = params.except(:controller, :action, :tool_id, :commit, :utf8)
+
+- if @tool.platform_oidc_auth_url.present?
+  .row
+    .col-md-12
+      .card
+        .card-header GET: query parameters being generated:
+        .card-body
+          %p
+            response_type:
+            %i id_token
+            %span.card-text.text-muted (required, the tool must use a value of id_token)
+          %p
+            redirect_uri:
+            %i= redirect_uri_location(@tool, params[:target_link_uri])
+            %spam.card-text.text-muted (required, This URI must exactly match a value pre-registered with the platform)
+          %p
+            response_mode:
+            %i form_post
+            %span.card-text.text-muted (required, tools and platforms must support a value of form_post)
+          %p
+            client_id:
+            %i= @tool.client_id
+            %span.card-text.text-muted (required, client identifier valid at the Platform)
+          %p
+            scope:
+            %i openid
+            %span.card-text.text-muted (required, must contain the openid scope value)
+          %p
+            state:
+            %i= @state_jwt
+            %span.card-text.text-muted (required, opaque value used to maintain state between the request and the callback)
+          %p
+            login_hint:
+            %i= params[:login_hint]
+            %span.card-text.text-muted (required, tools and platforms must support a value of form_post)
+          %p
+            lti_message_hint:
+            %i= params[:lti_message_hint]
+            %span.card-text.text-muted (required, a platform opaque identifier identifying the user to login)
+          %p
+            prompt:
+            %i none
+            %span.card-text.text-muted (optional, The tool should use a value of none. In the future a re-launch flow may support additional values being used here)
+          %p
+            nonce:
+            %i= @nonce
+            %span.card-text.text-muted (optional, string value used to associate a client session with an ID token, and to mitigate replay attacks)
+          = link_to 'Send Request', build_auth_url(@tool, @state_jwt, params, @nonce), class: 'btn btn-primary'
+- else
+  .row
+    .col-md-12
+      .card
+        .card-header Please add a Platform OIDC Authentication URL
+        .card-body Required to complete this flow.

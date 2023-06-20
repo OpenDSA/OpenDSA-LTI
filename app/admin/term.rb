@@ -18,9 +18,9 @@
 #  index_terms_on_year_and_season  (year,season)
 #
 ActiveAdmin.register Term, sort_order: :created_at_asc do
-  menu parent: 'University-oriented', priority: 10
+  menu parent: 'University-oriented', priority: 10, if: proc{ current_user.global_role.is_admin? }
   permit_params :year, :starts_on, :ends_on, :season
-  actions :all, except: [:destroy, :edit]
+  actions :all, except: [:destroy]
 
   index do
     id_column

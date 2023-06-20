@@ -48,6 +48,21 @@ class LmsInstance < ApplicationRecord
     "#{url}"
   end
 
+  def openssl_private_key
+    OpenSSL::PKey::RSA.new(private_key)
+  end
+
+  def openssl_public_key
+    openssl_private_key.public_key
+  end
+
+  def to_jwk
+    jwk = JWT::JWK.new(openssl_public_key).export
+    jwk['alg'] = 'RS256'
+    jwk['use'] = 'sig'
+    jwk
+  end
+
 
   #~ Private instance methods .................................................
 end

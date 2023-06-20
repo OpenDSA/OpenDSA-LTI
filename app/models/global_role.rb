@@ -37,6 +37,7 @@ class GlobalRole < ApplicationRecord
   ADMINISTRATOR_ID = 1
   INSTRUCTOR_ID    = 2
   REGULAR_USER_ID  = 3
+  RESEARCHER_ID    = 4
 
 
   #~ Class methods ............................................................
@@ -56,6 +57,11 @@ class GlobalRole < ApplicationRecord
   # -------------------------------------------------------------
   def self.regular_user
     find(REGULAR_USER_ID)
+  end
+
+# -------------------------------------------------------------
+  def self.researcher
+    find(RESEARCHER_ID)
   end
 
 
@@ -85,8 +91,19 @@ class GlobalRole < ApplicationRecord
     id == REGULAR_USER_ID
   end
 
-  def is_instructor_or_admin?
-    return id == ADMINISTRATOR_ID || id == INSTRUCTOR_ID
+  # -------------------------------------------------------------
+  def is_researcher?
+    id == RESEARCHER_ID
+  end
+
+  # -------------------------------------------------------------
+  def is_admin_or_researcher?
+    return id == ADMINISTRATOR_ID || id == RESEARCHER_ID
+  end
+
+  # -------------------------------------------------------------
+  def is_instructor_or_admin_or_researcher?
+    return id == ADMINISTRATOR_ID || id == INSTRUCTOR_ID || id == RESEARCHER_ID
   end
 
 end

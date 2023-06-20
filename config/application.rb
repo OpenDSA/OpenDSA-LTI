@@ -35,5 +35,8 @@ module OpenDSA
     #  OpenSSL::SSL.const_set(:VERIFY_PEER, OpenSSL::SSL::VERIFY_NONE)
     #  puts 'SSL DISABLED'
     #end
+
+    config.lti_claims_and_scopes = config_for(:lti_claims_and_scopes)
+    config.caliper_store = config_for(:caliper_store)
   end
 end
