@@ -42,6 +42,13 @@ ActiveAdmin.register LmsInstance do
       f.input :organization, collection: Organization.all.order(:name)
       f.input :consumer_key
       f.input :consumer_secret
+      f.input :client_id
+      f.input :private_key
+      f.input :public_key
+      f.input :keyset_url
+      f.input :oauth2_url
+      f.input :platform_oidc_auth_url
+      f.input :issuer
     end
     f.actions
   end
