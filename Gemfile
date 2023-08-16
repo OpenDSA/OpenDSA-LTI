@@ -101,7 +101,7 @@ gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-cas'
 gem 'cancancan'
-gem 'activeadmin', '~> 2.7'
+gem 'activeadmin', '~> 2.9'
 gem 'exception_handler', '~> 0.3.45'
 
 gem 'nokogiri', '1.15.2', require: false
@@ -165,6 +165,8 @@ gem 'sassc', '2.1.0'
 gem 'jwt', '~> 2.2', '>= 2.2.2'
 gem 'json-jwt', '~> 1.13.0'
 # TODO: to be removed later, used only to test lti13 layout
-gem 'bootstrap', '~> 4.5.0'
-gem 'bootstrap_form', '~> 4.5.0'
-gem 'selectize-rails', '~> 0.12.6'
+# gem 'bootstrap', '~> 4.5.0'
+# gem 'bootstrap_form', '~> 4.5.0'
+# gem 'selectize-rails', '~> 0.12.6'
+gem "cssbundling-rails", "~> 1.2"
+gem "jsbundling-rails", "~> 1.1"
