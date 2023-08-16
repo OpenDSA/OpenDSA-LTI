@@ -9,7 +9,7 @@ APP_DIR="/opendsa-lti"
 APP_LOG_FILE="/opendsa-lti/log/development.log"
 PORT="8443"
 
-ERROR_FOUND=false;
+ERROR_FOUND=false
 
 echo "-------------------------------------------------------"
 echo "Checkout LTI branch"
@@ -33,7 +33,7 @@ echo "git checkout ${ODSA_BRANCH}"
 git checkout ${ODSA_BRANCH}
 echo "-------------------------------------------------------"
 cd "${APP_DIR}"
-echo "nohup bash -c rake jobs:work" >> ${APP_LOG_FILE} 2>&1
+echo "nohup bash -c rake jobs:work" >>${APP_LOG_FILE} 2>&1
 nohup bash -c "rake jobs:work >> ${APP_LOG_FILE} 2>&1 &"
 echo "-------------------------------------------------------"
 echo "Starting server"

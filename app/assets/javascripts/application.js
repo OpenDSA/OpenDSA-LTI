@@ -28,6 +28,7 @@
 //= require handlebars.min
 //= require jstree
 //= require clipboard
+//= require popper
 // Add the route helpers directly into the window object for easy access.
 $.extend(window, Routes);
 

@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'sassc-rails'
 gem 'rails', '~> 6.0', '>= 6.0.3.1'
 gem 'bootstrap-sass', '>= 3.4.1'
 gem 'jquery-rails'
@@ -59,11 +60,8 @@ gem 'rabl'
 gem 'oj'
 # gem 'oj_mimic_json'
 
-group :assets do
-  gem 'sass-rails'
-  gem 'uglifier', '~> 4.2'
-  gem 'autoprefixer-rails'
-end
+gem 'uglifier', '~> 4.2'
+gem 'autoprefixer-rails'
 
 gem 'mysql2'
 
@@ -165,8 +163,10 @@ gem 'sassc', '2.1.0'
 gem 'jwt', '~> 2.2', '>= 2.2.2'
 gem 'json-jwt', '~> 1.13.0'
 # TODO: to be removed later, used only to test lti13 layout
-# gem 'bootstrap', '~> 4.5.0'
-# gem 'bootstrap_form', '~> 4.5.0'
-# gem 'selectize-rails', '~> 0.12.6'
+gem 'bootstrap', '~> 5.3.1'
+gem 'bootstrap_form', '~> 4.5.0'
+gem 'selectize-rails', '~> 0.12.6'
+
 gem "cssbundling-rails", "~> 1.2"
 gem "jsbundling-rails", "~> 1.1"
+gem 'popper_js', '~> 2.11.8'
