@@ -77,7 +77,7 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   controller do
     def compile
       if authorized? :update_configuration
-        success = `cd /opendsa && git pull`
+        success = `git config --global --add safe.directory /opendsa && cd /opendsa && git pull`
         flash[:success] = "Updated OpenDSA Repository"
       else
         flash[:error] = "not authorized"
