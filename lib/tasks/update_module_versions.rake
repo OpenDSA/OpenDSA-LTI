@@ -120,7 +120,7 @@ task :update_module_versions => :environment do
             Rails.logger.info(res['stderr_compressed'])
         end
 
-        return response.kind_of? Net::HTTPSuccess
+        return res.kind_of? Net::HTTPSuccess
     end
 
     def main()
