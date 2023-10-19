@@ -26,6 +26,15 @@ RUN apt-get update -qq \
   && apt-get install -y shared-mime-info \
   && rm -rf /var/apt/lists/*
 
+RUN printf 'Package: nodejs\nPin: origin deb.nodesource.com\nPin-Priority: 1001' > /etc/apt/preferences.d/nodesource \
+  && curl -sL https://deb.nodesource.com/setup_18.x | bash -\
+  && apt-get update -qq && apt-get install -qq --no-install-recommends \
+    nodejs \
+  && apt-get upgrade -qq \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*\
+  && npm install -g yarn@1
+
 RUN gem install bundler -v $BUNDLER_VERSION
 
 RUN mkdir /opendsa-lti && echo "cd /opendsa-lti" >> /root/.bashrc
