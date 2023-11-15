@@ -7,9 +7,7 @@ task :update_module_versions => :environment do
     REFERENCE_CONFIGS = [
         'Everything',
         'PL',
-        'VisFormalLang',
-        'CT',
-        'IntroToSoftwareDesign'
+        'PIFLAS23'
     ]
 
     FULL_CONFIG_FILENAME = '_config.json'
