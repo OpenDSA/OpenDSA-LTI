@@ -19,7 +19,7 @@ class ExportController < ApplicationController
         "institution": "Virginia Tech",
         "keywords": exercise.chapter_name,
         "exercise_name": exercise.name,
-        "iframe_URL": exercise.embed_url(host_url),
+        "iframe_url": exercise.embed_url(host_url),
         "lti_url": "#{host_url}/lti/launch?custom_ex_short_name=#{exercise.short_name}"
       }
     end
