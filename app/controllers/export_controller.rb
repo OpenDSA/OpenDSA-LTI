@@ -7,42 +7,29 @@ class ExportController < ApplicationController
     inst_book = InstBook.first
     raise "InstBook instance not found" unless inst_book
 
-    # extract avmetadata data from the RST files in opendsa/rst and fetch exercises inst_exercises
     av_data = inst_book.extract_av_data_from_rst
     @exercises = InstExercise.all
-    export_count = 0 # Initialize the export counter 
-    matched_exercises = [] # store the details of matched exercises
+    export_count = 0 # Initialize the export counter for debugging purposes
 
-    # initialize counters for matching keywords
-    matched_with_keywords_count = 0
-    matched_with_inlineav_and_shortname_count = 0
-
-    # map each exercise to its export data.
     export_data = @exercises.map do |exercise|
-      matching_chapter = nil # Store the chapter name
+      matching_chapter = nil
       matching_avmetadata = nil
 
       av_data.each do |chapter, data|
-        if data[:inlineav]&.include?(exercise.short_name)
+        if data[:inlineav]&.include?(exercise.short_name) || data[:avembed]&.include?(exercise.short_name)
           matching_avmetadata = data[:avmetadata]
           matching_chapter = chapter
-          matched_exercises << { exercise_name: exercise.name, chapter: chapter, keywords: matching_avmetadata }
-          matched_with_inlineav_and_shortname_count += 1
-
-          matched_with_keywords_count += 1 unless matching_avmetadata.nil? || matching_avmetadata[:keywords].nil? || matching_avmetadata[:keywords].empty?
           export_count += 1
           break
         end
       end
 
-      # Construct the keywords from avmetadata, else use chapter name.
       keywords = if matching_avmetadata && (matching_avmetadata[:satisfies] || matching_avmetadata[:topic] || matching_avmetadata[:keyword])
-                   [matching_avmetadata[:satisfies], matching_avmetadata[:topic], matching_avmetadata[:keyword]].compact
+                   [matching_avmetadata[:satisfies], matching_avmetadata[:topic], matching_avmetadata[:keyword]].compact.join(', ')
                  else
-                   [matching_chapter] # use chapter name if there no keywords
+                   matching_chapter # use book chapter name if there no keywords
                  end
 
-      # Construct the export data for the exercise.
       {
         "Platform_name": "OpenDSA",
         "URL": exercise.embed_url(host_url),
@@ -59,11 +46,6 @@ class ExportController < ApplicationController
       }
     end.compact
 
-    # p "Total exports processed: #{export_count}"
-
     render json: export_data
   end
 end
-
-
-
