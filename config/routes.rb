@@ -191,7 +191,7 @@ OpenDSA::Application.routes.draw do
   end
 
   get '/embed' => 'embed#index', as: :embed_index
-  get '/export' => 'export#index', as: :embed_export  # This is a new route for exporting for OpenDSA' exercise metadata to SPLICE
+  get '/embed/export' => 'export#index', as: :embed_export  # This is a new route for exporting for OpenDSA' exercise metadata to SPLICE
   get '/embed/:ex_short_name' => 'embed#show', as: :embed_show
   get '/SourceCode/*all' => 'embed#source_code_redirect'
 
