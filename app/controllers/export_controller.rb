@@ -31,18 +31,19 @@ class ExportController < ApplicationController
                  end
 
       {
-        "Platform_name": "OpenDSA",
-        "URL": exercise.embed_url(host_url),
-        "LTI_Instructions_URL": "https://opendsa-server.cs.vt.edu/guides/lti-instructions",
-        "Exercise_type": exercise.ex_type,
-        "License": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)",
-        "Description": exercise.description,
-        "Author": "Shaffer",
-        "Institution": "Virginia Tech",
-        "Keywords": keywords,
-        "Exercise_Name": exercise.name,
-        "Iframe_URL": exercise.embed_url(host_url),
-        "LTI_URL": "#{host_url}/lti/launch?custom_ex_short_name=#{exercise.short_name}"
+        "catalog_type": "SLCItemCatalog",
+        "platform_name": "OpenDSA",
+        "url": exercise.embed_url(host_url),
+        "lti_instructions_url": "https://opendsa-server.cs.vt.edu/guides/opendsa-canvas",
+        "exercise_type": exercise.ex_type,
+        "license": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)",
+        "description": exercise.description,
+        "author": "Cliff Shaffer",
+        "institution": "Virginia Tech",
+        "keywords": keywords,
+        "exercise_name": exercise.name,
+        "iframe_url": exercise.embed_url(host_url),
+        "lti_url": "#{host_url}/lti/launch?custom_ex_short_name=#{exercise.short_name}"
       }
     end.compact
 
