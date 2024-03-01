@@ -1,7 +1,7 @@
 class ExportController < ApplicationController
   # GET /export
   # gives an export of opendsa embeddable slideshows and exercises
-  # with iframe and lti links for SPLICE
+  # with iframe and lti urls for SPLICE catalog
   def index
     host_url = request.base_url
     inst_book = InstBook.first
@@ -9,7 +9,6 @@ class ExportController < ApplicationController
 
     av_data = inst_book.extract_av_data_from_rst
     @exercises = InstExercise.all
-    export_count = 0 # Initialize the export counter for debugging purposes
 
     export_data = @exercises.map do |exercise|
       matching_chapter = nil
@@ -19,15 +18,18 @@ class ExportController < ApplicationController
         if data[:inlineav]&.include?(exercise.short_name) || data[:avembed]&.include?(exercise.short_name)
           matching_avmetadata = data[:avmetadata]
           matching_chapter = chapter
-          export_count += 1
           break
         end
       end
 
+      # Handle keywords split by either commas or semicolons, return as comma-separated
       keywords = if matching_avmetadata && (matching_avmetadata[:satisfies] || matching_avmetadata[:topic] || matching_avmetadata[:keyword])
-                   [matching_avmetadata[:satisfies], matching_avmetadata[:topic], matching_avmetadata[:keyword]].compact.join(', ')
+                   combined_keywords = [matching_avmetadata[:satisfies], matching_avmetadata[:topic], matching_avmetadata[:keyword]].compact.join('; ')
+                   combined_keywords.split(/[,;]\s*/).join(', ') # Split by both commas and semicolons, then join with commas
+                 elsif matching_chapter
+                   matching_chapter # Use the chapter name if there are no specific keywords
                  else
-                   matching_chapter # use book chapter name if there no keywords
+                   exercise.name # or fallback to using the exercise's name as the keyword, if there are no specific keywords
                  end
 
       {
