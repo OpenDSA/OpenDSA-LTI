@@ -135,14 +135,18 @@ class InstBook < ApplicationRecord
 
   def extract_av_data_from_rst
     av_data = {}
-    lang = JSON.parse(self.options)['lang'] || 'en'
+    parsed_options = parse_json_options(self.options)
+    lang = parsed_options['lang'] || 'en' 
     rst_folder = File.join('public', 'OpenDSA', 'RST', lang)
-
+  
+    # Check if rst_folder to prevent Dir.glob from failing
+    return av_data unless Dir.exist?(rst_folder)
+  
     Dir.glob("#{rst_folder}/**/*.rst").each do |rst_file_path|
       module_name = File.basename(rst_file_path, ".rst")
       av_data[module_name] = { avmetadata: {}, inlineav: [], avembed: [] }
       in_metadata_block = false
-
+  
       File.foreach(rst_file_path) do |line|
         if line.strip == '.. avmetadata::'
           in_metadata_block = true
@@ -160,9 +164,9 @@ class InstBook < ApplicationRecord
         end
       end
     end
-
+  
     av_data
-  end
+  end  
 
   private
 
@@ -178,7 +182,14 @@ class InstBook < ApplicationRecord
 
   def extract_avembed_data_from_line(line)
     match = line.match(/\.\. avembed:: Exercises\/\w+\/(\w+)\.html/)
-    match[1] if match # Returns the 3rd level attribbutee or nil if no match
+    match[1] if match # Returns the 3rd level attribute or nil if no match
+  end
+
+  # helper method for extract_av_data_from_rst(), safely attempts to parse a JSON string, returning an empty hash as fallback
+  def parse_json_options(json_str)
+    JSON.parse(json_str)
+  rescue JSON::ParserError
+    {} # Return an empty hash as a fallback
   end
 
   # --------------------------------------------------------------------------------  
