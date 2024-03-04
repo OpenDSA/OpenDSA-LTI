@@ -135,7 +135,6 @@ class InstBook < ApplicationRecord
 
   def extract_av_data_from_rst
     av_data = {}
-    ç
     parsed_options = parse_json_options(self.options)
     lang = parsed_options['lang'] || 'en' 
     rst_folder = File.join('public', 'OpenDSA', 'RST', lang)
