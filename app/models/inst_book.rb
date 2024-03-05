@@ -177,19 +177,20 @@ class InstBook < ApplicationRecord
 
   def extract_inlineav_name_from_line(line)
     match = line.match(/\.\. inlineav:: (\w+)/)
-    match[1] if match # Returns the inlineav short name or nil if there is no match
+    match[1] if match 
   end
 
   def extract_avembed_data_from_line(line)
     match = line.match(/\.\. avembed:: Exercises\/\w+\/(\w+)\.html/)
-    match[1] if match # Returns the 3rd level attribute or nil if no match
+    match[1] if match 
   end
 
   # helper method for extract_av_data_from_rst(), safely attempts to parse a JSON string, returning an empty hash as fallback
   def parse_json_options(json_str)
-    JSON.parse(json_str)
+    return {} if json_str.nil? # Ensures nil input returns an empty hash
+    JSON.parse(json_str || '{}') 
   rescue JSON::ParserError
-    {} # Return an empty hash as a fallback
+    {} 
   end
 
   # --------------------------------------------------------------------------------  
