@@ -22,14 +22,13 @@ class ExportController < ApplicationController
         end
       end
 
-      # Handle keywords split by either commas or semicolons, return as comma-separated
+      # using array for keywords 
       keywords = if matching_avmetadata && (matching_avmetadata[:satisfies] || matching_avmetadata[:topic] || matching_avmetadata[:keyword])
-                   combined_keywords = [matching_avmetadata[:satisfies], matching_avmetadata[:topic], matching_avmetadata[:keyword]].compact.join('; ')
-                   combined_keywords.split(/[,;]\s*/).join(', ') # Split by both commas and semicolons, then join with commas
+                   [matching_avmetadata[:satisfies], matching_avmetadata[:topic], matching_avmetadata[:keyword]].compact.flat_map { |k| k.split(/[,;]\s*/) }
                  elsif matching_chapter
-                   matching_chapter # Use the chapter name if there are no specific keywords
+                   [matching_chapter] # Use the chapter name if there are no specific keywords
                  else
-                   exercise.name # or fallback to using the exercise's name as the keyword, if there are no specific keywords
+                   [exercise.name] # Fallback to using the exercise's name as the keyword, if there are no specific keywords
                  end
 
       {
@@ -42,7 +41,7 @@ class ExportController < ApplicationController
         "description": exercise.description,
         "author": "Cliff Shaffer",
         "institution": "Virginia Tech",
-        "keywords": keywords,
+        "keywords": keywords, 
         "exercise_name": exercise.name,
         "iframe_url": exercise.embed_url(host_url),
         "lti_url": "#{host_url}/lti/launch?custom_ex_short_name=#{exercise.short_name}"
