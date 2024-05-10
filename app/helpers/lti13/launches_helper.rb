@@ -34,7 +34,12 @@ module Lti13::LaunchesHelper
       LtiService::ProctoringJwt.new(launch).call
     end
   
+    # def assignment_and_grades_launch?(jwt_body)
+    #   jwt_body[Rails.configuration.lti_claims_and_scopes['ags_claim']]
+    # end
     def assignment_and_grades_launch?(jwt_body)
-      jwt_body[Rails.configuration.lti_claims_and_scopes['ags_claim']]
+      ags_claim_key = Rails.configuration.lti_claims_and_scopes['ags_claim']
+      jwt_body && ags_claim_key && jwt_body[ags_claim_key]
     end
+    
   end
