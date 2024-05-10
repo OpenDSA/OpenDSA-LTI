@@ -1,107 +1,112 @@
 class Lti13::LaunchesController < ApplicationController
-    layout 'lti13', only: [:create]
-    before_action :set_tool
-    # before_action :set_launch, only: %i[show edit update destroy]
-    skip_before_action only: :create
-    after_action :allow_iframe, only: [:create]
+  include Lti13::LaunchesHelper
+  layout 'lti13', only: [:create]
+  skip_before_action only: :create
+  # before_action :set_tool
+  # before_action :set_launch, only: %i[show edit update destroy]
+  after_action :allow_iframe, only: [:create]
+
+  # GET /launches
+  def index
+    puts "from index"
+    @launches = @lms_instance.launches
+  end
+
+  # GET /launches/1
+  def show
+    puts "from show"
+    Rails.application.executor.wrap { @access_token = @lms_instance.oauth2_url.present? ? Lti13Service::GetAgsAccessToken.new(@lms_instance).call : nil }
+    # caliper event background job
+    # ToolUseEventWorker.perform_async(@lms_instance.id, @launch.id, root_url, request.uuid)
+  end
+
+  # GET /launches/new
+  def new
+    puts "new"
+    @launch = Launch.new
+  end
+
+  # GET /launches/1/edit
+  def edit; end
+
+  # POST /launches
+  def create
+    # (ID token validation and other launch processes) with debug statements to track flow
+    puts "LaunchesController#create: Starting LTI 1.3 launch process"
+    puts "Launch request params: #{params.inspect}"
   
-    # GET /launches
-    # GET /launches.json
-    def index
-      @launches = @lms_instance.launches
-    end
+    if params[:id_token]&.present?
+      puts "LaunchesController#create: Found ID token: #{params[:id_token]}"
   
-    # GET /launches/1
-    # GET /launches/1.json
-    def show
-      Rails.application.executor.wrap { @access_token = @lms_instance.oauth2_url.present? ? Lti13Service::GetAgsAccessToken.new(@lms_instance).call : nil }
-      # caliper event background job
-      # ToolUseEventWorker.perform_async(@lms_instance.id, @launch.id, root_url, request.uuid)
-    end
+      if params[:state]&.present?
+        # Verify the state coming from the platform
+        @decoded_payload = Jwt::Payload.new(params[:state]).call
   
-    # GET /launches/new
-    def new
-      @launch = Launch.new
-    end
-  
-    # GET /launches/1/edit
-    def edit; end
-  
-    # POST /launches
-    # POST /launches.json
-    def create
-      # TODO: to be changed to including the following
-      # - id_token validation
-      # -- verfiy it is coming from the issuer
-      # -- verify the request was not expired as defined in the state token
-      # -- https://purl.imsglobal.org/spec/lti/claim/target_link_uri claim should have the same value as sent in the login initiation
-      # -- nonce should be the same as sent in the login initiation
-      # - get the access token with all possible claims and cache it
-      # - check the cookie value is equal as was sent in the login initiaiton redirect
-      # - send the content back as html
-      if params[:id_token]&.present?
-        if params[:state]&.present?
-          # TODO: FIXME verify the state coming form the platform first
-          @decoded_payload = Jwt::Payload.new(params[:state]).call
-          tool_id = @decoded_payload['tool_id']
-          @lms_instance = LmsInstance.find_by(id: tool_id.to_i)
+        if @decoded_payload.nil?
+          puts "LaunchesController#create: Decoded payload is nil"
+          # might nedd to handle the error appropriately, perhaps by rendering an error message or redirecting
+          return
         end
+        
+        tool_id = @decoded_payload['tool_id']
+        @lms_instance = LmsInstance.find_by(id: tool_id.to_i)
+        
+        puts "LaunchesController#create: Decoded state: #{@decoded_payload}"
+      else
+        puts "LaunchesController#create: State parameter missing"
+      end
   
-        @decoded_header = Jwt::Header.new(params[:id_token]).call
-        kid = @decoded_header['kid']
+      @decoded_header = Jwt::Header.new(params[:id_token]).call
+      kid = @decoded_header['kid']
   
+      # Handle potential errors when fetching platform keys
+      puts "Keyset URL from create: #{@lms_instance&.keyset_url}"
+      # Fetch platform keys
+      keys_response = Lti13Service::Keys.new(@lms_instance.keyset_url).call
+      if keys_response.nil?
+        puts "LaunchesController#create: Error fetching keys from keyset URL"
+        # ToDo :Handle error response (e.g., render an error page or return a specific response)
+      else
+        puts "Decode platform jwt:"
         @decoded_jwt = Lti13Service::DecodePlatformJwt.new(@lms_instance, params[:id_token], kid).call
-        @decoded_jwt = @decoded_jwt.first
+  
+        puts "LaunchesController#create: Decoded JWT: #{@decoded_jwt}"
   
         @id_token = params[:id_token]
         Rails.application.executor.wrap { @access_token = @lms_instance.oauth2_url.present? ? Lti13Service::GetAgsAccessToken.new(@lms_instance).call : nil }
-      end
   
-      return
+        # Testing AGS score service {Call send_score action from Lti13::ServicesController with necessary parameters}
+        Lti13::ServicesController.new.send_score(launch_id: @lms_instance.id, access_token: @access_token, platform_jwt: params[:id_token], kid: kid)       
+      end
+    else
+      puts "LaunchesController#create: ID token missing"
     end
-  
-    # PATCH/PUT /launches/1
-    # PATCH/PUT /launches/1.json
-    def update
-      respond_to do |format|
-        if @launch.update(launch_params)
-          format.html { redirect_to [:lti, @lms_instance, @launch], notice: 'Tool launch was successfully updated.' }
-          format.json { render :show, status: :ok, location: @launch }
-        else
-          format.html { render :edit }
-          format.json { render json: @launch.errors, status: :unprocessable_entity }
-        end
-      end
-    end
-  
-    # DELETE /launches/1
-    # DELETE /launches/1.json
-    def destroy
-      @launch.destroy
-      respond_to do |format|
-        format.html { redirect_to lti_tool_launches_url(@lms_instance), notice: 'Tool launch was successfully destroyed.' }
-        format.json { head :no_content }
-      end
-    end
-  
-    private
-      def set_tool
-        @lms_instance = LmsInstance.find_by(id: 3)
-        render json: { error: 'Tool not found' }, status: :not_found unless @lms_instance
-      end
-  
-      # Use callbacks to share common setup or constraints between actions.
-      def set_launch
-        @launch = Launch.find(params[:id])
-      end
-  
-      # Never trust parameters from the scary internet, only allow the white list through.
-      def launch_params
-        params.require(:launch).permit(:jwt, :decoded_jwt, :tool_id, :state)
-      end
-  
-      def allow_iframe
-        response.headers.except! 'X-Frame-Options'
-      end
-  
   end
+  
+  # PATCH/PUT /launches/1
+  def update
+    # (Update logic)
+  end
+
+  # DELETE /launches/1
+  def destroy
+    # (Destroy logic)
+  end
+
+  private
+
+  def set_launch
+    @launch = Launch.find(params[:id])
+  end
+
+  def launch_params
+    params.require(:launch).permit(:jwt, :decoded_jwt, :tool_id, :state)
+  end
+
+  def allow_iframe
+    response.headers.except! 'X-Frame-Options'
+  end
+end
+
+
+  
