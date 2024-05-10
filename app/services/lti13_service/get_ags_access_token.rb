@@ -1,30 +1,37 @@
 # module for handling platform requests
 module Lti13Service
-  # LtiPlatform::GetAgsAccessToken.new(lms_instance).call
+  # LtiPlatform::GetAgsAccessToken.new(tool).call
   class GetAgsAccessToken
     def initialize(lms_instance)
       @lms_instance = lms_instance
     end
 
     def call
-      # It stands to reason, one could post this as json (since we are getting json back)
-      # This works (from ref impl perspective), but we replaced with form encoded for now to use w IMS auth server.
-      # conn = Faraday.new(url: @lms_instance.oauth2_url)
-      # token_request = conn.post do |request|
-      #   request.headers['Content-Type'] = 'application/json;charset=UTF-8'
-      #   request.body = body.to_json
-      # end
-      # JSON.parse(token_request.body)
-
       conn = Faraday.new(url: @lms_instance.oauth2_url) do |faraday|
         faraday.headers['Content-Type'] = 'application/x-www-form-urlencoded'
         faraday.request :url_encoded
         faraday.adapter Faraday.default_adapter
       end
-
-      request = conn.post @lms_instance.oauth2_url, body
-      JSON.parse(request.body)
+    
+      response = conn.post(@lms_instance.oauth2_url, body)
+      begin
+        if response.success? && response.headers['content-type'].include?('application/json')
+          # Safely parse the JSON response
+          puts "sucess from getagstoken from call method"
+          parsed_response = JSON.parse(response.body)
+        else
+          # Log an error if the response is not successful or not JSON
+          Rails.logger.error "Failed to fetch or invalid content type: Status #{response.status}, Body: #{response.body}"
+          return nil
+        end
+      rescue JSON::ParserError => e
+        # Handle JSON parsing errors
+        Rails.logger.error "JSON Parsing Error: #{e.message} with body: #{response.body}"
+        return nil
+      end
+      parsed_response
     end
+    
 
     def body
       client_assertion = Lti13Service::ClientCredentialsJwt.new(@lms_instance).call
