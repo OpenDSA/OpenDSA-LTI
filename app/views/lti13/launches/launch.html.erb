@@ -1,0 +1,76 @@
+<script>
+  (function() {
+    var TP = {};
+
+    // Initialize launch params
+    TP.toParams = {};
+    TP.toParams.launch_params = {};
+    <% params.each do |key, value| %>
+      TP.toParams.launch_params.<%= key %> = "<%= value %>";
+    <% end %>
+
+    // Extract parameters from the decoded JWT
+    TP.decodedJwt = {
+      messageType: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/message_type') %>",
+      version: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/version') %>",
+      resourceLinkId: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id') %>",
+      resourceLinkTitle: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/resource_link', 'title') %>",
+      deploymentId: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/deployment_id') %>",
+      contextId: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/context', 'id') %>",
+      contextTitle: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/context', 'title') %>",
+      contextLabel: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/context', 'label') %>",
+      toolPlatformName: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/tool_platform', 'name') %>",
+      toolPlatformVersion: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/tool_platform', 'version') %>",
+      toolPlatformProductFamilyCode: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/tool_platform', 'product_family_code') %>",
+      userId: "<%= @decoded_jwt.dig(0, 'sub') %>",
+      oauthConsumerKey: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/lti1p1', 'oauth_consumer_key') %>",
+      oauthConsumerKeySign: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/lti1p1', 'oauth_consumer_key_sign') %>",
+      legacyUserId: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id') %>"
+    };
+
+    // Decode roles
+    var roles = "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/roles') %>";
+    roles = roles.replace(/&quot;/g, '').replace(/[\[\]]/g, '').split(',').map(role => role.trim());
+
+    TP.decodedJwt.roles = roles;
+
+    // Extract custom parameters from target_link_uri
+    var targetLinkUri = "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri') %>";
+
+    // Decode HTML entities in the target_link_uri
+    var parser = new DOMParser();
+    var decodedUri = parser.parseFromString('<!doctype html><body>' + targetLinkUri, 'text/html').body.textContent;
+
+    var urlParams = new URLSearchParams(decodedUri.split('?')[1]);
+
+    TP.moduleTitle = urlParams.get('custom_module_title');
+    TP.instChapterModuleId = urlParams.get('custom_inst_chapter_module_id');
+    TP.instModuleId = urlParams.get('custom_inst_module_id');
+    TP.instChapterId = urlParams.get('custom_inst_chapter_id');
+    TP.sectionTitle = urlParams.get('custom_section_title');
+    TP.instSectionId = urlParams.get('custom_inst_section_id');
+    TP.instBookId = urlParams.get('custom_inst_book_id');
+    TP.customBookPath = urlParams.get('custom_book_path');
+
+    // Log extracted values for debugging
+    console.log("Extracted values from target_link_uri:");
+    console.log("moduleTitle:", TP.moduleTitle);
+    console.log("instChapterModuleId:", TP.instChapterModuleId);
+    console.log("instModuleId:", TP.instModuleId);
+    console.log("instChapterId:", TP.instChapterId);
+    console.log("sectionTitle:", TP.sectionTitle);
+    console.log("instSectionId:", TP.instSectionId);
+    console.log("instBookId:", TP.instBookId);
+    console.log("customBookPath:", TP.customBookPath);
+
+
+    // Set the ODSA global object
+    window.ODSA = window.ODSA || {};
+    window.ODSA.TP = TP;
+
+    // Log the TP object for debugging
+    console.log("Initialized TP object:", TP);
+  }());
+</script>
+
+<%= @section_html.html_safe %>
