@@ -8,9 +8,25 @@ class InstBooksController < ApplicationController
   def compile
     host_port = request.protocol + request.host_with_port
     extrtool_launch_base_url = host_port + "/lti/launch_extrtool"
+    inst_book = InstBook.find(params[:id])
+    course_offering = inst_book.course_offering
+    lms_instance = course_offering.lms_instance
+
+    # Determine LTI version from the LmsInstance
+    lti_version = lms_instance.lti_version
+    puts "Determined LTI version: #{lti_version}"
+    # Set URLs based on the LTI version
     if params[:operation] == 'generate_course'
-      launch_url = host_port + "/lti/launch"
-      resource_selection_url = host_port + "/lti/resource"
+      if lti_version == 'LTI-1p0'
+        launch_url = host_port + "/lti/launch"
+        resource_selection_url = host_port + "/lti/resource"
+      elsif lti_version == 'LTI-1p3'
+        launch_url = host_port + "/lti13/launches"
+        resource_selection_url = host_port + "/lti13/deep_linking/content_selection"
+      else
+        render plain: "Unsupported LTI version", status: :unprocessable_entity
+        return
+      end
       @job = Delayed::Job.enqueue GenerateCourseJob.new(params[:id], launch_url, resource_selection_url,
                                                         extrtool_launch_base_url, current_user.id)
     else
