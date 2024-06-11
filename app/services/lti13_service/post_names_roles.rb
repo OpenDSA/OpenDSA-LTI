@@ -1,34 +1,43 @@
-# module for handling platform requests
 module Lti13Service
   class PostNamesRoles
     def initialize(access_token, decoded_jwt)
       @access_token = access_token
-      @decoded_jwt = HashWithIndifferentAccess.new(decoded_jwt)
+      @decoded_jwt = decoded_jwt.is_a?(Array) ? HashWithIndifferentAccess.new(decoded_jwt.first) : decoded_jwt
     end
 
     def call
       conn = Faraday.new(url: url_from_jwt)
       response = conn.get do |request|
-        request.headers['Accept'] = 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'
+        request.headers['Content-Type'] = 'application/json'
         request.headers['Authorization'] = "Bearer #{@access_token}"
+        request.headers['Accept'] = 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'
+        puts "Request Headers:"
+        request.headers.each { |key, value| puts "  #{key}: #{value}" }
       end
-      handle_response(response)
+
+      puts "Response status: #{response.status}"
+      puts "Response body from post names role: #{response.body}"
+      response
     end
 
     private
 
-    def handle_response(response)
-      if response.success?
-        Rails.logger.info("NRPS Data fetched successfully.")
-        JSON.parse(response.body)
-      else
-        Rails.logger.error("Failed to fetch NRPS data: #{response.status} - #{response.body}")
-        nil # Or raise an exception based on your error handling strategy
-      end
-    end
-
     def url_from_jwt
-      @decoded_jwt[Rails.configuration.lti_claims_and_scopes['names_and_roles_claim']]['context_memberships_url']
+      names_roles_claim = @decoded_jwt["https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice"]
+      puts "Decoded JWT names_roles_claim: #{names_roles_claim}"
+      
+      if names_roles_claim.nil?
+        puts "Warning: 'namesroleservice' claim not found in decoded JWT"
+        return nil
+      end
+
+      names_roles_url = names_roles_claim["context_memberships_url"]
+      if names_roles_url.nil?
+        puts "Warning: 'context_memberships_url' key not found within 'namesroleservice' claim"
+        return nil
+      end
+      puts "Names and roles URL from Decoded JWT: #{names_roles_url}"
+      names_roles_url
     end
   end
 end
