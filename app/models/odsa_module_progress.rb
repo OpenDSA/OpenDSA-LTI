@@ -169,10 +169,45 @@ class OdsaModuleProgress < ApplicationRecord
       end
       return res
     else
-      # Passback not attempted, so clear timestamp of last successful passback
-      self.last_passback = nil
-      # explicitly set return value to indicate no passback happened
-      return nil
+      lms_instance = self.inst_module_version.course_offering.lms_instance
+      if lms_instance.lti_version == 'LTI-1p3'
+        Rails.logger.info "LTI 1.3 detected, preparing to post score"
+        begin
+          access_token_response = Lti13Service::GetAgsAccessToken.new(lms_instance).call
+          access_token = access_token_response['access_token']
+          Rails.logger.info "Access token retrieved: #{access_token}"
+  
+          platform_jwt = self.lms_access ? self.lms_access.lti_jwt : nil
+          kid = self.lms_access ? self.lms_access.kid : nil
+  
+          response = Lti13::ServicesController.new.send_score(
+            launch_id: lms_instance.id,
+            access_token: access_token,
+            platform_jwt: platform_jwt,
+            kid: kid
+          )
+          Rails.logger.info "LTI 1.3 Score Submission Response: #{response.inspect}"
+  
+          if response[:status] == :ok || response[:status] == 200
+            self.last_passback = self.last_done
+            Rails.logger.info "LTI 1.3 Score post successful. Updating last_passback to last_done."
+          else
+            Rails.logger.info "LTI 1.3 Score post failed. Clearing last_passback timestamp."
+            self.last_passback = nil
+          end
+  
+          return response
+        rescue => e
+          Rails.logger.info "Error posting score to LTI 1.3: #{e.message}"
+          self.last_passback = nil
+          return { error: e.message, status: :internal_server_error }
+        end
+      else
+        # Passback not attempted, so clear timestamp of last successful passback
+        self.last_passback = nil
+        # explicitly set return value to indicate no passback happened
+        return nil
+      end
     end
   end
 
