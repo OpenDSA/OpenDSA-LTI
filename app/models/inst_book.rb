@@ -168,31 +168,6 @@ class InstBook < ApplicationRecord
     av_data
   end  
 
-  private
-
-  def extract_metadata_from_line(line)
-    key, value = line.strip.split(': ', 2)
-    [key[1..].to_sym, value] if key && value
-  end
-
-  def extract_inlineav_name_from_line(line)
-    match = line.match(/\.\. inlineav:: (\w+)/)
-    match[1] if match 
-  end
-
-  def extract_avembed_data_from_line(line)
-    match = line.match(/\.\. avembed:: Exercises\/\w+\/(\w+)\.html/)
-    match[1] if match 
-  end
-
-  # helper method for extract_av_data_from_rst(), safely attempts to parse a JSON string, returning an empty hash as fallback
-  def parse_json_options(json_str)
-    return {} if json_str.nil? # Ensures nil input returns an empty hash
-    JSON.parse(json_str || '{}') 
-  rescue JSON::ParserError
-    {} 
-  end
-
   # --------------------------------------------------------------------------------  
   
   # FIXME: shouldn't this method be removed? It appears to be out-dated?
@@ -324,6 +299,31 @@ class InstBook < ApplicationRecord
   def tree_view?
     tree_view = "\"include_tree_view\":true"
     return self.options.include? tree_view
+  end
+
+  private
+
+  def extract_metadata_from_line(line)
+    key, value = line.strip.split(': ', 2)
+    [key[1..].to_sym, value] if key && value
+  end
+
+  def extract_inlineav_name_from_line(line)
+    match = line.match(/\.\. inlineav:: (\w+)/)
+    match[1] if match 
+  end
+
+  def extract_avembed_data_from_line(line)
+    match = line.match(/\.\. avembed:: Exercises\/\w+\/(\w+)\.html/)
+    match[1] if match 
+  end
+
+  # helper method for extract_av_data_from_rst(), safely attempts to parse a JSON string, returning an empty hash as fallback
+  def parse_json_options(json_str)
+    return {} if json_str.nil? # Ensures nil input returns an empty hash
+    JSON.parse(json_str || '{}') 
+  rescue JSON::ParserError
+    {} 
   end
 
 end
