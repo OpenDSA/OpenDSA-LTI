@@ -24,7 +24,7 @@ ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
   end
 
   menu label: "LMS Accesses", parent: 'LMS config', priority: 30
-  permit_params :lms_instance_id, :user_id, :access_token
+  permit_params :lms_instance_id, :user_id, :access_token, :consumer_key
 
   index do
     id_column
@@ -45,6 +45,7 @@ ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
       link_to c.access_token, admin_lms_access_path(c)
     end
     # column :created_at
+    column :consumer_key
     actions
   end
 
@@ -56,6 +57,7 @@ ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
         f.input :user, collection: User.all.order(:first_name, :last_name)
       end
       f.input :access_token
+      f.input :consumer_key
     end
     f.actions
   end
