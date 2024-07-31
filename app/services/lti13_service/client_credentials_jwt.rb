@@ -22,23 +22,21 @@ module Lti13Service
     end
 
     def build_jwt(payload)
-      puts "Checking private key in client_credentials_jwt"
       if @lms_instance&.private_key.present?
         rsa_private = OpenSSL::PKey::RSA.new(@lms_instance.private_key)
-        if @lms_instance&.public_key.present?
-          jwks = JSON.parse(@lms_instance.public_key)
-          jwk_data = jwks.is_a?(Array) ? jwks.first : jwks
-          kid = jwk_data['kid']
-        else
-          puts "Public JWKS is missing for LmsInstance ID: #{@lms_instance.id}"
+        kid = Jwt::KidFromPrivateKey.new(@lms_instance.private_key).call
+        Rails.logger.info "kid from public key from client #{kid}"
+
+        if kid.nil?
+          Rails.logger.info "Failed to generate kid from private key for LmsInstance ID: #{@lms_instance.id}"
           return nil
         end
         header_params = { alg: 'RS256', typ: 'JWT', kid: kid }
         encoded_jwt = JWT.encode(payload, rsa_private, 'RS256', header_params)
-        puts "JWT encoded successfully: #{encoded_jwt}"
+        Rails.logger.info "JWT encoded successfully: #{encoded_jwt}"
         encoded_jwt
       else
-        puts "Private key is missing for LmsInstance ID: #{@lms_instance.id}"
+        Rails.logger.info "Private key is missing for LmsInstance ID: #{@lms_instance.id}"
         nil
       end
     end
