@@ -5,19 +5,16 @@ class Lti13::LaunchesController < ApplicationController
 
   # GET /launches
   def index
-    puts "from index"
     @launches = @lms_instance.launches
   end
 
   # GET /launches/1
   def show
-    puts "from show"
     Rails.application.executor.wrap { @access_token = @lms_instance.oauth2_url.present? ? Lti13Service::GetAgsAccessToken.new(@lms_instance).call : nil }
   end
 
   # GET /launches/new
   def new
-    puts "new"
     @launch = Launch.new
   end
 
@@ -28,18 +25,14 @@ class Lti13::LaunchesController < ApplicationController
   def create
     Rails.logger.info " Starting LTI 1.3 launch process: Launch request params: #{params.inspect}"
     if params[:id_token]&.present?
-      puts "LaunchesController#create: Found ID token: #{params[:id_token]}"
-
       if params[:state]&.present?
         @decoded_payload = Jwt::Payload.new(params[:state]).call
         if @decoded_payload.nil?
           Rails.logger.info "LaunchesController#create: Decoded payload is nil"
           return
         end
-
         tool_id = @decoded_payload['tool_id']
         @lms_instance = LmsInstance.find_by(id: tool_id.to_i)
-        Rails.logger.info "LaunchesController#create: Decoded state: #{@decoded_payload}"
       else
         Rails.logger.info "LaunchesController#create: State parameter missing"
       end
@@ -51,95 +44,77 @@ class Lti13::LaunchesController < ApplicationController
         Rails.logger.info "LaunchesController#create: Error fetching keys from keyset URL"
       else
         @decoded_jwt = Lti13Service::DecodePlatformJwt.new(@lms_instance, params[:id_token], kid).call
-        Rails.logger.info "LaunchesController#create: Decoded JWT: #{@decoded_jwt}"
-
         @id_token = params[:id_token]
         @access_token = Lti13Service::GetAgsAccessToken.new(@lms_instance).call
         Rails.logger.info "access token launches controller#create: access token: #{@access_token}"
-
         if @access_token.nil?
           Rails.logger.info "Failed to retrieve access token in LaunchesController#create"
           return
         end
-        # Call set_user after decoding JWT
         set_user
-
-        message_type_claim = @decoded_jwt.find { |claim| claim.has_key?('https://purl.imsglobal.org/spec/lti/claim/message_type') }
-        message_type = message_type_claim['https://purl.imsglobal.org/spec/lti/claim/message_type']
-
-        case message_type
-        when 'LtiResourceLinkRequest'
-          handle_resource_link_request
-        when 'LtiDeepLinkingRequest'
-          handle_deep_linking_request
-        else
-          render 'error' and return
+        if @decoded_jwt
+          launch = LtiLaunch.create!(        
+            lms_instance_id: @lms_instance.id,
+            user_id: @user.id,
+            id_token: @id_token,
+            decoded_jwt: @decoded_jwt,
+            kid: kid,
+            expires_at: Time.now + 1.hour          
+          )
         end
+        handle_message_type(@decoded_jwt)        
       end
     else
-      puts "LaunchesController#create: ID token missing"
+      Rails.logger.info "LaunchesController#create: ID token missing"
     end
   end
 
-  # PATCH/PUT /launches/1
-  def update
-    # (Update logic)
-  end
-
-  # DELETE /launches/1
-  def destroy
-    # (Destroy logic)
-  end
 
   private
 
-  def handle_resource_link_request
-    # show the LTI request parameters
-    puts "handle_resource_link_request: params - #{params.inspect}"
-  
-    # Extract necessary parameters from the decoded JWT
-    decoded_jwt = @decoded_jwt.first
-  
-    # Debug: decoded JWT
-    puts "Decoded JWT: #{decoded_jwt}"
-  
-    # Extracting the target_link_uri from the decoded JWT
-    target_link_uri = decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]
-    uri = URI.parse(target_link_uri)
-    query_params = CGI.parse(uri.query)
-  
-    file_name = query_params["custom_module_file_name"]&.first
-    book_path = query_params["custom_book_path"]&.first
-  
-    # Debug: print extracted parameters
-    puts "Extracted file name from target_link_uri: #{file_name}"
-    puts "Extracted book path from target_link_uri: #{book_path}"
-  
-    @course_offering = @lms_instance.course_offerings.first 
-  
-    # Debug: print course offerings and selected course offering
-    puts "Course offerings from the platform/lms: #{@lms_instance.course_offerings.pluck(:id, :label)}"
-    puts "Selected course offering: #{@course_offering.inspect}"
-  
-    unless @course_offering
-      render plain: "Course offering not found", status: :not_found
-      return
-    end
-  
-    if file_name && book_path
-      # Debug: show the file path being read
-      file_path = File.join('public/OpenDSA/Books', book_path, '/lti_html/', "#{file_name}.html")
-      puts "Reading file at: #{file_path}"
-  
-      @section_html = File.read(file_path)
-      render 'launch', layout: 'lti13'
+  def handle_message_type(decoded_jwt)
+    message_type_claim = decoded_jwt.find { |claim| claim.has_key?('https://purl.imsglobal.org/spec/lti/claim/message_type') }
+    message_type = message_type_claim['https://purl.imsglobal.org/spec/lti/claim/message_type']
+    case message_type
+    when 'LtiResourceLinkRequest'
+      handle_resource_link_request
+    when 'LtiDeepLinkingRequest'
+      handle_deep_linking_request
     else
-      render plain: "File name or book path not found (3)!", status: :unprocessable_entity
+      render 'error', status: :unprocessable_entity
     end
   end
 
-  def handle_deep_linking_request
-    redirect_to lti13_deep_linking_content_selection_path(jwt: @decoded_jwt)
+  def handle_resource_link_request    
+    decoded_jwt = @decoded_jwt.first  
+    target_link_uri = decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"]
+    uri = URI.parse(target_link_uri)
+    query_params = CGI.parse(uri.query) 
+    file_name = query_params["custom_module_file_name"]&.first
+    book_path = query_params["custom_book_path"]&.first  
+    @inst_book = InstBook.find_by(id: query_params["custom_inst_book_id"].first)
+    @course_offering = CourseOffering.find_by(id: @inst_book.course_offering_id) if @inst_book  
+    unless @course_offering
+      render plain: "Course offering not found", status: :not_found
+      return
+    end 
+    # lti_enroll(@course_offering)  # Todo: check this method  
+    if file_name && book_path
+      file_path = File.join('public/OpenDSA/Books', book_path, '/lti_html/', "#{file_name}.html")
+      @section_html = File.read(file_path)
+      client_id = decoded_jwt["aud"]
+      lms_access_id = LmsAccess.where(consumer_key: client_id).pluck(:id).first
+      OdsaModuleProgress.get_progress(current_user.id,
+                                      query_params["custom_inst_chapter_module_id"].first,
+                                      query_params["custom_inst_book_id"].first,
+                                      decoded_jwt.dig("https://purl.imsglobal.org/spec/lti-ags/claim/endpoint", "lineitem"),
+                                      decoded_jwt["sub"],
+                                      lms_access_id)
+      Rails.logger.info "Retrieved OdsaModuleProgress"     
+      render 'launch', layout: 'lti13', locals: { id_token: params[:id_token], kid: @decoded_header['kid'] }
+    else
+      render plain: "File name or book path not found!", status: :unprocessable_entity
+    end
   end
 
   def set_user
@@ -147,23 +122,22 @@ class Lti13::LaunchesController < ApplicationController
     lti11_legacy_user_id = decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id']
     sub = decoded_jwt['sub']
     email = decoded_jwt.dig('https://purl.imsglobal.org/spec/lti/claim', 'email')
-  
-    # find the user by email if available
+    # find the user if available
     if email.present?
       @user = User.find_by(email: email)
-      puts "User found by email: #{@user.inspect}" if @user
+      Rails.logger.info "User found by email: #{@user.inspect}" if @user
+    else
+      Rails.logger.info "Email not present in JWT"
     end
-  
-    # If user is not found by email, proceed to check via NRPS
+    # If user is not found, proceed to check via NRPS
     if @user.blank?
-      puts "User not found by email, checking NRPS service"
+      Rails.logger.info "User not found by email, checking NRPS service"
       lms_instance = @lms_instance
-  
       access_token_response = Lti13Service::GetAgsAccessToken.new(lms_instance).call
       access_token = access_token_response['access_token'] if access_token_response
   
       if access_token.blank?
-        puts "Failed to retrieve access token"
+        Rails.logger.info "Failed to retrieve access token"
         @message = 'OpenDSA: Failed to retrieve access token'
         return false
       end
@@ -174,9 +148,6 @@ class Lti13::LaunchesController < ApplicationController
         platform_jwt: @id_token,
         kid: @decoded_header['kid']
       )
-  
-      puts "NRPS service response: #{response.inspect}"
-  
       if response[:status] == :ok && response[:body].present?
         roster = response[:body]
         if roster.is_a?(String)
@@ -187,35 +158,55 @@ class Lti13::LaunchesController < ApplicationController
             member['user_id'] == lti11_legacy_user_id || member['user_id'] == sub
           end
         end
-  
         if user_info
-          # Find user by email from the NRPS roster if available
+          # Find user from the NRPS roster if available
           if user_info['email'].present?
             @user = User.find_by(email: user_info['email'])
-            puts "User found by email from NRPS: #{@user.inspect}" if @user
-          end
-  
+            Rails.logger.info "User found from NRPS: #{@user.inspect}" if @user
+          end  
           # Create a new user if no matching user is found
           if @user.blank?
-            puts "Creating new user from NRPS data"
-            @user = User.new(
-              email: user_info['email'],
-              first_name: user_info['given_name'],
-              last_name: user_info['family_name'],
+            begin
+              @user = User.create!(
+                email: user_info['email'] || "#{lms_instance.id}_#{user_info['user_id']}@#{lms_instance.url}",
+                first_name: user_info['given_name'],
+                last_name: user_info['family_name'],
+                password: SecureRandom.hex
+              )
+            rescue ActiveRecord::RecordInvalid => e
+              if e.message.include?("Email has already been taken")
+                @user = User.find_by(email: "#{lms_instance.id}_#{user_info['user_id']}@#{lms_instance.url}")
+                Rails.logger.info "User already exists, retrieved existing user: #{@user.inspect}"
+              else
+                Rails.logger.info "Failed to create user. Errors: #{e.message}"
+                @message = "OpenDSA: Failed to create user"
+                error = Error.new(class_name: 'user_create_fail', message: "Failed to create user #{user_info['user_id']}", params: params.to_s)
+                error.save!
+                return false
+              end
+            end
+          end
+        else
+          email = "#{lms_instance.id}_#{lti11_legacy_user_id || sub}@#{lms_instance.url}"
+          begin
+            @user = User.create!(
+              email: email,
+              first_name: decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lis_person_name_given'],
+              last_name: decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lis_person_name_family'],
               password: SecureRandom.hex
             )
-            unless @user.save
-              puts "Failed to create user. Errors: #{@user.errors.full_messages}"
+          rescue ActiveRecord::RecordInvalid => e
+            if e.message.include?("Email has already been taken")
+              @user = User.find_by(email: email)
+              Rails.logger.info "User already exists, retrieved existing user: #{@user.inspect}"
+            else
+              Rails.logger.info "Failed to create user. Errors: #{e.message}"
               @message = "OpenDSA: Failed to create user"
-              error = Error.new(class_name: 'user_create_fail', message: "Failed to create user #{lti11_legacy_user_id}", params: params.to_s)
+              error = Error.new(class_name: 'user_create_fail', message: "Failed to create user #{email}", params: params.to_s)
               error.save!
               return false
             end
           end
-        else
-          @message = 'OpenDSA: Unable to uniquely identify user'
-          puts @message
-          return false
         end
       else
         @message = 'OpenDSA: Failed to retrieve roster'
@@ -223,7 +214,6 @@ class Lti13::LaunchesController < ApplicationController
         return false
       end
     end
-  
     sign_in @user
   end
 

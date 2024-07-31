@@ -69,16 +69,16 @@ class Lti13::ToolsController < ApplicationController
   end
 
   private
-    
-    def set_lms_instance # Use callbacks to share common setup or constraints between actions.
-      # Example logic to set @lms_instance based on your application's logic
-      lms_instance_id = params[:lms_instance_id] || session[:lms_instance_id]
-      @lms_instance = LmsInstance.find_by(id: lms_instance_id)
-    end
+
+  def set_lms_instance 
+    lms_instance_id = params[:lms_instance_id] || session[:lms_instance_id]
+    @lms_instance = LmsInstance.find_by(id: lms_instance_id)
+  end
 
     # Only allowing a list of trusted parameters through.
-    def tool_params
-      params.require(:tool).permit(:name, :client_id, :deployment_id, :private_key, :keyset_url, :oauth2_url, :platform_oidc_auth_url)
-    end
+  def tool_params
+    params.require(:tool).permit(:name, :client_id, :deployment_id, :private_key, :keyset_url, :oauth2_url, :platform_oidc_auth_url)
+  end
+
 end
 
