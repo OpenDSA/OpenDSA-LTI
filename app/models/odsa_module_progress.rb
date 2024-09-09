@@ -146,21 +146,29 @@ class OdsaModuleProgress < ApplicationRecord
 
       consumer_key = nil
       consumer_secret = nil
-      if self.lms_access_id.blank?
-        lms_instance = self.inst_module_version.course_offering.lms_instance
-        consumer_key = lms_instance.consumer_key
-        consumer_secret = lms_instance.consumer_secret
+      if self.lms_access_id.blank?        
+        # ensuring that lms_instance is not nil
+        if self.inst_module_version&.course_offering&.lms_instance
+          lms_instance = self.inst_module_version.course_offering.lms_instance
+          consumer_key = lms_instance.consumer_key
+          consumer_secret = lms_instance.consumer_secret
+        else
+          Rails.logger.info "No valid LMS Instance found through inst_module_version"
+          return { error: "LMS instance not found", status: :internal_server_error }
+        end
       else
         consumer_key = self.lms_access.consumer_key
         consumer_secret = self.lms_access.consumer_secret
+        lms_instance = self.lms_access.lms_instance
       end
   
+      # LTI 1.3 flow
       if lms_instance.lti_version == 'LTI-1p3'
         Rails.logger.info "LTI 1.3 message detected"
         return post_score_to_lti_13(lms_instance)
       else
         # LTI 1.1 flow
-        Rails.logger.info "LTI 1.1 messagee detected"
+        Rails.logger.info "LTI 1.1 message detected"
         require 'lti/outcomes'
         res = LtiOutcomes.post_score_to_consumer(self.highest_score,
                                                  self.lis_outcome_service_url,
@@ -201,17 +209,11 @@ class OdsaModuleProgress < ApplicationRecord
       response = Lti13::ServicesController.new.send_score(
         launch_id: lms_instance.id,
         access_token: access_token,
-        platform_jwt: lti_launch.id_token,  # Pass the id_token from LtiLaunch
-        kid: lti_launch.kid,  # Pass the kid from LtiLaunch
-        score_details: {
-          scoreGiven: self.highest_score,
-          scoreMaximum: 100,
-          comment: "Optional",
-          activityProgress: 'Completed',
-          gradingProgress: 'FullyGraded'
-        }
+        platform_jwt: lti_launch.id_token,  # id_token from LtiLaunch
+        kid: lti_launch.kid,  # kid from LtiLaunch
+        highest_score: self.highest_score 
       )
-      Rails.logger.info "LTI 1.3 Score Submission Response: #{response.inspect}"
+      Rails.logger.info "LTI 1.3 score submission response: #{response.inspect}"
   
       if response[:status] == :ok || response[:status] == 200
         self.last_passback = self.last_done
