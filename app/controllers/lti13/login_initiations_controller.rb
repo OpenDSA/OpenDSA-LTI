@@ -1,29 +1,33 @@
 class Lti13::LoginInitiationsController < ApplicationController
   include Lti13::LoginInitiationsHelper
-  #Todo :move debug statements to tests
   skip_before_action only: :create
   before_action :set_tool
   before_action :generate_state_jwt
 
+  # OpenID allows for a GET or POST
+
+  # GET /lti/login_initiations
+  def index; end
+
+  # POST /lti/login_initiations
   def create
-    puts "LoginInitiationsController#create: Initiating login process"
     auth_url = build_auth_url(@lms_instance, @state_jwt, {
       login_hint: params[:login_hint], 
       lti_message_hint: params[:lti_message_hint]
-    }, @nonce)
-  
-    puts "LoginInitiationsController#create: Redirecting to #{auth_url}"
+    }, @nonce)  
+    Rails.logger.info "LoginInitiationsController#create: Redirecting to #{auth_url}"
     redirect_to auth_url
   end
 
-  private
+  #~ Private methods ..........................................................
 
+  private
+  # -------------------------------------------------------------
   def set_tool
     issuer = params[:iss]
     client_id = params[:client_id]
-    puts "Received Issuer: #{issuer}"
-    puts "Received Client ID: #{client_id}"
-    # Find the LMS instance from the database
+    Rails.logger.info "Received Issuer: #{issuer}"
+    Rails.logger.info "Received Client ID: #{client_id}"
     @lms_instance = LmsInstance.find_by(issuer: issuer, client_id: client_id)
 
     unless @lms_instance

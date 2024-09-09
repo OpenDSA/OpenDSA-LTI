@@ -68,7 +68,10 @@ class Lti13::ToolsController < ApplicationController
     end
   end
 
+  #~ Private methods ..........................................................
+
   private
+  # -------------------------------------------------------------
 
   def set_lms_instance 
     lms_instance_id = params[:lms_instance_id] || session[:lms_instance_id]
