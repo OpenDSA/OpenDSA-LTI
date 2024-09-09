@@ -6,12 +6,12 @@ module Jwt
     end
 
     def call
-      # Ensure rsa_private is an OpenSSL::PKey::RSA object
+      # rsa_private is an OpenSSL::PKey::RSA object
       rsa_key = ensure_rsa_object(@rsa_private)
       kid = KidFromPrivateKey.new(@rsa_private).call
-      Rails.logger.info "kid from public key from encode.rb #{kid}"
+      Rails.logger.info "KID from public key from encode.rb #{kid}"
       if kid.nil?
-        Rails.logger.info "Failed to generate kid from private key"
+        Rails.logger.info "Failed to generate KID from private key"
         return nil
       end
       encoded_jwt = JWT.encode(@payload, rsa_key, 'RS256', { kid: kid })
@@ -22,6 +22,7 @@ module Jwt
       nil 
     end
 
+    #~ Private instance methods .................................................
     private
 
     # Ensures the rsa_private parameter is a valid OpenSSL::PKey::RSA object
