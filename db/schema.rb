@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_07_10_125602) do
+ActiveRecord::Schema.define(version: 2024_09_03_143505) do
 
   create_table "active_admin_comments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -374,12 +374,14 @@ ActiveRecord::Schema.define(version: 2024_07_10_125602) do
   create_table "lti_launches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "lms_instance_id", null: false
     t.integer "user_id", null: false
+    t.integer "course_offering_id", null: false
     t.text "id_token"
     t.text "decoded_jwt", size: :long, collation: "utf8mb4_bin"
     t.string "kid"
     t.datetime "expires_at", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["course_offering_id"], name: "index_lti_launches_on_course_offering_id"
     t.index ["expires_at"], name: "index_lti_launches_on_expires_at"
     t.index ["lms_instance_id"], name: "fk_rails_73ea582aae"
     t.index ["user_id"], name: "fk_rails_bb7142408e"
@@ -676,6 +678,7 @@ ActiveRecord::Schema.define(version: 2024_07_10_125602) do
   add_foreign_key "lms_accesses", "users", name: "lms_accesses_user_id_fk"
   add_foreign_key "lms_instances", "lms_types", name: "lms_instances_lms_type_id_fk"
   add_foreign_key "lms_instances", "organizations", name: "lms_instances_organization_id_fk"
+  add_foreign_key "lti_launches", "course_offerings"
   add_foreign_key "lti_launches", "lms_instances"
   add_foreign_key "lti_launches", "users"
   add_foreign_key "odsa_book_progresses", "inst_books", name: "odsa_book_progresses_inst_book_id_fk"
