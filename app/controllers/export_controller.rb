@@ -44,7 +44,7 @@ class ExportController < ApplicationController
         "keywords": keywords, 
         "exercise_name": exercise.name,
         "iframe_url": exercise.embed_url(host_url),
-        "lti_url": "#{host_url}/lti/launch?custom_ex_short_name=#{exercise.short_name}"
+        "lti_url": "#{host_url}/lti/launch?custom_ex_short_name=#{exercise.short_name}&custom_ex_settings=%7B%7D"
       }
     end.compact
 
