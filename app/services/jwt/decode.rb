@@ -9,6 +9,7 @@ module Jwt
       end
   
       def call
+        puts "from decode.rb"
         JWT.decode(@token, @rsa_public, true, {algorithm: 'RS256'})
       end
     end

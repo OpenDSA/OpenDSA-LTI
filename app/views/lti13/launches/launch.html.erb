@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/resource_link', 'title') %></title>
+
+  <!-- CSS Imports -->
+  <link href="/OpenDSA/RST/_themes/haiku/static/haiku.css_t" rel="stylesheet" type="text/css"/>
+  <link href="/OpenDSA/lib/normalize.css" rel="stylesheet" type="text/css"/>
+  <link href="/OpenDSA/lib/odsaMOD-min.css" rel="stylesheet" type="text/css"/>
+  <link href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <link href="/OpenDSA/lib/odsaStyle-min.css" rel="stylesheet" type="text/css"/>
+
+  <!-- JS Imports -->
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js" type="text/javascript"></script>
+  <%# <script src="/OpenDSA/lib/odsaUtils.js" type="text/javascript"></script> %>
+  <script src="/OpenDSA/lib/odsaMOD.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" type="text/javascript"></script>
+  <script src="/OpenDSA/lib/dataStructures.js" type="text/javascript"></script>
+  <%# <script src="/OpenDSA/lib/conceptMap.js" type="text/javascript"></script> %>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ["\\[", "\\]"]],
+        processEscapes: true
+      },
+      "HTML-CSS": {
+        scale: "80"
+      }
+    });
+  </script>
+
+  <script>
+    (function() {
+      var TP = {};
+
+      // Initialize launch params
+      TP.toParams = {};
+      TP.toParams.launch_params = {};
+      <% params.each do |key, value| %>
+        TP.toParams.launch_params.<%= key %> = "<%= value %>";
+      <% end %>
+
+      // Extract parameters from the decoded JWT
+      TP.decodedJwt = {
+        messageType: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/message_type') %>",
+        version: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/version') %>",
+        resourceLinkId: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id') %>",
+        resourceLinkTitle: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/resource_link', 'title') %>",
+        deploymentId: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/deployment_id') %>",
+        contextId: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/context', 'id') %>",
+        contextTitle: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/context', 'title') %>",
+        contextLabel: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/context', 'label') %>",
+        toolPlatformName: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/tool_platform', 'name') %>",
+        toolPlatformVersion: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/tool_platform', 'version') %>",
+        toolPlatformProductFamilyCode: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/tool_platform', 'product_family_code') %>",
+        userId: "<%= @decoded_jwt.dig(0, 'sub') %>",
+        oauthConsumerKey: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/lti1p1', 'oauth_consumer_key') %>",
+        oauthConsumerKeySign: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/lti1p1', 'oauth_consumer_key_sign') %>",
+        legacyUserId: "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id') %>"
+      };
+
+      // Decode roles
+      var roles = "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/roles') %>";
+      roles = roles.replace(/&quot;/g, '').replace(/[\[\]]/g, '').split(',').map(role => role.trim());
+
+      TP.decodedJwt.roles = roles;
+
+      // Extract custom parameters from target_link_uri
+      var targetLinkUri = "<%= @decoded_jwt.dig(0, 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri') %>";
+
+      // Decode HTML entities in the target_link_uri
+      var parser = new DOMParser();
+      var decodedUri = parser.parseFromString('<!doctype html><body>' + targetLinkUri, 'text/html').body.textContent;
+
+      var urlParams = new URLSearchParams(decodedUri.split('?')[1]);
+
+      TP.moduleTitle = urlParams.get('custom_module_title');
+      TP.instChapterModuleId = urlParams.get('custom_inst_chapter_module_id');
+      TP.instModuleId = urlParams.get('custom_inst_module_id');
+      TP.instChapterId = urlParams.get('custom_inst_chapter_id');
+      TP.sectionTitle = urlParams.get('custom_section_title');
+      TP.instSectionId = urlParams.get('custom_inst_section_id');
+      TP.instBookId = urlParams.get('custom_inst_book_id');
+      TP.customBookPath = urlParams.get('custom_book_path');
+
+      // Set the ODSA global object
+      window.ODSA = window.ODSA || {};
+      window.ODSA.TP = TP;
+    }());
+  </script>
+
+</head>
+<body>
+  <%= @section_html.html_safe %>
+</body>
+</html>

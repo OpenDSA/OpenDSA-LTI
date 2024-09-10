@@ -10,6 +10,13 @@
 #  consumer_key    :string(255)
 #  consumer_secret :string(255)
 #  organization_id :bigint
+#  client_id        :string
+#  private_key      :text
+#  public_key       :text
+#  keyset_url       :string
+#  oauth2_url       :string
+#  platform_oidc_auth_url :string
+#  issuer           :string
 #
 # Indexes
 #
@@ -21,7 +28,9 @@ ActiveAdmin.register LmsInstance do
   includes :lms_type, :organization
 
   menu label: "LMS Instances",parent: 'LMS config', priority: 20
-  permit_params :url, :lms_type_id, :organization_id
+  # permit_params :url, :lms_type_id, :organization_id
+  permit_params :url, :lms_type_id, :organization_id, :client_id, :private_key, :public_key, :keyset_url, :oauth2_url, :platform_oidc_auth_url, :issuer
+
 
   index do
     id_column
@@ -31,6 +40,14 @@ ActiveAdmin.register LmsInstance do
     # column :consumer_key
     # column :consumer_secret
     column :created_at
+    column :client_id
+    # Consider if you really want to display keys and secrets here
+    # column :private_key
+    # column :public_key
+    column :keyset_url
+    column :oauth2_url
+    column :platform_oidc_auth_url
+    column :issuer
     actions
   end
 
@@ -43,8 +60,8 @@ ActiveAdmin.register LmsInstance do
       f.input :consumer_key
       f.input :consumer_secret
       f.input :client_id
-      f.input :private_key
-      f.input :public_key
+      f.input :private_key, as: :text
+      f.input :public_key, as: :text
       f.input :keyset_url
       f.input :oauth2_url
       f.input :platform_oidc_auth_url

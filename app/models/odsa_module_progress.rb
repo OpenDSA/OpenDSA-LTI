@@ -146,33 +146,88 @@ class OdsaModuleProgress < ApplicationRecord
 
       consumer_key = nil
       consumer_secret = nil
-      if self.lms_access_id.blank?
-        lms_instance = self.inst_module_version.course_offering.lms_instance
-        consumer_key = lms_instance.consumer_key
-        consumer_secret = lms_instance.consumer_secret
+      if self.lms_access_id.blank?        
+        # ensuring that lms_instance is not nil
+        if self.inst_module_version&.course_offering&.lms_instance
+          lms_instance = self.inst_module_version.course_offering.lms_instance
+          consumer_key = lms_instance.consumer_key
+          consumer_secret = lms_instance.consumer_secret
+        else
+          Rails.logger.info "No valid LMS Instance found through inst_module_version"
+          return { error: "LMS instance not found", status: :internal_server_error }
+        end
       else
         consumer_key = self.lms_access.consumer_key
         consumer_secret = self.lms_access.consumer_secret
+        lms_instance = self.lms_access.lms_instance
       end
-
-      require 'lti/outcomes'
-      res = LtiOutcomes.post_score_to_consumer(self.highest_score,
-                                               self.lis_outcome_service_url,
-                                               self.lis_result_sourcedid,
-                                               consumer_key,
-                                               consumer_secret)
-      if res.success?
-        self.last_passback = self.last_done
+  
+      # LTI 1.3 flow
+      if lms_instance.lti_version == 'LTI-1p3'
+        Rails.logger.info "LTI 1.3 message detected"
+        return post_score_to_lti_13(lms_instance)
       else
-        # passback failed, so clear timestamp of last successful passback
-        self.last_passback = nil
+        # LTI 1.1 flow
+        Rails.logger.info "LTI 1.1 message detected"
+        require 'lti/outcomes'
+        res = LtiOutcomes.post_score_to_consumer(self.highest_score,
+                                                 self.lis_outcome_service_url,
+                                                 self.lis_result_sourcedid,
+                                                 consumer_key,
+                                                 consumer_secret)
+        if res.success?
+          self.last_passback = self.last_done
+        else
+          # passback failed, so clear timestamp of last successful passback
+          self.last_passback = nil
+        end
+        return res
       end
-      return res
     else
       # Passback not attempted, so clear timestamp of last successful passback
       self.last_passback = nil
       # explicitly set return value to indicate no passback happened
       return nil
+    end
+  end
+  
+  def post_score_to_lti_13(lms_instance)
+    begin
+      lti_launch = LtiLaunch.where(user_id: self.user_id, lms_instance_id: lms_instance.id).order(created_at: :desc).first
+      
+      if lti_launch.nil?
+        Rails.logger.info "No LTI Launch found for user: #{self.user_id} and LMS instance: #{lms_instance.id}"
+        return { error: "No LTI Launch found", status: :not_found }
+      end
+  
+      Rails.logger.info "LTI Launch: #{lti_launch.inspect}"
+  
+      access_token_response = Lti13Service::GetAgsAccessToken.new(lms_instance).call
+      access_token = access_token_response['access_token']
+      Rails.logger.info "Access token retrieved from module progress: #{access_token}"
+  
+      response = Lti13::ServicesController.new.send_score(
+        launch_id: lms_instance.id,
+        access_token: access_token,
+        platform_jwt: lti_launch.id_token,  # id_token from LtiLaunch
+        kid: lti_launch.kid,  # kid from LtiLaunch
+        highest_score: self.highest_score 
+      )
+      Rails.logger.info "LTI 1.3 score submission response: #{response.inspect}"
+  
+      if response[:status] == :ok || response[:status] == 200
+        self.last_passback = self.last_done
+        Rails.logger.info "LTI 1.3 Score post successful."
+      else
+        Rails.logger.info "LTI 1.3 Score post didn't pass"
+        self.last_passback = nil
+      end
+  
+      return response
+    rescue => e
+      Rails.logger.info "Error posting score to LTI 1.3: #{e.message}"
+      self.last_passback = nil
+      return { error: e.message, status: :internal_server_error }
     end
   end
 
