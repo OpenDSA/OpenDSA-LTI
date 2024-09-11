@@ -11,6 +11,14 @@ module Lti13Service
       Rails.logger.info "Fetching client assertion from ClientCredentialsJwt" 
       client_assertion = Lti13Service::ClientCredentialsJwt.new(@lms_instance).call
       Rails.logger.info "Client assertion (JWT) generated: #{client_assertion}"
+
+      # debug the LTI claims and scopes pulled from lti scopes & claims
+      Rails.logger.info "LTI claims and scopes configuration: #{Rails.configuration.lti_claims_and_scopes.inspect}"
+      Rails.logger.info "Line Item Scope: #{Rails.configuration.lti_claims_and_scopes['ags_scope_line_item']}"
+      Rails.logger.info "Result Scope: #{Rails.configuration.lti_claims_and_scopes['ags_scope_result']}"
+      Rails.logger.info "Score Scope: #{Rails.configuration.lti_claims_and_scopes['ags_scope_score']}"
+      Rails.logger.info "Names and Roles Scope: #{Rails.configuration.lti_claims_and_scopes['names_and_roles_scope']}"
+
       # Build the request body for the token request
       request_body = {
         grant_type: 'client_credentials',
@@ -23,6 +31,9 @@ module Lti13Service
         ].join(" "),
         client_assertion: client_assertion
       }.to_query
+
+      # Log the complete request body
+      Rails.logger.info "Request body with scopes: #{request_body}"
 
       # Establish a connection to the LMS's OAuth2 endpoint using Faraday
       conn = Faraday.new(url: @lms_instance.oauth2_url) do |faraday|
