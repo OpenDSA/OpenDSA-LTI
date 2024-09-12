@@ -333,7 +333,12 @@ class Lti13::LaunchesController < ApplicationController
     params.require(:launch).permit(:jwt, :decoded_jwt, :tool_id, :state)
   end
 
+  #TODO: 
+  #same origin issue with X-frame-Options
+  #remove hardcoded canvas instance and set a dynamic CSP to allow iframe
+  
   def allow_iframe
     response.headers.except! 'X-Frame-Options'
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://canvas.endeavour.cs.vt.edu"
   end
 end
