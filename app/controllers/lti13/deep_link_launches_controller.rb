@@ -1,6 +1,7 @@
 class Lti13::DeepLinkLaunchesController < ApplicationController
   before_action :set_tool
   skip_before_action only: :create
+  after_action :allow_iframe, only: [:show, :launch, :content_selection, :content_selected]
 
   # POST lti/tools/#/deep_link_launches
   # Handles the creation of a deep link launch
@@ -74,4 +75,11 @@ class Lti13::DeepLinkLaunchesController < ApplicationController
     @tool = Tool.find_by_id(params[:tool_id])
     render json: { error: 'Tool not found' }, status: :not_found unless @tool
   end
+
+  def allow_iframe
+    response.headers.except! 'X-Frame-Options'
+    puts "Response headers after removing X-Frame-Options from deep_link_controller: #{response.headers.inspect}"
+    response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://canvas.endeavour.cs.vt.edu"
+  end
+
 end
