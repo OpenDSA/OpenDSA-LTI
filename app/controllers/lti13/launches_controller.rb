@@ -335,10 +335,11 @@ class Lti13::LaunchesController < ApplicationController
 
   #TODO: 
   #same origin issue with X-frame-Options
-  #remove hardcoded canvas instance and set a dynamic CSP to allow iframe
-  
+  #remove hardcoded canvas instance and set a dynamic CSP to allow iframe  
   def allow_iframe
     response.headers.except! 'X-Frame-Options'
+    Rails.logger.info "Response headers after removing X-Frame-Options: #{response.headers.inspect}"
+    puts "Response headers after removing X-Frame-Options: #{response.headers.inspect}"
     response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://canvas.endeavour.cs.vt.edu"
   end
 end
