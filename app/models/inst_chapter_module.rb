@@ -2,15 +2,18 @@
 #
 # Table name: inst_chapter_modules
 #
-#  id                  :bigint           not null, primary key
-#  inst_chapter_id     :bigint           not null
-#  inst_module_id      :bigint           not null
-#  module_position     :bigint
-#  lms_module_item_id  :bigint
-#  lms_section_item_id :bigint
+#  id                  :integer          not null, primary key
+#  inst_chapter_id     :integer          not null
+#  inst_module_id      :integer          not null
+#  module_position     :integer
+#  lms_module_item_id  :integer
+#  lms_section_item_id :integer
 #  created_at          :datetime
 #  updated_at          :datetime
-#  lms_assignment_id   :bigint
+#  lms_assignment_id   :integer
+#  due_date           :datetime
+#  open_date           :datetime
+#  close_date          :datetime
 #
 # Indexes
 #
@@ -24,6 +27,8 @@ class InstChapterModule < ApplicationRecord
   has_many :inst_sections, dependent: :destroy
   has_many :odsa_module_progresses, inverse_of: :inst_chapter_module, dependent: :destroy
   has_many :odsa_user_interactions, dependent: :destroy
+  has_many :student_extensions, dependent: :destroy
+  has_many :users, through: :student_extensions
 
   #~ Validation ...............................................................
   #~ Constants ................................................................
@@ -68,6 +73,30 @@ class InstChapterModule < ApplicationRecord
   def get_exercise_progresses(user_id)
     OdsaExerciseProgress.joins(inst_book_section_exercise: [:inst_section])
       .where(inst_sections: {inst_chapter_module_id: self.id}, user_id: user_id)
+  end
+
+  def get_due_date_for(user_id)
+    extension = StudentExtension.where(inst_chapter_module_id: self.id, user_id: user_id).first
+    if extension.nil? || extension.due_date.nil?
+      return self.due_date
+    end
+    return [extension.due_date, self.due_date].min
+  end
+
+  def get_close_date_for(user_id)
+    extension = StudentExtension.where(inst_chapter_module_id: self.id, user_id: user_id).first
+    if extension.nil? || extension.close_date.nil?
+      return self.close_date
+    end
+    return [extension.close_date, self.close_date].min
+  end
+
+  def get_open_date_for(user_id)
+    extension = StudentExtension.where(inst_chapter_module_id: self.id, user_id: user_id).first
+    if extension.nil? || extension.open_date.nil?
+      return self.open_date
+    end
+    return [extension.open_date, self.open_date].min
   end
 
   def gradable?

@@ -2,15 +2,15 @@
 #
 # Table name: odsa_exercise_attempts
 #
-#  id                               :bigint           not null, primary key
-#  user_id                          :bigint           not null
-#  inst_book_id                     :bigint
-#  inst_section_id                  :bigint
-#  inst_book_section_exercise_id    :bigint
+#  id                               :integer          not null, primary key
+#  user_id                          :integer          not null
+#  inst_book_id                     :integer
+#  inst_section_id                  :integer
+#  inst_book_section_exercise_id    :integer
 #  worth_credit                     :boolean          not null
 #  time_done                        :datetime         not null
-#  time_taken                       :bigint           not null
-#  count_hints                      :bigint           not null
+#  time_taken                       :integer          not null
+#  count_hints                      :integer          not null
 #  hint_used                        :boolean          not null
 #  points_earned                    :decimal(5, 2)    not null
 #  earned_proficiency               :boolean          not null
@@ -22,11 +22,12 @@
 #  updated_at                       :datetime
 #  correct                          :boolean
 #  pe_score                         :decimal(5, 2)
-#  pe_steps_fixed                   :bigint
-#  inst_course_offering_exercise_id :bigint
-#  inst_module_section_exercise_id  :bigint
+#  pe_steps_fixed                   :integer
+#  inst_course_offering_exercise_id :integer
+#  inst_module_section_exercise_id  :integer
 #  answer                           :string(255)
 #  question_id                      :integer
+#  finished_frame                   :boolean
 #
 # Indexes
 #
@@ -66,7 +67,13 @@ class OdsaExerciseAttempt < ApplicationRecord
 
     if hasBook
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
-      if @inst_chapter_module.due_dates.nil? or @inst_chapter_module.due_dates > Time.now
+
+      # get dates based on Student
+      @due_date = inst_chapter_module.get_due_date_for(user_id)
+      @open_date = inst_chapter_module.get_open_date_for(user_id)
+      @close_date = inst_chapter_module.get_close_date_for(user_id)
+
+      if (@open_date.nil? || Time.now < @open_date) && (@due_date.nil? || Time.now > @due_date) && (@close_date.nil? || Time.now > @close_date)
         if self.request_type === 'PE'
           update_pe_exercise_progress
         elsif self.request_type === 'AE'
@@ -77,6 +84,7 @@ class OdsaExerciseAttempt < ApplicationRecord
           update_ka_exercise_progress
         end
       end
+
     else
       if self.request_type === 'PE'
         update_pe_exercise_progress
