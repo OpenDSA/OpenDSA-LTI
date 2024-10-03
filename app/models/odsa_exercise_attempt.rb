@@ -73,7 +73,7 @@ class OdsaExerciseAttempt < ApplicationRecord
       @open_date = inst_chapter_module.get_open_date_for(user_id)
       @close_date = inst_chapter_module.get_close_date_for(user_id)
 
-      if (@open_date.nil? || Time.now < @open_date) && (@due_date.nil? || Time.now > @due_date) && (@close_date.nil? || Time.now > @close_date)
+      if (@open_date.nil? || Time.now > @open_date) && (@due_date.nil? || Time.now < @due_date) && (@close_date.nil? || Time.now < @close_date)
         if self.request_type === 'PE'
           update_pe_exercise_progress
         elsif self.request_type === 'AE'
