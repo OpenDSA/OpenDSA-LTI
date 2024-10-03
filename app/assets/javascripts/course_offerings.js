@@ -1,5 +1,5 @@
 (function () {
-    var check_completeness, form_alert, handle_submit, init, reset_alert_area, valid_token;
+    var check_completeness, form_alert, handle_submit, handle_generate_textbook, init, reset_alert_area, valid_token;
   
     $(document).ready(function () {
   
@@ -21,7 +21,12 @@
         $(this).prop('disabled', true);
         return handle_submit();
       });
-  
+
+      $('#btn-gen-textbook').click(function () {
+        $(this).prop('disabled', true);
+        return handle_generate_textbook();
+      });
+
       $('#display').click(function () {
         return handle_select_student();
         //return handle_display();
@@ -123,18 +128,23 @@
       return $('#alerts').append(alert_box);
     };
   
-    check_completeness = function () {
+    check_completeness = function (isTextbook) {
       var messages;
       messages = [];
       if ($('#lms-instance-select').val() === '') {
         messages.push('One of the LMS instances has to be selected.');
       }
-      if (!valid_token) {
-        messages.push('You have to provide an access token for the selected Canvas instance.');
+
+      if (!isTextbook){
+        if (!valid_token) {
+          messages.push('You have to provide an access token for the selected Canvas instance.');
+        }
+        if ($('#lms-course-num').val() === '') {
+          messages.push('You have to write LMS course Id.');
+        }
       }
-      if ($('#lms-course-num').val() === '') {
-        messages.push('You have to write LMS course Id.');
-      }
+
+
       // if ($('#lms-course-code').val() === '') {
       //   messages.push('You have to write LMS course name.');
       // }
@@ -175,10 +185,43 @@
         console.error(error);
       });
     };
-  
+
+    handle_generate_textbook = function () {
+    var organization_id, course_id, term_id, label, inst_book_id, fd, messages, url;
+    messages = check_completeness(true);
+    if (messages.length !== 0) {
+      form_alert(messages);
+      $('#btn-submit-co').prop('disabled', false);
+      return;
+    }
+    organization_id = $('#organization-select').val();
+    course_id = $('#course-select').val();
+    term_id = $('#term-select').val();
+    label = $('#label').val();
+    inst_book_id = $('#inst-book-select').val();
+    fd = new FormData;
+    fd.append('organization_id', organization_id);
+    fd.append('course_id', course_id);
+    fd.append('term_id', term_id);
+    fd.append('label', label);
+    fd.append('inst_book_id', inst_book_id);
+    url = '/textbooks'
+    return $.ajax({
+      url: url,
+      type: 'post',
+      data: fd,
+      processData: false,
+      contentType: false,
+      success: function (data) {
+        return window.location.href = data['url'];
+      }
+    });
+  };
+
+
     handle_submit = function () {
       var lms_instance_id, lms_course_num, lms_course_code, organization_id, course_id, term_id, label, late_policy_id, inst_book_id, fd, messages, url;
-      messages = check_completeness();
+      messages = check_completeness(false);
       if (messages.length !== 0) {
         form_alert(messages);
         $('#btn-submit-co').prop('disabled', false);

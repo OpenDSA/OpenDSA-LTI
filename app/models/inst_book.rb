@@ -164,6 +164,9 @@ class InstBook < ApplicationRecord
     av_data
   end
 
+  def get_clone(currentUser)
+    return clone(currentUser)
+  end
   private
 
   def extract_metadata_from_line(line)
@@ -276,6 +279,7 @@ class InstBook < ApplicationRecord
   # --------------------------------------------------------------------------
   # clone book configuration
   def clone(current_user)
+    puts "huh"
     b = InstBook.new
     b.title = self.title
     b.desc = self.desc
@@ -286,6 +290,7 @@ class InstBook < ApplicationRecord
     inst_chapters.each do |chapter|
       inst_chapter = chapter.clone(b)
     end
+
     return b
   end
 

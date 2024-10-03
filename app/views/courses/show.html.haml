@@ -48,13 +48,14 @@
           %tr
             %th Book Title
             %th Canvas Course
-            %th
-            %th
-            %th
+            %th Textbook
         %tbody#odsa
-          - @inst_book = offering.inst_books
-          = render @inst_book
-
+          -# - @inst_book = offering.inst_books
+          -# = render @inst_book
+          %td= offering.display_name
+          %td
+          %td
+            = button_to 'Compile Textbook', compile_textbooks_path(offering.id), method: :post
 
 -else
 
@@ -90,4 +91,3 @@
           / %td
           /   = render partial: 'course_offerings/self_enrollment',
           /     locals: { o: o }
-
