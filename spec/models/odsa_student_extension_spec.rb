@@ -2,14 +2,14 @@
 #
 # Table name: odsa_student_extensions
 #
-#  id              :bigint           not null, primary key
-#  user_id         :bigint
-#  inst_section_id :bigint           not null
+#  id              :integer          not null, primary key
+#  user_id         :integer
+#  inst_section_id :integer          not null
 #  soft_deadline   :datetime
 #  hard_deadline   :datetime
 #  created_at      :datetime
 #  updated_at      :datetime
-#  time_limit      :bigint
+#  time_limit      :integer
 #  opening_date    :datetime
 #
 # Indexes

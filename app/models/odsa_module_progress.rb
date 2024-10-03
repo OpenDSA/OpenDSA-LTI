@@ -2,21 +2,21 @@
 #
 # Table name: odsa_module_progresses
 #
-#  id                      :bigint           not null, primary key
-#  user_id                 :bigint           not null
-#  inst_book_id            :bigint
+#  id                      :integer          not null, primary key
+#  user_id                 :integer          not null
+#  inst_book_id            :integer
 #  first_done              :datetime         not null
 #  last_done               :datetime         not null
 #  proficient_date         :datetime         not null
 #  created_at              :datetime
 #  updated_at              :datetime
-#  inst_chapter_module_id  :bigint
+#  inst_chapter_module_id  :integer
 #  lis_outcome_service_url :string(255)
 #  lis_result_sourcedid    :string(255)
 #  current_score           :float(24)        not null
 #  highest_score           :float(24)        not null
-#  lms_access_id           :bigint
-#  inst_module_version_id  :bigint
+#  lms_access_id           :integer
+#  inst_module_version_id  :integer
 #  last_passback           :datetime         not null
 #
 # Indexes

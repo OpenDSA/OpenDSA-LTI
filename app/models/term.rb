@@ -2,11 +2,11 @@
 #
 # Table name: terms
 #
-#  id         :bigint           not null, primary key
-#  season     :bigint           not null
+#  id         :integer          not null, primary key
+#  season     :integer          not null
 #  starts_on  :date             not null
 #  ends_on    :date             not null
-#  year       :bigint           not null
+#  year       :integer          not null
 #  created_at :datetime
 #  updated_at :datetime
 #  slug       :string(255)      not null

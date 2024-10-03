@@ -2,7 +2,7 @@
 #
 # Table name: inst_exercises
 #
-#  id            :bigint           not null, primary key
+#  id            :integer          not null, primary key
 #  name          :string(255)
 #  short_name    :string(255)      not null
 #  ex_type       :string(50)
@@ -11,8 +11,8 @@
 #  updated_at    :datetime
 #  learning_tool :string(255)
 #  av_address    :string(512)
-#  width         :bigint
-#  height        :bigint
+#  width         :integer
+#  height        :integer
 #  links         :text(65535)
 #  scripts       :text(65535)
 #

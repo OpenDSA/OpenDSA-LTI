@@ -2,8 +2,8 @@
 #
 # Table name: inst_module_sections
 #
-#  id                     :bigint           not null, primary key
-#  inst_module_version_id :bigint           not null
+#  id                     :integer          not null, primary key
+#  inst_module_version_id :integer          not null
 #  name                   :string(255)      not null
 #  show                   :boolean          default(TRUE)
 #  learning_tool          :string(255)

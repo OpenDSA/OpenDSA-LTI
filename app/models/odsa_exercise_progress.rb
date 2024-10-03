@@ -2,26 +2,26 @@
 #
 # Table name: odsa_exercise_progresses
 #
-#  id                               :bigint           not null, primary key
-#  user_id                          :bigint           not null
-#  inst_book_section_exercise_id    :bigint
-#  current_score                    :bigint           not null
-#  highest_score                    :bigint           not null
+#  id                               :integer          not null, primary key
+#  user_id                          :integer          not null
+#  inst_book_section_exercise_id    :integer
+#  current_score                    :integer          not null
+#  highest_score                    :integer          not null
 #  first_done                       :datetime         not null
 #  last_done                        :datetime         not null
-#  total_correct                    :bigint           not null
-#  total_worth_credit               :bigint           not null
+#  total_correct                    :integer          not null
+#  total_worth_credit               :integer          not null
 #  proficient_date                  :datetime         not null
 #  current_exercise                 :string(255)
 #  correct_exercises                :string(255)
 #  hinted_exercise                  :string(255)
 #  created_at                       :datetime
 #  updated_at                       :datetime
-#  inst_course_offering_exercise_id :bigint
+#  inst_course_offering_exercise_id :integer
 #  lis_outcome_service_url          :string(255)
 #  lis_result_sourcedid             :string(255)
-#  lms_access_id                    :bigint
-#  inst_module_section_exercise_id  :bigint
+#  lms_access_id                    :integer
+#  inst_module_section_exercise_id  :integer
 #
 # Indexes
 #

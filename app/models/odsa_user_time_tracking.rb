@@ -3,15 +3,15 @@
 # Table name: odsa_user_time_trackings
 #
 #  id                               :bigint           not null, primary key
-#  user_id                          :bigint           not null
-#  inst_book_id                     :bigint
-#  inst_section_id                  :bigint
-#  inst_book_section_exercise_id    :bigint
-#  inst_course_offering_exercise_id :bigint
-#  inst_module_id                   :bigint
-#  inst_chapter_id                  :bigint
-#  inst_module_version_id           :bigint
-#  inst_module_section_exercise_id  :bigint
+#  user_id                          :integer          not null
+#  inst_book_id                     :integer
+#  inst_section_id                  :integer
+#  inst_book_section_exercise_id    :integer
+#  inst_course_offering_exercise_id :integer
+#  inst_module_id                   :integer
+#  inst_chapter_id                  :integer
+#  inst_module_version_id           :integer
+#  inst_module_section_exercise_id  :integer
 #  uuid                             :string(50)       not null
 #  session_date                     :string(50)       not null
 #  total_time                       :decimal(10, 2)   not null

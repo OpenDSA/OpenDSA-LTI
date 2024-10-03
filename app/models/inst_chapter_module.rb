@@ -11,7 +11,7 @@
 #  created_at          :datetime
 #  updated_at          :datetime
 #  lms_assignment_id   :integer
-#  due_date           :datetime
+#  due_date            :datetime
 #  open_date           :datetime
 #  close_date          :datetime
 #

@@ -4,13 +4,13 @@
 #
 # Table name: inst_module_versions
 #
-#  id                  :bigint           not null, primary key
-#  inst_module_id      :bigint           not null
+#  id                  :integer          not null, primary key
+#  inst_module_id      :integer          not null
 #  name                :string(255)      not null
 #  git_hash            :string(255)      not null
 #  file_path           :string(4096)     not null
 #  template            :boolean          default(FALSE)
-#  course_offering_id  :bigint
+#  course_offering_id  :integer
 #  resource_link_id    :string(255)
 #  resource_link_title :string(512)
 #  created_at          :datetime         not null

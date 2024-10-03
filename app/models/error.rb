@@ -2,9 +2,9 @@
 #
 # Table name: errors
 #
-#  id          :bigint           not null, primary key
+#  id          :integer          not null, primary key
 #  usable_type :string(255)
-#  usable_id   :bigint
+#  usable_id   :integer
 #  class_name  :string(255)
 #  message     :text(65535)
 #  trace       :text(65535)

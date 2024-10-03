@@ -2,9 +2,9 @@
 #
 # Table name: odsa_book_progresses
 #
-#  id                   :bigint           not null, primary key
-#  user_id              :bigint           not null
-#  inst_book_id         :bigint           not null
+#  id                   :integer          not null, primary key
+#  user_id              :integer          not null
+#  inst_book_id         :integer          not null
 #  started_exercises    :text(4294967295) not null
 #  proficient_exercises :text(4294967295) not null
 #  created_at           :datetime

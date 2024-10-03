@@ -2,7 +2,7 @@
 #
 # Table name: course_roles
 #
-#  id                         :bigint           not null, primary key
+#  id                         :integer          not null, primary key
 #  name                       :string(255)      not null
 #  can_manage_course          :boolean          default(FALSE), not null
 #  can_manage_assignments     :boolean          default(FALSE), not null

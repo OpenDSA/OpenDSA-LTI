@@ -2,7 +2,7 @@
 #
 # Table name: learning_tools
 #
-#  id         :bigint           not null, primary key
+#  id         :integer          not null, primary key
 #  name       :string(255)      not null
 #  key        :string(255)      not null
 #  secret     :string(255)      not null

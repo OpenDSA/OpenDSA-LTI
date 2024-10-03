@@ -2,10 +2,10 @@
 #
 # Table name: inst_book_section_exercises
 #
-#  id               :bigint           not null, primary key
-#  inst_book_id     :bigint           not null
-#  inst_section_id  :bigint           not null
-#  inst_exercise_id :bigint
+#  id               :integer          not null, primary key
+#  inst_book_id     :integer          not null
+#  inst_section_id  :integer          not null
+#  inst_exercise_id :integer
 #  points           :decimal(5, 2)    not null
 #  required         :boolean          default(FALSE)
 #  threshold        :decimal(5, 2)    not null

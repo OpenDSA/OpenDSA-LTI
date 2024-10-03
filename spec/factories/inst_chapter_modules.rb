@@ -2,15 +2,18 @@
 #
 # Table name: inst_chapter_modules
 #
-#  id                  :bigint           not null, primary key
-#  inst_chapter_id     :bigint           not null
-#  inst_module_id      :bigint           not null
-#  module_position     :bigint
-#  lms_module_item_id  :bigint
-#  lms_section_item_id :bigint
+#  id                  :integer          not null, primary key
+#  inst_chapter_id     :integer          not null
+#  inst_module_id      :integer          not null
+#  module_position     :integer
+#  lms_module_item_id  :integer
+#  lms_section_item_id :integer
 #  created_at          :datetime
 #  updated_at          :datetime
-#  lms_assignment_id   :bigint
+#  lms_assignment_id   :integer
+#  due_date            :datetime
+#  open_date           :datetime
+#  close_date          :datetime
 #
 # Indexes
 #

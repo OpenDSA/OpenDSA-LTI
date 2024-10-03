@@ -2,11 +2,11 @@
 #
 # Table name: courses
 #
-#  id              :bigint           not null, primary key
+#  id              :integer          not null, primary key
 #  name            :string(255)      not null
 #  number          :string(255)      not null
-#  organization_id :bigint           not null
-#  user_id         :bigint           not null
+#  organization_id :integer          not null
+#  user_id         :integer          not null
 #  created_at      :datetime
 #  updated_at      :datetime
 #  slug            :string(255)      not null

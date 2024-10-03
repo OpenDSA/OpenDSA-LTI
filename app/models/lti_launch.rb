@@ -2,28 +2,24 @@
 #
 # Table name: lti_launches
 #
-#  id                :bigint           not null, primary key
-#  lms_instance_id   :integer          not null
-#  user_id           :integer          not null
-#  course_offering_id: integer          not null
-#  id_token          :text             not null
-#  decoded_jwt       :json
-#  kid               :string
-#  expires_at        :datetime         not null
-#  created_at        :datetime
-#  updated_at        :datetime
+#  id                 :bigint           not null, primary key
+#  lms_instance_id    :integer          not null
+#  user_id            :integer          not null
+#  course_offering_id :integer          not null
+#  id_token           :text(65535)
+#  decoded_jwt        :text(4294967295)
+#  kid                :string(255)
+#  expires_at         :datetime         not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
 #
 # Indexes
 #
-#  index_lti_launches_on_lms_instance_id_and_user_id       (lms_instance_id, user_id)
-#  index_lti_launches_on_course_offering_id                (course_offering_id)
-#  index_lti_launches_on_expires_at                        (expires_at)
+#  fk_rails_73ea582aae                       (lms_instance_id)
+#  fk_rails_bb7142408e                       (user_id)
+#  index_lti_launches_on_course_offering_id  (course_offering_id)
+#  index_lti_launches_on_expires_at          (expires_at)
 #
-# Foreign Keys
-#
-#  fk_lti_launches_lms_instance_id   (lms_instance_id => lms_instances.id)
-#  fk_lti_launches_user_id           (user_id => users.id)
-#  fk_lti_launches_course_offering_id (course_offering_id => course_offerings.id)
 
 # =============================================================================
 # Represents a single launch event for LTI 1.3

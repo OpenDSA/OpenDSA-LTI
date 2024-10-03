@@ -2,10 +2,10 @@
 #
 # Table name: late_policies
 #
-#  id           :bigint           not null, primary key
+#  id           :integer          not null, primary key
 #  name         :string(255)      not null
-#  late_days    :bigint           not null
-#  late_percent :bigint           not null
+#  late_days    :integer          not null
+#  late_percent :integer          not null
 #  created_at   :datetime
 #  updated_at   :datetime
 #

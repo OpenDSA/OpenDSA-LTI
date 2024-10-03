@@ -2,9 +2,9 @@
 #
 # Table name: inst_course_offering_exercises
 #
-#  id                  :bigint           not null, primary key
-#  course_offering_id  :bigint           not null
-#  inst_exercise_id    :bigint           not null
+#  id                  :integer          not null, primary key
+#  course_offering_id  :integer          not null
+#  inst_exercise_id    :integer          not null
 #  resource_link_id    :string(255)
 #  resource_link_title :string(255)
 #  created_at          :datetime

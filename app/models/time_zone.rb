@@ -2,7 +2,7 @@
 #
 # Table name: time_zones
 #
-#  id         :bigint           not null, primary key
+#  id         :integer          not null, primary key
 #  name       :string(255)
 #  zone       :string(255)
 #  display_as :string(255)

@@ -2,21 +2,21 @@
 #
 # Table name: lms_instances
 #
-#  id              :bigint           not null, primary key
-#  url             :string(255)      not null
-#  created_at      :datetime
-#  updated_at      :datetime
-#  lms_type_id     :bigint
-#  consumer_key    :string(255)
-#  consumer_secret :string(255)
-#  organization_id :bigint
-#  client_id        :string
-#  private_key      :text
-#  public_key       :text
-#  keyset_url       :string
-#  oauth2_url       :string
-#  platform_oidc_auth_url :string
-#  issuer           :string
+#  id                     :integer          not null, primary key
+#  url                    :string(255)      not null
+#  created_at             :datetime
+#  updated_at             :datetime
+#  lms_type_id            :integer
+#  consumer_key           :string(255)
+#  consumer_secret        :string(255)
+#  organization_id        :integer
+#  client_id              :string(255)
+#  private_key            :text(65535)
+#  public_key             :text(65535)
+#  keyset_url             :string(255)
+#  oauth2_url             :string(255)
+#  platform_oidc_auth_url :string(255)
+#  issuer                 :string(255)
 #
 # Indexes
 #

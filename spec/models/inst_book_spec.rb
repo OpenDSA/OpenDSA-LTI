@@ -2,9 +2,9 @@
 #
 # Table name: inst_books
 #
-#  id                 :bigint           not null, primary key
-#  course_offering_id :bigint
-#  user_id            :bigint           not null
+#  id                 :integer          not null, primary key
+#  course_offering_id :integer
+#  user_id            :integer          not null
 #  title              :string(50)       not null
 #  created_at         :datetime
 #  updated_at         :datetime
@@ -12,7 +12,7 @@
 #  desc               :string(255)
 #  last_compiled      :datetime
 #  options            :text(4294967295)
-#  book_type          :bigint
+#  book_type          :integer
 #
 # Indexes
 #

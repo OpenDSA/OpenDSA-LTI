@@ -2,13 +2,13 @@
 #
 # Table name: inst_chapters
 #
-#  id                      :bigint           not null, primary key
-#  inst_book_id            :bigint           not null
+#  id                      :integer          not null, primary key
+#  inst_book_id            :integer          not null
 #  name                    :string(100)      not null
 #  short_display_name      :string(45)
-#  position                :bigint
-#  lms_chapter_id          :bigint
-#  lms_assignment_group_id :bigint
+#  position                :integer
+#  lms_chapter_id          :integer
+#  lms_assignment_group_id :integer
 #  created_at              :datetime
 #  updated_at              :datetime
 #

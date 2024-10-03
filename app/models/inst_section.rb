@@ -2,19 +2,19 @@
 #
 # Table name: inst_sections
 #
-#  id                     :bigint           not null, primary key
-#  inst_module_id         :bigint           not null
-#  inst_chapter_module_id :bigint           not null
+#  id                     :integer          not null, primary key
+#  inst_module_id         :integer          not null
+#  inst_chapter_module_id :integer          not null
 #  short_display_name     :string(50)
 #  name                   :string(255)      not null
-#  position               :bigint
+#  position               :integer
 #  gradable               :boolean          default(FALSE)
 #  soft_deadline          :datetime
 #  hard_deadline          :datetime
-#  time_limit             :bigint
+#  time_limit             :integer
 #  show                   :boolean          default(TRUE)
-#  lms_item_id            :bigint
-#  lms_assignment_id      :bigint
+#  lms_item_id            :integer
+#  lms_assignment_id      :integer
 #  created_at             :datetime
 #  updated_at             :datetime
 #  learning_tool          :string(255)

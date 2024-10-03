@@ -5,10 +5,9 @@
 #  id                     :bigint           not null, primary key
 #  user_id                :integer
 #  inst_chapter_module_id :integer
-#  soft_deadline          :datetime
-#  hard_deadline          :datetime
-#  time_limit             :integer
-#  opening_date           :datetime
+#  open_date              :datetime
+#  close_date             :datetime
+#  due_date               :datetime
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #

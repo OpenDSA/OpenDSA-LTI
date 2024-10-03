@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_09_26_212224) do
+ActiveRecord::Schema.define(version: 2024_09_30_155417) do
 
   create_table "active_admin_comments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -183,7 +183,7 @@ ActiveRecord::Schema.define(version: 2024_09_26_212224) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "lms_assignment_id"
-    t.datetime "due_dates"
+    t.datetime "due_date"
     t.datetime "open_date"
     t.datetime "close_date"
     t.index ["inst_chapter_id"], name: "inst_chapter_modules_inst_chapter_id_fk"
@@ -597,6 +597,18 @@ ActiveRecord::Schema.define(version: 2024_09_26_212224) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "student_extensions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "inst_chapter_module_id"
+    t.datetime "open_date"
+    t.datetime "close_date"
+    t.datetime "due_date"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["inst_chapter_module_id"], name: "index_student_extensions_on_inst_chapter_module_id"
+    t.index ["user_id"], name: "index_student_extensions_on_user_id"
+  end
+
   create_table "terms", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "season", null: false
     t.date "starts_on", null: false
@@ -719,6 +731,8 @@ ActiveRecord::Schema.define(version: 2024_09_26_212224) do
   add_foreign_key "odsa_user_time_trackings", "inst_modules", name: "odsa_user_time_tracking_inst_module_id_fk"
   add_foreign_key "odsa_user_time_trackings", "inst_sections", name: "odsa_user_time_tracking_inst_section_id_fk"
   add_foreign_key "odsa_user_time_trackings", "users", name: "odsa_user_time_tracking_user_id_fk"
+  add_foreign_key "student_extensions", "inst_chapter_modules", name: "student_extensions_inst_chapter_modules_id_fk"
+  add_foreign_key "student_extensions", "users", name: "student_extensions_user_id_fk"
   add_foreign_key "users", "global_roles", name: "users_global_role_id_fk"
   add_foreign_key "users", "time_zones", name: "users_time_zone_id_fk"
 end

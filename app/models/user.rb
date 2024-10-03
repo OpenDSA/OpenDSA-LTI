@@ -2,13 +2,13 @@
 #
 # Table name: users
 #
-#  id                     :bigint           not null, primary key
+#  id                     :integer          not null, primary key
 #  email                  :string(255)      default(""), not null
 #  encrypted_password     :string(255)      default(""), not null
 #  reset_password_token   :string(255)
 #  reset_password_sent_at :datetime
 #  remember_created_at    :datetime
-#  sign_in_count          :bigint           default(0), not null
+#  sign_in_count          :integer          default(0), not null
 #  current_sign_in_at     :datetime
 #  last_sign_in_at        :datetime
 #  current_sign_in_ip     :string(255)
@@ -20,10 +20,10 @@
 #  updated_at             :datetime
 #  first_name             :string(255)
 #  last_name              :string(255)
-#  global_role_id         :bigint           not null
+#  global_role_id         :integer          not null
 #  avatar                 :string(255)
 #  slug                   :string(255)      not null
-#  time_zone_id           :bigint
+#  time_zone_id           :integer
 #
 # Indexes
 #
@@ -49,7 +49,7 @@ class User < ApplicationRecord
   has_many    :course_enrollments, -> { includes :course_role, :course_offering }, inverse_of: :user, dependent: :destroy
   has_many    :course_offerings, through: :course_enrollments
   has_many    :identities, inverse_of: :user, dependent: :destroy
-  # has_many    :student_extensions
+  has_many  :student_extensions
   has_many  :lms_accesses, inverse_of: :user
   has_many  :inst_books, inverse_of: :user
   has_many  :courses, inverse_of: :user

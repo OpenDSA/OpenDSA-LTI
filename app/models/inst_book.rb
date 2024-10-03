@@ -2,9 +2,9 @@
 #
 # Table name: inst_books
 #
-#  id                 :bigint           not null, primary key
-#  course_offering_id :bigint
-#  user_id            :bigint           not null
+#  id                 :integer          not null, primary key
+#  course_offering_id :integer
+#  user_id            :integer          not null
 #  title              :string(50)       not null
 #  created_at         :datetime
 #  updated_at         :datetime
@@ -12,20 +12,13 @@
 #  desc               :string(255)
 #  last_compiled      :datetime
 #  options            :text(4294967295)
-#  book_type          :bigint
+#  book_type          :integer
 #
 # Indexes
 #
 #  inst_books_course_offering_id_fk  (course_offering_id)
 #  inst_books_user_id_fk             (user_id)
 #
-#~ Relationships ............................................................
-#~ Validation ...............................................................
-#~ Constants ................................................................
-#~ Hooks ....................................................................
-#~ Class methods ............................................................
-#~ Instance methods .........................................................
-#~ Private instance methods .................................................
 class InstBook < ApplicationRecord
   enum book_type: {Complete: 0, Exercises: 1}
 

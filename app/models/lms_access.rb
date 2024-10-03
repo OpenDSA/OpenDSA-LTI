@@ -2,12 +2,12 @@
 #
 # Table name: lms_accesses
 #
-#  id              :bigint           not null, primary key
+#  id              :integer          not null, primary key
 #  access_token    :string(255)
 #  created_at      :datetime
 #  updated_at      :datetime
-#  lms_instance_id :bigint           not null
-#  user_id         :bigint           not null
+#  lms_instance_id :integer          not null
+#  user_id         :integer          not null
 #  consumer_key    :string(255)
 #  consumer_secret :string(255)
 #

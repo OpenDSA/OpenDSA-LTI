@@ -4,10 +4,10 @@
 #
 # Table name: inst_module_section_exercises
 #
-#  id                     :bigint           not null, primary key
-#  inst_module_version_id :bigint           not null
-#  inst_module_section_id :bigint           not null
-#  inst_exercise_id       :bigint           not null
+#  id                     :integer          not null, primary key
+#  inst_module_version_id :integer          not null
+#  inst_module_section_id :integer          not null
+#  inst_exercise_id       :integer          not null
 #  points                 :decimal(5, 2)    not null
 #  required               :boolean          default(FALSE)
 #  threshold              :decimal(5, 2)    not null

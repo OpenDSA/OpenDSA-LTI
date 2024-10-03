@@ -2,8 +2,8 @@
 #
 # Table name: odsa_bugs
 #
-#  id             :bigint           not null, primary key
-#  user_id        :bigint           not null
+#  id             :integer          not null, primary key
+#  user_id        :integer          not null
 #  os_family      :string(50)       not null
 #  browser_family :string(20)       not null
 #  title          :string(50)       not null
