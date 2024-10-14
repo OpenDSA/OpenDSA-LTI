@@ -29,7 +29,7 @@ json.chapters do
           json.set! :lms_section_item_id, inst_chapter_module.lms_section_item_id
           json.set! :lms_assignment_id, inst_chapter_module.lms_assignment_id
           json.set! :long_name, InstModule.where(:id => inst_chapter_module.inst_module_id).first.name
-          json.set! :due_dates, inst_chapter_module.due_dates.try(:strftime, "%m/%d/%Y %I:%M %P")
+          json.set! :due_date, inst_chapter_module.due_date.try(:strftime, "%m/%d/%Y %I:%M %P")
 
           # sections
           json.sections do

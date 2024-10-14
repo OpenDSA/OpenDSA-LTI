@@ -46,10 +46,30 @@ class LtiController < ApplicationController
     else
       file_name = params[:custom_section_file_name]
     end
-    @section_html = File.read(File.join('public/OpenDSA/Books',
-                                        params[:custom_book_path],
-                                        '/lti_html/',
-                                        "#{file_name.to_s}.html")) and return
+
+    @inst_chapter_module = InstChapterModule.find_by(id: params[:custom_inst_chapter_module_id])
+
+    if @inst_chapter_module
+
+      @open_date = @inst_chapter_module.get_open_date_for(current_user.id)
+      @due_date = @inst_chapter_module.get_due_date_for(current_user.id)
+      @close_date = @inst_chapter_module.get_close_date_for(current_user.id)
+
+      Rails.logger.info "user: #{current_user.id}"
+      Rails.logger.info "Open Date: #{@open_date}"
+      Rails.logger.info "Due Date: #{@due_date}"
+      Rails.logger.info "Close Date: #{@close_date}"
+
+
+    else
+      render('error') and return
+    end
+
+
+    # @section_html = File.read(File.join('public/OpenDSA/Books',
+    #                                     params[:custom_book_path],
+    #                                     '/lti_html/',
+    #                                     "#{file_name.to_s}.html")) and return
   end
 
   # deprecated

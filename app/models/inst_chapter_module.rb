@@ -76,11 +76,14 @@ class InstChapterModule < ApplicationRecord
   end
 
   def get_due_date_for(user_id)
+    return self.due_date
     extension = StudentExtension.where(inst_chapter_module_id: self.id, user_id: user_id).first
     if extension.nil? || extension.due_date.nil?
       return self.due_date
     end
-    return [extension.due_date, self.due_date].min
+    Rails.logger.info "Due Date Origin: #{self.due_date}"
+    Rails.logger.info "Due Date Origin: #{extension.due_date}"
+
   end
 
   def get_close_date_for(user_id)

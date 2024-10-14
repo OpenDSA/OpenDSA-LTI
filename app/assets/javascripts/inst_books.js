@@ -391,7 +391,7 @@
     Handlebars.registerHelper('moduleCheck', function(key, value, parent, mod, chapter) {
       if (key == "module") {
         if (typeof(value) === "object") {
-          value = window.jsonFile['chapters'][chapter]['due_dates'];
+          value = window.jsonFile['chapters'][chapter]['due_date'];
         }
         return new Handlebars.SafeString(datepick(value, parent, mod, chapter));
       } 
@@ -512,7 +512,7 @@
               "{{#if long_name}}" + // Check Module Name
               "<li class=\"odsa_li\">" + // Module Line item
               "{{#unless ../../last_compiled}} <span class=\"glyphicon glyphicon-th-list\"></span> {{/unless}}" + // Sortable Icon
-              "<a class=\"module-list\" data-key=\"{{@key}}\"> {{#if sections}} {{/if}} {{long_name}} {{moduleCheck \"module\" due_dates @../key @../key @../key}} </a>" + // Module Title
+              "<a class=\"module-list\" data-key=\"{{@key}}\"> {{#if sections}} {{/if}} {{long_name}} {{moduleCheck \"module\" due_date @../key @../key @../key}} </a>" + // Module Title
               "</li>" + // Close Module Line Item
               "{{/if}}" + // Close Check Module Name
             "{{/each}}" + // Close Modules

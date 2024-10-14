@@ -67,7 +67,7 @@ class InstBooksController < ApplicationController
           end
           md = InstModule.where("name = ?", name).first
           inst_chap_module = InstChapterModule.where("inst_chapter_id = ? AND module_position = ?", ch.id, module_pos).first
-          inst_chap_module.update(due_dates: due_date)
+          inst_chap_module.update(due_date: due_date)
           module_pos = module_pos + 1
         end
       end
