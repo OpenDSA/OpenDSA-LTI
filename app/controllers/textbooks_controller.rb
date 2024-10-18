@@ -54,16 +54,9 @@ class TextbooksController < ApplicationController
     end
   end
 
-  def compile
-    book = InstBook.find_by(course_offering_id:params[:course_offering_id])
-    if book.blank?
-      err_string = 'There was a problem finding the book instance associated with the textbook.'
-      url = url_for new_course_offerings_path(notice: err_string)
-    else
+  private
+  def create_textbook_lms_instance
 
-      #TODO Initiate Book Compilation here
-
-    end
 
   end
 

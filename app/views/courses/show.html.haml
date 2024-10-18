@@ -54,9 +54,26 @@
           -# = render @inst_book
           %td= offering.display_name
           %td
-          %td
-            = button_to 'Compile Textbook', compile_textbooks_path(offering.id), method: :post
-
+            %td
+              - inst_book = InstBook.find_by(course_offering_id:offering.id)
+              - form_name = 'compile_book_' + inst_book.id.to_s
+              = form_tag '/inst_books/'+ inst_book.id.to_s , data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
+                = submit_tag "Compile Textbook", name: form_name, class: "btn btn-primary", title: 'Compile book confirmation.', data: {confirm: "The book compilation process will regenerate the book pages on the OpenDSA server. Assignments due dates and points in Canvas course won't be affected by this action. Do you want to continue?"}
+                .col-xs-1
+                  %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#generate-course-modal' } }
+                #generate-course-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+                  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+                    .modal-content
+                      .modal-header
+                        %p.lead Compile Textbook
+                      .modal-body
+                        %p
+                          When you click this button the OpenDSA book will be generated as an independent resource.
+                          This book will have no LMS ties such as Canvas integration.
+                          -# If this is the first time the course is being generated, all OpenDSA chapters and modules
+                          -# will be created in the course. If you are re-generating the Canvas course, this process
+                          -# will update the assignments points and due dates as well as create new Canvas assignments
+                          -# and modules for any new chapters and modules added to your course offering's OpenDSA book configuration.
 -else
 
   %h2 Offerings
