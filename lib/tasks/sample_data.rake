@@ -32,6 +32,13 @@ namespace :db do
           last_name:  'Researcher',
           email:      'example-01@railstutorial.org')
 
+    textbook_lms_type = FactoryBot(:lms_type,
+          name: "TEXTBOOK")
+
+    FactoryBot.create(:lms_instance,
+          url: "TEXTBOOK",
+          lms_type_id: textbook_lms_type.id,
+          )
 
     students = []
     50.times do |n|

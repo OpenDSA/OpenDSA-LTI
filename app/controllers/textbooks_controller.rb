@@ -54,10 +54,4 @@ class TextbooksController < ApplicationController
     end
   end
 
-  private
-  def create_textbook_lms_instance
-
-
-  end
-
 end
