@@ -32,7 +32,7 @@ namespace :db do
           last_name:  'Researcher',
           email:      'example-01@railstutorial.org')
 
-    textbook_lms_type = FactoryBot(:lms_type,
+    textbook_lms_type = FactoryBot.create(:lms_type,
           name: "TEXTBOOK")
 
     FactoryBot.create(:lms_instance,
