@@ -6,7 +6,6 @@ class InstBooksController < ApplicationController
   # -------------------------------------------------------------
   # POST /inst_books/:id
   def compile
-    puts "we are compiling"
     host_port = request.protocol + request.host_with_port
     extrtool_launch_base_url = host_port + "/lti/launch_extrtool"
     if params[:operation] == 'generate_course'

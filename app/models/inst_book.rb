@@ -279,7 +279,6 @@ class InstBook < ApplicationRecord
   # --------------------------------------------------------------------------
   # clone book configuration
   def clone(current_user)
-    puts "huh"
     b = InstBook.new
     b.title = self.title
     b.desc = self.desc

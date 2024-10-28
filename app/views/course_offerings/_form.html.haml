@@ -8,7 +8,8 @@
         %a{href: home_guide_path}
           instructor's guide
         for more information.
-      %h4.text-danger All fields are required.
+      %h4.text-danger All fields are required
+      %h4.text-danger Note: LMS fields are not required to create textbooks
 
   / .form-group
   /   = label_tag :name, 'Canvas course Name', class: 'control-label col-xs-2'
@@ -107,11 +108,11 @@
 
   .form-group
     .col-xs-offset-2.col-xs-2
-      %button#btn-submit-co.btn.btn-primary Submit
+      %button#btn-submit-co.btn.btn-primary Create New Course Offering
 
   .form-group
     .col-xs-offset-2.col-xs-2
-      %button#btn-gen-textbook.btn.btn-primary Generate Non LMS Textbook
+      %button#btn-gen-textbook.btn.btn-primary Create Non LMS Textbook
 
 #lms-instance-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
   .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }

@@ -25,7 +25,6 @@ class TextbooksController < ApplicationController
 
       cloned_book = inst_book.get_clone(current_user)
 
-      puts "worked"
       if course_offering.save!
         cloned_book.course_offering_id = course_offering.id
         cloned_book.save!

@@ -131,9 +131,6 @@
     check_completeness = function (isTextbook) {
       var messages;
       messages = [];
-      if ($('#lms-instance-select').val() === '') {
-        messages.push('One of the LMS instances has to be selected.');
-      }
 
       if (!isTextbook){
         if (!valid_token) {
@@ -142,8 +139,10 @@
         if ($('#lms-course-num').val() === '') {
           messages.push('You have to write LMS course Id.');
         }
+        if ($('#lms-instance-select').val() === '') {
+          messages.push('One of the LMS instances has to be selected.');
+        }
       }
-
 
       // if ($('#lms-course-code').val() === '') {
       //   messages.push('You have to write LMS course name.');
