@@ -1,4 +1,8 @@
 OpenDSA::Application.routes.draw do
+  namespace :epg_broker do
+    get 'tokens/get_tokens'
+    get 'tokens/redeem_token'
+  end
   root 'home#index'
 
   post 'lti/launch'
@@ -230,4 +234,11 @@ OpenDSA::Application.routes.draw do
     get 'deep_linking/content_selection', to: 'deep_linking#content_selection'
     post 'deep_linking/content_selected', to: 'deep_linking#content_selected'
   end  
+
+  # epg-broker routes
+  namespace :epg_broker do
+    get 'get_tokens', to: 'tokens#get_tokens'
+    post 'redeem_token', to: 'tokens#redeem_token'
+  end
+
 end

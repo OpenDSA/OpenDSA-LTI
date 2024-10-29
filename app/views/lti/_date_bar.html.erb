@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Launch Page</title>
+  <!-- Include Bootstrap CSS (assuming Bootstrap is used based on the HAML code) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Include jQuery and Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script>
+    // Countdown Timer Script
+    document.addEventListener('DOMContentLoaded', function() {
+      var countdownElement = document.getElementById("countdown-timer");
+
+      var now = new Date().getTime();
+      var openDate = new Date(countdownElement.getAttribute("open-date")).getTime();
+      var dueDate = new Date(countdownElement.getAttribute("due-date")).getTime();
+      var closeDate = new Date(countdownElement.getAttribute("close-date")).getTime();
+
+      console.log("Open Date:", openDate); // Debugging line
+      console.log("Due Date:", dueDate); // Debugging line
+      console.log("Close Date:", closeDate); // Debugging line
+
+      function updateCountdown() {
+      now = new Date().getTime();
+
+      if (now < openDate) {
+        var distance = openDate - now;
+
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownElement.innerHTML = "Assignment Opens In:  <b>" + days + "d " + hours + "h " + minutes + "m " + seconds + "s </b>";
+
+      } else if (now < dueDate) {
+        var distance = dueDate - now;
+
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownElement.innerHTML = "Due in: <b>" + days + "d " + hours + "h " + minutes + "m " + seconds + "s </b>";
+
+      } else if (now < closeDate) {
+        if (!window.keyDatesButtonRendered) {
+          renderKeyDatesButtonAndModal();
+          window.keyDatesButtonRendered = true;
+        }
+        var distance = closeDate - now;
+
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        var dueDateReadable = new Date(countdownElement.getAttribute("due-date")).toLocaleString();
+        countdownElement.innerHTML = "Due Date Has Passed: " + dueDateReadable + "<br>Assignment Closes In: <b>" + days + "d " + hours + "h " + minutes + "m " + seconds + "s </b>";
+        // countdownElement.innerHTML = "Due Date Passed: " + countdownElement.getAttribute("due-date") + "<br>Close Date: " + countdownElement.getAttribute("close-date");
+      
+      } else {
+        countdownElement.innerHTML = "Assignment Closed";
+      }
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    });
+
+    function renderKeyDatesButtonAndModal() {
+      var keyDatesButton = document.createElement('button');
+      keyDatesButton.id = 'token-menu-button';
+      keyDatesButton.type = 'button';
+      keyDatesButton.className = 'btn btn-warning navbar-btn';
+      keyDatesButton.setAttribute('data-toggle', 'modal');
+      keyDatesButton.setAttribute('data-target', '#key-dates-modal');
+      keyDatesButton.innerText = 'My Late Tokens';
+
+      var navbarRight = document.querySelector('.nav.navbar-nav.navbar-right');
+      var listItem = document.createElement('li');
+      listItem.appendChild(keyDatesButton);
+      navbarRight.appendChild(listItem);
+
+      var keyDatesModal = `
+        <div id="key-dates-modal" class="modal fade" role="dialog">
+          <div class="modal-dialog modal-md" style="overflow-y: scroll; max-height:85%; margin-top: 50px; margin-bottom:50px;">
+            <div class="modal-content">
+              <div class="modal-header">
+                <p class="lead">My Late Tokens</p>
+              </div>
+              <div class="modal-body">
+                <p>
+                  Select one of your avalible tokens to extend this assignments due date
+                </p>
+
+                <div class="row" style="margin-bottom: 10px;">
+                  <div class="col-xs-8">
+                  <p>example_token</p>
+                  </div>
+                  <div class="col-xs-4 text-right">
+                  <button type="button" class="btn btn-primary">Use</button>                
+                  </div>
+                </div>
+                <div class="row" style="margin-bottom: 10px;">
+                  <div class="col-xs-8">
+                  <p>example_token_2</p>
+                  </div>
+                  <div class="col-xs-4 text-right">
+                  <button type="button">Use</button>
+                  </div>
+                </div>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', keyDatesModal);
+
+      document.getElementById("token-menu-button").addEventListener("click", function() {
+        fetch('https://opendsa-lti.localhost.devcom.vt.edu/epg_broker/get_tokens', {
+          method: 'GET',
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Raw API response:", data); // Log the entire response
+          if (data.status === 'success') {
+            console.log("External API response:", data.data);
+          } else {
+            console.error("Error:", data.message);
+          }
+        })
+        .catch(error => console.error("Request failed:", error));
+      });
+    }
+
+  </script>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <p class="navbar-text">
+          <span id="countdown-timer" 
+            due-date=<%= @due_date %>
+            open-date=<%= @open_date %>
+            close-date=<%= @close_date %>
+          </span>
+        </p>
+
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <!-- The "Key Dates" button will be dynamically added here -->
+        </ul>
+      </div>
+    </div>
+
+  </nav>
+</body>
+</html>
+
+
