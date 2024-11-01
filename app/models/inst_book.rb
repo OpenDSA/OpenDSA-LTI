@@ -131,18 +131,21 @@ class InstBook < ApplicationRecord
   end
 
   # ---------------------------------------------------------------------------------
-  #  extract data from avmetadata and inlineav directives from opendsa/rst for SPLICE
+  #  extract data/keyword from avmetadata, avembed and inlineav directives from opendsa/rst/ for SPLICE catalog
 
   def extract_av_data_from_rst
     av_data = {}
-    lang = JSON.parse(self.options)['lang'] || 'en'
+    parsed_options = parse_json_options(self.options)
+    lang = parsed_options['lang'] || 'en' 
     rst_folder = File.join('public', 'OpenDSA', 'RST', lang)
+  
+    # Check if rst_folder to prevent Dir.glob from failing
+    return av_data unless Dir.exist?(rst_folder)
 
     Dir.glob("#{rst_folder}/**/*.rst").each do |rst_file_path|
       module_name = File.basename(rst_file_path, ".rst")
       av_data[module_name] = { avmetadata: {}, inlineav: [], avembed: [] }
       in_metadata_block = false
-
       File.foreach(rst_file_path) do |line|
         if line.strip == '.. avmetadata::'
           in_metadata_block = true
@@ -160,7 +163,6 @@ class InstBook < ApplicationRecord
         end
       end
     end
-
     av_data
   end
 
@@ -187,7 +189,6 @@ class InstBook < ApplicationRecord
 
 
   # --------------------------------------------------------------------------------  
-
   # FIXME: shouldn't this method be removed? It appears to be out-dated?
   # FIXME: the real code is now in views/inst_books/show.json.builder
   def to_builder
@@ -318,6 +319,31 @@ class InstBook < ApplicationRecord
   def tree_view?
     tree_view = "\"include_tree_view\":true"
     return self.options.include? tree_view
+  end
+
+  private
+
+  def extract_metadata_from_line(line)
+    key, value = line.strip.split(': ', 2)
+    [key[1..].to_sym, value] if key && value
+  end
+
+  def extract_inlineav_name_from_line(line)
+    match = line.match(/\.\. inlineav:: (\w+)/)
+    match[1] if match 
+  end
+
+  def extract_avembed_data_from_line(line)
+    match = line.match(/\.\. avembed:: Exercises\/\w+\/(\w+)\.html/)
+    match[1] if match 
+  end
+
+  # helper method for extract_av_data_from_rst(), safely attempts to parse a JSON string, returning an empty hash as fallback
+  def parse_json_options(json_str)
+    return {} if json_str.nil? # Ensures nil input returns an empty hash
+    JSON.parse(json_str || '{}') 
+  rescue JSON::ParserError
+    {} 
   end
 
 end

@@ -49,6 +49,8 @@ class CourseOffering < ApplicationRecord
     dependent: :destroy
   has_many :users, through: :course_enrollments
 
+  has_many :lti_launches, inverse_of: :course_offering, dependent: :destroy  #adding relationship with LtiLaunch
+
   accepts_nested_attributes_for :term
 
   scope :active, -> { where(archived: false) }

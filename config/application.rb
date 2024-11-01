@@ -37,6 +37,7 @@ module OpenDSA
     #end
 
     config.lti_claims_and_scopes = config_for(:lti_claims_and_scopes)
+    puts "LTI Claims and Scopes loaded: #{config.lti_claims_and_scopes.inspect}"
     config.caliper_store = config_for(:caliper_store)
   end
 end

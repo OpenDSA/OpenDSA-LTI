@@ -805,7 +805,7 @@
 	  }
     })
     $('.form-control').each(function(index, element) {
-      if(!(/^\d\d\/\d\d\/\d\d\d\d \d\d:\d\d ([AaPp][Mm])$/.test($(element).val())) && $(element).val() != 'undefined') {
+      if(!(/^\d\d\/\d\d\/\d\d\d\d \d?\d:\d\d ([AaPp][Mm])$/.test($(element).val())) && $(element).val() != 'undefined') {
         messages.push('Dates must be in the format YYYY/MM/DD HH:MM SOURCE: ' + $(element).attr('data-source'));
         return false;
       }
