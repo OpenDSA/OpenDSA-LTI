@@ -308,6 +308,7 @@ class CourseOfferingsController < ApplicationController
       else
         err_string = 'There was a problem while creating the course offering.'
         url = url_for new_course_offerings_path(notice: err_string)
+
       end
     end
 

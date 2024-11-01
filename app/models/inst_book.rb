@@ -141,12 +141,11 @@ class InstBook < ApplicationRecord
   
     # Check if rst_folder to prevent Dir.glob from failing
     return av_data unless Dir.exist?(rst_folder)
-  
+
     Dir.glob("#{rst_folder}/**/*.rst").each do |rst_file_path|
       module_name = File.basename(rst_file_path, ".rst")
       av_data[module_name] = { avmetadata: {}, inlineav: [], avembed: [] }
       in_metadata_block = false
-  
       File.foreach(rst_file_path) do |line|
         if line.strip == '.. avmetadata::'
           in_metadata_block = true
@@ -164,12 +163,32 @@ class InstBook < ApplicationRecord
         end
       end
     end
-  
     av_data
-  end  
+  end
+
+  def get_clone(currentUser)
+    return clone(currentUser)
+  end
+  private
+
+  def extract_metadata_from_line(line)
+    key, value = line.strip.split(': ', 2)
+    [key[1..].to_sym, value] if key && value
+  end
+
+  def extract_inlineav_name_from_line(line)
+    match = line.match(/\.\. inlineav:: (\w+)/)
+    match[1] if match # Returns the inlineav short name or nil if no match
+  end
+
+  def extract_avembed_data_from_line(line)
+    match = line.match(/\.\. avembed:: Exercises\/\w+\/(\w+)\.html/)
+    match[1] if match # Returns the 3rd level word or nil if no match
+  end
+
+
 
   # --------------------------------------------------------------------------------  
-  
   # FIXME: shouldn't this method be removed? It appears to be out-dated?
   # FIXME: the real code is now in views/inst_books/show.json.builder
   def to_builder
@@ -271,6 +290,7 @@ class InstBook < ApplicationRecord
     inst_chapters.each do |chapter|
       inst_chapter = chapter.clone(b)
     end
+
     return b
   end
 

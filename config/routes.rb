@@ -109,6 +109,12 @@ OpenDSA::Application.routes.draw do
 
   get '/course_offerings/indAssigment/assignmentList/student/exercise' => 'course_offerings#ind_assigment', as: :ind_assigment
 
+
+  #textbook routes
+  post '/textbooks' => 'textbooks#create', as: :create_textbooks
+  post '/textbooks/compile/:course_offering_id' => 'textbooks#compile', as: :compile_textbooks
+
+
   # All of the routes anchored at /gym
   scope :gym do
     # The top-level gym route
