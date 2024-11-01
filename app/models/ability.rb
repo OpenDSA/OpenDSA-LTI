@@ -98,7 +98,7 @@ class Ability
       end
 
       can [:create, :read], InstBook
-      can [:create, :read], Term
+      can [:read], Term
       can [:create, :read], LatePolicy
       can [:update, :destroy], InstBook, user_id: user.id
       can [:create, :read], Organization
