@@ -114,6 +114,7 @@ OpenDSA::Application.routes.draw do
   post '/textbooks' => 'textbooks#create', as: :create_textbooks
   post '/textbooks/compile/:course_offering_id' => 'textbooks#compile', as: :compile_textbooks
 
+  get '/documentation/hecvat' => 'documentation#hecvat_download', as: :hecvat_download
 
   # All of the routes anchored at /gym
   scope :gym do
