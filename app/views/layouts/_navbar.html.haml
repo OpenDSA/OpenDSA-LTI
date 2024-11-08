@@ -32,6 +32,20 @@
         %li
           %a{href: home_guide_path}
             Instructor Guides
+        %li.dropdown
+          %a.dropdown-toggle{ href: organizations_path,
+              data: { toggle: 'dropdown' }, value: 'System Documentation' }
+            System Documentation
+          %ul.dropdown-menu
+            %li
+              .yamm-content
+                %ul.list-unstyled
+                  %li
+                    %a{href:"https://opendsa.readthedocs.io/"}
+                      OpenDSA Official documentation
+                  %li
+                    -# %strong HECVAT3
+                    = link_to 'HECVAT3', hecvat_download_path
 
       %ul.nav.navbar-nav.navbar-right.nav-top
         - if user_signed_in?
