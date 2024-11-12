@@ -25,6 +25,8 @@
                     - if user_signed_in? && (current_user.global_role.is_instructor? or current_user.global_role.is_admin? or current_user.global_role.is_researcher?)
                       %li
                         %strong= link_to 'Create new course', new_course_offerings_path
+                      %li
+                        %strong= link_to 'Create new textbook', new_textbook_path
           - if (current_user.global_role.is_instructor? or current_user.global_role.is_admin? or current_user.global_role.is_researcher?)
             %li
               %a{href: configurations_book_path}

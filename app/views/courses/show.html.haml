@@ -5,7 +5,8 @@
   %small= @term.display_name
 - if @course_offerings && @course_offerings.any?
   %p
-    - @course_offerings.each_with_index do |offering, i|
+    - @course_offerings.filter_map.with_index do |offering, i|
+      -# - next unless offering.lms_instance.url != "TEXTBOOK"
       - if i > 0
         %br/
       %strong= offering.display_name
@@ -48,37 +49,39 @@
           %tr
             %th Book Title
             %th Canvas Course
-            %th Textbook
-        %tbody#odsa
-          -# - @inst_book = offering.inst_books
-          -# = render @inst_book
-          %td= offering.display_name
-          %td
-          %td
-            - course = Course.find_by(id:offering.course_id)
-            - organization = Organization.find_by(id:course.organization_id)
-            - term = Term.find_by(id:offering.term_id)
-            = ENV["config_api_link"].gsub("/api/configure/","/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/index.html")
-          %td
-            - inst_book = InstBook.find_by(course_offering_id:offering.id)
-            - form_name = 'compile_book_' + inst_book.id.to_s
-            = form_tag '/inst_books/'+ inst_book.id.to_s , data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
-              = submit_tag "Compile Textbook", name: form_name, class: "btn btn-primary", title: 'Compile book confirmation.', data: {confirm: "The book compilation process will regenerate the book pages on the OpenDSA server. Assignments due dates and points in Canvas course won't be affected by this action. Do you want to continue?"}
-              .col-xs-1
-                %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#generate-course-modal' } }
-              #generate-course-modal.modal.fade{role: 'dialog', tabindex: '-1' }
-                .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
-                  .modal-content
-                    .modal-header
-                      %p.lead Compile Textbook
-                    .modal-body
-                      %p
-                        When you click this button the OpenDSA book will be generated as an independent resource.
-                        This book will have no LMS ties such as Canvas integration.
-                        -# If this is the first time the course is being generated, all OpenDSA chapters and modules
-                        -# will be created in the course. If you are re-generating the Canvas course, this process
-                        -# will update the assignments points and due dates as well as create new Canvas assignments
-                        -# and modules for any new chapters and modules added to your course offering's OpenDSA book configuration.
+            %th
+            %th
+            %th
+        - if offering.lms_instance.url != "TEXTBOOK"
+          %tbody#odsa
+            - @inst_book = offering.inst_books
+            = render @inst_book
+        - else
+          %tbody#odsa
+            %td= offering.display_name
+            %td
+            %td
+              - course = Course.find_by(id:offering.course_id)
+              - organization = Organization.find_by(id:course.organization_id)
+              - term = Term.find_by(id:offering.term_id)
+              = ENV["config_api_link"].gsub("/api/configure/","/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/index.html")
+            %td
+              - inst_book = InstBook.find_by(course_offering_id:offering.id)
+              - form_name = 'compile_book_' + inst_book.id.to_s
+              = form_tag '/inst_books/'+ inst_book.id.to_s , data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'compile_book'; return true;" do
+                = submit_tag "Compile Textbook", name: form_name, class: "btn btn-primary", title: 'Compile book confirmation.', data: {confirm: "The book compilation process will regenerate the book pages on the OpenDSA server. Assignments due dates and points in Canvas course won't be affected by this action. Do you want to continue?"}
+                .col-xs-1
+                  %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#generate-course-modal' } }
+                #generate-course-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+                  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+                    .modal-content
+                      .modal-header
+                        %p.lead Compile Textbook
+                      .modal-body
+                        %p
+                          When you click this button the OpenDSA book will be generated as an independent resource.
+                          This book will have no LMS ties such as Canvas integration.
+
 -else
 
   %h2 Offerings

@@ -113,6 +113,7 @@ OpenDSA::Application.routes.draw do
   #textbook routes
   post '/textbooks' => 'textbooks#create', as: :create_textbooks
   post '/textbooks/compile/:course_offering_id' => 'textbooks#compile', as: :compile_textbooks
+  get '/textbooks/new' => 'textbooks#new', as: :new_textbook
 
   get '/documentation/hecvat' => 'documentation#hecvat_download', as: :hecvat_download
 

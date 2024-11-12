@@ -1,5 +1,8 @@
 class TextbooksController < ApplicationController
 
+  def new
+
+  end
   def create
     # Textbooks are CourseOffering with no LMS interaction
     # Hence the LMS instance TEXTBOOK is used for all CourseOfferings
