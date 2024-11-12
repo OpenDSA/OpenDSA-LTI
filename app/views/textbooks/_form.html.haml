@@ -1,0 +1,194 @@
+.row
+  .col-xs-9.alert-msg#alerts{style: 'display: none;'}
+.form-horizontal
+  .form-group
+    .col-xs-offset-2.col-xs-3
+      %h4
+        View the 
+        %a{href: home_guide_path}
+          instructor's guide
+        for more information.
+      %h4.text-danger All fields are required
+
+  .form-group
+    = label_tag :organization_select, 'Organization:', class: 'control-label col-xs-1'
+    .col-xs-3
+      = collection_select nil, nil, Organization.all.order(:name), :id, :name, { prompt: 'Select', selected: nil },
+      { id: 'organization-select', class: 'form-control' }
+    .col-xs-1
+      = link_to admin_organizations_path, title: "Create new organization", class: 'btn btn-default', :target => "_blank" do
+        %i.glyphicon.glyphicon-new-window
+
+  .form-group
+    = label_tag :course_select, 'Course:', class: 'control-label col-xs-1'
+    .col-xs-3
+      = collection_select nil, nil, Course.all.order(:slug, :name), :id, :display_name, { prompt: 'Select', selected: nil },
+      { id: 'course-select', class: 'form-control' }
+    .col-xs-1
+      = link_to admin_courses_path, title: "Create new course", class: 'btn btn-default', :target => "_blank" do
+        %i.glyphicon.glyphicon-new-window
+
+  .form-group
+    = label_tag :term_select, 'Term:', class: 'control-label col-xs-1'
+    .col-xs-3
+      = collection_select nil, nil, Term.on_or_future.order(:starts_on), :id, :display_name, { prompt: 'Select', selected: nil },
+      { id: 'term-select', class: 'form-control' }
+    .col-xs-1
+      = link_to admin_terms_path, title: "Create new term", class: 'btn btn-default', :target => "_blank" do
+        %i.glyphicon.glyphicon-new-window
+
+  .form-group
+    = label_tag :name, 'Label', class: 'control-label col-xs-2'
+    .col-lg-4.col-md-4.col-xs-4
+      = text_field_tag :name, nil, id: 'label', class: 'form-control', maxlength: 25,
+        placeholder: 'e.g. TR 10:00am'
+      %small.col-xs-11.text.text-warning
+        Write a label for each course section.
+
+  .form-group
+    = label_tag :inst_book_select, 'Book Instance:', class: 'control-label col-xs-1'
+    .col-xs-3
+      = collection_select nil, nil, InstBook.template.order(:title, :created_at), :id, :title_with_created_at, { prompt: 'Select', selected: nil },
+      { id: 'inst-book-select', class: 'form-control' }
+    .col-xs-1
+      = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default', :target => "_blank" do
+        %i.glyphicon.glyphicon-new-window
+
+  .form-group
+    .col-xs-offset-2.col-xs-2
+      - textbook_lms_instance = LmsInstance.find_by(url: "TEXTBOOK")
+      %button#btn-gen-textbook.btn.btn-primary{disabled:textbook_lms_instance.blank?} Create Non LMS Textbook
+      %small.col-xs-11.text.text-warning
+        = textbook_lms_instance.blank? ? 'Textbook LMS Instance not found' : ''
+
+
+#lms-instance-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead LMS Instances Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th URL
+          %tbody
+            - LmsInstance.all.each do |lms_instance|
+              %tr
+                %td
+                  = lms_instance.id
+                %td
+                  = lms_instance.url
+
+#org-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Organization Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Name
+            %th Abbreviation
+          %tbody
+            - Organization.all.each do |org|
+              %tr
+                %td
+                  = org.id
+                %td
+                  = org.name
+                %td
+                  = org.abbreviation
+
+#course-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Course Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Name
+            %th Organization
+          %tbody
+            - Course.all.each do |course|
+              %tr
+                %td
+                  = course.id
+                %td
+                  = course.display_name
+                %td
+                  = course.organization.name
+
+#term-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Term Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Name
+            %th Starts on
+            %th Ends on
+          %tbody
+            - Term.on_or_future.each do |term|
+              %tr
+                %td
+                  = term.id
+                %td
+                  = term.display_name
+                %td
+                  = term.starts_on
+                %td
+                  = term.ends_on
+
+#late-policy-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Late Policy Information
+        Late days are the number of days (after deadline) during which the penalty percent will be applied.
+        After late days, student submissions will be recorded but they will not be graded.
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Name
+            %th Late days
+            %th Penalty percent
+          %tbody
+            - LatePolicy.all.each do |late_policy|
+              %tr
+                %td
+                  = late_policy.id
+                %td
+                  = late_policy.name
+                %td
+                  = late_policy.late_days
+                %td
+                  = late_policy.late_percent
+
+#inst-book-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
+  .modal-dialog.modal-md{ style: 'overflow-y: scroll; max-height:85% margin-top: 50px; margin-bottom:50px;' }
+    .modal-content
+      .modal-header
+        %p.lead Book Instances Information
+      .modal-body
+        %table.table
+          %thead
+            %th Id
+            %th Title
+            %th Description
+          %tbody
+            - InstBook.template.each do |inst_book|
+              %tr
+                %td
+                  = inst_book.id
+                %td
+                  = inst_book.title
+                %td
+                  = inst_book.desc
