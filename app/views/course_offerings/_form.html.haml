@@ -9,7 +9,6 @@
           instructor's guide
         for more information.
       %h4.text-danger All fields are required
-      %h4.text-danger Note: LMS fields are not required to create textbooks
 
   / .form-group
   /   = label_tag :name, 'Canvas course Name', class: 'control-label col-xs-2'
@@ -109,13 +108,6 @@
   .form-group
     .col-xs-offset-2.col-xs-2
       %button#btn-submit-co.btn.btn-primary Create New Course Offering
-
-  .form-group
-    .col-xs-offset-2.col-xs-2
-      - textbook_lms_instance = LmsInstance.find_by(url: "TEXTBOOK")
-      %button#btn-gen-textbook.btn.btn-primary{disabled:textbook_lms_instance.blank?} Create Non LMS Textbook
-      %small.col-xs-11.text.text-warning
-        = textbook_lms_instance.blank? ? 'Textbook LMS Instance not found' : ''
 
 
 #lms-instance-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }
