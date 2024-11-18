@@ -108,35 +108,62 @@
     }
 
   function useToken(tokenId) {
+    var TP = window.ODSA.TP;
+
     if (confirm('Are you sure you want to use this token?')) {
-      // fetch('https://opendsa-lti.localhost.devcom.vt.edu/epg_broker/tokens/redeem_token', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-      //   },
-      //   body: JSON.stringify({ token_id: tokenId })
-      // })
-      // .then(response => response.json())
-      // .then(data => {
-      //   if (data.status === "success") {
-      //     alert('Token used successfully!');
-      //     $('#tokens-modal').modal('hide');
-      //     // Optionally refresh the page or update the deadline display
-      //     location.reload();
-      //   } else {
-      //     alert('Error: ' + data.message);
-      //   }
-      // })
-      // .catch(error => {
-      //   console.error('Error using token:', error);
-      //   alert('Error using token. Please try again.');
-      // });
+      fetch('https://opendsa-lti.localhost.devcom.vt.edu/epg_broker/tokens/redeem_token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ 
+          token_id: tokenId, 
+          inst_chapter_module_id: TP.instChapterModuleId, 
+          user_id: TP.toParams.launch_params.user_id
+        })
+        
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        if (data.status === "success") {
+          alert('Token used successfully!');
+          $('#tokens-modal').modal('hide');
+          // Optionally refresh the page or update the deadline display
+          location.reload();
+        } else {
+          alert('Error: ' + data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error using token:', error);
+        alert('Error using token. Please try again.');
+      });
       
       location.reload();
 
     }
   }
+
+  // Access TP object
+  var TP = window.ODSA.TP;
+  
+  // Examples of accessing TP properties:
+  if (TP.outcomeService) {
+    // Handle outcome service case
+    console.log(TP.exerciseName);
+    console.log(TP.instBookSectionExerciseId);
+  }
+
+  // Access module info if available
+  if (TP.moduleTitle) {
+    console.log(TP.moduleTitle);
+    console.log(TP.instModuleId);
+  }
+
+  // Access launch parameters
+  console.log(TP.toParams.launch_params);
 
   </script>
 </head>

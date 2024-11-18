@@ -1,8 +1,9 @@
 OpenDSA::Application.routes.draw do
   namespace :epg_broker do
     get 'tokens/get_tokens'
-    get 'tokens/redeem_token'
+    post 'tokens/redeem_token'
   end
+  
   root 'home#index'
 
   post 'lti/launch'

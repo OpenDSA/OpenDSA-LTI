@@ -33,17 +33,17 @@ class StudentExtension < ApplicationRecord
     student_extension.user = student
     student_extension.inst_chapter_module = inst_chapter_module
 
-    if opts['opening_date'].present?
-      student_extension.opening_date =
-        DateTime.strptime(opts['opening_date'].to_s, '%Q')
+    if opts['open_date'].present?
+      student_extension.open_date =
+        DateTime.strptime(opts['open_date'].to_s, '%Q')
     end
-    if opts['soft_deadline'].present?
-      student_extension.soft_deadline =
-        DateTime.strptime(opts['soft_deadline'].to_s, '%Q')
+    if opts['due_date'].present?
+      student_extension.due_date =
+        DateTime.strptime(opts['due_date'].to_s, '%Q')
     end
-    if opts['hard_deadline'].present?
-      student_extension.hard_deadline =
-        DateTime.strptime(opts['hard_deadline'].to_s, '%Q')
+    if opts['close_date'].present?
+      student_extension.close_date =
+        DateTime.strptime(opts['close_date'].to_s, '%Q')
     end
 
     student_extension.time_limit = opts['time_limit'] if opts['time_limit'].present?
