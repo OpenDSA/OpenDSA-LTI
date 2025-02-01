@@ -186,6 +186,7 @@
     };
 
     handle_generate_textbook = function () {
+      console.log("working on standalone textbook")
     var organization_id, course_id, term_id, label, inst_book_id, fd, messages, url;
     messages = check_completeness(true);
     if (messages.length !== 0) {
