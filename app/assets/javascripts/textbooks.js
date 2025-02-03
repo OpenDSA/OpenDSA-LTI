@@ -23,6 +23,7 @@
       });
 
       $('#btn-gen-textbook').click(function () {
+        console.log("here")
         $(this).prop('disabled', true);
         return handle_generate_textbook();
       });
