@@ -67,7 +67,7 @@
               - if ENV["opendsa_branch"] == "staging"
                 = link_to "Textbook URL", "https://opendsax.cs.vt.edu/ODSA/" + "/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/"
               - elsif ENV["opendsa_branch"] == "master"
-                = link_to "Textbook URL", "https://opendsax.cs.vt.edu/ODSA/" + "/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/"
+                = link_to "Textbook URL", "https://opendsa-server.cs.vt.edu/ODSA/" + "/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/"
               - else
                 = link_to "Textbook URL", ENV["config_api_link"].gsub("/api/configure/","/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/index.html")
             %td
