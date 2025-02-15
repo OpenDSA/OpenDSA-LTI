@@ -53,6 +53,7 @@ OpenDSA::Application.routes.draw do
   get 'main' => 'home#index'
   get 'home/about'
   get 'home/license'
+  get 'home/official'
   get 'home/contact'
   get 'home/guide'
   get 'home/books'

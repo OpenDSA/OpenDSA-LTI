@@ -5,11 +5,13 @@
         Build your
         %strong knowledge of Data Structures
         through visualizations and practice!
-    .pitch.col-md-4.col-md-offset-8
-      %p
-        Number of exercises practiced till
-        %strong NOW!
-      .stat-count
+
+  -#  .pitch.col-md-4.col-md-offset-8
+  -#   %p
+  -#     Number of exercises practiced till
+  -#     %strong NOW!
+  -#   .stat-count
+
   .row
     .pitch.col-md-4
       %p
@@ -55,9 +57,9 @@
 
   .col-md-4
     %i.fa.fa-users.fa-5x{ style: 'color: #efb04f;' }
-    %h2 Have to Be a Student?
+    %h2 Do I Have to Be Enrolled?
     %p
-      No, you do not have to be a student in a course to use OpenDSA.
+      No, you do not have to be a student enrolled in a course to use OpenDSA.
       OpenDSA provides comprehensive support for teachers who want
       to use our materials for their textbook or homeworks.
       But we also support independent learners who are just practicing
@@ -99,18 +101,23 @@
           https://github.com/OpenDSA
     %p
       Contributions of new materials are welcome!
-      For more information on contributing, see
-      = succeed '.' do
-        %a{ href: 'https://github.com/OpenDSA/OpenDSA/wiki' }
-          https://github.com/OpenDSA/OpenDSA/wiki
+      For more information on contributing, please contact us!
+
     %p
       Contact us at
       %a{ href: 'mailto:opendsa@cs.vt.edu' }
         opendsa@cs.vt.edu
 
     %p
-      The OpenDSA Project is supported by the National Science
+      The OpenDSA Project was initially created with support by the National Science
       Foundation.
       = link_to "See more.", home_support_path
       = link_to image_tag("nsf1.gif", :alt => "NSF Logo", :width => '64'),
                 "http://nsf.gov/"
+
+  -#    %p
+  -#      Contributions of new materials are welcome!
+  -#      For more information on contributing, please contact us!
+  -#      = succeed '.' do
+  -#        %a{ href: 'https://github.com/OpenDSA/OpenDSA/wiki' }
+  -#          https://github.com/OpenDSA/OpenDSA/wiki
