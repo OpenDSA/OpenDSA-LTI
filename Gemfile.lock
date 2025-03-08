@@ -404,7 +404,7 @@ GEM
       activesupport (>= 5.2.1)
       i18n
       polyamorous (= 2.3.2)
-    rdoc (6.2.1)
+    rdoc (6.3.2)
     redcarpet (3.5.0)
     remotipart (1.4.4)
     representable (3.0.4)
