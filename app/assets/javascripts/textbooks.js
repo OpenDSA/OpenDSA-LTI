@@ -192,7 +192,7 @@
     messages = check_completeness(true);
     if (messages.length !== 0) {
       form_alert(messages);
-      $('#btn-gen-textbook').prop('disabled', false);
+      $('#btn-gen-textbook').attr('disabled', false);
       return;
     }
     organization_id = $('#organization-select').val();
