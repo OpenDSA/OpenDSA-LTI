@@ -64,12 +64,14 @@
               - course = Course.find_by(id:offering.course_id)
               - organization = Organization.find_by(id:course.organization_id)
               - term = Term.find_by(id:offering.term_id)
-              - if ENV["opendsa_branch"] == "staging"
-                = link_to "Textbook URL", "https://opendsax.cs.vt.edu/ODSA/" + "/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/"
+              - route = "Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/".gsub(" ","_")
+              - if ENV["host_url"].include? "localhost"
+                - route = ENV["host_url"].gsub("-lti","") +"/" + route + "index.html"
+              - elsif ENV["opendsa_branch"] == "staging"
+                - route = "https://opendsax.cs.vt.edu/ODSA/" + route
               - elsif ENV["opendsa_branch"] == "master"
-                = link_to "Textbook URL", "https://opendsa-server.cs.vt.edu/ODSA/" + "/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/"
-              - else
-                = link_to "Textbook URL", ENV["config_api_link"].gsub("/api/configure/","/Books/#{organization.slug}/#{course.slug}/#{term.slug}/#{offering.label}/html/index.html")
+                - route = "https://opendsa-server.cs.vt.edu/ODSA/" + route
+              = link_to "Textbook URL", route
             %td
               - inst_book = InstBook.find_by(course_offering_id:offering.id)
               - form_name = 'compile_book_' + inst_book.id.to_s
