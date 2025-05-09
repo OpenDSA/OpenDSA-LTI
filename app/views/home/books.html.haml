@@ -21,13 +21,19 @@
   always be used when OpenDSA is being used for graded class
   assignments.
   OpenDSA can also be configured to generate stand-alone HTML pages.
-  In this format, users can view the content, and work the exercises.
-  But no scoring information is remembered.
+  In this format, users can view the content and work the exercises,
+  but no scoring information is remembered.
   This format is appropriate for an eTextbook used strictly as
   supplemental reading material.
 
 %p
-  Canvas versions (you will need to register at
+  Besides eTextbooks, materials can also be configured either as
+  slides for in-class presentation or as notes that contain the slides
+  content with annotations. Examples of these are shown in the
+  supplemental section below.
+
+%p
+  Canvas versions (you will need to register for a free account at
   %a{ href: 'http://canvas.instructure.com', target: "_blank" }
     http://canvas.instructure.com
   to view):
@@ -67,7 +73,7 @@
   <br/>
 
 %p
-  Supplemental reading versions:
+  Supplemental reading versions and course slides/notes (directly accessible HTML pages):
 
 %ul
   %li
@@ -94,7 +100,7 @@
   %li
     - url = @config_url + '/OpenDSA/Books/CS3notes/index.html'
     %a{ href: url, target: "_blank" }
-      Coursenotes form of presentation slides for "CS3" course on Data Structures. 
+      Coursenotes form of presentation slides for "CS3" course on Data Structures.
 
   %li
     - url = @config_url + '/OpenDSA/Books/CS4104/index.html'
@@ -102,10 +108,9 @@
       A senior-level course on Algorithm Design and Analysis.
 
   %li
-    - url = @config_url + '/OpenDSA/Books/Everything/index.html'
+    - url = @config_url + '/OpenDSA/Books/Catalog/index.html'
     %a{ href: url, target: "_blank" }
-      All current OpenDSA content
-    related to Data Structures and Algorithms.
+      All current stable OpenDSA content.
 
   %li
     - url = @config_url + '/OpenDSA/Books/PL/index.html'
@@ -113,9 +118,19 @@
       Programming Languages
 
   %li
-    - url = @config_url + '/OpenDSA/Books/PIFLAS23/index.html'
+    - url = @config_url + '/OpenDSA/Books/PIFLA/index.html'
     %a{ href: url, target: "_blank" }
-      Formal Languages and Automata
+      A textbook for Formal Languages and Automata couses that uses Programmed Instruction pedagogy
+
+  %li
+    - url = @config_url + '/OpenDSA/Books/FLAslides/index.html'
+    %a{ href: url, target: "_blank" }
+      Presentation slides for a Formal Languages and Automata course
+
+  %li
+    - url = @config_url + '/OpenDSA/Books/FLAnotes/index.html'
+    %a{ href: url, target: "_blank" }
+      Coursenotes form of presentation slides a Formal Languages and Automata course
 
 %p
   WARNING TO INSTRUCTORS: Some instructors like to give their students
