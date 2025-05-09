@@ -24,6 +24,9 @@ module Lti13::LoginInitiationsHelper
       # else
       #   lti_tool_launches_url(lms_instance)
       # end
-      lti13_launches_url
+      # lti13_launches_url
+      redirect_uri = lti13_launches_url
+      puts "Generated Redirect URI: #{redirect_uri}"
+      redirect_uri
     end
   end

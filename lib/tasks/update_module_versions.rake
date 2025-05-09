@@ -7,7 +7,7 @@ task :update_module_versions => :environment do
     REFERENCE_CONFIGS = [
         'Everything',
         'PL',
-        'PIFLAS23',
+        'PIFLA',
         'SWDesignAndDataStructs',
         'IntroToSoftwareDesign'
     ]

@@ -4,18 +4,11 @@
   .form-group
     .col-xs-offset-2.col-xs-3
       %h4
-        View the 
+        View the
         %a{href: home_guide_path}
           instructor's guide
         for more information.
       %h4.text-danger All fields are required
-
-  / .form-group
-  /   = label_tag :name, 'Canvas course Name', class: 'control-label col-xs-2'
-  /   .col-lg-5.col-md-5.col-xs-5
-  /     = text_field_tag :lms_course_name, nil, id: 'lms-course-code', class: 'form-control', maxlength: 25
-  /     %small.col-xs-11.text.text-warning
-  /       Canvas course name.
 
   .form-group
     = label_tag :organization_select, 'Organization:', class: 'control-label col-xs-1'
@@ -34,8 +27,6 @@
     .col-xs-1
       = link_to admin_courses_path, title: "Create new course", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
-    / .col-xs-1
-    /   %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#course-help-modal' } }
 
   .form-group
     = label_tag :term_select, 'Term:', class: 'control-label col-xs-1'
@@ -45,8 +36,6 @@
     .col-xs-1
       = link_to admin_terms_path, title: "Create new term", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
-    / .col-xs-1
-    /   %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#term-help-modal' } }
 
   .form-group
     = label_tag :name, 'Label', class: 'control-label col-xs-2'
@@ -56,17 +45,6 @@
       %small.col-xs-11.text.text-warning
         Write a label for each course section.
 
-  / .form-group
-  /   = label_tag :late_policy_select, 'Late Policy:', class: 'control-label col-xs-1'
-  /   .col-xs-3
-  /     = collection_select nil, nil, LatePolicy.all, :id, :name, { prompt: 'Select', selected: nil },
-  /     { id: 'late-policy-select', class: 'form-control' }
-  /   .col-xs-1
-  /     = link_to admin_late_policies_path, title: "Create new late policy", class: 'btn btn-default', :target => "_blank" do
-  /       %i.glyphicon.glyphicon-new-window
-  /   .col-xs-1
-  /     %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#late-policy-help-modal' } }
-
   .form-group
     = label_tag :inst_book_select, 'Book Instance:', class: 'control-label col-xs-1'
     .col-xs-3
@@ -75,39 +53,13 @@
     .col-xs-1
       = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
-    / .col-xs-1
-    /   %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#inst-book-help-modal' } }
-
-  .form-group
-    = label_tag :lms_instance_select, 'LMS Instance:', class: 'control-label col-xs-1'
-    .col-xs-3
-      = collection_select nil, nil, LmsInstance.all, :id, :url, { prompt: 'Select', selected: nil },
-      { id: 'lms-instance-select', class: 'form-control' }
-
-  #lms-access-token-group.form-group
-    = label_tag :name, 'LMS access token', class: 'control-label col-xs-2'
-    .col-lg-4.col-md-4.col-xs-4
-      = text_field_tag :lms_access_token, nil, id: 'lms-access-token', class: 'form-control', maxlength: 100, disabled: 'true'
-      %small.col-xs-11.text.text-warning#lms-access-token-desc
-        Your access token allows the OpenDSA application to generate the book instance in your LMS course on your behalf. First, you need to generate LMS access token by following
-        the instructions <a href="https://guides.instructure.com/m/4214/l/40399-how-do-i-obtain-an-api-access-token-for-an-account" target="_blank">here</a>. Second, go to the OpenDSA
-        = link_to "LMS Accesses", admin_lms_accesses_path, :target => "_blank"
-        page to add or update your access token.
-    #lms-access-update-btn.col-xs-1
-      = link_to admin_lms_accesses_path, title: "Update your access token for the selected LMS instance", class: 'btn btn-default', :target => "_blank" do
-        %i.glyphicon.glyphicon-new-window
-    #lms-access-token-check.col-xs-1.fa.fa-check
-
-  .form-group
-    = label_tag :name, 'LMS course Id', class: 'control-label col-xs-2'
-    .col-lg-4.col-md-4.col-xs-4
-      = text_field_tag :lms_course_id, nil, id: 'lms-course-num', class: 'form-control', maxlength: 25
-      %small.col-xs-11.text.text-warning
-        Create a new course at the selected LMS instance and copy the course Id here (e.g. Course Id of https://canvas.instructure.com/courses/1076903 is 1076903).
 
   .form-group
     .col-xs-offset-2.col-xs-2
-      %button#btn-submit-co.btn.btn-primary Create New Course Offering
+      - textbook_lms_instance = LmsInstance.find_by(url: "TEXTBOOK")
+      %button#btn-gen-textbook.btn.btn-primary{disabled:textbook_lms_instance.blank?} Create Non LMS Textbook
+      %small.col-xs-11.text.text-warning
+        = textbook_lms_instance.blank? ? 'Textbook LMS Instance not found' : ''
 
 
 #lms-instance-help-modal.modal.fade{role: 'dialog', tabindex: '-1' }

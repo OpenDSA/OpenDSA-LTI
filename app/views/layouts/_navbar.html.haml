@@ -25,6 +25,8 @@
                     - if user_signed_in? && (current_user.global_role.is_instructor? or current_user.global_role.is_admin? or current_user.global_role.is_researcher?)
                       %li
                         %strong= link_to 'Create new course', new_course_offerings_path
+                      %li
+                        %strong= link_to 'Create new textbook', new_textbook_path
           - if (current_user.global_role.is_instructor? or current_user.global_role.is_admin? or current_user.global_role.is_researcher?)
             %li
               %a{href: configurations_book_path}
@@ -32,6 +34,20 @@
         %li
           %a{href: home_guide_path}
             Instructor Guides
+        %li.dropdown
+          %a.dropdown-toggle{ href: organizations_path,
+              data: { toggle: 'dropdown' }, value: 'System Documentation' }
+            System Documentation
+          %ul.dropdown-menu
+            %li
+              .yamm-content
+                %ul.list-unstyled
+                  %li
+                    %a{href:"https://opendsa.readthedocs.io/"}
+                      OpenDSA Official documentation
+                  %li
+                    -# %strong HECVAT3
+                    = link_to 'HECVAT3', hecvat_download_path
 
       %ul.nav.navbar-nav.navbar-right.nav-top
         - if user_signed_in?

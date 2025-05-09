@@ -10,6 +10,13 @@
 #  consumer_key    :string(255)
 #  consumer_secret :string(255)
 #  organization_id :bigint
+#  client_id        :string
+#  private_key      :text
+#  public_key       :text
+#  keyset_url       :string
+#  oauth2_url       :string
+#  platform_oidc_auth_url :string
+#  issuer           :string
 #
 # Indexes
 #
@@ -29,6 +36,7 @@ class LmsInstance < ApplicationRecord
 
   validates_presence_of :lms_type, :url, :organization
   validates :url, uniqueness: true
+  validates :client_id, :issuer, :keyset_url, :platform_oidc_auth_url, :oauth2_url, presence: true, if: -> { lms_type&.name == "LTI 1.3" }
 
   def self.get_oauth_creds(key)
     lms_instance = LmsInstance.where(consumer_key: key).first
@@ -63,6 +71,14 @@ class LmsInstance < ApplicationRecord
     jwk
   end
 
+    # Determine LTI version
+  def lti_version
+    if client_id.present? && oauth2_url.present?
+      'LTI-1p3'
+    else
+      'LTI-1p0'
+    end
+  end
 
   #~ Private instance methods .................................................
 end

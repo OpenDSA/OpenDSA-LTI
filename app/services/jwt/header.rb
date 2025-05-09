@@ -1,15 +1,20 @@
-# module for handling encode/decode of JWT's
 module Jwt
-    # class for handling encoding of JWT
-    # Jwt::Encode.new(payload, rsa_rsa_private).call
-    class Header
-      def initialize(jwt)
-        @jwt = jwt
-      end
-  
-      def call
-        header_segment = @jwt.split('.').first
-        JSON.parse(Base64.decode64(header_segment))
-      end
+  class Header
+    def initialize(jwt)
+      @jwt = jwt
+    end
+
+    def call
+      header_segment = @jwt.split('.').first
+      JSON.parse(base64_url_decode(header_segment))
+    end
+
+    private
+
+    # Decodes a Base64URL-encoded string
+    def base64_url_decode(str)
+      str += '=' * (4 - str.length.modulo(4))
+      Base64.decode64(str.tr('-_', '+/'))
     end
   end
+end

@@ -64,17 +64,15 @@ GEM
       activesupport (>= 4.2)
     active_record_union (1.3.0)
       activerecord (>= 4.0)
-    activeadmin (2.7.0)
+    activeadmin (2.12.0)
       arbre (~> 1.2, >= 1.2.1)
-      formtastic (~> 3.1)
+      formtastic (>= 3.1, < 5.0)
       formtastic_i18n (~> 0.4)
       inherited_resources (~> 1.7)
       jquery-rails (~> 4.2)
-      kaminari (~> 1.0, >= 1.0.1)
-      railties (>= 5.2, < 6.1)
-      ransack (~> 2.1, >= 2.1.1)
-      sassc-rails (~> 2.1)
-      sprockets (>= 3.0, < 4.1)
+      kaminari (~> 1.0, >= 1.2.1)
+      railties (>= 6.0, < 7.1)
+      ransack (>= 2.1.1, < 4)
     activejob (6.0.3.5)
       activesupport (= 6.0.3.5)
       globalid (>= 0.3.6)
@@ -104,8 +102,9 @@ GEM
     annotate (3.1.1)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 14.0)
-    arbre (1.2.1)
+    arbre (1.7.0)
       activesupport (>= 3.0.0)
+      ruby2_keywords (>= 0.0.2)
     autoprefixer-rails (9.8.6.1)
       execjs
     awesome_print (1.8.0)
@@ -115,10 +114,6 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     bcrypt (3.1.15)
     bindata (2.4.15)
-    bootstrap (4.5.3)
-      autoprefixer-rails (>= 9.1.0)
-      popper_js (>= 1.14.3, < 2)
-      sassc-rails (>= 2.0.0)
     bootstrap-editable-rails (0.0.9)
       railties (>= 3.1)
       sass-rails
@@ -129,9 +124,6 @@ GEM
       railties (>= 3.0)
     bootstrap3-datetimepicker-rails (4.14.30)
       momentjs-rails (>= 2.8.1)
-    bootstrap_form (4.5.0)
-      actionpack (>= 5.2)
-      activemodel (>= 5.2)
     browser (4.2.0)
     builder (3.2.4)
     cancancan (3.1.0)
@@ -218,7 +210,7 @@ GEM
       actionpack (>= 3.2.13)
     formtastic-bootstrap (3.1.1)
       formtastic (>= 3.0)
-    formtastic_i18n (0.6.0)
+    formtastic_i18n (0.7.0)
     friendly_id (5.4.0)
       activerecord (>= 4.0.0)
     globalid (0.4.2)
@@ -233,9 +225,9 @@ GEM
       haml (>= 4.0.6, < 6.0)
       html2haml (>= 1.0.1)
       railties (>= 5.1)
-    has_scope (0.7.2)
-      actionpack (>= 4.1)
-      activesupport (>= 4.1)
+    has_scope (0.8.2)
+      actionpack (>= 5.2)
+      activesupport (>= 5.2)
     hashie (4.1.0)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
@@ -251,11 +243,11 @@ GEM
       builder (>= 1.0, < 4.0)
       oauth (>= 0.4.5, < 0.6)
     inflecto (0.0.2)
-    inherited_resources (1.11.0)
-      actionpack (>= 5.0, < 6.1)
-      has_scope (~> 0.6)
-      railties (>= 5.0, < 6.1)
-      responders (>= 2, < 4)
+    inherited_resources (1.14.0)
+      actionpack (>= 6.0)
+      has_scope (>= 0.6)
+      railties (>= 6.0)
+      responders (>= 2)
     jbuilder (2.10.0)
       activesupport (>= 5.0.0)
     jquery-rails (4.4.0)
@@ -351,7 +343,6 @@ GEM
       virtus (>= 1.0.3)
     polyamorous (2.3.2)
       activerecord (>= 5.2.1)
-    popper_js (1.16.1)
     power_assert (1.2.0)
     progress_job (0.0.4)
       delayed_job
@@ -404,6 +395,9 @@ GEM
       activesupport (>= 5.2.1)
       i18n
       polyamorous (= 2.3.2)
+    rb-fsevent (0.11.2)
+    rb-inotify (0.10.1)
+      ffi (~> 1.0)
     rdoc (6.2.1)
     redcarpet (3.5.0)
     remotipart (1.4.4)
@@ -435,23 +429,26 @@ GEM
     rspec-support (3.9.3)
     ruby-graphviz (1.2.5)
       rexml
+    ruby2_keywords (0.0.5)
     ruby_parser (3.14.2)
       sexp_processor (~> 4.9)
-    sass-rails (6.0.0)
-      sassc-rails (~> 2.1, >= 2.1.1)
+    sass (3.7.4)
+      sass-listen (~> 4.0.0)
+    sass-listen (4.0.0)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
+    sass-rails (5.0.8)
+      railties (>= 5.2.0)
+      sass (~> 3.1)
+      sprockets (>= 2.8, < 4.0)
+      sprockets-rails (>= 2.0, < 4.0)
+      tilt (>= 1.1, < 3)
     sassc (2.1.0)
       ffi (~> 1.9)
     sassc (2.1.0-x86_64-linux)
       ffi (~> 1.9)
-    sassc-rails (2.1.2)
-      railties (>= 4.0.0)
-      sassc (>= 2.0)
-      sprockets (> 3.0)
-      sprockets-rails
-      tilt
     sdoc (1.1.0)
       rdoc (>= 5.0)
-    selectize-rails (0.12.6)
     sexp_processor (4.15.0)
     simple_oauth (0.3.1)
     sprockets (3.7.2)
@@ -499,7 +496,7 @@ PLATFORMS
 DEPENDENCIES
   active_record-acts_as
   active_record_union
-  activeadmin (~> 2.7)
+  activeadmin (~> 2.9)
   acts-as-taggable-on
   acts_as_list
   addressable (~> 2.3, >= 2.3.8)
@@ -507,12 +504,10 @@ DEPENDENCIES
   annotate
   autoprefixer-rails
   awesome_print
-  bootstrap (~> 4.5.0)
   bootstrap-editable-rails
   bootstrap-sass (>= 3.4.1)
   bootstrap-wysihtml5-rails
   bootstrap3-datetimepicker-rails (~> 4.14.30)
-  bootstrap_form (~> 4.5.0)
   browser
   cancancan
   clipboard-rails
@@ -528,7 +523,6 @@ DEPENDENCIES
   exception_handler (~> 0.3.45)
   factory_bot_rails
   faker
-  ffi
   figaro
   font-awesome-rails
   formtastic (~> 3.1)
@@ -583,10 +577,8 @@ DEPENDENCIES
   request-log-analyzer
   responders
   rspec-rails (>= 3.4.2)
-  sass-rails
-  sassc (= 2.1.0)
+  sass-rails (~> 5.0.7)
   sdoc
-  selectize-rails (~> 0.12.6)
   simple_oauth (= 0.3.1)
   sprockets (= 3.7.2)
   sucker_punch (~> 1.0)
