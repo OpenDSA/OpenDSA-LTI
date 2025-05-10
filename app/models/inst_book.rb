@@ -136,9 +136,9 @@ class InstBook < ApplicationRecord
   def extract_av_data_from_rst
     av_data = {}
     parsed_options = parse_json_options(self.options)
-    lang = parsed_options['lang'] || 'en' 
+    lang = parsed_options['lang'] || 'en'
     rst_folder = File.join('public', 'OpenDSA', 'RST', lang)
-  
+
     # Check if rst_folder to prevent Dir.glob from failing
     return av_data unless Dir.exist?(rst_folder)
 
@@ -166,29 +166,8 @@ class InstBook < ApplicationRecord
     av_data
   end
 
-  def get_clone(currentUser)
-    return clone(currentUser)
-  end
-  private
 
-  def extract_metadata_from_line(line)
-    key, value = line.strip.split(': ', 2)
-    [key[1..].to_sym, value] if key && value
-  end
-
-  def extract_inlineav_name_from_line(line)
-    match = line.match(/\.\. inlineav:: (\w+)/)
-    match[1] if match # Returns the inlineav short name or nil if no match
-  end
-
-  def extract_avembed_data_from_line(line)
-    match = line.match(/\.\. avembed:: Exercises\/\w+\/(\w+)\.html/)
-    match[1] if match # Returns the 3rd level word or nil if no match
-  end
-
-
-
-  # --------------------------------------------------------------------------------  
+  # --------------------------------------------------------------------------------
   # FIXME: shouldn't this method be removed? It appears to be out-dated?
   # FIXME: the real code is now in views/inst_books/show.json.builder
   def to_builder
@@ -330,20 +309,20 @@ class InstBook < ApplicationRecord
 
   def extract_inlineav_name_from_line(line)
     match = line.match(/\.\. inlineav:: (\w+)/)
-    match[1] if match 
+    match[1] if match
   end
 
   def extract_avembed_data_from_line(line)
     match = line.match(/\.\. avembed:: Exercises\/\w+\/(\w+)\.html/)
-    match[1] if match 
+    match[1] if match
   end
 
   # helper method for extract_av_data_from_rst(), safely attempts to parse a JSON string, returning an empty hash as fallback
   def parse_json_options(json_str)
     return {} if json_str.nil? # Ensures nil input returns an empty hash
-    JSON.parse(json_str || '{}') 
+    JSON.parse(json_str || '{}')
   rescue JSON::ParserError
-    {} 
+    {}
   end
 
 end

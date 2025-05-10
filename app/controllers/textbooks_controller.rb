@@ -26,7 +26,7 @@ class TextbooksController < ApplicationController
         lms_course_num: 9999999
         )
 
-      cloned_book = inst_book.get_clone(current_user)
+      cloned_book = inst_book.clone(current_user)
 
       if course_offering.save!
         cloned_book.course_offering_id = course_offering.id
