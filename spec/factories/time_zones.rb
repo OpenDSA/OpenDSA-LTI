@@ -6,6 +6,7 @@
 #  name       :string(255)
 #  zone       :string(255)
 #  display_as :string(255)
+#  name_formatted :string(255)
 #  created_at :datetime
 #  updated_at :datetime
 #
@@ -17,5 +18,6 @@ FactoryBot.define do
     name { "America/New_York" }
     zone { "UTC -05:00" }
     display_as { "UTC -05:00(New York)" }
+    name_formatted { "Eastern Time (US & Canada)" }
   end
 end

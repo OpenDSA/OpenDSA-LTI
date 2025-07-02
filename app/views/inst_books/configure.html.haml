@@ -1,5 +1,6 @@
 :javascript
   window.jsonFile = #{@inst_book_json.html_safe}
+  window.userTimezone = "#{current_user&.time_zone.name || 'America/New_York'}"
 
 %ol.breadcrumb
   %li= link_to 'Home', root_path

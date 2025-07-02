@@ -23,6 +23,7 @@
 //= require counter.js
 //= require data-confirm-modal
 //= require moment
+//= require moment-timezone-with-data
 //= require bootstrap-datetimepicker
 //= require mustache.min
 //= require handlebars.min
