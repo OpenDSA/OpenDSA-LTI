@@ -1,0 +1,107 @@
+<p class="navbar-text">
+  <span id="countdown-timer" 
+        due-date="<%= @due_date %>" 
+        open-date="<%= @open_date %>" 
+        close-date="<%= @close_date %>">
+  </span>
+</p>
+
+<div class="nav navbar-nav navbar-right">
+  <button type="button" 
+          class="btn btn-warning navbar-btn" 
+          id="show-tokens-btn"
+          onclick="toggleTokensModal()">
+    My Late Tokens
+  </button>
+</div>
+
+<!-- Tokens Modal -->
+<div id="tokens-modal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">My Late Tokens</h4>
+      </div>
+      <div class="modal-body" id="tokens-container">
+        <!-- Tokens will be loaded here dynamically -->
+        <div class="loading text-center">
+          <i class="fa fa-spinner fa-spin"></i> Loading tokens...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleTokensModal() {
+  // Show the modal
+  $('#tokens-modal').modal('show');
+  
+  // Fetch tokens when modal is opened
+  fetch('/epg_broker/tokens/get_tokens')
+    .then(response => response.json())
+    .then(data => {
+      const tokensContainer = document.getElementById('tokens-container');
+      
+      if (data.status === "success" && data.data.length > 0) {
+        // Create HTML for tokens
+        const tokensHtml = data.data.map(token => `
+          <div class="row" style="margin-bottom: 10px;">
+            <div class="col-xs-8">
+              <p>${token.name} (${token.value} hours)</p>
+              <small class="text-muted">${token.description}</small>
+            </div>
+            <div class="col-xs-4 text-right">
+              <button type="button" 
+                      class="btn btn-primary" 
+                      onclick="useToken('${token.id}')">
+                Use (${token.quantity} left)
+              </button>
+            </div>
+          </div>
+        `).join('');
+        
+        tokensContainer.innerHTML = tokensHtml;
+      } else {
+        tokensContainer.innerHTML = '<p class="text-center">No tokens available</p>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching tokens:', error);
+      document.getElementById('tokens-container').innerHTML = 
+        '<p class="text-center text-danger">Error loading tokens</p>';
+    });
+}
+
+function useToken(tokenId) {
+  if (confirm('Are you sure you want to use this token?')) {
+    fetch('/epg_broker/tokens/redeem_token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: JSON.stringify({ token_id: tokenId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        alert('Token used successfully!');
+        $('#tokens-modal').modal('hide');
+        // Optionally refresh the page or update the deadline display
+        location.reload();
+      } else {
+        alert('Error: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error using token:', error);
+      alert('Error using token. Please try again.');
+    });
+  }
+}
+</script> 

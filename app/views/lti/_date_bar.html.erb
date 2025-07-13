@@ -9,6 +9,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script>
+    // Access TP object
+    var TP = window.ODSA.TP;
+    
     document.addEventListener('DOMContentLoaded', function() {
       var countdownElement = document.getElementById("countdown-timer");
 
@@ -72,7 +75,7 @@
       $('#tokens-modal').modal('show');
       
       // Fetch tokens when modal is opened
-      fetch('https://opendsa-lti.localhost.devcom.vt.edu/epg_broker/tokens/get_tokens')
+      fetch('/epg_broker/tokens/get_tokens')
         .then(response => response.json())
         .then(data => {          
           const tokensContainer = document.getElementById('tokens-container');
@@ -82,14 +85,14 @@
             const tokensHtml = data.data.map(token => `
               <div class="row" style="margin-bottom: 10px;">
                 <div class="col-xs-8">
-                  <p>${token.name} (${token.value} hours)</p>
+                  <p>${token.name}</p>
                   <small class="text-muted">${token.description}</small>
                 </div>
                 <div class="col-xs-4 text-right">
                   <button type="button" 
                           class="btn btn-primary" 
                           onclick="useToken('${token.id}')">
-                    Use (${token.quantity} left)
+                    Use (${token.count} left)
                   </button>
                 </div>
               </div>
@@ -144,11 +147,7 @@
       location.reload();
 
     }
-  }
-
-  // Access TP object
-  var TP = window.ODSA.TP;
-  
+  }  
   // Examples of accessing TP properties:
   if (TP.outcomeService) {
     // Handle outcome service case

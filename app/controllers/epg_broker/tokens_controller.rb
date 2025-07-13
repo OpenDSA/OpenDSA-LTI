@@ -4,8 +4,8 @@ class EpgBroker::TokensController < ApplicationController
   require 'json'
   
   # for testing purposes only
-  JWT_SECRET = 'your_jwt_secret'
-  EGP_BROKER_URL = 'http://host.docker.internal:3001/egp-broker-service'
+  JWT_SECRET = 'secretkey'
+  EGP_BROKER_URL = 'https://one-sunbeam-distinctly.ngrok-free.app'
 
   def generate_jwt_token(payload)
     token_payload = payload.merge(exp: Time.now.to_i + 3600) # Expires in 1 hour
@@ -14,8 +14,8 @@ class EpgBroker::TokensController < ApplicationController
   end
 
   def get_tokens
-    user_id = "67393490ddab8ff9922ee674"
-    course_id = "6739348fddab8ff9922ee652"
+    user_id = "stud001"
+    course_id = "course001"
 
     token = generate_jwt_token({ id: user_id })
 
@@ -24,7 +24,7 @@ class EpgBroker::TokensController < ApplicationController
       'Content-Type' => 'application/json'
     }
 
-    url = URI(EGP_BROKER_URL + '/api/tool_auth/get_freepasses')
+    url = URI(EGP_BROKER_URL + '/api/tool/student_passes')
 
     begin
       # Create an HTTP request
@@ -35,10 +35,13 @@ class EpgBroker::TokensController < ApplicationController
       headers.each { |key, value| request[key] = value }
 
       # Add request body
-      request.body = { userId: user_id, courseId: course_id }.to_json
+      request.body = { canvasStudentId: user_id, canvasCourseId: course_id, passType: "DURATION" }.to_json
 
       # Execute the request
       response = http.request(request)
+
+      Rails.logger.info "Response Code: #{response.code}"
+      Rails.logger.info "Response Body: #{response.body}"
 
       # Parse and return response
       if response.is_a?(Net::HTTPSuccess)
@@ -78,141 +81,113 @@ class EpgBroker::TokensController < ApplicationController
   
   def redeem_token
 
-    token_id = params[:token_id]
-    inst_chapter_module_id = params[:inst_chapter_module_id]
-    user_id = params[:user_id]
+    # body parameters
+    # pass_id
+    # studentCanvasID (custom_canvas_user_id in TP)
+    # studentEmail (custom_canvas_user_email in TP)
+    # courseCanvasID (custom_canvas_course_id in TP)
+    # inst_chapter_module_id (custom_inst_chapter_module_id in TP)
+    # assignmentCanvasID (this can be obtained from inst_chapter_module_id 
+    #                      or custom_canvas_assignment_id)
 
-    Rails.logger.info "Token ID: #{token_id}"
-    Rails.logger.info "Inst Chapter Module ID: #{inst_chapter_module_id}"
-    Rails.logger.info "User ID: #{user_id}"
+    # pass_id = params[:pass_id]
+    # inst_chapter_module_id = params[:inst_chapter_module_id]
+    # studentCanvasID = params[:studentCanvasID]
+    # studentEmail = params[:studentEmail]
+    # canvasCourseID = params[:canvasCourseID]
+    # canvasAssignmentID = params[:canvasAssignmentID]
 
-    inst_chapter_module = InstChapterModule.find(inst_chapter_module_id)
-    Rails.logger.info "InstChapterModule: #{inst_chapter_module.inspect}"
+    # dummy data
+    pass_id = "67c89f9b1353a53eaf685cbd"
+    inst_chapter_module_id = 17
+    studentCanvasID = "stud001"
+    studentEmail = "saketh@vt.edu"
+    canvasCourseID = "course001"
+    canvasAssignmentID = "assign001"
 
-    new_due_date = inst_chapter_module.due_date + 24.hours
-    new_close_date = inst_chapter_module.close_date + 24.hours
+    Rails.logger.info "
+      pass_id: #{pass_id},
+      inst_chapter_module_id: #{inst_chapter_module_id},
+      studentCanvasID: #{studentCanvasID},
+      studentEmail: #{studentEmail},
+      canvasCourseID: #{canvasCourseID},
+      canvasAssignmentID: #{canvasAssignmentID}
+    "
 
-    StudentExtension.create_or_update!(
-      user_id,
-      inst_chapter_module,
-      {
-        'due_date' => new_due_date.to_i,
-        'close_date' => new_close_date.to_i
-      }
-    )
-
-    # Rails.logger.info "New due date: #{new_due_date}"
-    # Rails.logger.info "New close date: #{new_close_date}"
-
-    # render json: { status: "success", message: "Token redeemed successfully" }, status: :ok
-    return inst_chapter_module.inspect
-  end
-  
-  def redeem_token2()
-    # canvas
-    inst_chapter_module_id = 1
-    # broker
-    token_id = "67393490ddab8ff9922ee6be"
-    # for onw broker, but should match canvas
-    user_id = "67393490ddab8ff9922ee674"
-    # course_id = "6739348fddab8ff9922ee652"
-    
     # Validate parameters
-    unless token_id && inst_chapter_module_id
+    unless pass_id && inst_chapter_module_id && studentCanvasID && canvasCourseID && canvasAssignmentID
       render json: { status: "error", message: "Missing required parameters" }, status: :bad_request
       return
     end
 
     # Request the EPG broker to redeem the token and get extension value
-    # token = generate_jwt_token({ id: user_id })
-    # headers = {
-    #   'Authorization' => "Bearer #{token}",
-    #   'Content-Type' => 'application/json'
-    # }
+    token = generate_jwt_token({ id: studentCanvasID })
+    headers = {
+      'Authorization' => "Bearer #{token}",
+      'Content-Type' => 'application/json'
+    }
 
-    # url = URI(EGP_BROKER_URL + '/api/tool_auth/redeem_freepass')
+    url = URI(EGP_BROKER_URL + '/api/tool/redeem_pass')
 
-    # begin
-    #   http = Net::HTTP.new(url.host, url.port)
-    #   http.use_ssl = (url.scheme == 'https') # Enable SSL if the URL is HTTPS
-
-    #   request = Net::HTTP::Post.new(url)
-    #   headers.each { |key, value| request[key] = value }
-    #   request.body = { userId: user_id, courseId: course_id, token: token_id }.to_json
-
-    #   response = http.request(request)
-
-    #   if response.is_a?(Net::HTTPSuccess)
-    #     response_data = {
-    #       status: "success",
-    #       data: JSON.parse(response.body),
-    #       message: "Token redeemed successfully"
-    #     }
-    #     # Check if the response contains the expected extension value
-    #     response_body = JSON.parse(response.body)
-    #     if response_body["extension"].nil?
-    #       response_data = {
-    #         status: "error", 
-    #         message: "Missing extension value in response"
-    #       }
-    #       return render json: response_data, status: :unprocessable_entity
-    #     end
-
-
-      
-    #   else
-    #     response_data = {
-    #       status: "error",
-    #       message: response.body
-    #     }
-    #   end
-
-    #   render json: response_data, status: response.is_a?(Net::HTTPSuccess) ? :ok : response.code.to_i
-
-    # rescue StandardError => e
-    #   render json: { status: "error", message: e.message }, status: :internal_server_error
-    
-    # end
-
-    
-    inst_chapter_module = InstChapterModule.find(inst_chapter_module_id)
-    
-    # Calculate new dates based on token value (assuming 24 hours extension)
-    new_due_date = inst_chapter_module.due_date + 24.hours
-    new_close_date = inst_chapter_module.close_date + 24.hours
-    
-    # Create or update student extension
     begin
-      StudentExtension.create_or_update!(
-        current_user,
-        inst_chapter_module,
-        {
-          'due_date' => new_due_date.to_i,
-          'close_date' => new_close_date.to_i
-        }
-      )
-      
-      render json: { 
-        status: "success", 
-        message: "Token redeemed successfully",
-        new_due_date: new_due_date,
-        new_close_date: new_close_date
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = (url.scheme == 'https') # Enable SSL if the URL is HTTPS
+
+      request = Net::HTTP::Post.new(url)
+      headers.each { |key, value| request[key] = value }
+
+      request.body = {
+        passId: pass_id,
+        canvasStudentId: studentCanvasID,
+        canvasCourseId: canvasCourseID,
+        canvasAssignmentId: canvasAssignmentID
+      }.to_json
+
+      response = http.request(request)
+      if response.is_a?(Net::HTTPSuccess)
+        response_body = JSON.parse(response.body)
+        duration_hours = response_body["durationHours"]
+        if duration_hours.nil?
+          render json: { status: "error", message: "Missing durationHours in response" }, status: :unprocessable_entity
+          return
+        end
+
+        # Find the InstChapterModule instance
+        inst_chapter_module = InstChapterModule.find(inst_chapter_module_id)
+        if inst_chapter_module.nil?
+          render json: { status: "error", message: "Invalid inst_chapter_module_id" }, status: :unprocessable_entity
+          return
+        end
+
+        # Find the student with email (use email because user canvas id is not stored in OpenDSA DB)
+        student = User.find_by(email: studentEmail)
+        if student.nil?
+          render json: { status: "error", message: "Student not found (searched for student using email)" }, status: :unprocessable_entity
+          return
+        end
+
+        # Calculate new dates based on durationHours
+        new_due_date = inst_chapter_module.due_date + duration_hours.hours
+        new_close_date = inst_chapter_module.close_date + duration_hours.hours
+
+        # create or update a StudentExtension record
+        extension = StudentExtension.find_or_create_by(inst_chapter_module_id: inst_chapter_module_id, user_id: student.id)
+        extension.update(due_date: new_due_date, close_date: new_close_date)
+
+        render json: { 
+          status: "success", 
+          message: "Token redeemed successfully",
+          new_due_date: new_due_date,
+          new_close_date: new_close_date
         }, status: :ok
-      rescue => e
-        render json: { status: "error", message: e.message }, status: :unprocessable_entity
+
+      else
+        Rails.logger.error "Error Response: #{response.body}"
+        render json: { status: "error", message: response.body }, status: response.code.to_i
       end
     end
+
   end
   
-  def get_tokens_old
-    # Request the EPG broker for available tokens based on the user
-    get_tokens_test()
-    tokens = [
-      { id: 1, name: "example_token", value: 24, description: "This is an example token", quantity: 1 },
-      { id: 2, name: "example_token_2", value: 12, description: "This is another example token", quantity: 2 }
-    ]
-    
-    render json: { status: "success", data: tokens, message: "Tokens fetched successfully" }, status: :ok
-  rescue => e
-    render json: { status: "error", message: e.message }, status: :internal_server_error
-  end
+
+end

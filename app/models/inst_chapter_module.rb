@@ -77,11 +77,14 @@ class InstChapterModule < ApplicationRecord
 
   def get_due_date_for(user_id)
     extension = StudentExtension.where(inst_chapter_module_id: self.id, user_id: user_id).first
+    Rails.logger.info { "Extension: #{extension.inspect}" }
     if extension.nil? || extension.due_date.nil?
       return self.due_date
     end
-
-    return [extension.due_date, self.due_date].min
+    Rails.logger.info { "using extention or due date" }
+    Rails.logger.info { "extension.due_date: #{extension.due_date}" }
+    Rails.logger.info { "self.due_date: #{self.due_date}" }
+    return [extension.due_date, self.due_date].max
 
   end
 
@@ -90,7 +93,7 @@ class InstChapterModule < ApplicationRecord
     if extension.nil? || extension.close_date.nil?
       return self.close_date
     end
-    return [extension.close_date, self.close_date].min
+    return [extension.close_date, self.close_date].max
   end
 
   def get_open_date_for(user_id)
