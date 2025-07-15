@@ -243,6 +243,8 @@ class GenerateCourseJob < ProgressJob::Base
     opts[:module_item__title__] = title
     if chapt_module.gradable?
       assignment_opts[:assignment__points_possible__] = chapt_module.total_points
+      # Note: Canvas assignments use the default due date, not individual extensions
+      # Individual extensions are handled in the OpenDSA application logic
       if chapt_module.due_dates
         assignment_opts[:assignment__due_at__] = chapt_module.due_dates.strftime("%Y-%m-%dT%H:%M:%S%:z")
       end

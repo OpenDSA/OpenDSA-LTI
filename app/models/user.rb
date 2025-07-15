@@ -58,6 +58,7 @@ class User < ApplicationRecord
   has_many  :odsa_module_progresses, inverse_of: :user
   has_many  :odsa_book_progresses, inverse_of: :user
   has_many  :odsa_user_interactions, inverse_of: :user
+  has_many  :student_extensions, inverse_of: :user
   #~ Hooks ....................................................................
 
   delegate :can?, :cannot?, to: :ability
@@ -196,6 +197,24 @@ class User < ApplicationRecord
       joins(course_offerings: { course_enrollments: :user }).
       where('course_offerings.term_id' => term, 'users.id' => self).
       distinct
+  end
+
+  # -------------------------------------------------------------
+  # Get all extensions for this user
+  def extensions
+    student_extensions.includes(:inst_chapter_module)
+  end
+
+  # -------------------------------------------------------------
+  # Get extension for a specific module
+  def extension_for_module(inst_chapter_module)
+    student_extensions.find_by(inst_chapter_module: inst_chapter_module)
+  end
+
+  # -------------------------------------------------------------
+  # Check if user has an extension for a specific module
+  def has_extension_for_module?(inst_chapter_module)
+    student_extensions.exists?(inst_chapter_module: inst_chapter_module)
   end
 
 
