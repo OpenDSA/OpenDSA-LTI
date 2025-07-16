@@ -511,4 +511,20 @@ class CourseOfferingsController < ApplicationController
                                             :label, :url, :self_enrollment_allowed)
   end
 
+  require 'csv'
+
+ def export_events
+  # Example data — you will replace with real queries later
+  csv_data = CSV.generate(headers: true) do |csv|
+    csv << ["Event ID", "User ID", "Event Type", "Timestamp"]
+    csv << [1, 42, "viewed_lesson", Time.now]
+    csv << [2, 42, "completed_exercise", Time.now]
+    csv << [3, 99, "submitted_quiz", Time.now]
+  end
+
+  send_data csv_data,
+            filename: "course_#{params[:id]}_events.csv",
+            type: 'text/csv'
+  end
+
 end
