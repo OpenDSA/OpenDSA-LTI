@@ -8,8 +8,17 @@ class ApplicationController < ActionController::Base
 
   skip_before_action :verify_authenticity_token
 
+  around_action :use_user_time_zone
+
   self.responder = ApplicationResponder
   respond_to :html, :json
+
+  #current_user&.time_zone
+
+  def use_user_time_zone(&block)
+    zone =  current_user&.time_zone&.name || Rails.application.config.time_zone
+    Time.use_zone(zone, &block)
+  end
 
   # -------------------------------------------------------------
   # On access errors, redirect to home page with flash of error message.
