@@ -4,8 +4,8 @@ MAINTAINER Jihane Najdi <jnajdi@vt.edu>
 
 # Default environment
 ARG RAILS_ENV='development'
-ARG ODSA_BRANCH='master'
 ARG LTI_BRANCH='staging'
+ARG ODSA_BRANCH=master
 
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
