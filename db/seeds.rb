@@ -98,150 +98,125 @@ CourseRole.create!(
  TimeZone.create!(
   name: 'America/New_York',
   zone: 'UTC -05:00',
-  display_as: 'UTC -05:00(New York)',
-  name_formatted: 'Eastern Time (US & Canada)')
+  display_as: 'UTC -05:00(New York)')
   
   TimeZone.create!(
   name: 'America/Chicago',
   zone: 'UTC -06:00',
-  display_as: 'UTC -06:00(Chicago)',
-  name_formatted: 'Central Time (US & Canada)')
+  display_as: 'UTC -06:00(Chicago)')
   
   TimeZone.create!(
   name: 'America/Denver',
   zone: 'UTC -07:00',
-  display_as: 'UTC -07:00(Denver)',
-  name_formatted: 'Mountain Time (US & Canada)')
+  display_as: 'UTC -07:00(Denver)')
   
   TimeZone.create!(
   name: 'America/Los_Angeles',
   zone: 'UTC -08:00',
-  display_as: 'UTC -08:00(Los Angeles)',
-  name_formatted: 'Pacific Time (US & Canada)')
+  display_as: 'UTC -08:00(Los Angeles)')
   
   TimeZone.create!(
   name: 'America/Anchorage',
   zone: 'UTC -09:00',
-  display_as: 'UTC -09:00(Anchorage)',
-  name_formatted: 'Alaska')
+  display_as: 'UTC -09:00(Anchorage)')
   
   TimeZone.create!(
   name: 'Pacific/Honolulu',
   zone: 'UTC -10:00',
-  display_as: 'UTC -10:00(Honolulu)',
-  name_formatted: 'Hawaii')
+  display_as: 'UTC -10:00(Honolulu)')
   
   TimeZone.create!(
   name: 'Pacific/Midway',
   zone: 'UTC -11:00',
-  display_as: 'UTC -11:00(Midway)',
-  name_formatted: 'Midway Island')
+  display_as: 'UTC -11:00(Midway)')
   
   TimeZone.create!(
   name: 'Pacific/Auckland',
   zone: 'UTC +12:00',
-  display_as: 'UTC +12:00(Auckland)',
-  name_formatted: 'Auckland')
+  display_as: 'UTC +12:00(Auckland)')
   
   TimeZone.create!(
   name: 'Pacific/Guadalcanal',
   zone: 'UTC +11:00',
-  display_as: 'UTC +11:00(Guadalcanal)',
-  name_formatted: 'Magadan')
+  display_as: 'UTC +11:00(Guadalcanal)')
   
   TimeZone.create!(
   name: 'Australia/Sydney',
   zone: 'UTC +10:00',
-  display_as: 'UTC +10:00(Sydney)',
-  name_formatted: 'Melbourne')
+  display_as: 'UTC +10:00(Sydney)')
   
   TimeZone.create!(
   name: 'Asia/Tokyo',
   zone: 'UTC +09:00',
-  display_as: 'UTC +09:00(Tokyo)',
-  name_formatted: 'Tokyo')
+  display_as: 'UTC +09:00(Tokyo)')
   
   TimeZone.create!(
   name: 'Asia/Shanghai',
   zone: 'UTC +08:00',
-  display_as: 'UTC +08:00(Shanghai)',
-  name_formatted: 'Beijing')
+  display_as: 'UTC +08:00(Shanghai)')
   
   TimeZone.create!(
   name: 'Asia/Bangkok',
   zone: 'UTC +07:00',
-  display_as: 'UTC +07:00(Bangkok)',
-  name_formatted: 'Bangkok')
+  display_as: 'UTC +07:00(Bangkok)')
   
   TimeZone.create!(
   name: 'Asia/Dhaka',
   zone: 'UTC +06:00',
-  display_as: 'UTC +06:00(Dhaka)',
-  name_formatted: 'Dhaka')
+  display_as: 'UTC +06:00(Dhaka)')
   
   TimeZone.create!(
   name: 'Asia/Karachi',
   zone: 'UTC +05:00',
-  display_as: 'UTC +05:00(Karachi)',
-  name_formatted: 'Karachi')
+  display_as: 'UTC +05:00(Karachi)')
   
   TimeZone.create!(
   name: 'Europe/Moscow',
   zone: 'UTC +03:00',
-  display_as: 'UTC +03:00(Moscow)',
-  name_formatted: 'Moscow')
+  display_as: 'UTC +03:00(Moscow)')
   
   TimeZone.create!(
   name: 'Europe/Kiev',
   zone: 'UTC +02:00',
-  display_as: 'UTC +02:00(Kiev)',
-  name_formatted: 'Kyiv')
+  display_as: 'UTC +02:00(Kiev)')
   
   TimeZone.create!(
   name: 'Europe/Paris',
   zone: 'UTC +01:00',
-  display_as: 'UTC +01:00(Paris)',
-  name_formatted: 'Paris')
+  display_as: 'UTC +01:00(Paris)')
   
   TimeZone.create!(
   name: 'Europe/Samara',
   zone: 'UTC +04:00',
-  display_as: 'UTC +04:00(Samara)',
-  name_formatted: 'Samara')
+  display_as: 'UTC +04:00(Samara)')
   
   TimeZone.create!(
   name: 'Europe/London',
   zone: 'UTC',
-  display_as: 'UTC(London)',
-  name_formatted: 'UTC')
+  display_as: 'UTC(London)')
   
   TimeZone.create!(
   name: 'Atlantic/Azores',
   zone: 'UTC -01:00',
-  display_as: 'UTC -01:00(Azores)',
-  name_formatted: 'Azores')
+  display_as: 'UTC -01:00(Azores)')
   
   TimeZone.create!(
   name: 'Atlantic/South_Georgia',
   zone: 'UTC -02:00',
-  display_as: 'UTC -02:00(South Georgia)',
-  name_formatted: 'Mid-Atlantic')
+  display_as: 'UTC -02:00(South Georgia)')
   
   TimeZone.create!(
   name: 'America/Montevideo',
   zone: 'UTC -03:00',
-  display_as: 'UTC -03:00(Montevideo)',
-  name_formatted: 'Montevideo')
+  display_as: 'UTC -03:00(Montevideo)')
   
   TimeZone.create!(
   name: 'America/Halifax',
   zone: 'UTC -04:00',
-  display_as: 'UTC  -04:00(Halifax)',
-  name_formatted: 'Atlantic Time (Canada)')
+  display_as: 'UTC  -04:00(Halifax)')
   
   TimeZone.create!(
   name: 'Asia/Kolkata',
   zone: 'UTC +05:30',
-  display_as: 'UTC  +05:30(Kolkata)',
-  name_formatted: 'Kolkata')
+  display_as: 'UTC  +05:30(Kolkata)')
 

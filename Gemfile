@@ -44,7 +44,6 @@ gem 'tzinfo' # For timezone support
 # Bootstrap Datepicker
 gem 'momentjs-rails', '>= 2.9.0'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.14.30'
-gem 'moment_timezone-rails'
 
 # Addressable is a replacement for the URI implementation that is part of Ruby's standard library.
 # It more closely conforms to the relevant RFCs and adds support for IRIs and URI templates.

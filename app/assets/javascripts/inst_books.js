@@ -16,8 +16,6 @@
       autoOpen: false
     });
   });
-
-  moment.tz.setDefault(window.userTimezone);
   
   /*
    * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
