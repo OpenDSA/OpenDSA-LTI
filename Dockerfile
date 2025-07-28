@@ -1,4 +1,4 @@
-FROM docker.io/bitnami/ruby:2.7
+FROM docker.io/bitnamilegacy/ruby:2.7
 
 MAINTAINER Jihane Najdi <jnajdi@vt.edu>
 
