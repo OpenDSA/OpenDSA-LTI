@@ -26,6 +26,8 @@ ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
   menu label: "LMS Accesses", parent: 'LMS config', priority: 30
   permit_params :lms_instance_id, :user_id, :access_token, :consumer_key
 
+  filter :user_email_cont, as: String, label: "Email"
+
   index do
     id_column
 
@@ -35,10 +37,13 @@ ActiveAdmin.register LmsAccess, sort_order: :created_at_asc do
       end
     end
 
-    column :user, sortable: 'user.display_name' do |c|
-      link_to c.user.display_name, admin_user_path(c.user)
+    column :first_name, sortable: 'users.first_name' do |c|
+      link_to c.user.first_name, admin_user_path(c.user)
     end
-    column :user, sortable: 'user.email' do |c|
+    column :last_name, sortable: 'users.last_name' do |c|
+      link_to c.user.last_name, admin_user_path(c.user)
+    end
+    column :email, sortable: 'users.email' do |c|
       link_to c.user.email, admin_user_path(c.user)
     end
     column :access_token do |c|
