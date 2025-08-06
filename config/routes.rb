@@ -188,6 +188,11 @@ OpenDSA::Application.routes.draw do
     post 'generate_gradebook' => :generate_gradebook, as: :gradebook
     get 'add_workout' => :add_workout, as: :add_workout
     post 'store_workout/:id' => :store_workout, as: :store_workout
+
+    # NEW ROUTE for Export Events CSV
+    member do
+    get :export_events
+   end
   end
 
   # All of the routes anchored at /users
