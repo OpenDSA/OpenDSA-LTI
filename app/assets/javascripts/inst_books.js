@@ -16,25 +16,25 @@
       autoOpen: false
     });
   });
-
+  
   /*
    * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
    */
-   $(document).on('focus', '.timemodal', function() {
-	$(this).parent().css("position", "relative");
-    $(this).parent().datetimepicker({
-      showClose: true,
-      sideBySide: true,
-      keepInvalid: true,
-	    allowInputToggle: true,
-      format: "YYYY-MM-DD HH:MM"
-    });
-
-   });
+  $(document).on('focus', '.timemodal', function() {
+    $(this).parent().css("position", "relative");
+      $(this).parent().datetimepicker({
+        showClose: true,
+        sideBySide: true,
+        keepInvalid: true,
+        allowInputToggle: true,
+        format: "YYYY-MM-DD HH:MM"
+      });
+  
+     });
   /*
    * Defines the class 'datetimepicker' as a bootstrap datetimepicker.
    */
-   $(document).on('focus', '.chapterTimemodal', function() {
+  $(document).on('focus', '.chapterTimemodal', function() {
     $(this).datetimepicker({
       // showClose: true,
       sideBySide: true,

@@ -28,7 +28,8 @@ class CompileBookJob < ProgressJob::Base
     config_path = config_file_path[15..-1] # without the public/OpenDSA
     require 'net/http'
     uri = URI(ENV["config_api_link"])
-    res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => build_path, 'rake' => false)
+
+    res = Net::HTTP.post_form(uri, 'config_file_path' => config_path, 'build_path' => build_path, 'rake' => is_textbook(@inst_book))
     unless res.kind_of? Net::HTTPSuccess
       Rails.logger.info(res['stderr_compressed'])
     end
@@ -54,4 +55,17 @@ class CompileBookJob < ProgressJob::Base
     sanitize_filename(term.slug) + "/" +
     sanitize_filename(course_offering.label)
   end
+
+
+  def is_textbook(inst_book)
+    course_offering = CourseOffering.where(:id => inst_book.course_offering_id).first
+
+    textbook_instance = LmsInstance.find_by(url: "TEXTBOOK")
+    if course_offering.lms_instance_id == textbook_instance.id
+      Rails.logger.info("Compiling Standalone Book")
+    end
+
+    course_offering.lms_instance_id == textbook_instance.id
+  end
+
 end

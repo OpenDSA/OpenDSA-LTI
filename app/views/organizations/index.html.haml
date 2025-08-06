@@ -28,7 +28,7 @@
               %th Term
               %th Section
               - if user_signed_in? && current_user.global_role.is_admin?
-                %th Canvas course
+                %th LMS Course
               %th OpenDSA Book
               %th Instructor(s)
               / %th Enroll
@@ -46,7 +46,10 @@
                   %td= link_to o.display_name,
                     organization_course_path(o.course.organization,o.course, o.term)
                   - if user_signed_in? && current_user.global_role.is_admin?
-                    %td= link_to lms_course_code, course_offering_url, :target => "_blank"
+                    -if lms_url != "TEXTBOOK"
+                      %td= link_to lms_course_code, course_offering_url, :target => "_blank"
+                    -else
+                      %td LMS Course Not Available
                   - if o.odsa_books.many?
                     %td
                       %table.table.table-striped

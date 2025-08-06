@@ -30,7 +30,6 @@ class InstExercise < ApplicationRecord
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
   def self.save_data_from_json(book, inst_section, exercise_name, exercise_obj, update_mode = false)
-    # puts "inst_exercises"
     require 'json'
     ex = InstExercise.find_by short_name: exercise_name
     if !ex and exercise_obj.is_a?(Hash)
@@ -87,6 +86,16 @@ class InstExercise < ApplicationRecord
     end
 
     book_sec_ex.save
+
+    if exercise_obj.key?('url')
+      ex.update(
+        short_name: exercise_name,
+        name:       exercise_obj['long_name'],
+        av_address: exercise_obj['url'],
+        width:      exercise_obj['width'],
+        height:     exercise_obj['height']
+      ) 
+    end
   end
 
   def self.get_av_dimensions(av_path)

@@ -110,6 +110,14 @@ OpenDSA::Application.routes.draw do
 
   get '/course_offerings/indAssigment/assignmentList/student/exercise' => 'course_offerings#ind_assigment', as: :ind_assigment
 
+
+  #textbook routes
+  post '/textbooks' => 'textbooks#create', as: :create_textbooks
+  post '/textbooks/compile/:course_offering_id' => 'textbooks#compile', as: :compile_textbooks
+  get '/textbooks/new' => 'textbooks#new', as: :new_textbook
+
+  get '/documentation/hecvat' => 'documentation#hecvat_download', as: :hecvat_download
+
   # All of the routes anchored at /gym
   scope :gym do
     # The top-level gym route
@@ -192,6 +200,7 @@ OpenDSA::Application.routes.draw do
   end
 
   get '/embed' => 'embed#index', as: :embed_index
+  get '/embed/export' => 'export#index', as: :embed_export  # This is a new route for exporting for OpenDSA' exercise metadata to SPLICE
   get '/embed/:ex_short_name' => 'embed#show', as: :embed_show
   get '/SourceCode/*all' => 'embed#source_code_redirect'
 
@@ -210,14 +219,24 @@ OpenDSA::Application.routes.draw do
     delete '/logout' => 'devise/sessions#destroy', as: :destroy_user_session
   end
 
+  # LTI 1.3 Routes
   namespace :lti13 do
     resources :login_initiations, only: %i[index create]
     resources :launches
     resources :deep_link_launches, only: %i[create show] do
       post 'launch'
     end
-  end
-  get 'lti13/:id/.well-known/jwks', to: 'lti13/tools#jwks', as: 'lti13_tool_jwks'
-
-
+    resources :names_roles, only: [:index]
+    resources :line_items, only: [:create, :index, :show, :update, :destroy]
+    resources :results, only: [:create, :index, :show, :update]
+    resources :scores, only: [:create]
+    # get '/lti13/.well-known/jwks', to: 'lti13/tools#jwks', as: 'lti13_tool_jwks'
+    get '/.well-known/jwks', to: 'tools#jwks', as: 'lti13_tool_jwks'
+    # Routes for LTI 1.3 services (NRPS or AGS))
+    post 'send_score', to: 'services#send_score'
+    post 'request_names_and_roles', to: 'services#request_names_and_roles'
+    # ... [service-specific routes] ...
+    get 'deep_linking/content_selection', to: 'deep_linking#content_selection'
+    post 'deep_linking/content_selected', to: 'deep_linking#content_selected'
+  end  
 end

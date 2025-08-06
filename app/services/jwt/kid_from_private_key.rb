@@ -5,6 +5,7 @@ module Jwt
     class KidFromPrivateKey
       def initialize(rsa_private)
         @rsa_private = rsa_private
+        Rails.logger.info "KID from private class service"
       end
   
       def call

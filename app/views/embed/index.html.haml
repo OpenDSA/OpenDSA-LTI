@@ -98,6 +98,9 @@
                             %a{"data-toggle": "collapse", "data-parent": "#accordion_mod_#{j}", 
                             href: "#mod_#{j}_collapse", onclick: "moduleClicked(this)"}
                                 %i.fa.fa-chevron-right #{mod_obj['name']}
+                            %a{href: '#', onclick: "previewExercise(this, '#{mod_name}', '', '<iframe src=\"OpenDSA/Books/Catalog/html/#{mod_name}.html\" height=\"600\" width=\"100%\"></iframe>'); event.preventDefault();"}
+                                [Preview]
+
                         .panel-collapse.collapse{id: "mod_#{j}_collapse"}
                             - mod_obj['inst_module_sections'].each do |section_obj|
                                 - section_obj['inst_module_section_exercises'].each do |ex|

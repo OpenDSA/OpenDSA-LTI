@@ -10,11 +10,12 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+// add require popper back
+// add reqire selectize back
+//
 //= require rails-ujs
 //= require jquery3
-//= require popper
 //= require bootstrap-sprockets
-//= require selectize
 
 $('document').ready(function() {
     $(function() {

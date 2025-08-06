@@ -1,11 +1,11 @@
-FROM docker.io/bitnami/ruby:2.7
+FROM docker.io/bitnamilegacy/ruby:2.7
 
 MAINTAINER Jihane Najdi <jnajdi@vt.edu>
 
 # Default environment
 ARG RAILS_ENV='development'
 ARG ODSA_BRANCH='master'
-ARG LTI_BRANCH='master'
+ARG LTI_BRANCH='staging'
 
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -26,14 +26,14 @@ RUN apt-get update -qq \
   && apt-get install -y shared-mime-info \
   && rm -rf /var/apt/lists/*
 
-RUN printf 'Package: nodejs\nPin: origin deb.nodesource.com\nPin-Priority: 1001' > /etc/apt/preferences.d/nodesource \
-  && curl -sL https://deb.nodesource.com/setup_18.x | bash -\
-  && apt-get update -qq && apt-get install -qq --no-install-recommends \
-    nodejs \
-  && apt-get upgrade -qq \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*\
-  && npm install -g yarn@1
+# RUN printf 'Package: nodejs\nPin: origin deb.nodesource.com\nPin-Priority: 1001' > /etc/apt/preferences.d/nodesource \
+#   && curl -sL https://deb.nodesource.com/setup_18.x | bash -\
+#   && apt-get update -qq && apt-get install -qq --no-install-recommends \
+#     nodejs \
+#   && apt-get upgrade -qq \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/*\
+#   && npm install -g yarn@1
 
 RUN gem install bundler -v $BUNDLER_VERSION
 
