@@ -19,7 +19,6 @@ ActiveAdmin.register User do
     column :last_name
     column :first_name
     column(:email) { |u| link_to u.email, 'mailto:' + u.email }
-    column :avatar
     column :confirmed, :confirmed_at
     column :last_login, :last_sign_in_at
     column 'Last IP', :last_sign_in_ip
