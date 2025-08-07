@@ -595,6 +595,19 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "student_extensions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "inst_chapter_module_id", null: false
+    t.datetime "open_deadline"
+    t.datetime "due_deadline"
+    t.datetime "close_deadline"
+    t.integer "time_limit"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["inst_chapter_module_id"], name: "fk_rails_59b7c9962e"
+    t.index ["user_id", "inst_chapter_module_id"], name: "index_student_extensions_on_user_id_and_inst_chapter_module_id", unique: true
+  end
+
   create_table "terms", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "season", null: false
     t.date "starts_on", null: false
@@ -717,6 +730,8 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
   add_foreign_key "odsa_user_time_trackings", "inst_modules", name: "odsa_user_time_tracking_inst_module_id_fk"
   add_foreign_key "odsa_user_time_trackings", "inst_sections", name: "odsa_user_time_tracking_inst_section_id_fk"
   add_foreign_key "odsa_user_time_trackings", "users", name: "odsa_user_time_tracking_user_id_fk"
+  add_foreign_key "student_extensions", "inst_chapter_modules"
+  add_foreign_key "student_extensions", "users"
   add_foreign_key "users", "global_roles", name: "users_global_role_id_fk"
   add_foreign_key "users", "time_zones", name: "users_time_zone_id_fk"
 end

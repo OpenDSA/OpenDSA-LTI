@@ -24,6 +24,7 @@ class InstChapterModule < ApplicationRecord
   has_many :inst_sections, dependent: :destroy
   has_many :odsa_module_progresses, inverse_of: :inst_chapter_module, dependent: :destroy
   has_many :odsa_user_interactions, dependent: :destroy
+  has_many :student_extensions, inverse_of: :inst_chapter_module, dependent: :destroy
 
   #~ Validation ...............................................................
   #~ Constants ................................................................
@@ -77,6 +78,81 @@ class InstChapterModule < ApplicationRecord
   def total_points
     return InstBookSectionExercise.joins(inst_section: [:inst_chapter_module])
              .where(inst_sections: {inst_chapter_module_id: self.id}).sum(:points)
+  end
+
+  # -------------------------------------------------------------
+  # Get the effective deadline for a specific user, considering extensions
+  def effective_deadline(user)
+    extension = student_extensions.find_by(user: user)
+    if extension&.due_deadline
+      extension.due_deadline
+    else
+      due_dates
+    end
+  end
+
+  # -------------------------------------------------------------
+  # Check if the module is still open for a specific user
+  def open_for_user?(user)
+    effective_open = effective_open_date(user)
+    effective_open.nil? || effective_open <= Time.now
+  end
+
+  # -------------------------------------------------------------
+  # Check if the module is past due for a specific user
+  def past_due_for_user?(user)
+    effective_due = effective_deadline(user)
+    effective_due && effective_due < Time.now
+  end
+
+  # -------------------------------------------------------------
+  # Check if the module is closed for a specific user
+  def closed_for_user?(user)
+    effective_close = effective_close_date(user)
+    effective_close && effective_close < Time.now
+  end
+
+  # -------------------------------------------------------------
+  # Check if a user can still submit to this module
+  def can_submit_for_user?(user)
+    # Module must be open and not closed
+    open_for_user?(user) && !closed_for_user?(user)
+  end
+
+  # -------------------------------------------------------------
+  # Get time remaining for a user (in seconds)
+  def time_remaining_for_user(user)
+    effective_close = effective_close_date(user)
+    return nil unless effective_close
+    
+    remaining = effective_close - Time.now
+    remaining > 0 ? remaining.to_i : 0
+  end
+
+  # -------------------------------------------------------------
+  # Get the effective open date for a specific user
+  def effective_open_date(user)
+    extension = student_extensions.find_by(user: user)
+    if extension&.open_deadline
+      extension.open_deadline
+    else
+      # You might want to add an open_dates field to inst_chapter_modules
+      # For now, return nil (always open)
+      nil
+    end
+  end
+
+  # -------------------------------------------------------------
+  # Get the effective close date for a specific user
+  def effective_close_date(user)
+    extension = student_extensions.find_by(user: user)
+    if extension&.close_deadline
+      extension.close_deadline
+    else
+      # You might want to add a close_dates field to inst_chapter_modules
+      # For now, return nil (never close)
+      nil
+    end
   end
 
   #~ Private instance methods .................................................

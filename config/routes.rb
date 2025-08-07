@@ -239,4 +239,9 @@ OpenDSA::Application.routes.draw do
     get 'deep_linking/content_selection', to: 'deep_linking#content_selection'
     post 'deep_linking/content_selected', to: 'deep_linking#content_selected'
   end  
+
+  # EGP Broker CRUD endpoints
+  scope :egp_broker do
+    resources :student_extensions, controller: 'egp_broker', except: [:new, :edit]
+  end
 end
