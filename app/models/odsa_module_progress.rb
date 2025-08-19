@@ -50,22 +50,16 @@ class OdsaModuleProgress < ApplicationRecord
   #~ Class methods ............................................................
 
   def self.get_progress(user_id, inst_chapter_module_id, inst_book_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil)
-    module_progress = OdsaModuleProgress.find_by(user_id: user_id, inst_chapter_module_id: inst_chapter_module_id)
-    if module_progress == nil
-      module_progress = OdsaModuleProgress.new(user_id: user_id, inst_book_id: inst_book_id,
-                                               inst_chapter_module_id: inst_chapter_module_id)
-      unless lis_outcome_service_url == nil or lis_result_sourcedid == nil or lms_access_id == nil
-        module_progress.lis_outcome_service_url = lis_outcome_service_url
-        module_progress.lis_result_sourcedid = lis_result_sourcedid
-        module_progress.lms_access_id = lms_access_id
-      end
-      module_progress.save!
-    elsif (lis_outcome_service_url != nil and module_progress.lis_outcome_service_url == nil) or (lis_result_sourcedid != nil and module_progress.lis_result_sourcedid == nil) or (lms_access_id != nil and module_progress.lms_access_id == nil)
+    module_progress = OdsaModuleProgress.find_or_create_by(user_id: user_id, inst_chapter_module_id: inst_chapter_module_id) do |mp|
+      mp.inst_book_id = inst_book_id
+    end
+    if lis_outcome_service_url.present?
       module_progress.lis_outcome_service_url = lis_outcome_service_url
       module_progress.lis_result_sourcedid = lis_result_sourcedid
       module_progress.lms_access_id = lms_access_id
-      module_progress.save!
+      save_result = module_progress.save!
     end
+
     module_progress
   end
 
@@ -90,6 +84,7 @@ class OdsaModuleProgress < ApplicationRecord
 
   #~ Instance methods .........................................................
   def update_proficiency(inst_exercise, force_send = false)
+    Rails.logger.info("--- ODSA_MODULE_PROGRESS: update_proficiency called for user #{self.user_id} ---")
     if self.inst_module_version_id
       # standalone module
       return update_standalone_proficiency(inst_exercise)
@@ -111,8 +106,8 @@ class OdsaModuleProgress < ApplicationRecord
     # passback was not performed or unsuccessful
     if force_send or
       self.last_passback.nil? or
-      self.inst_book.last_compiled.nil? or   # should never happen, NPE guard
-      (self.last_passback < self.inst_book.last_compiled) or
+      (self.inst_book && self.inst_book.last_compiled.nil?) or
+      (self.last_passback && self.inst_book && self.inst_book.last_compiled && (self.last_passback < self.inst_book.last_compiled)) or
       self.highest_score > old_score
       res = post_score_to_lms()
     end
@@ -146,14 +141,19 @@ class OdsaModuleProgress < ApplicationRecord
 
       consumer_key = nil
       consumer_secret = nil
-      if self.lms_access_id.blank?        
-        # ensuring that lms_instance is not nil
-        if self.inst_module_version&.course_offering&.lms_instance
-          lms_instance = self.inst_module_version.course_offering.lms_instance
+      lms_instance = nil
+
+      if self.lms_access_id.blank?
+        if self.inst_module_version
+          lms_instance = self.inst_module_version.course_offering&.lms_instance
+        elsif self.inst_book
+          lms_instance = self.inst_book.course_offering&.lms_instance
+        end
+
+        if lms_instance
           consumer_key = lms_instance.consumer_key
           consumer_secret = lms_instance.consumer_secret
         else
-          Rails.logger.info "No valid LMS Instance found through inst_module_version"
           return { error: "LMS instance not found", status: :internal_server_error }
         end
       else
@@ -161,14 +161,12 @@ class OdsaModuleProgress < ApplicationRecord
         consumer_secret = self.lms_access.consumer_secret
         lms_instance = self.lms_access.lms_instance
       end
-  
+
       # LTI 1.3 flow
-      if lms_instance.lti_version == 'LTI-1p3'
-        Rails.logger.info "LTI 1.3 message detected"
+      if lms_instance&.lti_version == 'LTI-1p3'
         return post_score_to_lti_13(lms_instance)
       else
         # LTI 1.1 flow
-        Rails.logger.info "LTI 1.1 message detected"
         require 'lti/outcomes'
         res = LtiOutcomes.post_score_to_consumer(self.highest_score,
                                                  self.lis_outcome_service_url,
@@ -190,42 +188,34 @@ class OdsaModuleProgress < ApplicationRecord
       return nil
     end
   end
-  
+
   def post_score_to_lti_13(lms_instance)
     begin
       lti_launch = LtiLaunch.where(user_id: self.user_id, lms_instance_id: lms_instance.id).order(created_at: :desc).first
-      
+
       if lti_launch.nil?
-        Rails.logger.info "No LTI Launch found for user: #{self.user_id} and LMS instance: #{lms_instance.id}"
         return { error: "No LTI Launch found", status: :not_found }
       end
-  
-      Rails.logger.info "LTI Launch: #{lti_launch.inspect}"
-  
+
       access_token_response = Lti13Service::GetAgsAccessToken.new(lms_instance).call
       access_token = access_token_response['access_token']
-      Rails.logger.info "Access token retrieved from module progress: #{access_token}"
-  
+
       response = Lti13::ServicesController.new.send_score(
         launch_id: lms_instance.id,
         access_token: access_token,
         platform_jwt: lti_launch.id_token,  # id_token from LtiLaunch
         kid: lti_launch.kid,  # kid from LtiLaunch
-        highest_score: self.highest_score 
+        highest_score: self.highest_score
       )
-      Rails.logger.info "LTI 1.3 score submission response: #{response.inspect}"
-  
+
       if response[:status] == :ok || response[:status] == 200
         self.last_passback = self.last_done
-        Rails.logger.info "LTI 1.3 Score post successful."
       else
-        Rails.logger.info "LTI 1.3 Score post didn't pass"
         self.last_passback = nil
       end
-  
+
       return response
     rescue => e
-      Rails.logger.info "Error posting score to LTI 1.3: #{e.message}"
       self.last_passback = nil
       return { error: e.message, status: :internal_server_error }
     end

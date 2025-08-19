@@ -332,7 +332,7 @@ class OdsaExerciseAttempt < ApplicationRecord
       return OdsaExerciseProgress.where("user_id=? and inst_book_section_exercise_id=?",
         user.id,
         inst_book_section_exercise.id).first
-    elsif !inst_module_section_exercise_id.blank? 
+    elsif !inst_module_section_exercise_id.blank?
       return OdsaExerciseProgress.find_by(user_id: user_id,
         inst_module_section_exercise_id: inst_module_section_exercise_id)
     else
