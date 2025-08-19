@@ -101,7 +101,7 @@ class OdsaExerciseAttemptsController < ApplicationController
       request_type: request_type,
       ip_address: request.ip,
     )
-    
+
     respond_to do |format|
       if exercise_attempt.save
         if hasBook
@@ -117,9 +117,9 @@ class OdsaExerciseAttemptsController < ApplicationController
           exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
                                                            inst_course_offering_exercise_id: inst_course_offering_exercise.id)
         end
-        if !already_proficient and exercise_progress.proficient? and 
+        if !already_proficient and exercise_progress.proficient? and
           exercise_progress.has_inst_course_offering_exercise?()
-          
+
           exercise_progress.post_course_offering_exercise_score_to_lms()
         end
         format.json {
@@ -147,7 +147,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     unless user_logged_in?
       return
     end
-    
+
     hasBook = params.key?(:inst_book_id)
     is_standalone_module = params.key?(:inst_module_version_id)
     if params.key?(:inst_book_section_exercise_id)
@@ -172,7 +172,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     elsif is_standalone_module
       inst_exercise = InstExercise.find_by(short_name: params[:exercise])
       inst_module_section_exercise = InstModuleSectionExercise.find_by(
-                                                        inst_exercise_id: inst_exercise.id, 
+                                                        inst_exercise_id: inst_exercise.id,
                                                         inst_module_version_id: params[:inst_module_version_id])
       threshold = inst_module_section_exercise.threshold
     else
@@ -214,7 +214,7 @@ class OdsaExerciseAttemptsController < ApplicationController
 
       already_proficient = exercise_progress.proficient?
       correct = params[:score].to_f >= params[:threshold].to_f
-      
+
       exercise_attempt = OdsaExerciseAttempt.new(
         inst_book_id: params[:inst_book_id],
         user: current_user,
@@ -251,9 +251,9 @@ class OdsaExerciseAttemptsController < ApplicationController
             exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
               inst_course_offering_exercise_id: inst_course_offering_exercise.id)
           end
-          if !already_proficient and exercise_progress.proficient? and 
+          if !already_proficient and exercise_progress.proficient? and
             exercise_progress.has_inst_course_offering_exercise?()
-            
+
             exercise_progress.post_course_offering_exercise_score_to_lms()
           end
           format.json {
@@ -284,7 +284,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     unless user_logged_in?
       return
     end
-    
+
     hasBook = params.key?(:inst_book_id)
     is_standalone_module = params.key?(:inst_module_version_id)
     if params.key?(:inst_book_section_exercise_id)
@@ -309,7 +309,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     elsif is_standalone_module
       inst_exercise = InstExercise.find_by(short_name: params[:exercise])
       inst_module_section_exercise = InstModuleSectionExercise.find_by(
-                                                        inst_exercise_id: inst_exercise.id, 
+                                                        inst_exercise_id: inst_exercise.id,
                                                         inst_module_version_id: params[:inst_module_version_id])
       threshold = inst_module_section_exercise.threshold
     else
@@ -390,9 +390,9 @@ class OdsaExerciseAttemptsController < ApplicationController
             exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
               inst_course_offering_exercise_id: inst_course_offering_exercise.id)
           end
-          if !already_proficient and exercise_progress.proficient? and 
+          if !already_proficient and exercise_progress.proficient? and
             exercise_progress.has_inst_course_offering_exercise?()
-            
+
             exercise_progress.post_course_offering_exercise_score_to_lms()
           end
           # byebug
@@ -421,7 +421,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     unless user_logged_in?
       return
     end
-    
+
     hasBook = params.key?(:inst_book_id)
     is_standalone_module = params.key?(:inst_module_version_id)
     if params.key?(:inst_book_section_exercise_id)
@@ -446,7 +446,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     elsif is_standalone_module
       inst_exercise = InstExercise.find_by(short_name: params[:exercise])
       inst_module_section_exercise = InstModuleSectionExercise.find_by(
-                                                        inst_exercise_id: inst_exercise.id, 
+                                                        inst_exercise_id: inst_exercise.id,
                                                         inst_module_version_id: params[:inst_module_version_id])
       threshold = inst_module_section_exercise.threshold
     else
@@ -519,9 +519,9 @@ class OdsaExerciseAttemptsController < ApplicationController
             exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
               inst_course_offering_exercise_id: inst_course_offering_exercise.id)
           end
-          if !already_proficient and exercise_progress.proficient? and 
+          if !already_proficient and exercise_progress.proficient? and
             exercise_progress.has_inst_course_offering_exercise?()
-            
+
             exercise_progress.post_course_offering_exercise_score_to_lms()
           end
           format.json {
