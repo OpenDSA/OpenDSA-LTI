@@ -3,6 +3,7 @@ OpenDSA::Application.configure do
   # config/application.rb.
   config.hosts << "opendsa.dev.tlos.cloud.vt.edu"
   config.hosts << "opendsa-lti.localhost.devcom.vt.edu"
+  config.hosts << "host.docker.internal"
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
