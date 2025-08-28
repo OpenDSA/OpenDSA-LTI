@@ -100,6 +100,9 @@ class OdsaExerciseAttemptsController < ApplicationController
       question_name: question_name,
       request_type: request_type,
       ip_address: request.ip,
+      lis_outcome_service_url: session[:lis_outcome_service_url],
+      lis_result_sourcedid: session[:lis_result_sourcedid],
+      lms_access_id: session[:lms_access_id]
     )
 
     respond_to do |format|
