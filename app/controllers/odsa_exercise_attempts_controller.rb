@@ -155,6 +155,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     is_standalone_module = params.key?(:inst_module_version_id)
     if params.key?(:inst_book_section_exercise_id)
       inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
+      inst_section = inst_book_section_exercise.inst_section
       threshold = inst_book_section_exercise.threshold
     elsif hasBook
       inst_book = InstBook.find_by(id: params[:inst_book_id])
@@ -292,6 +293,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     is_standalone_module = params.key?(:inst_module_version_id)
     if params.key?(:inst_book_section_exercise_id)
       inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
+      inst_section = inst_book_section_exercise.inst_section
       threshold = inst_book_section_exercise.threshold
     elsif hasBook
       inst_book = InstBook.find_by(id: params[:inst_book_id])
@@ -429,6 +431,7 @@ class OdsaExerciseAttemptsController < ApplicationController
     is_standalone_module = params.key?(:inst_module_version_id)
     if params.key?(:inst_book_section_exercise_id)
       inst_book_section_exercise = InstBookSectionExercise.find(params[:inst_book_section_exercise_id])
+      inst_section = inst_book_section_exercise.inst_section
       threshold = inst_book_section_exercise.threshold
     elsif hasBook
       inst_book = InstBook.find_by(id: params[:inst_book_id])
