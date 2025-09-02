@@ -16,6 +16,8 @@
       TP.toParams.launch_params.<%= key %> = "<%= value %>";
     <% end%>
     TP.userEmail = "<%= @user.email %>";
+    TP.courseOfferingId = "<%= @course_offering.id %>";
+    TP.userId = "<%= current_user.id %>";
     <% if params.key?(:custom_inst_chapter_module_id) %>
       TP.moduleTitle = "<%= params[:custom_module_title] %>";
       TP.instChapterModuleId = "<%= params[:custom_inst_chapter_module_id] %>";
