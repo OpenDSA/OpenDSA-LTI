@@ -1,5 +1,6 @@
 class CourseOfferingsController < ApplicationController
   before_action :rename_course_offering_id_param
+  before_action :authorize_user_for_course_offering_data, only: [:show, :get_individual_attempt, :find_attempts]
   # load_and_authorize_resource
 
   # -------------------------------------------------------------
@@ -509,6 +510,47 @@ class CourseOfferingsController < ApplicationController
   def course_offering_params
     params.require(:course_offering).permit(:course_id, :term_id,
                                             :label, :url, :self_enrollment_allowed)
+  end
+
+  def authorize_user_for_course_offering_data
+    if current_user.blank?
+      render json: { message: 'You must be logged in to access this data.' }, status: :unauthorized
+      return
+    end
+
+    course_offering = nil
+    if params[:id].present?
+      course_offering = CourseOffering.find_by(id: params[:id])
+    elsif params[:course_offering_id].present?
+      course_offering = CourseOffering.find_by(id: params[:course_offering_id])
+    elsif params[:inst_section_id].present?
+      inst_section = InstSection.find_by(id: params[:inst_section_id])
+      if inst_section.present? && inst_section.inst_chapter_module.present? && inst_section.inst_chapter_module.inst_chapter.present? && inst_section.inst_chapter_module.inst_chapter.inst_book.present?
+        course_offering = inst_section.inst_chapter_module.inst_chapter.inst_book.course_offering
+      end
+    end
+
+    if course_offering.blank?
+      render json: { message: 'Course offering not found.' }, status: :not_found
+      return
+    end
+
+    # Allow access if the user is an instructor for the course or an admin
+    if current_user.global_role.is_admin? || course_offering.is_instructor?(current_user)
+      return
+    end
+
+    # Allow access if the user is requesting their own data
+    if params[:user_id].present? && current_user.id.to_s == params[:user_id]
+      return
+    end
+    
+    # In the 'show' action, a student should be able to see the course offering if they are enrolled.
+    if action_name == 'show' && course_offering.is_enrolled?(current_user)
+      return
+    end
+
+    render json: { message: 'You are not authorized to access this data.' }, status: :forbidden
   end
 
 end
