@@ -39,7 +39,7 @@ OpenDSA::Application.routes.draw do
   #used by grading.js in the front end
   post '/student_exercise_progress/new_progress' => 'student_exercise_progresses#create'
   post '/student_exercise_progress/get_progress' => 'student_exercise_progresses#fetch'
-  
+
   #me
   #get '/Display' => 'course_offerings#postData'
   #get '/course_offerings/:id/Display' => 'course_offerings#postData'
@@ -101,9 +101,9 @@ OpenDSA::Application.routes.draw do
   get '/course_offerings/:id' => 'course_offerings#show', as: :show_course_offerings
   get '/course_offerings/time_tracking_lookup/:id' => 'course_offerings#get_time_tracking_lookup', as: :get_time_tracking_lookup
   get '/course_offerings/time_tracking_data/:id/date/:date' => 'course_offerings#get_time_tracking_data', as: :get_time_tracking_data
-  get '/course_offerings/:user_id/:inst_section_id' => 'course_offerings#find_attempts', as: :find_attempts
+  get '/course_offerings/(:user_id)/:inst_section_id/section' => 'course_offerings#find_attempts', as: :find_attempts
   get '/course_offerings/:id/modules/:inst_chapter_module_id/progresses' => 'course_offerings#find_module_progresses', as: :find_module_progresses
-  get '/course_offerings/:user_id/:id/exercise_list' => 'course_offerings#get_individual_attempt', as: :get_individual_attempt
+  get '/course_offerings/(:user_id)/:id/exercise_list' => 'course_offerings#get_individual_attempt', as: :get_individual_attempt
   get '/lms_accesses/:lms_instance_id/search' => 'lms_accesses#search', as: :lms_access_search
   get '/request_extension' => 'workout_offerings#request_extension'
   post '/add_extension' => 'workout_offerings#add_extension'
@@ -238,5 +238,5 @@ OpenDSA::Application.routes.draw do
     # ... [service-specific routes] ...
     get 'deep_linking/content_selection', to: 'deep_linking#content_selection'
     post 'deep_linking/content_selected', to: 'deep_linking#content_selected'
-  end  
+  end
 end

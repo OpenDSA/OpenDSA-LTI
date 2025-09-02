@@ -2575,7 +2575,7 @@ $(function () {
 
     function handleDisplay(user_id, inst_section_id) {
       //GET /course_offerings/:user_id/:inst_section_id
-      var request = `/course_offerings/${user_id}/${inst_section_id}`
+      var request = `/course_offerings/${user_id}/${inst_section_id}/section`
 
       $.ajax({
         url: request,
