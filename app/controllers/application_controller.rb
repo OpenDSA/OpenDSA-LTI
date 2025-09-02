@@ -13,11 +13,13 @@ class ApplicationController < ActionController::Base
   self.responder = ApplicationResponder
   respond_to :html, :json
 
-  #current_user&.time_zone
-
   def use_user_time_zone(&block)
-    zone =  current_user&.time_zone&.name || Rails.application.config.time_zone
-    Time.use_zone(zone, &block)
+    if current_user.nil?
+      zone = Time.find_zone(Rails.application.config.time_zone)
+    else
+      zone = Time.find_zone(current_user&.time_zone&.name) || Time.find_zone(Rails.application.config.time_zone)
+    end
+      Time.use_zone(zone, &block)
   end
 
   # -------------------------------------------------------------
