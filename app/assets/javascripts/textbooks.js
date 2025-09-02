@@ -1,22 +1,22 @@
 (function () {
     var check_completeness, form_alert, handle_submit, handle_generate_textbook, init, reset_alert_area, valid_token;
-  
+
     $(document).ready(function () {
-  
+
       $('#organization-select').change(function () {
         return load_courses();
       });
-  
+
       $('#lms-instance-select').change(function () {
         return handle_lms_access();
       });
-  
+
       $('#lms-access-token').change(function () {
         $("#lms-access-token-check").hide("slow");
         // return handle_access_token();
-  
+
       });
-  
+
       $('#btn-submit-co').click(function () {
         $(this).prop('disabled', true);
         return handle_submit();
@@ -32,19 +32,19 @@
         return handle_select_student();
         //return handle_display();
       });
-  
+
       $('#inst-book-select').on('change', function () {
         var bookId = this[this.selectedIndex].value;
         if (!bookId) return;
         validate_book_config(bookId);
       });
-  
+
       init();
     });
-  
+
     load_courses = function () {
       var request = "/courses/" + $('#organization-select').val() + "/search";
-  
+
       var aj = $.ajax({
         url: request,
         type: 'get',
@@ -55,11 +55,11 @@
         console.log('AJAX request has FAILED');
       });
     };
-  
+
     handle_lms_access = function () {
       if ($('#lms-instance-select').val()) {
         var request = "/lms_accesses/" + $('#lms-instance-select').val() + "/search";
-  
+
         var aj = $.ajax({
           url: request,
           type: 'get',
@@ -90,7 +90,7 @@
         });
       }
     };
-  
+
     //modify the course dropdown
     change_courses = function (data) {
       $("#course-select").empty();
@@ -100,14 +100,14 @@
         );
       }
     };
-  
+
     init = function () {
       // $("#lms-access-update-btn").hide();
       $("#lms-access-token-check").hide();
       $("#lms-access-token-desc").hide();
       // $("#lms-access-token-group").hide();
     };
-  
+
     form_alert = function (messages) {
       var alert_list, message, _fn, _i, _len;
       reset_alert_area();
@@ -121,14 +121,14 @@
       }
       return $('#alerts').css('display', 'block');
     };
-  
+
     reset_alert_area = function () {
       var alert_box;
       $('#alerts').find('.alert').alert('close');
       alert_box = "<div class='alert alert-danger alert-dismissable' role='alert'>" + "<button class='close' data-dismiss='alert' aria-label='Close'><i class='fa fa-times'></i></button>" + "<ul></ul>" + "</div>";
       return $('#alerts').append(alert_box);
     };
-  
+
     check_completeness = function (isTextbook) {
       var messages;
       messages = [];
@@ -163,10 +163,10 @@
       if ($('#inst-book-select').val() === '') {
         messages.push('One of book instances has to be selected.');
       }
-  
+
       return messages;
     };
-  
+
     validate_book_config = function (bookId) {
       $.ajax({
         url: '/inst_books/' + bookId + '/validate',
@@ -261,7 +261,7 @@
         }
       });
     };
-  
+
     handle_select_student = function () {
       var messages = check_dis_completeness();
       if (messages.length !== 0) {
@@ -288,16 +288,16 @@
         console.log('AJAX request has FAILED');
       });
     }
-  
+
     handle_display = function () {
       var messages = check_dis_completeness();
       if (messages.length !== 0) {
         alert(messages);
         return;
       }
-      //GET /course_offerings/:user_id/:inst_section_id
-      var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('#comb').find('option:selected').val();
-  
+      //GET /course_offerings/:user_id/:inst_section_id/section
+      var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('#comb').find('option:selected').val() + "/section";
+
       var aj = $.ajax({
         url: request,
         type: 'get',
@@ -341,7 +341,7 @@
         console.log('AJAX request has FAILED');
       });
     };
-  
+
     getFieldMember = function (pData, attempts) {
       console.dir(pData)
       var member = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.current_score + '</th>';
@@ -353,7 +353,7 @@
       member += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;">' + pData.last_done.substring(0, 10) + " " + pData.last_done.substring(11, 16) + '</th>';
       return member;
     }
-  
+
     buildProgressHeader = function () {
       var elem = '<tr> <th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Current Score </th>';
       elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Highest Score </th>';
@@ -364,7 +364,7 @@
       elem += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Last Done </th> </tr>';
       return elem
     }
-  
+
     getAttemptHeader = function () {
       var head = '<tr><th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Question name </th>';
       head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Request Type </th>';
@@ -374,7 +374,7 @@
       head += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> Time Taken (s)</th>';
       return head;
     }
-  
+
     getAttemptMemeber = function (aData, j) {
       var memb = "";
       console.dir(aData.earned_proficiency + " and j = " + j)
@@ -388,12 +388,12 @@
       memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.worth_credit + '</th>';
       memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_done.substring(0, 10) + " " + aData.time_done.substring(11, 16) + '</th>';
       memb += '<th style="border: 1px solid #dddddd;text-align: left; padding: 8px;"> ' + aData.time_taken + '</th>';
-  
+
       return memb;
-  
-  
+
+
     }
-  
+
     check_dis_completeness = function () {
       var messages;
       messages = [];
@@ -408,5 +408,5 @@
       }
       return messages
     };
-  
+
   }).call(this);

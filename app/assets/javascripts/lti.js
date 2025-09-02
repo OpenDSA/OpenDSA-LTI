@@ -155,8 +155,8 @@
       alert(messages);
       return;
     }
-    //GET /course_offerings/:user_id/:inst_section_id
-    var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('#comb').find('option:selected').val();
+    //GET /course_offerings/:user_id/:inst_section_id/section
+    var request = "/course_offerings/" + $('#combobox').find('option:selected').val() + "/" + $('#comb').find('option:selected').val() + "/section";
 
     var aj = $.ajax({
       url: request,

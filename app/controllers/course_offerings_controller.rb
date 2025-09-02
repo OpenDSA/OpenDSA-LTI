@@ -65,7 +65,11 @@ class CourseOfferingsController < ApplicationController
   # GET /course_offerings/:user_id/id/exercise_list
   def get_individual_attempt
     #puts "trying to find individual attempt"
-    @user_id = User.find_by(id: params[:user_id])
+    if params[:user_id].present?
+      @user_id = User.find_by(id: params[:user_id])
+    else
+      @user_id = current_user
+    end
     @course_offering = CourseOffering.find_by(id: params[:id])
     @url = url_for(organization_course_path(
       @course_offering.course.organization,
@@ -119,9 +123,13 @@ class CourseOfferingsController < ApplicationController
     end
   end
 
-  # GET /course_offerings/:user_id/:inst_section_id
+  # GET /course_offerings/:user_id/:inst_section_id/section
   def find_attempts
-    @user_id = User.find_by(id: params[:user_id])
+    if params[:user_id].present?
+      @user_id = User.find_by(id: params[:user_id])
+    else
+      @user_id = current_user
+    end
     @inst_section = InstSection.find_by(id: params[:inst_section_id])
     @inst_book_section_exercise = InstBookSectionExercise.where(inst_section_id: @inst_section.id, required: true).first #not sure about the first
     @inst_book_section_exercise_id = @inst_book_section_exercise.id
@@ -544,7 +552,7 @@ class CourseOfferingsController < ApplicationController
     if params[:user_id].present? && current_user.id.to_s == params[:user_id]
       return
     end
-    
+
     # In the 'show' action, a student should be able to see the course offering if they are enrolled.
     if action_name == 'show' && course_offering.is_enrolled?(current_user)
       return
