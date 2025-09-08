@@ -53,8 +53,11 @@ class OdsaModuleProgress < ApplicationRecord
     module_progress = OdsaModuleProgress.find_or_create_by(user_id: user_id, inst_chapter_module_id: inst_chapter_module_id) do |mp|
       mp.inst_book_id = inst_book_id
     end
-    if lis_outcome_service_url.present? && (module_progress.lis_outcome_service_url != lis_outcome_service_url || module_progress.lis_result_sourcedid != lis_result_sourcedid || module_progress.lms_access_id != lms_access_id)
-      module_progress.update(lis_outcome_service_url: lis_outcome_service_url, lis_result_sourcedid: lis_result_sourcedid, lms_access_id: lms_access_id)
+    if lis_outcome_service_url.present?
+      module_progress.lis_outcome_service_url = lis_outcome_service_url
+      module_progress.lis_result_sourcedid = lis_result_sourcedid
+      module_progress.lms_access_id = lms_access_id
+      save_result = module_progress.save!
     end
 
     module_progress
@@ -62,8 +65,19 @@ class OdsaModuleProgress < ApplicationRecord
 
   def self.get_standalone_progress(user_id, inst_module_version_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil)
     module_progress = OdsaModuleProgress.find_or_create_by(user_id: user_id, inst_module_version_id: inst_module_version_id)
-    if lis_outcome_service_url.present? && (module_progress.lis_outcome_service_url != lis_outcome_service_url || module_progress.lis_result_sourcedid != lis_result_sourcedid || module_progress.lms_access_id != lms_access_id)
-      module_progress.update(lis_outcome_service_url: lis_outcome_service_url, lis_result_sourcedid: lis_result_sourcedid, lms_access_id: lms_access_id)
+    if module_progress == nil
+      module_progress = OdsaModuleProgress.new(user_id: user_id, inst_module_version_id: inst_module_version_id)
+      unless lis_outcome_service_url == nil or lis_result_sourcedid == nil
+        module_progress.lis_outcome_service_url = lis_outcome_service_url
+        module_progress.lis_result_sourcedid = lis_result_sourcedid
+        module_progress.lms_access_id = lms_access_id
+      end
+      module_progress.save!
+    elsif (lis_outcome_service_url != nil and module_progress.lis_outcome_service_url == nil) or (lis_result_sourcedid != nil and module_progress.lis_result_sourcedid == nil) or (lms_access_id != nil and module_progress.lms_access_id == nil)
+      module_progress.lis_outcome_service_url = lis_outcome_service_url
+      module_progress.lis_result_sourcedid = lis_result_sourcedid
+      module_progress.lms_access_id = lms_access_id
+      module_progress.save!
     end
     module_progress
   end

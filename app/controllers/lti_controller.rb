@@ -30,11 +30,6 @@ class LtiController < ApplicationController
 
     lti_enroll(@course_offering)
 
-    # Store LTI parameters in the session
-    session[:lis_outcome_service_url] = request.request_parameters['lis_outcome_service_url']
-    session[:lis_result_sourcedid] = request.request_parameters['lis_result_sourcedid']
-    session[:lms_access_id] = LmsAccess.where(consumer_key: request.request_parameters['oauth_consumer_key']).pluck(:id).first
-
     if params.has_key?(:custom_course_offering_id)
       launch_instructor_tool()
       return
@@ -42,10 +37,11 @@ class LtiController < ApplicationController
 
     file_name = nil
     if params.key?(:custom_module_file_name)
+      lms_access_id = LmsAccess.where(consumer_key: request.request_parameters['oauth_consumer_key']).pluck(:id).first
       OdsaModuleProgress.get_progress(current_user.id,
                                       params[:custom_inst_chapter_module_id],
-                                      params[:custom_inst_book_id], session[:lis_outcome_service_url],
-                                      session[:lis_result_sourcedid], session[:lms_access_id])
+                                      params[:custom_inst_book_id], params[:lis_outcome_service_url],
+                                      params[:lis_result_sourcedid], lms_access_id)
       file_name = params[:custom_module_file_name]
     else
       file_name = params[:custom_section_file_name]
