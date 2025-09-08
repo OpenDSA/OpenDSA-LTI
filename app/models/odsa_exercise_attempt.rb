@@ -39,7 +39,6 @@
 #
 
 class OdsaExerciseAttempt < ApplicationRecord
-  attr_accessor :lis_outcome_service_url, :lis_result_sourcedid, :lms_access_id
   #~ Relationships ............................................................
   belongs_to :user
   belongs_to :inst_book
@@ -99,7 +98,7 @@ class OdsaExerciseAttempt < ApplicationRecord
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
       book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
-      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id, lis_outcome_service_url, lis_result_sourcedid, lms_access_id)
+      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
     elsif has_standalone_module
       inst_exercise = InstExercise.find_by(id: inst_module_section_exercise.inst_exercise)
       module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
@@ -183,10 +182,10 @@ class OdsaExerciseAttempt < ApplicationRecord
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
       book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
-      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id, lis_outcome_service_url, lis_result_sourcedid, lms_access_id)
+      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
     elsif has_standalone_module
       inst_exercise = InstExercise.find(inst_module_section_exercise.inst_exercise_id)
-      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id, lis_outcome_service_url, lis_result_sourcedid, lms_access_id)
+      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
     else
       inst_exercise = InstExercise.find(inst_course_offering_exercise.inst_exercise_id)
     end
@@ -231,10 +230,10 @@ class OdsaExerciseAttempt < ApplicationRecord
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
       book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
-      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id, lis_outcome_service_url, lis_result_sourcedid, lms_access_id)
+      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
     elsif has_standalone_module
       inst_exercise = InstExercise.find(inst_module_section_exercise.inst_exercise_id)
-      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id, lis_outcome_service_url, lis_result_sourcedid, lms_access_id)
+      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
     else
       inst_exercise = InstExercise.find(inst_course_offering_exercise.inst_exercise_id)
     end
@@ -284,10 +283,10 @@ class OdsaExerciseAttempt < ApplicationRecord
       @inst_chapter_module = inst_book_section_exercise.get_chapter_module
       inst_exercise = InstExercise.find_by(id: inst_book_section_exercise.inst_exercise_id)
       book_progress = OdsaBookProgress.get_progress(user_id, inst_book_id)
-      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id, lis_outcome_service_url, lis_result_sourcedid, lms_access_id)
+      module_progress = OdsaModuleProgress.get_progress(user_id, @inst_chapter_module.id, inst_book_id)
     elsif has_standalone_module
       inst_exercise = InstExercise.find(inst_module_section_exercise.inst_exercise_id)
-      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id, lis_outcome_service_url, lis_result_sourcedid, lms_access_id)
+      module_progress = OdsaModuleProgress.get_standalone_progress(user_id, inst_module_section_exercise.inst_module_version_id)
     else
       inst_exercise = InstExercise.find(inst_course_offering_exercise.inst_exercise_id)
     end
