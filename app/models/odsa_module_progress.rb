@@ -104,13 +104,14 @@ class OdsaModuleProgress < ApplicationRecord
     # Comparing two floats.
     # Only send score to LMS if the score has increased, or previous
     # passback was not performed or unsuccessful
-    if force_send or
-      self.last_passback.nil? or
-      (self.inst_book && self.inst_book.last_compiled.nil?) or
-      (self.last_passback && self.inst_book && self.inst_book.last_compiled && (self.last_passback < self.inst_book.last_compiled)) or
-      self.highest_score > old_score
-      res = post_score_to_lms()
-    end
+    # if force_send or
+    #   self.last_passback.nil? or
+    #   (self.inst_book && self.inst_book.last_compiled.nil?) or
+    #   (self.last_passback && self.inst_book && self.inst_book.last_compiled && (self.last_passback < self.inst_book.last_compiled)) or
+    #   self.highest_score > old_score
+    #   res = post_score_to_lms()
+    # end
+    res = post_score_to_lms()
     self.save!
 
     last_exercise = false
