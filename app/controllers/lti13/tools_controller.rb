@@ -1,6 +1,5 @@
 class Lti13::ToolsController < ApplicationController
-  before_action :set_lms_instance, only: [:jwks]
-  
+
   # GET /tools
   def index
     @tools = Tool.all
@@ -51,21 +50,28 @@ class Lti13::ToolsController < ApplicationController
 
   # GET /.well-known/jwks
   def jwks
-    Rails.logger.info "ToolsController#jwks: Generating JWKS"
-    
-    if @lms_instance
-      begin
-        private_key = OpenSSL::PKey::RSA.new(@lms_instance.private_key)
-        public_key = private_key.public_key
-        jwk = JWT::JWK.new(public_key)
-        render json: { keys: [jwk.export] }
-      rescue => e
-        Rails.logger.error "Error generating JWKS: #{e.message}"
-        render json: { error: 'Error generating JWKS' }, status: :internal_server_error
+    Rails.logger.info "ToolsController#jwks: Generating JWKS for all LMS instances"
+    keys = LmsInstance.all.map do |lms_instance|
+      if lms_instance.private_key.present?
+        begin
+          private_key = OpenSSL::PKey::RSA.new(lms_instance.private_key)
+          kid = Jwt::KidFromPrivateKey.new(lms_instance.private_key).call
+          public_key = private_key.public_key
+          jwk = JWT::JWK.new(public_key)
+          
+          exported_jwk = jwk.export
+          exported_jwk[:kid] = kid
+          exported_jwk[:alg] = 'RS256'
+          exported_jwk[:use] = 'sig'
+          
+          exported_jwk
+        rescue => e
+          Rails.logger.error "Error generating JWK for LmsInstance #{lms_instance.id}: #{e.message}"
+          nil
+        end
       end
-    else
-      render json: { error: 'LMS Instance not found' }, status: :not_found
-    end
+    end.compact
+    render json: { keys: keys }
   end
 
   #~ Private methods ..........................................................
@@ -73,15 +79,9 @@ class Lti13::ToolsController < ApplicationController
   private
   # -------------------------------------------------------------
 
-  def set_lms_instance 
-    lms_instance_id = params[:lms_instance_id] || session[:lms_instance_id]
-    @lms_instance = LmsInstance.find_by(id: lms_instance_id)
-  end
-
     # Only allowing a list of trusted parameters through.
   def tool_params
     params.require(:tool).permit(:name, :client_id, :deployment_id, :private_key, :keyset_url, :oauth2_url, :platform_oidc_auth_url)
   end
 
 end
-
