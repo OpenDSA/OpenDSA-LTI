@@ -5,6 +5,7 @@ module Jwt
     end
 
     def call
+      return {} unless @jwt
       header_segment = @jwt.split('.').first
       JSON.parse(base64_url_decode(header_segment))
     end
