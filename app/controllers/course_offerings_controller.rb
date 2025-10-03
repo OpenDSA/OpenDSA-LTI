@@ -473,6 +473,77 @@ class CourseOfferingsController < ApplicationController
       notice: 'Workouts added to course offering!'
   end
 
+  def export_students
+    require 'csv'
+
+    course_offering = CourseOffering.find(params[:id])
+
+    # Only instructors/admins
+    unless course_offering.is_instructor?(current_user) || current_user.global_role.is_admin?
+      render json: { message: 'Forbidden' }, status: :forbidden and return
+    end
+
+    # Enrolled students (users) for this course offering
+    students = CourseEnrollment
+                .where(course_offering_id: course_offering.id, course_role_id: CourseRole::STUDENT_ID)
+                .includes(:user).map(&:user)
+
+    # ----- Aggregates we’ll join into the CSV -----
+
+    inst_book = course_offering.odsa_books.first
+
+    ex_prog = OdsaExerciseProgress
+                .where(user_id: students.map(&:id))
+                .group(:user_id)
+                .select(:user_id,
+                        'COUNT(*) AS exercises_seen',
+                        'SUM(CASE WHEN proficient_date IS NOT NULL THEN 1 ELSE 0 END) AS exercises_prof')
+                .index_by(&:user_id)
+
+    mod_prog = OdsaModuleProgress
+                .where(user_id: students.map(&:id))
+                .group(:user_id)
+                .select(:user_id,
+                        'COUNT(*) AS modules_seen',
+                        'SUM(CASE WHEN proficient_date IS NOT NULL THEN 1 ELSE 0 END) AS modules_prof')
+                .index_by(&:user_id)
+
+    time_totals = OdsaUserTimeTracking
+                    .where(user_id: students.map(&:id), inst_book_id: inst_book&.id)
+                    .group(:user_id)
+                    .select(:user_id, 'SUM(total_time) AS total_minutes')
+                    .index_by(&:user_id)
+
+    # ----- CSV -----
+
+    csv = CSV.generate(headers: true) do |out|
+      out << %w[
+        anon_id
+        exercises_seen exercises_prof
+        modules_seen modules_prof
+        total_minutes_spent
+      ]
+
+      students.each do |u|
+        anon_id = u.id  
+
+        ep = ex_prog[u.id]&.attributes || {}
+        mp = mod_prog[u.id]&.attributes || {}
+        tt = time_totals[u.id]&.attributes || {}
+
+        out << [
+          anon_id,
+          ep['exercises_seen'].to_i, ep['exercises_completed'].to_i,
+          mp['modules_seen'].to_i,   mp['modules_completed'].to_i,
+          tt['total_minutes'].to_f
+        ]
+      end
+    end
+
+    fname = "#{course_offering.course.number}-#{course_offering.label}-students.csv"
+    send_data csv, filename: fname, type: 'text/csv; charset=utf-8'
+  end
+
   #~ Private instance methods .................................................
   private
 
@@ -560,5 +631,6 @@ class CourseOfferingsController < ApplicationController
 
     render json: { message: 'You are not authorized to access this data.' }, status: :forbidden
   end
+
 
 end

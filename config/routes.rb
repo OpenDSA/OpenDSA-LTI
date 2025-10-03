@@ -104,6 +104,7 @@ OpenDSA::Application.routes.draw do
   get '/course_offerings/(:user_id)/:inst_section_id/section' => 'course_offerings#find_attempts', as: :find_attempts
   get '/course_offerings/:id/modules/:inst_chapter_module_id/progresses' => 'course_offerings#find_module_progresses', as: :find_module_progresses
   get '/course_offerings/(:user_id)/:id/exercise_list' => 'course_offerings#get_individual_attempt', as: :get_individual_attempt
+  get '/course_offerings/:id/export_students' => 'course_offerings#export_students', as: :export_students_course_offering
   get '/lms_accesses/:lms_instance_id/search' => 'lms_accesses#search', as: :lms_access_search
   get '/request_extension' => 'workout_offerings#request_extension'
   post '/add_extension' => 'workout_offerings#add_extension'
