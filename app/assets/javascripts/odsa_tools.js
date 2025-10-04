@@ -2554,11 +2554,12 @@ $(function () {
     var users = lookups["users"];
     var modulesGradable = lookups["modulesGradable"];
 
-    var selectize_modules, // module picker
-      selectize_exoverview_exs; // exercise picker (exercise overview tab)
+    var selectize_modules; // module picker
+    var selectize_exoverview_exs; // exercise picker (exercise overview tab)
 
     var EXERCISE_OVERVIEW_MODE = false;
 
+    /* ---------------- UI helpers ---------------- */
     function clearContainers() {
       $("#multi-container").hide(); // module dropdown row
       $("#exercise-overview-container").hide(); // exercise dropdown row
@@ -2595,31 +2596,23 @@ $(function () {
 
     function resetExercisePicker() {
       if (!selectize_exoverview_exs) return;
-      // clear selection & options
       selectize_exoverview_exs.clear(true);
       selectize_exoverview_exs.clearOptions();
-      // get rid of render caches so old labels can’t show up
       selectize_exoverview_exs.renderCache = { item: {}, option: {} };
-      // close dropdown and disable Export until a new exercise is chosen
       selectize_exoverview_exs.close();
       updateExportEnabled();
     }
 
+    /* ---------------- Tabs ---------------- */
     $("#ex-btn-exercise-overview")
       .off("click")
       .on("click", function () {
         EXERCISE_OVERVIEW_MODE = true;
         clearContainers();
-
-        $("#multi-container").show();
-        $("#exercise-overview-container").show();
-        $("#exercise-overview-actions").show();
-
-        if (selectize_exoverview_exs) {
-          selectize_exoverview_exs.clearOptions();
-          selectize_exoverview_exs.clear();
-        }
-        updateExportEnabled();
+        $("#multi-container").show(); // 1) module
+        $("#exercise-overview-container").show(); // 2) exercise
+        $("#exercise-overview-actions").show(); // 3) export
+        resetExercisePicker();
       });
 
     $("#ex-btn-multi")
@@ -2627,7 +2620,7 @@ $(function () {
       .on("click", function () {
         EXERCISE_OVERVIEW_MODE = false;
         clearContainers();
-        $("#multi-container").show();
+        $("#multi-container").show(); // render table on change
       });
 
     $("#ex-btn-single")
@@ -2639,7 +2632,7 @@ $(function () {
         $("#single-container-exs").show();
       });
 
-    /* ======================= Selectize: Modules ===================== */
+    /* ---------------- Selectize: Modules ---------------- */
     var $selMods = $("#select-for-modules").selectize({
       persist: false,
       valueField: "ch_mod_id",
@@ -2682,15 +2675,106 @@ $(function () {
           resetExercisePicker();
           await populateExercisesFromModule(modId);
           updateExportEnabled();
-          return;
+          return; // don't render big table in this tab
         }
 
         if (modId) {
+          // existing behavior for multi-student table
           handleModuleDisplay(modId);
         }
       });
 
-    /* ===== Selectize: Exercise picker (Exercise Overview tab only) ==== */
+    var selectize_students;
+
+    var $selStudents = $("#select-for-students").selectize({
+      valueField: "id",
+      labelField: "name",
+      searchField: ["first_name", "last_name", "email"],
+      sortField: [
+        { field: "first_name", direction: "asc" },
+        { field: "last_name", direction: "asc" },
+      ],
+      options: users, // <— lookups["users"]
+      render: {
+        item: function (item, esc) {
+          var name = [item.first_name, item.last_name]
+            .filter(Boolean)
+            .join(" ");
+          return (
+            "<div>" +
+            (name ? '<span class="name">' + esc(name) + "</span>" : "") +
+            (item.email
+              ? ' <span class="email">' + esc(item.email) + "</span>"
+              : "") +
+            "</div>"
+          );
+        },
+        option: function (item, esc) {
+          var name = [item.first_name, item.last_name]
+            .filter(Boolean)
+            .join(" ");
+          var label = name || item.email || "User " + item.id;
+          var caption = name ? item.email : null;
+          return (
+            "<div>" +
+            '<span class="label">' +
+            esc(label) +
+            "</span>" +
+            (caption
+              ? ' <span class="caption">' + esc(caption) + "</span>"
+              : "") +
+            "</div>"
+          );
+        },
+      },
+    });
+    selectize_students = $selStudents[0].selectize;
+
+    // When a student is chosen, fetch their exercise list for the 2nd dropdown
+    $("select#select-for-students.selectized")
+      .off("change")
+      .on("change", function () {
+        var userId = selectize_students.getValue();
+        if (userId) handleSelectStudent(userId, ODSA_DATA.course_offering_id);
+      });
+
+    /* -------- Selectize: exercises for the chosen student ---------- */
+    var selectize_students_exs;
+
+    var $selStuEx = $("#select-for-students-exs").selectize({
+      valueField: "key", // we’ll set this via handleSelectStudent
+      labelField: "name",
+      searchField: ["name"],
+      sortField: [{ field: "name", direction: "asc" }],
+      options: [], // filled after a student is picked
+      render: {
+        item: function (item, esc) {
+          return item.attempt_flag
+            ? "<div><span class='name'>" + esc(item.name) + "</span></div>"
+            : "<div></div>";
+        },
+        option: function (item, esc) {
+          return item.attempt_flag
+            ? "<div><span class='name'>" + esc(item.name) + "</span></div>"
+            : "<div></div>";
+        },
+      },
+    });
+    selectize_students_exs = $selStuEx[0].selectize;
+
+    // When a student exercise is chosen, render the tables
+    $("select#select-for-students-exs.selectized")
+      .off("change")
+      .on("change", function () {
+        var inst_section_id = selectize_students_exs.getValue();
+        var userId = selectize_students.getValue();
+        if (userId && inst_section_id) {
+          $("#display_table").html("");
+          handleDisplay(userId, inst_section_id); // existing function renders progress/attempts
+        }
+      });
+
+    /* -------- Selectize: Exercise picker (Exercise Overview tab) ------ */
     var $selEx = $("#select-for-exercises-ov").selectize({
       valueField: "section_id", // route-ready inst_section_id
       labelField: "name",
@@ -2714,7 +2798,7 @@ $(function () {
         updateExportEnabled();
       });
 
-    /* ======================= Populate exercises ===================== */
+    /* ---------------- Populate exercises for module ---------------- */
     async function populateExercisesFromModule(chModId) {
       if (!chModId || !selectize_exoverview_exs) return;
 
@@ -2751,147 +2835,23 @@ $(function () {
 
           selectize_exoverview_exs.addOption({
             section_id: String(sectionId),
-            name,
+            name: name,
           });
         });
 
-        // Replace option set atomically
-        selectize_exoverview_exs.refreshOptions(true); // true = trigger dropdown rebuild
+        selectize_exoverview_exs.refreshOptions(true); // rebuild dropdown
         updateExportEnabled();
       } catch (err) {
         console.error("Failed to load exercises for module", chModId, err);
       }
     }
 
-    $(document)
-      .off("click", "#btn-exercise-overview-csv")
-      .on("click", "#btn-exercise-overview-csv", async function (e) {
-        e.preventDefault();
-        if ($(this).prop("disabled")) return;
-
-        var instSectionId = getSelectedExerciseSectionId();
-        if (!instSectionId) {
-          alert("Please choose an exercise.");
-          return;
-        }
-        try {
-          await exportExerciseCSV(instSectionId);
-        } catch (err) {
-          console.error("Export failed:", err);
-          alert(
-            "Something went wrong exporting the CSV. Check the console for details."
-          );
-        }
-      });
-
-    /* ======================= Fetch + CSV helpers ==================== */
+    /* ---------------- Fetch + CSV helpers (summary only) ------------- */
     function fetchSection(userId, instSectionId) {
       return $.ajax({
         url: "/course_offerings/" + userId + "/" + instSectionId + "/section",
         type: "get",
       });
-    }
-    function q(v) {
-      var s = v == null ? "" : String(v);
-      return '"' + s.replace(/"/g, '""') + '"';
-    }
-    function csv(arr) {
-      return arr.map(q);
-    }
-
-    async function rowsForStudentOnExercise(stu, instSectionId) {
-      try {
-        var data = await fetchSection(stu.id, instSectionId);
-
-        var prog =
-          (data &&
-            data.odsa_exercise_progress &&
-            data.odsa_exercise_progress[0]) ||
-          {};
-        var attempts = Array.isArray(data && data.odsa_exercise_attempts)
-          ? data.odsa_exercise_attempts
-          : [];
-        var meta = data && data.inst_book_section_exercise;
-
-        var exName =
-          (data && data.inst_section && data.inst_section.name) ||
-          (meta && meta.inst_exercise && meta.inst_exercise.name) ||
-          "";
-
-        var pointsPossible = meta && meta.points != null ? meta.points : "";
-        var pointsEarned = prog.proficient_date ? pointsPossible || 0 : 0;
-
-        var summary = [
-          stu.id,
-          instSectionId,
-          exName,
-          pointsPossible,
-          prog.current_score != null ? prog.current_score : "",
-          prog.highest_score != null ? prog.highest_score : "",
-          prog.total_correct != null ? prog.total_correct : "",
-          attempts.length,
-          pointsEarned,
-          prog.proficient_date || "N/A",
-          prog.first_done || "N/A",
-          prog.last_done || "N/A",
-        ];
-
-        var rows = [];
-        if (!attempts.length) {
-          rows.push(
-            csv(summary.concat(["", "", "", "", "", "", "", ""])).join(",")
-          );
-        } else {
-          for (var i = 0; i < attempts.length; i++) {
-            var a = attempts[i];
-            rows.push(
-              csv(
-                summary.concat([
-                  i + 1,
-                  a.request_type || "",
-                  a.correct != null ? a.correct : "",
-                  a.worth_credit != null ? a.worth_credit : "",
-                  a.time_done || "",
-                  a.time_taken != null ? a.time_taken : "",
-                  a.pe_score != null ? a.pe_score : "",
-                  a.pe_steps_fixed != null ? a.pe_steps_fixed : "",
-                ])
-              ).join(",")
-            );
-          }
-        }
-        return rows;
-      } catch (err) {
-        console.warn("Detail fetch failed", {
-          userId: stu.id,
-          instSectionId,
-          err,
-        });
-        return [
-          csv([
-            stu.id,
-            instSectionId,
-            "ERROR",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-          ]).join(","),
-        ];
-      }
     }
 
     const SUMMARY_HEADER = [
@@ -2917,7 +2877,7 @@ $(function () {
       return arr.map(q).join(",");
     }
 
-    // Build exactly ONE summary row for a student on the exercise
+    // Exactly ONE summary row per student/exercise
     async function rowsForStudentOnExercise(stu, instSectionId) {
       try {
         const data = await fetchSection(stu.id, instSectionId);
@@ -2981,7 +2941,6 @@ $(function () {
       }
     }
 
-    // Export the chosen exercise for ALL students (summary rows only)
     async function exportExerciseCSV(instSectionId) {
       const students = Array.isArray(users) ? users.slice() : [];
       if (!students.length) {
@@ -3023,9 +2982,11 @@ $(function () {
       URL.revokeObjectURL(url);
       a.remove();
     }
-    $("#btn-exercise-ex-csv")
-      .off("click")
-      .on("click", async function (e) {
+
+    // ONE click handler (matches HAML id)
+    $(document)
+      .off("click", "#btn-exercise-overview-csv")
+      .on("click", "#btn-exercise-overview-csv", async function (e) {
         e.preventDefault();
         if ($(this).prop("disabled")) return;
         var sectionId = getSelectedExerciseSectionId();
