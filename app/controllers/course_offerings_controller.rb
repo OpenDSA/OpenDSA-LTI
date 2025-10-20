@@ -1,6 +1,7 @@
 class CourseOfferingsController < ApplicationController
   before_action :rename_course_offering_id_param
-  before_action :authorize_user_for_course_offering_data, only: [:show, :get_individual_attempt, :find_attempts]
+  # before_action :authorize_user_for_course_offering_data, only: [:show, :get_individual_attempt, :find_attempts]
+  before_action :authorize_user_for_course_offering_data, only: [:show, :find_attempts]
   # load_and_authorize_resource
 
   # -------------------------------------------------------------
@@ -152,6 +153,34 @@ class CourseOfferingsController < ApplicationController
                :@inst_section => @inst_section},
     )
   end
+
+  # GET /course_offerings/:id/codeworkout_progress
+def get_codeworkout_progress
+  if params[:user_id].present?
+    @user_id = User.find_by(id: params[:user_id])
+  else
+    @user_id = current_user
+  end
+  
+  @inst_book_section_exercise_id = params[:inst_book_section_exercise_id]
+  
+  if @inst_book_section_exercise_id.blank?
+    render json: { error: 'inst_book_section_exercise_id is required' }, status: :bad_request
+    return
+  end
+  
+  @progress = OdsaExerciseProgress.where(
+    "inst_book_section_exercise_id = ? AND user_id = ?",
+    @inst_book_section_exercise_id,
+    @user_id
+  ).select("current_score, highest_score, total_correct, proficient_date, first_done, last_done").first
+  
+  if @progress
+    render json: @progress
+  else
+    render json: { completed: false }
+  end
+end
 
   # GET /course_offerings/:id/modules/:inst_chapter_module_id/progresses
   def find_module_progresses
