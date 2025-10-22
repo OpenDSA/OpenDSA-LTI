@@ -1,7 +1,7 @@
 class CourseOfferingsController < ApplicationController
   before_action :rename_course_offering_id_param
   # before_action :authorize_user_for_course_offering_data, only: [:show, :get_individual_attempt, :find_attempts]
-  before_action :authorize_user_for_course_offering_data, only: [:show, :find_attempts]
+  before_action :authorize_user_for_course_offering_data, only: [:show, :get_individual_attempt, :find_attempts, :get_codeworkout_progress]
   # load_and_authorize_resource
 
   # -------------------------------------------------------------
