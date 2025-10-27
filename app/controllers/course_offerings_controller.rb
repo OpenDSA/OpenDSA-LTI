@@ -66,7 +66,6 @@ class CourseOfferingsController < ApplicationController
 
 # GET /course_offerings/:user_id/id/exercise_list
 def get_individual_attempt
-  #puts "trying to find individual attempt"
   if params[:user_id].present?
     @user_id = User.find_by(id: params[:user_id])
   else
@@ -108,25 +107,38 @@ def get_individual_attempt
               if section.gradable
                 @inst_section_id = section.id
                 
-                # Get the first required exercise in this section
-                inst_book_section_exercise = InstBookSectionExercise.where(
-                  inst_section_id: @inst_section_id,
-                  required: true
-                ).first
+                # Check if we should use proficiency-based completion
+                check_proficiency = params[:check_proficiency] == 'true'
                 
-                @exercise_list[@inst_section_id].push(title)
-                
-                if inst_book_section_exercise
-                  # Check for proficiency/completion, not just attempts
-                  progress = OdsaExerciseProgress.where(
-                    "inst_book_section_exercise_id=? AND user_id=?",
-                    inst_book_section_exercise.id,
-                    @user_id
+                if check_proficiency
+                  # Check for proficiency
+                  inst_book_section_exercise = InstBookSectionExercise.where(
+                    inst_section_id: @inst_section_id,
+                    required: true
                   ).first
                   
-                  # Only mark as complete if proficient
-                  if progress && progress.proficient_date.present?
-                    @exercise_list[@inst_section_id].push('complete_flag')
+                  @exercise_list[@inst_section_id].push(title)
+                  
+                  if inst_book_section_exercise
+                    progress = OdsaExerciseProgress.where(
+                      "inst_book_section_exercise_id=? AND user_id=?",
+                      inst_book_section_exercise.id,
+                      @user_id
+                    ).first
+                    
+                    if progress && progress.proficient_date.present?
+                      @exercise_list[@inst_section_id].push('complete_flag')
+                    end
+                  end
+                else
+                  # But also Check for any attempts (unchanged behavior)
+                  attempted = OdsaExerciseAttempt.where("inst_section_id=? AND user_id=?",
+                                                        @inst_section_id, @user_id)
+                  if attempted.empty?
+                    @exercise_list[@inst_section_id].push(title)
+                  else
+                    @exercise_list[@inst_section_id].push(title)
+                    @exercise_list[@inst_section_id].push('attempt_flag')
                   end
                 end
               end
