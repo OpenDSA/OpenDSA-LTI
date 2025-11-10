@@ -1,6 +1,8 @@
 class CourseOfferingsController < ApplicationController
   before_action :rename_course_offering_id_param
-  before_action :authorize_user_for_course_offering_data, only: [:show, :get_individual_attempt, :find_attempts]
+  # before_action :authorize_user_for_course_offering_data, only: [:show, :get_individual_attempt, :find_attempts]
+  before_action :authorize_user_for_course_offering_data, 
+              only: [:show, :get_individual_attempt, :find_attempts, :get_codeworkout_progress, :find_module_progresses]
   # load_and_authorize_resource
 
   # -------------------------------------------------------------
@@ -62,49 +64,74 @@ class CourseOfferingsController < ApplicationController
     render(:partial => 'lti/show_individual_exercise.html.haml') and return
   end
 
-  # GET /course_offerings/:user_id/id/exercise_list
-  def get_individual_attempt
-    #puts "trying to find individual attempt"
-    if params[:user_id].present?
-      @user_id = User.find_by(id: params[:user_id])
-    else
-      @user_id = current_user
-    end
-    @course_offering = CourseOffering.find_by(id: params[:id])
-    @url = url_for(organization_course_path(
-      @course_offering.course.organization,
-      @course_offering.course,
-      @course_offering.term
-    ))
+# GET /course_offerings/:user_id/id/exercise_list
+def get_individual_attempt
+  if params[:user_id].present?
+    @user_id = User.find_by(id: params[:user_id])
+  else
+    @user_id = current_user
+  end
+  @course_offering = CourseOffering.find_by(id: params[:id])
+  @url = url_for(organization_course_path(
+    @course_offering.course.organization,
+    @course_offering.course,
+    @course_offering.term
+  ))
 
-    @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
-    @student_list = []
-    #puts @course_enrollment.inspect
-    @course_enrollment.each do |s|
-      q = User.where("id=?", s.user_id).select("id, first_name, last_name")
-      @student_list.push(q)
-    end
-    @instBook = @course_offering.odsa_books.first
+  @course_enrollment = CourseEnrollment.where("course_offering_id=?", @course_offering.id)
+  @student_list = []
+  #puts @course_enrollment.inspect
+  @course_enrollment.each do |s|
+    q = User.where("id=?", s.user_id).select("id, first_name, last_name")
+    @student_list.push(q)
+  end
+  @instBook = @course_offering.odsa_books.first
 
-    @exercise_list = Hash.new { |hsh, key| hsh[key] = [] }
-    chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
-    chapters.each do |chapter|
-      modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
-      modules.each do |inst_ch_module|
-        sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
-        section_item_position = 1
-        if !sections.empty?
-          sections.each do |section|
-            title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
-                    (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + "." +
-                    section_item_position.to_s.rjust(2, "0") + " - "
-            learning_tool = nil
-            if section
-              title = title + section.name
-              learning_tool = section.learning_tool
-              if !learning_tool
-                if section.gradable
-                  @inst_section_id = section.id
+  @exercise_list = Hash.new { |hsh, key| hsh[key] = [] }
+  chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
+  chapters.each do |chapter|
+    modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
+    modules.each do |inst_ch_module|
+      sections = InstSection.where(inst_chapter_module_id: inst_ch_module.id)
+      section_item_position = 1
+      if !sections.empty?
+        sections.each do |section|
+          title = (chapter.position.to_s.rjust(2, "0") || "") + "." +
+                  (inst_ch_module.module_position.to_s.rjust(2, "0") || "") + "." +
+                  section_item_position.to_s.rjust(2, "0") + " - "
+          learning_tool = nil
+          if section
+            title = title + section.name
+            learning_tool = section.learning_tool
+            if !learning_tool
+              if section.gradable
+                @inst_section_id = section.id
+                
+                # Check if we should use proficiency-based completion
+                check_proficiency = params[:check_proficiency] == 'true'
+                
+                if check_proficiency
+                  # Check for proficiency
+                  inst_book_section_exercise = InstBookSectionExercise.where(
+                    inst_section_id: @inst_section_id,
+                    required: true
+                  ).first
+                  
+                  @exercise_list[@inst_section_id].push(title)
+                  
+                  if inst_book_section_exercise
+                    progress = OdsaExerciseProgress.where(
+                      "inst_book_section_exercise_id=? AND user_id=?",
+                      inst_book_section_exercise.id,
+                      @user_id
+                    ).first
+                    
+                    if progress && progress.proficient_date.present?
+                      @exercise_list[@inst_section_id].push('complete_flag')
+                    end
+                  end
+                else
+                  # But also Check for any attempts (unchanged behavior)
                   attempted = OdsaExerciseAttempt.where("inst_section_id=? AND user_id=?",
                                                         @inst_section_id, @user_id)
                   if attempted.empty?
@@ -116,12 +143,13 @@ class CourseOfferingsController < ApplicationController
                 end
               end
             end
-            section_item_position += 1
           end
+          section_item_position += 1
         end
       end
     end
   end
+end
 
   # GET /course_offerings/:user_id/:inst_section_id/section
   def find_attempts
@@ -152,6 +180,34 @@ class CourseOfferingsController < ApplicationController
                :@inst_section => @inst_section},
     )
   end
+
+  # GET /course_offerings/:id/codeworkout_progress
+def get_codeworkout_progress
+  if params[:user_id].present?
+    @user_id = User.find_by(id: params[:user_id])
+  else
+    @user_id = current_user
+  end
+  
+  @inst_book_section_exercise_id = params[:inst_book_section_exercise_id]
+  
+  if @inst_book_section_exercise_id.blank?
+    render json: { error: 'inst_book_section_exercise_id is required' }, status: :bad_request
+    return
+  end
+  
+  @progress = OdsaExerciseProgress.where(
+    "inst_book_section_exercise_id = ? AND user_id = ?",
+    @inst_book_section_exercise_id,
+    @user_id
+  ).select("current_score, highest_score, total_correct, proficient_date, first_done, last_done").first
+  
+  if @progress
+    render json: @progress
+  else
+    render json: { completed: false }
+  end
+end
 
   # GET /course_offerings/:id/modules/:inst_chapter_module_id/progresses
   def find_module_progresses

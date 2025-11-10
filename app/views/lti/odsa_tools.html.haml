@@ -97,21 +97,28 @@
           .btn-group.d-flex.justify-content-center.mt-2.mb-2
             %button.btn.btn-secondary#ex-btn-single{:type => "button"} Single Student Detail View
             %button.btn.btn-secondary#ex-btn-multi{:type => "button"} Multi-Student Overview
+            %button.btn.btn-secondary#ex-btn-exercise-overview{:type => "button"} Exercise Overview
 
-          -# single
-          .sel_wrapper#single-container{:style => "display:none"}
-            .control-group
-              %select#select-for-students.contacts{:placeholder => "Select a student..."}
 
-          -# single exercise
-          .sel_wrapper#single-container-exs{:style => "display:none"}
+          .sel_wrapper#multi-container{ style: "display:none" }
             .control-group
-              %select#select-for-students-exs.contacts{:placeholder => "Select an exercise..."}
+              %select#select-for-modules.contacts{ placeholder: "Select from gradable modules..." }
 
-          -# multi
-          .sel_wrapper#multi-container{:style => "display:none"}
+          .sel_wrapper#exercise-overview-container{ style: "display:none" }
             .control-group
-              %select#select-for-modules.contacts{:placeholder => "Select from gradable modules..."}
+              %select#select-for-exercises-ov.contacts{ placeholder: "Select an exercise..." }
+
+          #exercise-overview-actions{ style: "display:none" }
+            %button.btn.btn-primary#btn-exercise-overview-csv{ type: "button", disabled: true }
+              Export CSV
+
+          .sel_wrapper#single-container{ style: "display:none" }
+            .control-group
+              %select#select-for-students.contacts{ placeholder: "Select a student..." }
+
+          .sel_wrapper#single-container-exs{ style: "display:none" }
+            .control-group
+              %select#select-for-students-exs.contacts{ placeholder: "Select an exercise..." }
 
           #datatabels_wrapper
             %table#exercises_progress.display{:width => "100%"}
