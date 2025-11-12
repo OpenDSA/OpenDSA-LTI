@@ -610,7 +610,12 @@ end
     end
 
     # In the 'show' action, a student should be able to see the course offering if they are enrolled.
-    if action_name == 'show' && course_offering.is_enrolled?(current_user)
+    if (action_name == 'show' || 
+        action_name == 'get_individual_attempt' || 
+        action_name == 'find_attempts' ||
+        action_name == 'get_codeworkout_progress' ||
+        action_name == 'find_module_progresses') && 
+      course_offering.is_enrolled?(current_user)
       return
     end
 
