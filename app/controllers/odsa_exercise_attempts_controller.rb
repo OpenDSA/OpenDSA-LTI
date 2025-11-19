@@ -582,6 +582,70 @@ class OdsaExerciseAttemptsController < ApplicationController
       format.json {render json: result}
     end
   end
+
+  def export_all_attempts_csv
+    if current_user.blank?
+      render json: { message: "Error: current user could not be identified" },
+            status: :forbidden and return
+    end
+
+    course_offering =
+      CourseOffering.find(params[:course_offering_id]) if params[:course_offering_id].present?
+
+    unless current_user.global_role.is_admin? ||
+          (course_offering && course_offering.is_instructor?(current_user))
+      render json: { message: "You are not authorized to view this data." },
+            status: :forbidden and return
+    end
+
+    filename = "opendsa_attempts_#{Time.zone.now.strftime('%Y%m%d_%H%M%S')}.csv"
+
+    sql = <<~SQL
+      SELECT
+        a.user_id AS "User ID",
+        im.name   AS "Module Name",      -- from inst_modules
+        ie.name   AS "Exercise Name",
+        a.question_name AS "Question name",
+        a.correct       AS "Correct",
+        a.worth_credit  AS "Worth Credit",
+        a.time_done     AS "Time Done",
+        a.time_taken    AS "Time Taken (s)"
+      FROM odsa_exercise_attempts a
+      JOIN inst_book_section_exercises ibse ON ibse.id = a.inst_book_section_exercise_id
+      JOIN inst_exercises ie               ON ie.id  = ibse.inst_exercise_id
+      JOIN inst_sections s                 ON s.id   = ibse.inst_section_id
+      JOIN inst_chapter_modules icm        ON icm.id = s.inst_chapter_module_id
+      JOIN inst_modules im                 ON im.id  = icm.inst_module_id   -- <== if your FK is module_id, change to icm.module_id
+      JOIN users u                         ON u.id   = a.user_id
+      WHERE u.email != #{ActiveRecord::Base.connection.quote(OpenDSA::STUDENT_VIEW_EMAIL)}
+      ORDER BY a.user_id, im.name, a.time_done
+    SQL
+
+    rows = ActiveRecord::Base.connection.exec_query(sql)
+
+    header = [
+      "User ID",
+      "Module Name",
+      "Exercise Name",
+      "Question name",
+      "Correct",
+      "Worth Credit",
+      "Time Done",
+      "Time Taken (s)"
+    ]
+
+    csv_data = CSV.generate(headers: true) do |csv|
+      csv << header
+      rows.each { |r| csv << header.map { |k| r[k] } }
+    end
+
+    send_data csv_data,
+              filename: filename,
+              type: "text/csv; charset=utf-8"
+  end
+
+
+
   #~ Private instance methods .................................................
 
   private

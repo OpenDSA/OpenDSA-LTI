@@ -2485,6 +2485,7 @@ $(function () {
               $("#generate_data").show();
               $("#export_students_csv").show();
               $(".accordionjs").show();
+
               initViz(vizData, lookups).then(() => {
                 $("#tools-accordion").accordionjs({
                   activeIndex: false,
@@ -2494,6 +2495,12 @@ $(function () {
                   activeIndex: false,
                   closeAble: true,
                 });
+
+                // Reveal the stacked export buttons *with* the rest of the UI
+                // If you want a fade-in: $(".export-actions").fadeIn(250);
+                const $exports = $(".export-actions");
+                $exports.removeClass("d-none").addClass("d-flex");
+
                 initExTools(lookups);
                 resolve();
               });
@@ -2601,7 +2608,11 @@ $(function () {
       selectize_exoverview_exs.close();
       updateExportEnabled();
     }
-
+    setTimeout(function () {
+      if (selectize_modules) selectize_modules.refreshOptions(false);
+      if (selectize_exoverview_exs)
+        selectize_exoverview_exs.refreshOptions(false);
+    }, 0);
     /* ---------------- Tabs ---------------- */
     $("#ex-btn-exercise-overview")
       .off("click")
