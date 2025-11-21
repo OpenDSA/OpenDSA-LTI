@@ -137,8 +137,7 @@ class OdsaExerciseProgressesController < ApplicationController
 
   def export_all_progress_csv
     if current_user.blank?
-      @message = "Error: current user could not be identified"
-      render :error
+      render json: { message: 'You must be logged in to access this data.' }, status: :unauthorized
       return
     end
 
