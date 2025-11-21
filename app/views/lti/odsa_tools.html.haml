@@ -91,14 +91,12 @@
     %p.h2.accordionjs{:style => "display:none"} Exercises Analysis Tools
     %ul#tools-accordion-exs.accordionjs{:style => "display:none"}
       %li
-        %div Exercises Lookup
         .container
-
-          .btn-group.d-flex.justify-content-center.mt-2.mb-2
-            %button.btn.btn-secondary#ex-btn-single{:type => "button"} Single Student Detail View
-            %button.btn.btn-secondary#ex-btn-multi{:type => "button"} Multi-Student Overview
-            %button.btn.btn-secondary#ex-btn-exercise-overview{:type => "button"} Exercise Overview
-
+          .text-center.mt-3.mb-2
+            .btn-group
+              %button.btn.btn-secondary#ex-btn-single{:type => "button"} Single Student Detail View
+              %button.btn.btn-secondary#ex-btn-multi{:type => "button"} Multi-Student Overview
+              %button.btn.btn-secondary#ex-btn-exercise-overview{:type => "button"} Exercise Overview
 
           .sel_wrapper#multi-container{ style: "display:none" }
             .control-group
@@ -164,7 +162,24 @@
                     Last Exercise Completed
                     %a{href: '#', "data-tooltip": 'The last time an exercise was completed and a score sent to Canvas.'} (?)
               %tbody#mst-body
+      
+    .export-actions.mt-3.d-none
+      .d-flex.flex-column.align-items-start.gap-2
+        .export-item.d-flex.align-items-center.mb-2
+          = link_to "Export All Attempts",
+            export_all_attempts_csv_odsa_exercise_attempts_path(format: :csv, course_offering_id: @course_offering.id),
+            class: "btn btn-primary btn-sm me-2",
+            style: "width: 220px; font-size: 0.9rem; font-weight: 500;",
+            data: { turbo: false }
+          %i.fa.fa-info-circle.text-secondary{"title" => "CSV with one row per attempt for all enrolled students, contains attempt module name, question name, correct, worth credit, time done, time taken, etc."}
 
-
+        .export-item.d-flex.align-items-center.mb-2
+          = link_to "Export All Progress",
+            export_all_progress_csv_odsa_exercise_progresses_path(format: :csv, course_offering_id: @course_offering.id),
+            class: "btn btn-primary btn-sm me-2",
+            style: "width: 220px; font-size: 0.9rem; font-weight: 500;",
+            data: { turbo: false }
+          %i.fa.fa-info-circle.text-secondary{"title" => "CSV of exercise progress (only users with activity): current/highest scores, total correct, first/last done, proficient date."}
+        
 = javascript_include_tag('accordion.min.js')
 = javascript_include_tag('odsa_tools.js')
