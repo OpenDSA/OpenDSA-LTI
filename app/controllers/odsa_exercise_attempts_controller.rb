@@ -585,8 +585,8 @@ class OdsaExerciseAttemptsController < ApplicationController
 
   def export_all_attempts_csv
     if current_user.blank?
-      render json: { message: "Error: current user could not be identified" },
-            status: :forbidden and return
+      render json: { message: 'You must be logged in to access this data.' }, status: :unauthorized
+      return
     end
 
     course_offering =
