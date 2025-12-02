@@ -13,8 +13,19 @@ OpenDSA::Application.routes.draw do
 
   resources :odsa_user_interactions
   resources :odsa_user_time_tracking
-  resources :odsa_exercise_attempts
-  # resources :odsa_exercise_progresses
+  resources :odsa_exercise_attempts do
+    collection do
+      get :export_all_attempts_csv
+    end
+  end  
+  resources :odsa_exercise_progresses do
+    collection do
+      get :export_all_progress_csv
+    end
+  end
+  resources :course_offerings, only: [] do
+    member { get :export_module_overview_csv }  
+  end
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/' => 'odsa_exercise_progresses#show_exercise'
   get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' => 'odsa_exercise_progresses#show_exercise',
@@ -189,6 +200,7 @@ OpenDSA::Application.routes.draw do
     post 'generate_gradebook' => :generate_gradebook, as: :gradebook
     get 'add_workout' => :add_workout, as: :add_workout
     post 'store_workout/:id' => :store_workout, as: :store_workout
+    get :full_progress_dump, on: :member
   end
 
   # All of the routes anchored at /users
