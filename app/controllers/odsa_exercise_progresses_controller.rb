@@ -135,5 +135,103 @@ class OdsaExerciseProgressesController < ApplicationController
     end
   end
 
+  def export_all_progress_csv
+    if current_user.blank?
+      render json: { message: 'You must be logged in to access this data.' }, status: :unauthorized
+      return
+    end
+
+    course_offering = CourseOffering.find(params[:course_offering_id]) if params[:course_offering_id].present?
+
+    unless current_user.global_role.is_admin? || (course_offering && course_offering.is_instructor?(current_user))
+      render json: { message: "You are not authorized to view this data." },
+            status: :forbidden and return
+    end
+
+    inst_book_id =
+      if course_offering&.odsa_books&.first
+        course_offering.odsa_books.first.id
+      else
+        nil
+      end
+
+    filename = "opendsa_progress_#{Time.zone.now.strftime('%Y%m%d_%H%M%S')}.csv"
+    conn     = ActiveRecord::Base.connection
+
+    sql = <<~SQL
+      SELECT
+        p.user_id,
+        ie.name AS exercise,
+        s.name AS section,
+        p.current_score,
+        p.highest_score,
+        p.total_correct,
+        p.first_done,
+        p.last_done,
+        p.proficient_date,
+
+        -- attempts by this user on this ibse
+        (
+          SELECT COUNT(*)
+          FROM odsa_exercise_attempts a
+          WHERE a.user_id = p.user_id
+            AND a.inst_book_section_exercise_id = p.inst_book_section_exercise_id
+        ) AS total_attempts,
+
+        -- points live on the book-section-exercise
+        ibse.points AS points_possible,
+
+        -- earn full points when proficient, else 0
+        CASE
+          WHEN p.proficient_date IS NOT NULL THEN ibse.points
+          ELSE 0
+        END AS points_earned
+
+      FROM odsa_exercise_progresses p
+        JOIN inst_book_section_exercises ibse ON ibse.id = p.inst_book_section_exercise_id
+        JOIN inst_exercises ie               ON ie.id  = ibse.inst_exercise_id
+        JOIN inst_sections s                 ON s.id   = ibse.inst_section_id
+        JOIN inst_chapter_modules icm        ON icm.id = s.inst_chapter_module_id
+        JOIN inst_chapters ich               ON ich.id = icm.inst_chapter_id
+        JOIN users u                         ON u.id   = p.user_id
+      WHERE u.email != #{conn.quote(OpenDSA::STUDENT_VIEW_EMAIL)}
+        #{inst_book_id ? "AND ich.inst_book_id = #{conn.quote(inst_book_id)}" : ""}
+        -- only include rows where the student actually attempted the exercise
+        AND EXISTS (
+          SELECT 1
+          FROM odsa_exercise_attempts a
+          WHERE a.user_id = p.user_id
+            AND a.inst_book_section_exercise_id = p.inst_book_section_exercise_id
+        )
+      ORDER BY p.user_id, ie.short_name
+    SQL
+
+    rows = conn.exec_query(sql)
+
+    header = %w[
+      user_id
+      exercise
+      section
+      current_score
+      highest_score
+      total_correct
+      first_done
+      last_done
+      proficient_date
+      total_attempts
+      points_earned
+      points_possible
+    ]
+
+    csv_data = CSV.generate(headers: true) do |csv|
+      csv << header
+      rows.each { |r| csv << header.map { |k| r[k] } }
+    end
+
+    send_data csv_data,
+              filename: filename,
+              type: "text/csv; charset=utf-8"
+  end
+
   #~ Private instance methods .................................................
 end
