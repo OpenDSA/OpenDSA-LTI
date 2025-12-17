@@ -35,8 +35,8 @@ ActiveAdmin.register LmsInstance do
   index do
     id_column
     column(:url) { |lms_inst| link_to lms_inst.url, admin_lms_instance_path(lms_inst) }
-    column :lms_type
-    column :organization
+    column :lms_type, sortable:'lms_types.name'
+    column :organization, sortable: 'organizations.name'
     # column :consumer_key
     # column :consumer_secret
     column :created_at

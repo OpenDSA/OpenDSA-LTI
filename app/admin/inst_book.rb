@@ -78,7 +78,12 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     def compile
       if authorized? :update_configuration
         success = `git config --global --add safe.directory /opendsa && cd /opendsa && git pull`
-        flash[:success] = "Updated OpenDSA Repository"
+        if $?.success?
+          flash[:success] = "Updated OpenDSA Repository: #{output}"
+        else
+          flash[:error] = "Update Failed: #{output}"
+          Rails.logger.error("Git Pull Failed: #{output}")
+        end
       else
         flash[:error] = "not authorized"
       end
