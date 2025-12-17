@@ -32,7 +32,7 @@ ActiveAdmin.register Course, sort_order: :created_at_asc do
   index do
     id_column
     column :number
-    column (:name) { |c| link_to c.name, admin_course_path(c) }
+    column(:name, sortable: :name) { |c| link_to c.name, admin_course_path(c) }
     column :organization, sortable: 'organizations.name'
     if current_user.global_role.is_admin?
       column "Owner", :user
