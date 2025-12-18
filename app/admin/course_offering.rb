@@ -30,9 +30,9 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
   remove_filter :users, :late_policy, :course_enrollments, :inst_books, :self_enrollment_allowed, :cutoff_date, :lms_course_code
   # filter :course_organization_name, :as => :string
 
-  before_build do |record|
-    record.user = current_user
-  end
+  # before_build do |record|
+  #   record.user = current_user
+  # end
 
   menu parent: 'University-oriented', priority: 40
   permit_params :course_id, :term_id, :label, :url,
@@ -74,7 +74,7 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
   index do
     selectable_column
     id_column
-    column :course, sortable: 'courses.display_name' do |c|
+    column :course, sortable: 'courses.name' do |c|
       link_to c.course.number_and_org, admin_course_path(c.course)
     end
     column :term, sortable: 'term.ends_on' do |c|
@@ -88,7 +88,7 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
     # column(:url) { |c| link_to c.url, c.url }
     column :created_at
     # column :late_policy, sortable: 'late_policy.name'
-    column :lms_instance, sortable: 'lms_instance.url'
+    column :lms_instance, sortable: 'lms_instances.url'
     if current_user.global_role.is_admin?
       column :students_count, sortable: 'students count'
     end
@@ -115,11 +115,11 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
 
   form do |f|
     f.semantic_errors
-    # f.inputs 'LMS Details:' do
-    #   f.input :lms_instance
-    #   f.input :lms_course_code
-    #   f.input :lms_course_num
-    # end
+    f.inputs 'LMS Details:' do
+      f.input :lms_instance
+      f.input :lms_course_code, label: "LMS Course Label (e.g. Shortname/SIS ID)"
+      f.input :lms_course_num, label: "LMS Internal Course ID (Number)"
+    end
     f.inputs 'Course Offering Details:' do
       f.input :course, collection: Course.all.order(:slug, :name)
       f.input :term, collection: Term.order(:starts_on)
@@ -128,16 +128,16 @@ ActiveAdmin.register CourseOffering, sort_order: :created_at_asc do
       # f.input :late_policy
       # f.input :self_enrollment_allowed
     end
-    # f.inputs 'OpenDSA Books:' do
-    #   f.has_many :inst_books, heading: false, allow_destroy: true do |a|
-    #     a.input :id
-    #     a.input :user_id, :input_html => { :value => current_user.id }, as: :hidden
-    #     # a.input :course_offering_id
-    #     a.input :title
-    #     a.input :desc ,label: 'Book Description'
-    #     # a.input :template
-    #   end
-    # end
+    f.inputs 'OpenDSA Books:' do
+      f.has_many :inst_books, heading: false, allow_destroy: true do |a|
+        a.input :user_id, input_html: { value: current_user.id }, as: :hidden
+        a.input :title
+        a.input :desc, label: 'Book Description'
+        if !a.object.new_record?
+          a.input :id, input_html: { disabled: true } 
+        end
+      end
+    end
     f.actions
   end
 

@@ -70,10 +70,11 @@
   .form-group
     = label_tag :inst_book_select, 'Book Instance:', class: 'control-label col-xs-1'
     .col-xs-3
-      = collection_select nil, nil, InstBook.template.order(:title, :created_at), :id, :title_with_created_at, { prompt: 'Select', selected: nil },
+      / Fix: Show templates OR books created by the current user
+      = collection_select nil, nil, InstBook.where("template = ? OR user_id = ?", true, current_user.id).order(:title, :created_at), :id, :title_with_created_at, { prompt: 'Select', selected: nil },
       { id: 'inst-book-select', class: 'form-control' }
     .col-xs-1
-      = link_to admin_inst_books_path, title: "Create new late policy", class: 'btn btn-default', :target => "_blank" do
+      = link_to admin_inst_books_path, title: "Create new book instance", class: 'btn btn-default', :target => "_blank" do
         %i.glyphicon.glyphicon-new-window
     / .col-xs-1
     /   %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#inst-book-help-modal' } }
