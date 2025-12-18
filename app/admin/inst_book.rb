@@ -45,7 +45,11 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
     inst_book = InstBook.find(params[:id])
     title = inst_book.title
     inst_book.destroy
-    redirect_to admin_inst_books_path, notice: "Book configuration '#{title}' was deleted successfully!"
+    # redirect_to admin_inst_books_path, notice: "Book configuration '#{title}' was deleted successfully!"
+    respond_to do |format|
+      format.html { redirect_to admin_inst_books_path, notice: "Book '#{title}' deleted!" }
+      format.js { head :ok }
+    end
   end
 
   collection_action :upload_books, method: :get do
@@ -184,7 +188,11 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
         links += ' '
       end
       if authorized? :destroy, inst_book
-        links += link_to "Delete", destroy_book_admin_inst_book_path(inst_book), method: :delete, data: {confirm: message}
+        links += link_to "Delete", destroy_book_admin_inst_book_path(inst_book), 
+                 method: :delete, 
+                 remote: true, 
+                 data: { confirm: message },
+                 onclick: "$(this).closest('tr').fadeOut();"
         links += ' '
       end
       links += link_to "Clone", clone_book_admin_inst_book_path(inst_book)
