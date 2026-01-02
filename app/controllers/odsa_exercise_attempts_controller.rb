@@ -143,6 +143,8 @@ class OdsaExerciseAttemptsController < ApplicationController
 
   # POST /odsa_exercise_attempts/new
   def create_attempt
+    puts params
+    
     unless user_logged_in?
       return
     end
@@ -161,13 +163,14 @@ class OdsaExerciseAttemptsController < ApplicationController
         "inst_book_id=? and inst_section_id=? and inst_exercise_id=?",
         params[:inst_book_id], params[:inst_section_id], inst_exercise.id
       ).first
-      if inst_book_section_exercise.blank?
-        respond_to do |format|
-          msg = {:status => "fail", :message => "Fail!"}
-          format.json { render :json => msg }
+    if inst_book_section_exercise.blank?
+      respond_to do |format|
+        format.json do
+          render json: { status: "fail", message: "Unable to find inst_book_section_exercise!" }, status: :bad_request
         end
-        return
       end
+      return
+    end
       threshold = inst_book_section_exercise.threshold
     elsif is_standalone_module
       inst_exercise = InstExercise.find_by(short_name: params[:exercise])
@@ -214,11 +217,11 @@ class OdsaExerciseAttemptsController < ApplicationController
 
       already_proficient = exercise_progress.proficient?
 
-      correct = 1
-      request_type = "AE"
-      if params.has_key?(:score)
-        correct = params[:score].to_f >= params[:threshold].to_f
-        request_type = "PE"
+      
+      correct = 1 #params[:score][:correct]
+      request_type = params[:type]
+      if request_type == "PE"
+        correct = params[:score][:correct].to_f >= params[:threshold].to_f
       end
 
       exercise_attempt = OdsaExerciseAttempt.new(
@@ -236,11 +239,11 @@ class OdsaExerciseAttemptsController < ApplicationController
         count_attempts: params[:uiid],
         hint_used: 0,
         question_name: params[:exercise],
-        request_type: "AE",
+        request_type: request_type,
         ip_address: request.ip,
         pe_score: params[:score],
         pe_steps_fixed: params[:steps_fixed],
-      )
+      )0
 
       respond_to do |format|
         if exercise_attempt.save
