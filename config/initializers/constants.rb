@@ -57,10 +57,8 @@ module OpenDSA
   # languages that OpenDSA has content for
   BOOK_LANGUAGES = {
     "en" => "English",
-    "fr" => "Français",
     "pt" => "Português",
     "fi" => "Suomi",
-    "sv" => "Svenska",
   }
 
   BOOK_THEMES = {
