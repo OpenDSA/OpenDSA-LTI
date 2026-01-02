@@ -242,7 +242,7 @@ class OdsaExerciseAttemptsController < ApplicationController
         ip_address: request.ip,
         pe_score: params[:score],
         pe_steps_fixed: params[:steps_fixed],
-      )0
+      )
 
       respond_to do |format|
         if exercise_attempt.save
