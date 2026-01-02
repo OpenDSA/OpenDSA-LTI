@@ -27,6 +27,8 @@ OpenDSA::Application.routes.draw do
   post '/odsa_exercise_attempts/ae' => 'odsa_exercise_attempts#create_attempt'
   post '/odsa_exercise_attempts/pi' => 'odsa_exercise_attempts#create_pi'
   post '/odsa_exercise_attempts/new' => 'odsa_exercise_attempts#create_attempt'
+  post '/odsa_exercise_attempts/new/pe' => 'odsa_exercise_attempts#create_attempt'
+  post '/odsa_exercise_attempts/new/ka' => 'odsa_exercise_attempts#create'
   post '/odsa_exercise_attempts/get_attempts' => 'odsa_exercise_attempts#get_attempts'
   post '/odsa_exercise_attempts/get_checkpoint' => 'odsa_exercise_attempts#get_checkpoint'
   post '/odsa_exercise_attempts/get_progress' => 'odsa_exercise_attempts#get_progress'

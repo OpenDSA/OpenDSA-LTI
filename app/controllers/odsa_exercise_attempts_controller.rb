@@ -143,7 +143,6 @@ class OdsaExerciseAttemptsController < ApplicationController
 
   # POST /odsa_exercise_attempts/new
   def create_attempt
-    puts params
     
     unless user_logged_in?
       return
