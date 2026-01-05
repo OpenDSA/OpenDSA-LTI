@@ -139,7 +139,6 @@ class OdsaModuleProgress < ApplicationRecord
 
   def post_score_to_lms()
     if self.lis_outcome_service_url and self.lis_result_sourcedid
-
       consumer_key = nil
       consumer_secret = nil
       lms_instance = nil
@@ -192,6 +191,7 @@ class OdsaModuleProgress < ApplicationRecord
 
   def post_score_to_lti_13(lms_instance)
     begin
+      puts params
       lti_launch = LtiLaunch.where(user_id: self.user_id, lms_instance_id: lms_instance.id).order(created_at: :desc).first
 
       if lti_launch.nil?
