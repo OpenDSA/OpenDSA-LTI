@@ -21,6 +21,7 @@ OpenDSA::Application.routes.draw do
   resources :course_offerings, only: [] do
     member { get :export_module_overview_csv }
   end
+  get '/odsa_exercise_progresses' => 'odsa_exercise_progresses#show_exercise'
   get  '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
   get '/odsa_exercise_progresses/export_all_progress_csv', to: 'odsa_exercise_progresses#export_all_progress_csv', as: :export_all_progress_csv_odsa_exercise_progresses
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
