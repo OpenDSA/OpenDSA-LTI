@@ -19,21 +19,19 @@ OpenDSA::Application.routes.draw do
       get :export_all_attempts_csv
     end
   end  
-  resources :odsa_exercise_progresses do
-    collection do
-      get :export_all_progress_csv
-    end
-  end
   resources :course_offerings, only: [] do
     member { get :export_module_overview_csv }  
   end
-  get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' => 'odsa_exercise_progresses#show_exercise'
-  get '/odsa_exercise_progresses/' => 'odsa_exercise_progresses#show_exercise'
-  get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' => 'odsa_exercise_progresses#show_exercise',
-      constraints: {inst_course_offering_exercise_id: /\d+/}
-  get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id' => 'odsa_exercise_progresses#show_section'
-  get '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
+  get  '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
+  get '/odsa_exercise_progresses/export_all_progress_csv', to: 'odsa_exercise_progresses#export_all_progress_csv', as: :export_all_progress_csv_odsa_exercise_progresses
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
+  get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' =>
+    'odsa_exercise_progresses#show_exercise'
+  get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id' =>
+    'odsa_exercise_progresses#show_section'
+  get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' =>
+    'odsa_exercise_progresses#show_exercise',
+    constraints: { inst_course_offering_exercise_id: /\d+/ }
   post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_attempt'
   post '/odsa_exercise_attempts/ae' => 'odsa_exercise_attempts#create_attempt'
   post '/odsa_exercise_attempts/pi' => 'odsa_exercise_attempts#create_pi'
