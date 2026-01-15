@@ -279,7 +279,7 @@ end
     }
   end
 
-  # GET /course_offerings/time_tracking_data/:id
+  # GET /course_offerings/time_tracking_data/:id/date/:date
   def get_time_tracking_data
     if current_user.blank?
       render :json => {
@@ -301,6 +301,48 @@ end
     userTimeTrackings = OdsaUserTimeTracking.where(inst_book_id: instBook.id, session_date: params[:date]).select('user_id as usr_id,inst_module_id as mod_id, inst_chapter_id as ch_id, total_time as tt, session_date as dt, sections_time as st')
 
     render :json => userTimeTrackings.as_json()
+  end
+
+  # GET /course_offerings/time_tracking_data/:id/range?from=yyyymmdd&to=yyyymmdd
+  def get_time_tracking_data_range
+    if current_user.blank?
+      render json: {
+        message: 'You are not logged in. Please make sure your browser is set to allow third-party cookies',
+      }, status: :forbidden
+      return
+    end
+
+    course_offering = CourseOffering.find(params[:id])
+    unless course_offering.is_instructor?(current_user) || current_user.global_role.is_admin?
+      render json: {
+        message: "You are not an instructor for this course offering. Your user id: #{current_user.id}",
+      }, status: :forbidden
+      return
+    end
+
+    instBook = course_offering.odsa_books.first
+
+    from = params[:from] # 'yyyymmdd'
+    to   = params[:to]   # 'yyyymmdd'
+
+    if from.blank? || to.blank?
+      render json: { message: "Missing 'from' or 'to' query params" }, status: :bad_request
+      return
+    end
+
+    userTimeTrackings = OdsaUserTimeTracking.where(
+      inst_book_id: instBook.id,
+      session_date: from..to
+    ).select(
+      'user_id as usr_id,
+      inst_module_id as mod_id,
+      inst_chapter_id as ch_id,
+      total_time as tt,
+      session_date as dt,
+      sections_time as st'
+    )
+
+    render json: userTimeTrackings.as_json
   end
 
   # -------------------------------------------------------------
