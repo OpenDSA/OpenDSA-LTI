@@ -304,10 +304,11 @@ $(function () {
 
           if (!_keys.length) {
             resolve({ data: null, date: null });
+            return;
           }
           // sort in descending order
           _keys.sort(function (a, b) {
-            return a - b;
+            return b - a;
           });
 
           // get the most recent record
@@ -390,59 +391,98 @@ $(function () {
     return promise;
   }
 
-  // Gets visualizations data form the local storage if found. Otherwise get it from the server
   function getTimeTrackingData(odsaStore, lookups, count) {
-    var currentDate = getTimestamp(new Date(), "yyyymmdd");
-    var trackingEndDate = lookups["trackingEndDate"];
+    const currentDate = getTimestamp(new Date(), "yyyymmdd");
+    const trackingEndDate = lookups["trackingEndDate"]; // 'yyyymmdd'
 
-    var promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       getStoreData(odsaStore, "odsaTimeTrackingData")
         .then((result) => {
-          if (
-            result &&
-            Object.keys(result).includes("date") &&
-            result["date"] == currentDate
-          ) {
-            resolve(result["data"]);
-          } else {
-            // else recursively fetch all the days until today and
-            var date = result["date"]
-              ? addDay(result["date"])
+          // Up-to-date cache
+          if (result && result.date === currentDate && result.data) {
+            resolve(result.data);
+            return;
+          }
+
+          const hasExistingData = !!(result && result.data);
+
+          const lastFetchedDate =
+            hasExistingData && result.data && result.data.lastFetchedDate
+              ? result.data.lastFetchedDate
+              : null;
+
+          const fallbackKeyDate = result ? result.date : null;
+
+          const fromDate =
+            hasExistingData && (lastFetchedDate || fallbackKeyDate)
+              ? addDay(lastFetchedDate || fallbackKeyDate)
               : lookups["term"]["starts_on"].replace(/-/g, "");
 
-            // show the overlay
-            $.LoadingOverlay("show", {
-              text: "Downloading OpenDSA Analytics Data",
-              textResizeFactor: 0.3,
-              progress: true,
-            });
-
-            var progressEnd = parseInt(trackingEndDate) - parseInt(date);
-            _getTimeTrackingData(
-              odsaStore,
-              "/course_offerings/time_tracking_data/" +
-                ODSA_DATA.course_offering_id +
-                "/date/",
-              date,
-              result["data"],
-              lookups,
-              progressEnd,
-              count
-            )
-              .then((odsaTimeTrackingData) => {
-                resolve(odsaTimeTrackingData);
-              })
-              .catch((err) => {
-                reject(err);
-              });
+          // Nothing to fetch (already caught up)
+          if (parseInt(fromDate, 10) > parseInt(trackingEndDate, 10)) {
+            resolve(result.data);
+            return;
           }
+
+          _getTimeTrackingDataRange(
+            odsaStore,
+            `/course_offerings/time_tracking_data/${ODSA_DATA.course_offering_id}/range`,
+            fromDate,
+            trackingEndDate,
+            hasExistingData ? result.data : null,
+            lookups,
+            count
+          )
+            .then((combined) => resolve(combined))
+            .catch(reject);
         })
-        .catch((err) => {
-          reject(err);
-        });
+        .catch(reject);
     });
-    return promise;
   }
+
+  const _getTimeTrackingDataRange = async function (
+    odsaStore,
+    urlBase,
+    fromDate,
+    toDate,
+    existingStoreData,
+    lookups,
+    count
+  ) {
+    const backoff = 1000 * count;
+
+    $.LoadingOverlay("show", {
+      text: "Downloading OpenDSA Analytics Data",
+      textResizeFactor: 0.3,
+      progress: true,
+    });
+
+    try {
+      const res = await fetch(`${urlBase}?from=${fromDate}&to=${toDate}`).then(
+        sleeper(backoff)
+      );
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Range fetch failed (${res.status}): ${text}`);
+      }
+
+      const rows = await res.json(); // array of {usr_id, mod_id, ch_id, tt, dt, st}
+
+      // Merge new rows into existing aggregated object
+      let combined = formatTimeTrackingData(existingStoreData, rows, lookups);
+      combined = enrichStoreData(combined);
+
+      combined.lastFetchedDate = toDate;
+      await updateStoreData(odsaStore, "odsaTimeTrackingData", combined);
+
+      $.LoadingOverlay("hide");
+      return combined;
+    } catch (err) {
+      $.LoadingOverlay("hide");
+      throw err;
+    }
+  };
 
   // Adds one day to the given date and returns a new date
   function addDay(date) {
@@ -462,54 +502,6 @@ $(function () {
       return new Promise((resolve) => setTimeout(() => resolve(x), ms));
     };
   }
-
-  // Gets time tracking data form the server for one day
-  const _getTimeTrackingDataPerDay = async function (url, date, backoff) {
-    var data = await fetch(url + date)
-      .then(sleeper(backoff))
-      .then((res) => res.json());
-    return data;
-  };
-
-  // Gets time tracking data recursively form the server
-  const _getTimeTrackingData = async function (
-    odsaStore,
-    url,
-    date,
-    storeData,
-    lookups,
-    progressEnd,
-    count
-  ) {
-    var backoff = 1000 * count;
-    var storeData = storeData || null;
-    var trackingEndDate = lookups["trackingEndDate"];
-    var progress =
-      100 - ((parseInt(trackingEndDate) - parseInt(date)) * 100) / progressEnd;
-    var progressPercent = progress.toFixed(2);
-
-    if (parseInt(date) <= parseInt(trackingEndDate)) {
-      var text = `${progressPercent}% Downloading OpenDSA Analytics Data.`;
-      $.LoadingOverlay("progress", progress);
-      $.LoadingOverlay("text", text);
-      var data = await _getTimeTrackingDataPerDay(url, date, backoff);
-      storeData = formatTimeTrackingData(storeData, data, lookups);
-      return await _getTimeTrackingData(
-        odsaStore,
-        url,
-        addDay(date),
-        storeData,
-        lookups,
-        progressEnd,
-        count
-      );
-    } else {
-      storeData = enrichStoreData(storeData);
-      updateStoreData(odsaStore, "odsaTimeTrackingData", storeData);
-      $.LoadingOverlay("hide");
-      return storeData;
-    }
-  };
 
   // Calculates q1, median, and q3 for array of numbers
   function stats(arr) {
@@ -2993,18 +2985,24 @@ $(function () {
       a.remove();
     }
 
-    // ONE click handler (matches HAML id)
-    $(document)
-      .off("click", "#btn-exercise-overview-csv")
-      .on("click", "#btn-exercise-overview-csv", async function (e) {
+    $("#btn-exercise-overview-csv")
+      .off("click.exportcsv")
+      .on("click.exportcsv", async function (e) {
         e.preventDefault();
+
         if ($(this).prop("disabled")) return;
-        var sectionId = getSelectedExerciseSectionId();
+
+        const sectionId = getSelectedExerciseSectionId();
         if (!sectionId) {
           alert("Pick an exercise first.");
           return;
         }
-        await exportExerciseCSV(sectionId);
+
+        try {
+          await exportExerciseCSV(sectionId);
+        } catch (err) {
+          console.error("EXPORT failed:", err);
+        }
       });
 
     function handleModuleDisplay(mod_id) {
