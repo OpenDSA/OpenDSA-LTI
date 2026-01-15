@@ -110,6 +110,7 @@ OpenDSA::Application.routes.draw do
   post '/course_offerings' => 'course_offerings#create', as: :create_course_offerings
   get '/course_offerings/:id' => 'course_offerings#show', as: :show_course_offerings
   get '/course_offerings/time_tracking_lookup/:id' => 'course_offerings#get_time_tracking_lookup', as: :get_time_tracking_lookup
+  get '/course_offerings/time_tracking_data/:id/range' => 'course_offerings#get_time_tracking_data_range', as: :get_time_tracking_data_range
   get '/course_offerings/time_tracking_data/:id/date/:date' => 'course_offerings#get_time_tracking_data', as: :get_time_tracking_data
   get '/course_offerings/(:user_id)/:inst_section_id/section' => 'course_offerings#find_attempts', as: :find_attempts
   get '/course_offerings/:id/modules/:inst_chapter_module_id/progresses' => 'course_offerings#find_module_progresses', as: :find_module_progresses
