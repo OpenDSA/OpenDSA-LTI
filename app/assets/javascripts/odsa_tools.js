@@ -788,6 +788,20 @@ $(function () {
       }
     }
 
+    while (weeksData.length < weeksDates.length) {
+      weeksData = addRow(weeksData, users.length);
+    }
+
+    // Ensure chaptersData has enough rows for current chaptersIds
+    while (chaptersData.length < chaptersIds.length) {
+      chaptersData = addRow(chaptersData, users.length);
+    }
+
+    // Keep chaptersTotalData in sync
+    while (chaptersTotalData.length < chaptersIds.length) {
+      chaptersTotalData.push(0);
+    }
+
     // init modulesData object
     if ($.isEmptyObject(modulesData)) {
       for (var i = 0; i < chaptersIds.length; i++) {
@@ -827,8 +841,11 @@ $(function () {
 
       if (usersIds.includes(usr_id)) {
         // Aggregate weeksData
-        if (daysIds.includes(dt)) {
-          weeksData[daysHash[dt]][usersHash[usr_id]] += tt;
+        const w = daysHash[dt];
+        const u = usersHash[usr_id];
+
+        if (w !== undefined && u !== undefined && weeksData[w]) {
+          weeksData[w][u] += tt;
         }
 
         // Aggregate chaptersData/chaptersTotalData
