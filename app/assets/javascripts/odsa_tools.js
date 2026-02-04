@@ -5,6 +5,88 @@ $(function () {
     storeName: storeName,
   });
 
+  
+  /* ---------------- CSV Download for Module Scores Table ---------------- */
+
+  // Use both delegated and direct handlers for maximum compatibility
+  $(document).on("click", "#btn-module-csv", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    downloadModuleCSV();
+  });
+
+  // Also set up a direct handler once the button appears
+  function setupDirectHandler() {
+    const btn = document.getElementById("btn-module-csv");
+    if (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        downloadModuleCSV();
+      });
+    } else {
+      setTimeout(setupDirectHandler, 1000);
+    }
+  }
+  setTimeout(setupDirectHandler, 100);
+
+  function downloadModuleCSV() {
+    const table = $("#module-scores-table");
+    const headers = [];
+    const rows = [];
+    
+    // Get module name from the selectize dropdown
+    const selectize = $("#select-for-modules")[0]?.selectize;
+    const moduleName = selectize ? selectize.getItem(selectize.getValue())?.text() : "module";
+    const sanitizedModuleName = moduleName.replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_');
+
+    // Get headers
+    $("#mst-header-row th").each(function () {
+      headers.push(
+        $(this)
+          .text()
+          .trim()
+          .replace(/\s*\(\?\)\s*/g, ""),
+      );
+    });
+
+    console.log("Headers:", headers);
+
+    // Get data rows
+    $("#mst-body tr").each(function () {
+      const row = [];
+      $(this)
+        .find("td")
+        .each(function () {
+          const text = $(this).text().trim();
+          // Escape commas and quotes in CSV
+          const escaped =
+            text.includes(",") || text.includes('"')
+              ? `"${text.replace(/"/g, '""')}"`
+              : text;
+          row.push(escaped);
+        });
+      rows.push(row.join(","));
+    });
+
+    // Create CSV content
+    const csvContent = [headers.join(","), ...rows].join("\n");
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", `MS-Overview-${sanitizedModuleName}.csv`);
+    link.style.visibility = "hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
   // Returns weeks start and end dates
   function getWeeksDates(start, end) {
     var sDate;
