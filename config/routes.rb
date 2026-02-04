@@ -11,16 +11,19 @@ OpenDSA::Application.routes.draw do
   get 'lti/launch_extrtool/:exercise_id', to: 'lti#launch_extrtool', as: :lti_launch_extrtool
   post 'lti/outcomes', to: 'lti#grade_passback', as: :lti_grade_passback
 
-  get '/odsa_user_interactions/latest_state' => 'odsa_user_interactions#get_latest_state'
   resources :odsa_user_interactions
   resources :odsa_user_time_tracking
+  resources :odsa_exercise_attempts do
+    collection do
+      get :export_all_attempts_csv
+    end
+  end
   resources :course_offerings, only: [] do
-    member { get :export_module_overview_csv }  
+    member { get :export_module_overview_csv }
   end
   get '/odsa_exercise_progresses' => 'odsa_exercise_progresses#show_exercise'
   get  '/odsa_exercise_progresses/get_count' => 'odsa_exercise_progresses#get_count'
   get '/odsa_exercise_progresses/export_all_progress_csv', to: 'odsa_exercise_progresses#export_all_progress_csv', as: :export_all_progress_csv_odsa_exercise_progresses
-  get '/odsa_exercise_attempts/export_all_attempts_csv' => 'odsa_exercise_attempts#export_all_attempts_csv', as: :export_all_attempts_csv_odsa_exercise_attempts
   post '/odsa_exercise_progresses' => 'odsa_exercise_progresses#update'
   get '/odsa_exercise_progresses/:inst_book_id/:inst_section_id/:exercise_name' =>
     'odsa_exercise_progresses#show_exercise'
