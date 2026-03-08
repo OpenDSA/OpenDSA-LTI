@@ -81,12 +81,13 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
   controller do
     def compile
       if authorized? :update_configuration
-        success = `git config --global --add safe.directory /opendsa && cd /opendsa && git pull`
+        stat = File.stat('/opendsa')
+        pid = Process.spawn('git', 'pull', chdir: '/opendsa', uid: stat.uid, gid: stat.gid)
+        Process.wait(pid)
         if $?.success?
-          flash[:success] = "Updated OpenDSA Repository: #{output}"
+          flash[:success] = "Updated OpenDSA repository"
         else
-          flash[:error] = "Update Failed: #{output}"
-          Rails.logger.error("Git Pull Failed: #{output}")
+          flash[:error] = "Failed to update OpenDSA repository"
         end
       else
         flash[:error] = "not authorized"
@@ -188,9 +189,9 @@ ActiveAdmin.register InstBook, sort_order: :created_at_asc do
         links += ' '
       end
       if authorized? :destroy, inst_book
-        links += link_to "Delete", destroy_book_admin_inst_book_path(inst_book), 
-                 method: :delete, 
-                 remote: true, 
+        links += link_to "Delete", destroy_book_admin_inst_book_path(inst_book),
+                 method: :delete,
+                 remote: true,
                  data: { confirm: message },
                  onclick: "$(this).closest('tr').fadeOut();"
         links += ' '

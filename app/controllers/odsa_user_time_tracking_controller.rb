@@ -8,7 +8,7 @@ class OdsaUserTimeTrackingController < ApplicationController
   # POST /odsa_user_time_tracking/create
   def create
     failed_to_save = false
-    errors = []
+    error_msgs = []
     # puts params[:modulesTracking]
     params[:modulesTracking].each_pair do |key, event|
       # puts event
@@ -31,9 +31,7 @@ class OdsaUserTimeTrackingController < ApplicationController
         total_time: event[:totalTime],
         sections_time: event[:sectionsTime]
       )
-      if @user_time_tracking.save
-        failed_to_save = false
-      else
+      if !@user_time_tracking.save
         failed_to_save = true
         error_msgs << @user_time_tracking.errors.full_messages
       end

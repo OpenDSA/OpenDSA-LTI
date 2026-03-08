@@ -456,21 +456,28 @@ class OdsaExerciseAttemptsController < ApplicationController
       return
     end
 
-    course_offering =
-      CourseOffering.find(params[:course_offering_id]) if params[:course_offering_id].present?
+    course_offering = CourseOffering.find(params[:course_offering_id]) if params[:course_offering_id].present?
 
-    unless current_user.global_role.is_admin? ||
-          (course_offering && course_offering.is_instructor?(current_user))
+    unless current_user.global_role.is_admin? || (course_offering && course_offering.is_instructor?(current_user))
       render json: { message: "You are not authorized to view this data." },
             status: :forbidden and return
     end
 
+    # Get the inst_book_id from the course offering
+    inst_book_id =
+      if course_offering&.odsa_books&.first
+        course_offering.odsa_books.first.id
+      else
+        nil
+      end
+
     filename = "opendsa_attempts_#{Time.zone.now.strftime('%Y%m%d_%H%M%S')}.csv"
+    conn = ActiveRecord::Base.connection
 
     sql = <<~SQL
       SELECT
         a.user_id AS "User ID",
-        im.name   AS "Module Name",      -- from inst_modules
+        im.name   AS "Module Name",
         ie.name   AS "Exercise Name",
         a.question_name AS "Question name",
         a.correct       AS "Correct",
@@ -482,13 +489,15 @@ class OdsaExerciseAttemptsController < ApplicationController
       JOIN inst_exercises ie               ON ie.id  = ibse.inst_exercise_id
       JOIN inst_sections s                 ON s.id   = ibse.inst_section_id
       JOIN inst_chapter_modules icm        ON icm.id = s.inst_chapter_module_id
-      JOIN inst_modules im                 ON im.id  = icm.inst_module_id   -- <== if your FK is module_id, change to icm.module_id
+      JOIN inst_chapters ich               ON ich.id = icm.inst_chapter_id
+      JOIN inst_modules im                 ON im.id  = icm.inst_module_id
       JOIN users u                         ON u.id   = a.user_id
-      WHERE u.email != #{ActiveRecord::Base.connection.quote(OpenDSA::STUDENT_VIEW_EMAIL)}
+      WHERE u.email != #{conn.quote(OpenDSA::STUDENT_VIEW_EMAIL)}
+        #{inst_book_id ? "AND ich.inst_book_id = #{conn.quote(inst_book_id)}" : ""}
       ORDER BY a.user_id, im.name, a.time_done
     SQL
 
-    rows = ActiveRecord::Base.connection.exec_query(sql)
+    rows = conn.exec_query(sql)
 
     header = [
       "User ID",

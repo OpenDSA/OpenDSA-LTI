@@ -34,13 +34,13 @@
 class OdsaUserTimeTracking < ApplicationRecord
   #~ Relationships ............................................................
   belongs_to :user
-  belongs_to :inst_book
-  belongs_to :inst_book_section_exercise
-  belongs_to :inst_course_offering_exercise
-  belongs_to :inst_module
-  belongs_to :inst_chapter
-  belongs_to :inst_module_version
-  belongs_to :inst_module_section_exercise
+  belongs_to :inst_book, optional: true
+  belongs_to :inst_book_section_exercise, optional: true
+  belongs_to :inst_course_offering_exercise, optional: true
+  belongs_to :inst_module, optional: true
+  belongs_to :inst_chapter, optional: true
+  belongs_to :inst_module_version, optional: true
+  belongs_to :inst_module_section_exercise, optional: true
 
   #~ Validation ...............................................................
   validate :required_fields
