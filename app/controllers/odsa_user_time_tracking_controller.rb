@@ -15,6 +15,7 @@ class OdsaUserTimeTrackingController < ApplicationController
       inst_book_id = event[:inst_book_id]
       inst_module_id = event[:inst_module_id]
       inst_chapter_id = event[:inst_chapter_id]
+      raw_sections_time = event[:sectionsTime]
 
       @user_time_tracking = OdsaUserTimeTracking.new(
         user: current_user,
@@ -29,7 +30,7 @@ class OdsaUserTimeTrackingController < ApplicationController
         uuid: event[:uuid],
         session_date: key.split('-')[2],
         total_time: event[:totalTime],
-        sections_time: event[:sectionsTime]
+        sections_time: raw_sections_time
       )
       if !@user_time_tracking.save
         failed_to_save = true
