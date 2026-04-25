@@ -20,6 +20,15 @@
 # Learn more: http://github.com/javan/whenever
 
 env :PATH, ENV['PATH']
+set :path, "/opendsa-lti"
+set :output, "/opendsa-lti/log/cron_log.log"
+
+# Consolidate staged OpenDSA time tracking rows into the main table once per day.
+every 1.day, :at => '1:15 am' do
+  rake "odsa_user_time_tracking:consolidate"
+end
+
+# Legacy jobs kept as-is for non-container deploy environments.
 set :output, "/home/deploy/OpenDSA-LTI/current/log/cron_log.log"
 every :reboot do
   command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production bin/delayed_job -n 2 start"
