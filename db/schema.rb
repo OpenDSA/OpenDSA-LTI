@@ -440,6 +440,7 @@ ActiveRecord::Schema.define(version: 2026_04_02_130000) do
     t.index ["inst_course_offering_exercise_id"], name: "odsa_exercise_attempts_inst_course_offering_exercise_id_fk"
     t.index ["inst_module_section_exercise_id"], name: "fk_rails_6944f2321b"
     t.index ["inst_section_id"], name: "odsa_exercise_attempts_inst_section_id_fk"
+    t.index ["user_id", "inst_book_section_exercise_id"], name: "idx_attempts_user_ibse"
     t.index ["user_id"], name: "odsa_exercise_attempts_user_id_fk"
   end
 
@@ -741,4 +742,3 @@ ActiveRecord::Schema.define(version: 2026_04_02_130000) do
   add_foreign_key "odsa_user_time_trackings", "users", name: "odsa_user_time_tracking_user_id_fk"
   add_foreign_key "users", "global_roles", name: "users_global_role_id_fk"
   add_foreign_key "users", "time_zones", name: "users_time_zone_id_fk"
-end
