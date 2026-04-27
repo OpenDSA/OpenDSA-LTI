@@ -742,3 +742,4 @@ ActiveRecord::Schema.define(version: 2026_04_02_130000) do
   add_foreign_key "odsa_user_time_trackings", "users", name: "odsa_user_time_tracking_user_id_fk"
   add_foreign_key "users", "global_roles", name: "users_global_role_id_fk"
   add_foreign_key "users", "time_zones", name: "users_time_zone_id_fk"
+end
