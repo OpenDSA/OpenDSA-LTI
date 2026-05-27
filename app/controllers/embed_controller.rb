@@ -20,8 +20,9 @@ class EmbedController < ApplicationController
       @message = "No resource found with the name \"#{params[:ex_short_name]}\""
       render 'lti/error' and return
     end
-    if !@ex.av_address.blank?
-      @ex_url = "#{request.protocol}#{request.host_with_port}/OpenDSA/#{@ex.av_address}"
+    inlineav_path = @ex.av_address.presence || InstExercise.inlineav_metadata_path(@ex.short_name)
+    if inlineav_path.present?
+      @ex_url = "#{request.protocol}#{request.host_with_port}/OpenDSA/#{inlineav_path}"
       render 'embed_av', layout: 'embed_inlineav'
     elsif !@ex.learning_tool.blank?
       # external tool
