@@ -5,11 +5,7 @@ task :update_module_versions => :environment do
     # configuration files used to determine which modules to include
     # and what to use as the default module and exercise settings
     REFERENCE_CONFIGS = [
-        'Everything',
-        'PL',
-        'PIFLA',
-        'SWDesignAndDataStructs',
-        'IntroToSoftwareDesign'
+        'Catalog'
     ]
 
     FULL_CONFIG_FILENAME = '_config.json'
