@@ -96,7 +96,7 @@ GEM
       activerecord (>= 5.0, < 6.1)
     acts_as_list (1.0.1)
       activerecord (>= 4.2)
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     aes_key_wrap (1.1.0)
     annotate (3.1.1)
@@ -349,7 +349,7 @@ GEM
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    public_suffix (4.0.5)
+    public_suffix (4.0.6)
     puma (4.3.5)
       nio4r (~> 2.0)
     rabl (0.14.3)
@@ -499,7 +499,7 @@ DEPENDENCIES
   activeadmin (~> 2.9)
   acts-as-taggable-on
   acts_as_list
-  addressable (~> 2.3, >= 2.3.8)
+  addressable (~> 2.8)
   andand!
   annotate
   autoprefixer-rails
