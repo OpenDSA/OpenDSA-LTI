@@ -237,7 +237,7 @@ class GenerateCourseJob < ProgressJob::Base
 
     assignment_opts = {
       :assignment__submission_types__ => "external_tool",
-      :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query},
+      :assignment__external_tool_tag_attributes__ => {:url => @odsa_launch_url + '?' + uri.query, :new_tab => true},
     }
 
     opts[:module_item__title__] = title
