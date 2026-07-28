@@ -99,5 +99,15 @@ class LmsInstance < ApplicationRecord
     end
   end
 
+  # True if this LmsInstance has the configuration needed for LTI 1.3
+  # (client_id + oauth2_url; private_key is auto-generated on save).
+  # LTI 1.1 is always available — its consumer_key/consumer_secret are
+  # derived per-user from LmsAccess (see User#update_lms_access), not
+  # stored on the LmsInstance — so there is no supports_lti_1p1?
+  # counterpart.
+  def supports_lti_1p3?
+    client_id.present? && oauth2_url.present?
+  end
+
   #~ Private instance methods .................................................
 end

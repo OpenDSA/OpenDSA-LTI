@@ -1,11 +1,12 @@
 class GenerateCourseJob < ProgressJob::Base
-  def initialize(inst_book_id, launch_url, resource_selection_url, extrtool_launch_base_url, user_id)
+  def initialize(inst_book_id, launch_url, resource_selection_url, extrtool_launch_base_url, user_id, lti_version = 'LTI-1p0')
     @user_id = user_id
     @user = User.find_by(id: user_id)
     @inst_book = InstBook.find_by(id: inst_book_id)
     @odsa_launch_url = launch_url
     @odsa_resource_selection_url = resource_selection_url
     @extrtool_launch_base_url = extrtool_launch_base_url
+    @lti_version = lti_version
     @course_offering = CourseOffering.where(:id => @inst_book.course_offering_id).first
     @term = Term.where(:id => @course_offering.term_id).first
     @course = Course.where(:id => @course_offering.course_id).first
@@ -109,8 +110,7 @@ class GenerateCourseJob < ProgressJob::Base
       opts[:resource_selection__selection_height__] = 600
     end
 
-    # Add OpenDSA tools menu item in case the lti app is "OpenDSA-LTI"
-    if tool_name == "OpenDSA-LTI"
+    if tool_name == "OpenDSA-LTI" && @lti_version == 'LTI-1p0'
       odsa_url_opts = {
         :custom_inst_book_id => @inst_book.id,
         :custom_course_offering_id => @course_offering.id
