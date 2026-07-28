@@ -18,12 +18,14 @@
 #  lms_access_id           :bigint
 #  inst_module_version_id  :bigint
 #  last_passback           :datetime         not null
+#  lti_launch_id           :integer
 #
 # Indexes
 #
 #  fk_rails_38a9ac7560                               (inst_module_version_id)
 #  index_odsa_mod_prog_on_user_mod_version           (user_id,inst_module_version_id) UNIQUE
 #  index_odsa_module_progress_on_user_and_module     (user_id,inst_chapter_module_id) UNIQUE
+#  index_odsa_module_progresses_on_lti_launch_id     (lti_launch_id)
 #  odsa_module_progresses_inst_book_id_fk            (inst_book_id)
 #  odsa_module_progresses_inst_chapter_module_id_fk  (inst_chapter_module_id)
 #  odsa_module_progresses_lms_access_id_fk           (lms_access_id)
@@ -35,6 +37,7 @@ class OdsaModuleProgress < ApplicationRecord
   belongs_to :inst_chapter_module
   belongs_to :inst_module_version
   belongs_to :lms_access
+  belongs_to :lti_launch, optional: true
 
   #~ Validation ...............................................................
   validate :required_fields
@@ -49,36 +52,66 @@ class OdsaModuleProgress < ApplicationRecord
   #~ Hooks ....................................................................
   #~ Class methods ............................................................
 
-  def self.get_progress(user_id, inst_chapter_module_id, inst_book_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil)
+  def self.get_progress(user_id, inst_chapter_module_id, inst_book_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil, lti_launch_id = nil)
     module_progress = OdsaModuleProgress.find_or_initialize_by(user_id: user_id, inst_chapter_module_id: inst_chapter_module_id)
     if module_progress.new_record?
       module_progress.inst_book_id = inst_book_id
       module_progress.lis_outcome_service_url = lis_outcome_service_url
       module_progress.lis_result_sourcedid = lis_result_sourcedid
       module_progress.lms_access_id = lms_access_id
+      module_progress.lti_launch_id = lti_launch_id
       module_progress.save!
-    elsif lis_outcome_service_url.present? && module_progress.lis_outcome_service_url != lis_outcome_service_url
-      module_progress.lis_outcome_service_url = lis_outcome_service_url
-      module_progress.lis_result_sourcedid = lis_result_sourcedid
-      module_progress.lms_access_id = lms_access_id
-      module_progress.save!
+    elsif lis_outcome_service_url.present?
+      changed = false
+      if module_progress.lis_outcome_service_url != lis_outcome_service_url
+        module_progress.lis_outcome_service_url = lis_outcome_service_url
+        changed = true
+      end
+      if lis_result_sourcedid.present? && module_progress.lis_result_sourcedid != lis_result_sourcedid
+        module_progress.lis_result_sourcedid = lis_result_sourcedid
+        changed = true
+      end
+      if lms_access_id.present? && module_progress.lms_access_id != lms_access_id
+        module_progress.lms_access_id = lms_access_id
+        changed = true
+      end
+      if lti_launch_id.present? && module_progress.lti_launch_id != lti_launch_id
+        module_progress.lti_launch_id = lti_launch_id
+        changed = true
+      end
+      module_progress.save! if changed
     end
 
     module_progress
   end
 
-  def self.get_standalone_progress(user_id, inst_module_version_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil)
+  def self.get_standalone_progress(user_id, inst_module_version_id, lis_outcome_service_url = nil, lis_result_sourcedid = nil, lms_access_id = nil, lti_launch_id = nil)
     module_progress = OdsaModuleProgress.find_or_initialize_by(user_id: user_id, inst_module_version_id: inst_module_version_id)
     if module_progress.new_record?
       module_progress.lis_outcome_service_url = lis_outcome_service_url
       module_progress.lis_result_sourcedid = lis_result_sourcedid
       module_progress.lms_access_id = lms_access_id
+      module_progress.lti_launch_id = lti_launch_id
       module_progress.save!
-    elsif lis_outcome_service_url.present? && module_progress.lis_outcome_service_url != lis_outcome_service_url
-      module_progress.lis_outcome_service_url = lis_outcome_service_url
-      module_progress.lis_result_sourcedid = lis_result_sourcedid
-      module_progress.lms_access_id = lms_access_id
-      module_progress.save!
+    elsif lis_outcome_service_url.present?
+      changed = false
+      if module_progress.lis_outcome_service_url != lis_outcome_service_url
+        module_progress.lis_outcome_service_url = lis_outcome_service_url
+        changed = true
+      end
+      if lis_result_sourcedid.present? && module_progress.lis_result_sourcedid != lis_result_sourcedid
+        module_progress.lis_result_sourcedid = lis_result_sourcedid
+        changed = true
+      end
+      if lms_access_id.present? && module_progress.lms_access_id != lms_access_id
+        module_progress.lms_access_id = lms_access_id
+        changed = true
+      end
+      if lti_launch_id.present? && module_progress.lti_launch_id != lti_launch_id
+        module_progress.lti_launch_id = lti_launch_id
+        changed = true
+      end
+      module_progress.save! if changed
     end
     module_progress
   end
@@ -138,76 +171,93 @@ class OdsaModuleProgress < ApplicationRecord
   end
 
   def post_score_to_lms()
-    if self.lis_outcome_service_url and self.lis_result_sourcedid
+    consumer_key = nil
+    consumer_secret = nil
+    lms_instance = nil
 
-      consumer_key = nil
-      consumer_secret = nil
-      lms_instance = nil
-
-      if self.lms_access_id.blank?
-        if self.inst_module_version
-          lms_instance = self.inst_module_version.course_offering&.lms_instance
-        elsif self.inst_book
-          lms_instance = self.inst_book.course_offering&.lms_instance
-        end
-
-        if lms_instance
-          consumer_key = lms_instance.consumer_key
-          consumer_secret = lms_instance.consumer_secret
-        else
-          return { error: "LMS instance not found", status: :internal_server_error }
-        end
-      else
-        consumer_key = self.lms_access.consumer_key
-        consumer_secret = self.lms_access.consumer_secret
-        lms_instance = self.lms_access.lms_instance
+    if self.lms_access_id.blank?
+      if self.inst_module_version
+        lms_instance = self.inst_module_version.course_offering&.lms_instance
+      elsif self.inst_book
+        lms_instance = self.inst_book.course_offering&.lms_instance
       end
 
-      # LTI 1.3 flow
-      if lms_instance&.lti_version == 'LTI-1p3'
-        return post_score_to_lti_13(lms_instance)
+      # Standalone module launched via LTI 1.3 Deep Linking uses a
+      # template inst_module_version with no course_offering. Fall back
+      # to the LMS instance recorded on the launch that created this
+      # progress row (stored via lti_launch_id).
+      if lms_instance.nil? && self.inst_module_version_id.present? && self.lti_launch_id.present?
+        lms_instance = self.lti_launch&.lms_instance
+      end
+
+      if lms_instance
+        consumer_key = lms_instance.consumer_key
+        consumer_secret = lms_instance.consumer_secret
       else
-        # LTI 1.1 flow
-        require 'lti/outcomes'
-        res = LtiOutcomes.post_score_to_consumer(self.highest_score,
-                                                 self.lis_outcome_service_url,
-                                                 self.lis_result_sourcedid,
-                                                 consumer_key,
-                                                 consumer_secret)
-        if res.success?
-          self.last_passback = self.last_done
-        else
-          # passback failed, so clear timestamp of last successful passback
-          self.last_passback = nil
-        end
-        return res
+        return { error: "LMS instance not found", status: :internal_server_error }
       end
     else
-      # Passback not attempted, so clear timestamp of last successful passback
+      consumer_key = self.lms_access.consumer_key
+      consumer_secret = self.lms_access.consumer_secret
+      lms_instance = self.lms_access.lms_instance
+    end
+
+    # LTI 1.3 flow - does not require lis_outcome_service_url on the row;
+    # the lineitem URL stored on this progress row (lis_outcome_service_url)
+    # is passed directly to PostScore. Only use LTI 1.3 if this progress row
+    # was created from an LTI 1.3 launch (recorded via lti_launch_id). LTI 1.1
+    # launches never set lti_launch_id, so they fall through to the 1.1 flow
+    # even if the LmsInstance is configured for LTI-1p3.
+    if lms_instance&.lti_version == 'LTI-1p3' && self.lti_launch_id.present?
+      return post_score_to_lti_13(lms_instance)
+    end
+
+    # LTI 1.1 flow - requires lis_outcome_service_url and lis_result_sourcedid
+    if self.lis_outcome_service_url and self.lis_result_sourcedid
+      require 'lti/outcomes'
+      res = LtiOutcomes.post_score_to_consumer(self.highest_score,
+                                               self.lis_outcome_service_url,
+                                               self.lis_result_sourcedid,
+                                               consumer_key,
+                                               consumer_secret)
+      if res.success?
+        self.last_passback = self.last_done
+      else
+        self.last_passback = nil
+      end
+      return res
+    else
       self.last_passback = nil
-      # explicitly set return value to indicate no passback happened
       return nil
     end
   end
 
   def post_score_to_lti_13(lms_instance)
     begin
-      lti_launch = LtiLaunch.where(user_id: self.user_id, lms_instance_id: lms_instance.id).order(created_at: :desc).first
-
+      # Use the LtiLaunch recorded on this progress row at launch time.
+      # Falling back to "most recent launch for this user" would post the
+      # score to the wrong lineitem if the student has since launched a
+      # different module.
+      lti_launch = self.lti_launch
       if lti_launch.nil?
-        return { error: "No LTI Launch found", status: :not_found }
+        return { error: "No LTI Launch associated with this module progress", status: :not_found }
       end
 
       access_token_response = Lti13Service::GetAgsAccessToken.new(lms_instance).call
       access_token = access_token_response['access_token']
 
-      response = Lti13::ServicesController.new.send_score(
+      # Pass the lineitem URL and user id (sub) that were captured on this
+      # progress row at launch time, so the score goes to the correct
+      # lineitem regardless of any subsequent launches.
+      response = Lti13Service::SendScore.new(
         launch_id: lms_instance.id,
         access_token: access_token,
-        platform_jwt: lti_launch.id_token,  # id_token from LtiLaunch
-        kid: lti_launch.kid,  # kid from LtiLaunch
-        highest_score: self.highest_score
-      )
+        platform_jwt: lti_launch.id_token,
+        kid: lti_launch.kid,
+        highest_score: self.highest_score * 100,  # convert fraction (0-1) to percentage (0-100)
+        lineitem_url: self.lis_outcome_service_url,
+        user_id: self.lis_result_sourcedid
+      ).call
 
       if response[:status] == :ok || response[:status] == 200
         self.last_passback = self.last_done

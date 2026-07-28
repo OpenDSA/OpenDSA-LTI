@@ -23,9 +23,8 @@ class LmsAccessesController < ApplicationController
         courses = remote_collection.first_page
         valid_token = true
       rescue => ex
-        if ex.class == 'Footrest::HttpError::Unauthorized'
-          valid_token = false
-        end
+        Rails.logger.warn "LmsAccess token validation failed: #{ex.class}: #{ex.message}"
+        valid_token = false
       end
     end
 

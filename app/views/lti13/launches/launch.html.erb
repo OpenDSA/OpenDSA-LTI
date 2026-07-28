@@ -89,6 +89,24 @@
       TP.instBookId = urlParams.get('custom_inst_book_id');
       TP.customBookPath = urlParams.get('custom_book_path');
 
+      // Standalone module launch (selected via Deep Linking): when there's
+      // no inst_book_id, the JS odsaMOD.js library treats null as a defined
+      // value (typeof null !== "undefined"), which sends it down the
+      // book-based path with inst_book_id=null. Delete these fields so
+      // hasBook()/isFullModule() return false, and set instModuleVersionId
+      // so isStandaloneModule() returns true.
+      <% if defined?(inst_module_version_id) && inst_module_version_id.present? %>
+        TP.instModuleVersionId = "<%= inst_module_version_id %>";
+        delete TP.instBookId;
+        delete TP.instChapterModuleId;
+      <% else %>
+        // Normal book-based module: odsaUtils.getBookID() returns null when
+        // instBookId is null, but typeof check still sees it as defined.
+        // Normalize null to undefined so hasBook() returns false.
+        if (TP.instBookId === null) { delete TP.instBookId; }
+        if (TP.instChapterModuleId === null) { delete TP.instChapterModuleId; }
+      <% end %>
+
       // Set the ODSA global object
       window.ODSA = window.ODSA || {};
       window.ODSA.TP = TP;

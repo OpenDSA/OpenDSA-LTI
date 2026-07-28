@@ -5,7 +5,7 @@
 #  id                :bigint           not null, primary key
 #  lms_instance_id   :integer          not null
 #  user_id           :integer          not null
-#  course_offering_id: integer          not null
+#  course_offering_id: integer
 #  id_token          :text             not null
 #  decoded_jwt       :json
 #  kid               :string
@@ -32,11 +32,18 @@
 #
 class LtiLaunch < ApplicationRecord
 
+  # MariaDB stores `json` columns as longtext, so ActiveRecord doesn't
+  # auto-serialize. Force JSON serialization so decoded_jwt is stored as
+  # valid JSON and parsed back into a Hash/Array on read.
+  serialize :decoded_jwt, JSON
+
   #~ Relationships ............................................................
 
   belongs_to :lms_instance, inverse_of: :lti_launches
   belongs_to :user, inverse_of: :lti_launches
-  belongs_to :course_offering, inverse_of: :lti_launches
+  belongs_to :course_offering, inverse_of: :lti_launches, optional: true
+
+  has_many :odsa_module_progresses, dependent: :nullify
 
   #~ Validations ..............................................................
 

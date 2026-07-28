@@ -11,7 +11,8 @@ module Lti13Service
 
     def call
       platform_keys = platform_request_for_keys
-      deployment_key = platform_keys['keys'].detect { |f| f['kid'] == @kid }
+      keys_array = platform_keys['keys'] || []
+      deployment_key = keys_array.detect { |f| f['kid'] == @kid }
 
       if deployment_key.nil?
         Rails.logger.info "No deployment key found for KID: #{@kid}"
