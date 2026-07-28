@@ -245,5 +245,8 @@ OpenDSA::Application.routes.draw do
     # Deep Linking content selection is handled by DeepLinkLaunchesController
     get 'deep_linking/content_selection', to: 'deep_link_launches#content_selection', as: 'deep_linking_content_selection'
     post 'deep_linking/content_selected', to: 'deep_link_launches#content_selected', as: 'deep_linking_content_selected'
+    # LTI 1.3 Dynamic Registration (IMS spec v1.0)
+    get 'dynamic_registration', to: 'dynamic_registrations#show', as: 'dynamic_registration'
+    post 'dynamic_registration', to: 'dynamic_registrations#create'
   end
 end

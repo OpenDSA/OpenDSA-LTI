@@ -84,6 +84,9 @@ class Lti13::LaunchesController < ApplicationController
         if @decoded_jwt
           payload = launch_payload
           message_type = payload['https://purl.imsglobal.org/spec/lti/claim/message_type']
+          target_link_uri_log = payload['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']
+          placement_log = payload.dig('https://purl.imsglobal.org/spec/lti/claim/launch_presentation', 'placement')
+          Rails.logger.info "LTI 1.3 launch: message_type=#{message_type.inspect} placement=#{placement_log.inspect} target_link_uri=#{target_link_uri_log.inspect}"
 
           if message_type == 'LtiDeepLinkingRequest'
             @launch = LtiLaunch.create!(
