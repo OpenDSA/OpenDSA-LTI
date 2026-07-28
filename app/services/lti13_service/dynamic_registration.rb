@@ -157,11 +157,6 @@ module Lti13Service
               label: 'Select OpenDSA Content',
               placements: ['link_selection', 'assignment_selection'],
               supported_types: ['ltiResourceLink']
-            },
-            {
-              type: 'LtiResourceLinkRequest',
-              target_link_uri: "#{@base_url}/lti13/launches",
-              placements: ['course_navigation']
             }
           ]
         }
