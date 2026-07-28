@@ -288,6 +288,11 @@ class Lti13::LaunchesController < ApplicationController
       lms_access_id = LmsAccess.where(lms_instance_id: launch_lms_instance.id, user_id: current_user.id).first&.id
     end
 
+    @course_offering = find_or_create_standalone_course_offering(decoded_jwt)
+    if @course_offering
+      lti_enroll(@course_offering)
+    end
+
     OdsaModuleProgress.get_standalone_progress(
       current_user.id,
       version.id,
@@ -336,6 +341,7 @@ class Lti13::LaunchesController < ApplicationController
       'instModuleId' => inst_module_id.to_s,
       'moduleTitle' => (decoded_jwt.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'title') || inst_module.name).to_s,
       'userEmail' => current_user.email.to_s,
+      'courseOfferingId' => @course_offering&.id.to_s,
       'outcomeService' => false
     }
     tp_json = ERB::Util.json_escape(tp_data.to_json).html_safe
@@ -362,6 +368,86 @@ class Lti13::LaunchesController < ApplicationController
     @section_html = section_html.sub(%r{<head>}, "<head>#{tp_init}#{style_overrides}")
 
     render 'standalone', layout: false
+  end
+
+
+  # Find or create a CourseOffering for a standalone module launch by
+  # extracting the LMS course ID from the NRPS or AGS URL in the JWT.
+  # Only instructors/admins can create a new CourseOffering; students
+  # launching before an instructor has visited will get nil (the
+  # Exercise Overview widget will show "Not available").
+  def find_or_create_standalone_course_offering(decoded_jwt)
+    lms_course_num = nil
+
+    nrps_url = decoded_jwt.dig("https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice", "context_memberships_url")
+    if nrps_url
+      match = nrps_url.match(%r{/courses/(\d+)})
+      lms_course_num = match[1] if match
+    end
+
+    if lms_course_num.nil?
+      ags_lineitems = decoded_jwt.dig("https://purl.imsglobal.org/spec/lti-ags/claim/endpoint", "lineitems")
+      if ags_lineitems
+        match = ags_lineitems.match(%r{/courses/(\d+)})
+        lms_course_num = match[1] if match
+      end
+    end
+
+    # Fall back to context.id if no LMS-specific course number was found
+    lms_course_num ||= decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/context", "id")
+    if lms_course_num.nil?
+      Rails.logger.warn "Standalone launch: could not determine lms_course_num from JWT"
+      return nil
+    end
+
+    course_offering = CourseOffering.find_by(
+      lms_instance_id: @lms_instance.id,
+      lms_course_num: lms_course_num.to_s
+    )
+    return course_offering if course_offering
+
+    # Determine if the launching user is an instructor or admin
+    roles = decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/roles"] || []
+    is_instructor = roles.include?("http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor") ||
+                    roles.include?("http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator")
+
+    unless is_instructor
+      Rails.logger.warn "Standalone launch: no CourseOffering for lms_course_num=#{lms_course_num}, user #{current_user.id} is not instructor/admin"
+      return nil
+    end
+
+    orgid = @lms_instance.organization_id
+    if orgid.blank?
+      Rails.logger.warn "Standalone launch: LmsInstance #{@lms_instance.id} has no organization_id"
+      return nil
+    end
+
+    context = decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/context") || {}
+    context_label = context["label"] || "LTI"
+    context_title = context["title"] || "LTI Course"
+
+    course = Course.find_by(organization_id: orgid, number: context_label)
+    if course.blank?
+      course = Course.new(
+        name: context_title,
+        number: context_label,
+        organization_id: orgid,
+        user_id: current_user.id,
+      )
+      course.save!
+    end
+
+    course_offering = CourseOffering.new(
+      course: course,
+      term: Term.current_or_next_term,
+      label: context_label,
+      lms_instance: @lms_instance,
+      lms_course_code: "#{context_title} - #{context_label}",
+      lms_course_num: lms_course_num.to_s,
+    )
+    course_offering.save!
+    Rails.logger.info "Created CourseOffering #{course_offering.id} for standalone module (lms_course_num=#{lms_course_num})"
+    course_offering
   end
 
 
