@@ -60,8 +60,10 @@ ActiveAdmin.register LmsInstance do
       f.input :consumer_key
       f.input :consumer_secret
       f.input :client_id
-      f.input :private_key, as: :text
-      f.input :public_key, as: :text
+      f.input :private_key, as: :text,
+                            hint: "Leave blank on create to auto-generate a 2048-bit RSA keypair (LTI 1.3 only). Paste a PEM only when rotating keys or importing an existing key."
+      f.input :public_key, as: :text,
+                           hint: "Auto-generated from the private key if left blank (LTI 1.3 only)."
       f.input :keyset_url
       f.input :oauth2_url
       f.input :platform_oidc_auth_url

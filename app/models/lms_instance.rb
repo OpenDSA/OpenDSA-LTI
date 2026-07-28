@@ -33,6 +33,14 @@ class LmsInstance < ApplicationRecord
   belongs_to :organization
   # has_many :users, :through => :lms_accesses
 
+  #~ Callbacks ..............................................................
+  # Auto-generate a 2048-bit RSA keypair on create for LTI 1.3 instances
+  # if the admin didn't paste one in. LTI 1.1 instances use
+  # consumer_key/consumer_secret instead and don't need a keypair.
+  # Mirrors Lti13Service::DynamicRegistration#generate_keypair so manual
+  # and dynamic registrations produce equivalent keypairs.
+  before_create :generate_keypair, if: -> { private_key.blank? && lti_version == 'LTI-1p3' }
+
   #~ Validation ...............................................................
 
   validates_presence_of :lms_type, :url, :organization
@@ -70,6 +78,16 @@ class LmsInstance < ApplicationRecord
     jwk['alg'] = 'RS256'
     jwk['use'] = 'sig'
     jwk
+  end
+
+  # Generate a 2048-bit RSA keypair and assign both PEMs. Called from
+  # the before_create callback when no private_key was provided, but
+  # also usable on an existing instance to rotate keys (call save
+  # afterwards).
+  def generate_keypair
+    rsa = OpenSSL::PKey::RSA.new(2048)
+    self.private_key = rsa.to_pem
+    self.public_key  = rsa.public_key.to_pem
   end
 
     # Determine LTI version
