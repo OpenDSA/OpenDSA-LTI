@@ -125,6 +125,16 @@ class InstExercise < ApplicationRecord
     return "<iframe src=\"#{url}\" height=\"600\" width=\"100%\"></iframe>"
   end
 
+  def self.inlineav_metadata_path(short_name)
+    return nil if short_name.blank?
+    opendsa_root = Rails.root.join(OpenDSA::OPENDSA_DIRECTORY)
+    metadata_dir = opendsa_root.join('Metadata', 'inlineav')
+    return nil unless metadata_dir.exist?
+    match = Dir.glob(metadata_dir.join('**', "#{short_name}.html").to_s).first
+    return nil if match.blank?
+    Pathname.new(match).relative_path_from(opendsa_root).to_s
+  end
+
   #~ Instance methods .........................................................
 
   def embed_url(host)
