@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_04_02_130000) do
+ActiveRecord::Schema.define(version: 2026_07_27_130000) do
 
   create_table "active_admin_comments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -374,7 +374,7 @@ ActiveRecord::Schema.define(version: 2026_04_02_130000) do
   create_table "lti_launches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "lms_instance_id", null: false
     t.integer "user_id", null: false
-    t.integer "course_offering_id", null: false
+    t.integer "course_offering_id"
     t.text "id_token"
     t.text "decoded_jwt", size: :long, collation: "utf8mb4_bin"
     t.string "kid"
@@ -489,10 +489,12 @@ ActiveRecord::Schema.define(version: 2026_04_02_130000) do
     t.integer "lms_access_id"
     t.integer "inst_module_version_id"
     t.datetime "last_passback", null: false
+    t.bigint "lti_launch_id"
     t.index ["inst_book_id"], name: "odsa_module_progresses_inst_book_id_fk"
     t.index ["inst_chapter_module_id"], name: "odsa_module_progresses_inst_chapter_module_id_fk"
     t.index ["inst_module_version_id"], name: "fk_rails_38a9ac7560"
     t.index ["lms_access_id"], name: "odsa_module_progresses_lms_access_id_fk"
+    t.index ["lti_launch_id"], name: "index_odsa_module_progresses_on_lti_launch_id"
     t.index ["user_id", "inst_chapter_module_id"], name: "index_odsa_module_progress_on_user_and_module", unique: true
     t.index ["user_id", "inst_module_version_id"], name: "index_odsa_mod_prog_on_user_mod_version", unique: true
   end
@@ -717,6 +719,7 @@ ActiveRecord::Schema.define(version: 2026_04_02_130000) do
   add_foreign_key "odsa_module_progresses", "inst_chapter_modules", name: "odsa_module_progresses_inst_chapter_module_id_fk"
   add_foreign_key "odsa_module_progresses", "inst_module_versions"
   add_foreign_key "odsa_module_progresses", "lms_accesses", name: "odsa_module_progresses_lms_access_id_fk"
+  add_foreign_key "odsa_module_progresses", "lti_launches"
   add_foreign_key "odsa_module_progresses", "users", name: "odsa_module_progresses_user_id_fk"
   add_foreign_key "odsa_student_extensions", "inst_sections", name: "odsa_student_extensions_inst_section_id_fk"
   add_foreign_key "odsa_student_extensions", "users", name: "odsa_student_extensions_user_id_fk"

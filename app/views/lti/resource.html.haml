@@ -1,6 +1,11 @@
+- if @deep_linking
+  - content_item_params = { launch_id: @launch&.id, lms_instance_id: @lms_instance_id, deep_link_return_url: @deep_link_return_url.to_s }
+- else
+  - content_item_params = { oauth_consumer_key: params[:oauth_consumer_key], content_item_return_url: params[:content_item_return_url], tool_consumer_info_product_family_code: params[:tool_consumer_info_product_family_code], data: (params[:data].presence) }
+
 :javascript
   window.jsonFile = #{@json.html_safe};
-  window.return_url = "#{params[:content_item_return_url] ? params[:content_item_return_url].html_safe : params[:launch_presentation_return_url].html_safe}";
+  window.return_url = "#{@deep_linking ? @deep_link_return_url.to_s.html_safe : (params[:content_item_return_url] ? params[:content_item_return_url].html_safe : params[:launch_presentation_return_url].to_s.html_safe)}";
   window.odsa_launch_url = "#{@launch_url}";
   window.odsa_organizations = #{@organizations.blank? ? 'undefined' : @organizations.to_json.html_safe};
   window.organization_id = #{@organization_id.blank? ? 'undefined' : @organization_id};
@@ -15,12 +20,7 @@
     }
   };
   window.course_offering_id = #{@course_offering.blank? ? 'undefined' : @course_offering.id};
-  window.content_item_params = {
-    oauth_consumer_key: "#{params[:oauth_consumer_key]}",
-    content_item_return_url: "#{params[:content_item_return_url]}",
-    tool_consumer_info_product_family_code: "#{params[:tool_consumer_info_product_family_code]}",
-    data: #{params[:data].blank? ? 'undefined' : ('"' + params[:data] + '"').html_safe}
-  };
+  window.content_item_params = #{content_item_params.to_json.html_safe};
 
 = render :partial => 'shared/exerciseSettingsDialog'
 
@@ -32,7 +32,7 @@
           &times;
       %ul#alert-messages
 
-  - if @course_offering.blank?
+  - if @course_offering.blank? && !@deep_linking
     .row
       %form.form-horizontal#course_info_form{method: 'post'}
         %h3.col-xs-offset-1
@@ -98,16 +98,24 @@
 #using_json
 
 - if @deep_linking
-  %form{action: "#{params[:content_item_return_url]}", method: "post", encType: "application/x-www-form-urlencoded", id: "return_form"}
-    %input{type: "hidden", name: "lti_message_type", value: ""}
-    %input{type: "hidden", name: "lti_version", value: ""}
-    %input{type: "hidden", name: "content_items", value: "", id: 'content_items'}
-    - if !params[:data].blank?
-      %input{type: "hidden", name: "data", value: "#{params[:data]}"}
-    %input{type: "hidden", name: "oauth_version", value: ""}
-    %input{type: "hidden", name: "oauth_nonce", value: ""}
-    %input{type: "hidden", name: "oauth_timestamp", value: ""}
-    %input{type: "hidden", name: "oauth_consumer_key", value: ""}
-    %input{type: "hidden", name: "oauth_signature_method", value: ""}
-    %input{type: "hidden", name: "oauth_signature", value: ""}
+  - if @deep_link_return_url.blank?
+    .alert.alert-danger
+      Deep Linking return URL not found. Cannot return content selection to the LMS.
+  - elsif @launch.blank?
+    / LTI 1.1 fallback: no launch record, use the OAuth return form.
+    %form{action: "#{@deep_link_return_url}", method: "post", encType: "application/x-www-form-urlencoded", id: "return_form"}
+      %input{type: "hidden", name: "lti_message_type", value: ""}
+      %input{type: "hidden", name: "lti_version", value: ""}
+      %input{type: "hidden", name: "content_items", value: "", id: 'content_items'}
+      - if !params[:data].blank?
+        %input{type: "hidden", name: "data", value: "#{params[:data]}"}
+      %input{type: "hidden", name: "oauth_version", value: ""}
+      %input{type: "hidden", name: "oauth_nonce", value: ""}
+      %input{type: "hidden", name: "oauth_timestamp", value: ""}
+      %input{type: "hidden", name: "oauth_consumer_key", value: ""}
+      %input{type: "hidden", name: "oauth_signature_method", value: ""}
+      %input{type: "hidden", name: "oauth_signature", value: ""}
+  - else
+    / LTI 1.3: the return is handled by JS (redirect to deep_link_return_url?JWT=<jwt>).
+    / The signed JWT is produced by the server at /lti13/deep_linking/content_selected.
     

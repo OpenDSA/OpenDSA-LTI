@@ -236,20 +236,17 @@ OpenDSA::Application.routes.draw do
   namespace :lti13 do
     resources :login_initiations, only: %i[index create]
     resources :launches
-    resources :deep_link_launches, only: %i[create show] do
-      post 'launch'
-    end
-    resources :names_roles, only: [:index]
-    resources :line_items, only: [:create, :index, :show, :update, :destroy]
-    resources :results, only: [:create, :index, :show, :update]
-    resources :scores, only: [:create]
-    # get '/lti13/.well-known/jwks', to: 'lti13/tools#jwks', as: 'lti13_tool_jwks'
+    resources :deep_link_launches, only: %i[create show]
     get '/.well-known/jwks', to: 'tools#jwks', as: 'lti13_tool_jwks'
-    # Routes for LTI 1.3 services (NRPS or AGS))
+    get '/.well-known/jwks/:lms_instance_id', to: 'tools#jwks'
+    # Routes for LTI 1.3 services (NRPS or AGS)
     post 'send_score', to: 'services#send_score'
     post 'request_names_and_roles', to: 'services#request_names_and_roles'
-    # ... [service-specific routes] ...
-    get 'deep_linking/content_selection', to: 'deep_linking#content_selection'
-    post 'deep_linking/content_selected', to: 'deep_linking#content_selected'
+    # Deep Linking content selection is handled by DeepLinkLaunchesController
+    get 'deep_linking/content_selection', to: 'deep_link_launches#content_selection', as: 'deep_linking_content_selection'
+    post 'deep_linking/content_selected', to: 'deep_link_launches#content_selected', as: 'deep_linking_content_selected'
+    # LTI 1.3 Dynamic Registration (IMS spec v1.0)
+    get 'dynamic_registration', to: 'dynamic_registrations#show', as: 'dynamic_registration'
+    post 'dynamic_registration', to: 'dynamic_registrations#create'
   end
 end

@@ -5,7 +5,6 @@ require 'ostruct'
 
 class Lti13::LoginInitiationsController < ApplicationController
   include Lti13::LoginInitiationsHelper
-  skip_before_action only: :create
   before_action :set_tool
   before_action :generate_state_jwt
 
@@ -28,7 +27,11 @@ class Lti13::LoginInitiationsController < ApplicationController
     auth_url = build_auth_url(@lms_instance, @state_jwt, {
       login_hint: params[:login_hint], 
       lti_message_hint: params[:lti_message_hint]
-    }, @nonce)  
+    }, @nonce)
+    if auth_url.nil?
+      render plain: "LMS instance not configured: missing platform OIDC auth URL", status: :internal_server_error
+      return
+    end
     Rails.logger.info "LoginInitiationsController#create: auth_url: #{auth_url}"
     redirect_to auth_url
   end

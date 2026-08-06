@@ -90,10 +90,49 @@
       TP.instSectionId = urlParams.get('custom_inst_section_id');
       TP.instBookId = urlParams.get('custom_inst_book_id');
       TP.customBookPath = urlParams.get('custom_book_path');
+      TP.courseOfferingId = "<%= @course_offering&.id %>";
+
+      // Standalone module launch (selected via Deep Linking): when there's
+      // no inst_book_id, the JS odsaMOD.js library treats null as a defined
+      // value (typeof null !== "undefined"), which sends it down the
+      // book-based path with inst_book_id=null. Delete these fields so
+      // hasBook()/isFullModule() return false, and set instModuleVersionId
+      // so isStandaloneModule() returns true.
+      <% if defined?(inst_module_version_id) && inst_module_version_id.present? %>
+        TP.instModuleVersionId = "<%= inst_module_version_id %>";
+        delete TP.instBookId;
+        delete TP.instChapterModuleId;
+      <% else %>
+        // Normal book-based module: odsaUtils.getBookID() returns null when
+        // instBookId is null, but typeof check still sees it as defined.
+        // Normalize null to undefined so hasBook() returns false.
+        if (TP.instBookId === null) { delete TP.instBookId; }
+        if (TP.instChapterModuleId === null) { delete TP.instChapterModuleId; }
+      <% end %>
 
       // Set the ODSA global object
       window.ODSA = window.ODSA || {};
       window.ODSA.TP = TP;
+
+      // LTI 1.3 launches via POST to /lti13/launches, so the browser URL
+      // has no query string. The Exercise Overview widget (embedded in
+      // module HTML by postprocessor.py) reads custom_module_title and
+      // other custom_* params from window.location.search. Re-inject the
+      // custom params from target_link_uri into the browser URL so the
+      // widget can find them.
+      if (decodedUri && decodedUri.indexOf('?') !== -1) {
+        var injectedParams = new URLSearchParams(decodedUri.split('?')[1]);
+        var customOnly = new URLSearchParams();
+        injectedParams.forEach(function(value, key) {
+          if (key.indexOf('custom_') === 0 || key === 'resource_link_id' || key === 'resource_link_title') {
+            customOnly.set(key, value);
+          }
+        });
+        var qs = customOnly.toString();
+        if (qs) {
+          history.replaceState(null, '', window.location.pathname + '?' + qs);
+        }
+      }
     }());
   </script>
 
