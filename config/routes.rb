@@ -11,7 +11,6 @@ OpenDSA::Application.routes.draw do
   get 'lti/launch_extrtool/:exercise_id', to: 'lti#launch_extrtool', as: :lti_launch_extrtool
   post 'lti/outcomes', to: 'lti#grade_passback', as: :lti_grade_passback
 
-  get '/odsa_user_interactions/latest_state' => 'odsa_user_interactions#get_latest_state'
   resources :odsa_user_interactions
   resources :odsa_user_time_tracking
   resources :odsa_exercise_attempts do
@@ -33,12 +32,9 @@ OpenDSA::Application.routes.draw do
   get '/odsa_exercise_progresses/:inst_course_offering_exercise_id' =>
     'odsa_exercise_progresses#show_exercise',
     constraints: { inst_course_offering_exercise_id: /\d+/ }
-  post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_attempt'
-  post '/odsa_exercise_attempts/ae' => 'odsa_exercise_attempts#create_attempt'
+  post '/odsa_exercise_attempts/pe' => 'odsa_exercise_attempts#create_pe'
+  post '/odsa_exercise_attempts/ae' => 'odsa_exercise_attempts#create_ae'
   post '/odsa_exercise_attempts/pi' => 'odsa_exercise_attempts#create_pi'
-  post '/odsa_exercise_attempts/new' => 'odsa_exercise_attempts#create_attempt'
-  post '/odsa_exercise_attempts/new/pe' => 'odsa_exercise_attempts#create_attempt'
-  post '/odsa_exercise_attempts/new/ka' => 'odsa_exercise_attempts#create'
   post '/odsa_exercise_attempts/get_attempts' => 'odsa_exercise_attempts#get_attempts'
   post '/odsa_exercise_attempts/get_checkpoint' => 'odsa_exercise_attempts#get_checkpoint'
   post '/odsa_exercise_attempts/get_progress' => 'odsa_exercise_attempts#get_progress'
