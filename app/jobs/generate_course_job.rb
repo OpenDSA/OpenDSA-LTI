@@ -62,17 +62,20 @@ class GenerateCourseJob < ProgressJob::Base
     canvas_course = client.get_single_course_courses(lms_course_id)
     @inst_book.course_offering.lms_course_code = canvas_course.course_code
     @inst_book.course_offering.save!
-    consumer_key, consumer_secret = @user.get_lms_creds.first
 
     tool_data = {
       "tool_name" => "OpenDSA-LTI",
       "privacy_level" => "public",
-      "consumer_key" => consumer_key,
-      "consumer_secret" => consumer_secret,
       "launch_url" => @odsa_launch_url,
       "resource_selection_url" => @odsa_resource_selection_url,
       "client_id" => client_id
     }
+
+    if @lti_version == 'LTI-1p0'
+      consumer_key, consumer_secret = @user.get_lms_creds.first
+      tool_data["consumer_key"] = consumer_key
+      tool_data["consumer_secret"] = consumer_secret
+    end
 
     Rails.logger.info(tool_data)
 
@@ -97,12 +100,28 @@ class GenerateCourseJob < ProgressJob::Base
     tool_exists = false
     if res
       res.each do |tool|
-        tool_exists = true if tool['name'] == tool_name
+        if @lti_version == 'LTI-1p3'
+          tool_exists = true if tool['client_id'].to_s == tool_data['client_id'].to_s
+        else
+          tool_exists = true if tool['name'] == tool_name
+        end
       end
     end
 
+    if @lti_version == 'LTI-1p3'
+      unless tool_exists
+        path = "/v1/courses/#{lms_course_id}/external_tools"
+        form_params = { 'client_id' => tool_data['client_id'] }
+        form_params['name'] = tool_name if tool_name.present?
+        form_params['privacy_level'] = privacy_level if privacy_level.present?
+        Rails.logger.info "LTI 1.3: binding Developer Key client_id=#{tool_data['client_id']} to course #{lms_course_id}"
+        client.mixed_request(:post, path, {}, form_params, nil)
+        @created_LTI_tools.push(tool_name)
+      end
+      return
+    end
+
     opts = {:url => launch_url}
-    opts[:client_id] = tool_data[:client_id]
     if tool_data.key?("resource_selection_url")
       opts[:resource_selection__enabled__] = true
       opts[:resource_selection__url__] = tool_data["resource_selection_url"]
@@ -110,7 +129,7 @@ class GenerateCourseJob < ProgressJob::Base
       opts[:resource_selection__selection_height__] = 600
     end
 
-    if tool_name == "OpenDSA-LTI" && @lti_version == 'LTI-1p0'
+    if tool_name == "OpenDSA-LTI"
       odsa_url_opts = {
         :custom_inst_book_id => @inst_book.id,
         :custom_course_offering_id => @course_offering.id

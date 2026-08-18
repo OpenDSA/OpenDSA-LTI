@@ -248,7 +248,7 @@ class Lti13::LaunchesController < ApplicationController
                                       lms_access_id,
                                       @launch&.id)
       Rails.logger.info "Retrieved user's progress"
-      render 'launch', layout: 'lti13', locals: { id_token: params[:id_token], kid: @decoded_header['kid'] } and return
+      render 'launch', layout: false and return
     else
       render plain: "File name or book path not found!", status: :unprocessable_entity and return
     end

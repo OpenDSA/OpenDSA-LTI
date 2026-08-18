@@ -34,7 +34,15 @@
       - confirm_msg = 'Re-generating the Canvas course will override due dates and number of points for all the assignments. If you have updated the book configuration for your course offering to include additional chapters and modules, these will be added to your Canvas course. Do you want to continue?'
 
     - form_name = 'generate_course_' + inst_book.id.to_s
+    - lms_instance = inst_book.course_offering.lms_instance
+    - default_lti_version = lms_instance.lti_version
+    - lti_choices = [['LTI 1.1', 'LTI-1p0']]
+    - if lms_instance.supports_lti_1p3?
+      - lti_choices << ['LTI 1.3', 'LTI-1p3']
     = form_tag '/inst_books/'+ inst_book.id.to_s + '?operation=generate_course', data: {type: "script"}, format: 'js', remote: true, onsubmit: "#{form_name}.disabled = true; #{form_name}.value = 'Please wait...'; Window.ODSA = Window.ODSA || {}; Window.ODSA.inst_book_id = #{inst_book.id}; Window.ODSA.action_type = 'generate_course'; return true;" do
+      .form-inline{ style: "margin-bottom: 8px;" }
+        = label_tag :lti_version, "LTI version", class: "control-label", style: "margin-right: 8px;"
+        = select_tag :lti_version, options_for_select(lti_choices, default_lti_version), class: "form-control input-sm"
       = submit_tag btn_label, name: form_name, class: "btn btn-primary", title: btn_label + ' confirmation.', data: {confirm: confirm_msg}
       .col-xs-1
         %i.fa.fa-info-circle.action{ data: { toggle: 'modal', target: '#generate-course-modal' } }
