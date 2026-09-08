@@ -20,7 +20,8 @@ ENV ODSA_BRANCH=$ODSA_BRANCH
 ENV LTI_BRANCH=$LTI_BRANCH
 
 # shared-mime-info temporary due to mimemagic issues
-RUN apt-get update -qq \
+RUN echo "deb http://archive.debian.org/debian bullseye main" > /etc/apt/sources.list \
+  && apt-get update -o Acquire::Check-Valid-Until=false -qq \
   && apt-get install -y apt-utils build-essential patch cron python2 zlib1g-dev liblzma-dev \
   && apt-get install -y libyaml-dev libevent-dev libxml2 libffi-dev libxslt-dev libmariadb-dev-compat libmariadb-dev \
   && apt-get install -y shared-mime-info \
