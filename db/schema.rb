@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_07_27_130000) do
+ActiveRecord::Schema.define(version: 2026_10_04_120000) do
 
   create_table "active_admin_comments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -464,6 +464,7 @@ ActiveRecord::Schema.define(version: 2026_07_27_130000) do
     t.string "lis_result_sourcedid"
     t.integer "lms_access_id"
     t.integer "inst_module_section_exercise_id"
+    t.text "state", size: :medium
     t.index ["inst_book_section_exercise_id"], name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk"
     t.index ["inst_course_offering_exercise_id"], name: "odsa_exercise_progresses_inst_course_offering_exercise_id_fk"
     t.index ["inst_module_section_exercise_id"], name: "fk_rails_7b1bb7d31f"

@@ -41,6 +41,9 @@ class OdsaExerciseProgress < ApplicationRecord
   belongs_to :user
   belongs_to :lms_access
 
+  # SPLICE state object passed through from the exercise iframe by odsaMOD
+  serialize :state, JSON
+
   #~ Validation ...............................................................
   validate :required_fields
 
