@@ -757,15 +757,13 @@ class LtiController < ApplicationController
   end
 
   def find_lms_instance_for_launch
-    find_lms_instance_from_launch_url || ensure_lms_instance
+    find_lms_instance_from_launch_url
   end
 
   def find_lms_instance_from_launch_url
     launch_urls = [
       params[:lis_outcome_service_url],
-      params[:launch_presentation_return_url],
-      params[:custom_canvas_api_base_url],
-      params[:custom_canvas_api_domain]
+      params[:launch_presentation_return_url]
     ].compact
 
     launch_urls.each do |launch_url|
