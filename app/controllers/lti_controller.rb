@@ -757,30 +757,27 @@ class LtiController < ApplicationController
   end
 
   def find_lms_instance_for_launch
-    lms_instance = find_lms_instance_from_canvas_api_url || ensure_lms_instance
-    return nil unless launch_credential_matches_instance?(lms_instance)
-
-    lms_instance
+    find_lms_instance_from_launch_url || ensure_lms_instance
   end
 
-  def find_lms_instance_from_canvas_api_url
-    api_url = params[:custom_canvas_api_base_url].presence ||
-               params[:custom_canvas_api_domain].presence
-    return nil if api_url.blank?
+  def find_lms_instance_from_launch_url
+    launch_urls = [
+      params[:lis_outcome_service_url],
+      params[:launch_presentation_return_url],
+      params[:custom_canvas_api_base_url],
+      params[:custom_canvas_api_domain]
+    ].compact
 
-    uri = URI.parse(api_url.to_s)
-    host = uri.host || api_url
-    LmsInstance.find_by(url: ["https://#{host}", "http://#{host}"])
-  rescue URI::InvalidURIError
+    launch_urls.each do |launch_url|
+      uri = URI.parse(launch_url.to_s)
+      host = uri.host || launch_url
+      lms_instance = LmsInstance.find_by(url: ["https://#{host}", "http://#{host}"])
+      return lms_instance if lms_instance
+    rescue URI::InvalidURIError
+      next
+    end
+
     nil
-  end
-
-  def launch_credential_matches_instance?(lms_instance)
-    consumer_key = params[:oauth_consumer_key]
-    return false if lms_instance.blank? || consumer_key.blank?
-
-    lms_instance.consumer_key == consumer_key ||
-      LmsAccess.exists?(lms_instance_id: lms_instance.id, consumer_key: consumer_key)
   end
 
   def ensure_user(lms_instance)
