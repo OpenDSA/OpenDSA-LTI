@@ -20,6 +20,11 @@
 # Learn more: http://github.com/javan/whenever
 
 env :PATH, ENV['PATH']
+
+every 1.day, :at => '1:15 am' do
+  rake "odsa_user_time_tracking:consolidate"
+end
+
 set :output, "/home/deploy/OpenDSA-LTI/current/log/cron_log.log"
 every :reboot do
   command "cd /home/deploy/OpenDSA-LTI/current && RAILS_ENV=production bin/delayed_job -n 2 start"

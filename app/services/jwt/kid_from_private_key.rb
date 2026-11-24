@@ -9,8 +9,8 @@ module Jwt
       end
   
       def call
-        cert = OpenSSL::PKey::RSA.new(@rsa_private)
-        cert.to_jwk['kid']
+        rsa_key = OpenSSL::PKey::RSA.new(@rsa_private)
+        JWT::JWK.new(rsa_key.public_key).export[:kid]
       end
     end
   end

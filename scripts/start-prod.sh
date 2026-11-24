@@ -19,7 +19,7 @@ echo "Create the log file"
 touch /opendsa-lti/log/development.log
 echo "-------------------------------------------------------"
 echo "updating permissions" #>> ${OPENDSA_LOG_FILE} 2>&1
-rm -rf /opendsa/lti/public/OpenDSA
+rm -rf /opendsa-lti/public/OpenDSA
 ln -s /opendsa /opendsa-lti/public/OpenDSA
 cd "${OPENDSA_DIR}"
 echo "-------------------------------------------------------"
@@ -29,6 +29,11 @@ echo "-------------------------------------------------------"
 cd "${APP_DIR}"
 echo "nohup bash -c rake jobs:work" >> ${APP_LOG_FILE} 2>&1
 nohup bash -c "rake jobs:work >> ${APP_LOG_FILE} 2>&1 &"
+echo "-------------------------------------------------------"
+echo "Starting cron and installing whenever schedule"
+echo "-------------------------------------------------------"
+service cron start >/dev/null 2>&1 || cron
+bundle exec whenever --update-crontab opendsa-lti --set "environment=${ENVIRONMENT}" --load-file config/schedule.rb
 echo "-------------------------------------------------------"
 echo "Starting server"
 echo "-------------------------------------------------------"

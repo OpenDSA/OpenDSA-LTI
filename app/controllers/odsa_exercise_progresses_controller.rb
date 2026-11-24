@@ -38,10 +38,11 @@ class OdsaExerciseProgressesController < ApplicationController
                                                      inst_course_offering_exercise_id: params[:inst_course_offering_exercise_id])
       end
     end
-    exercise_progress['current_exercise'] = params['current_exercise']
+    exercise_progress['current_exercise'] = params['current_exercise'] if params.key?('current_exercise')
 
     respond_to do |format|
       if exercise_progress.save
+        store_state(exercise_progress)
         msg = {:status => "success", :message => "Success!"}
         format.json { render :json => msg }
       else

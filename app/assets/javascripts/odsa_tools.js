@@ -478,18 +478,25 @@ $(function () {
     return new Promise((resolve, reject) => {
       getStoreData(odsaStore, "odsaTimeTrackingData")
         .then((result) => {
-          // Up-to-date cache
-          if (result && result.date === currentDate && result.data) {
-            resolve(result.data);
-            return;
-          }
-
           const hasExistingData = !!(result && result.data);
-
           const lastFetchedDate =
             hasExistingData && result.data && result.data.lastFetchedDate
               ? result.data.lastFetchedDate
               : null;
+          const cacheIsFullyCaughtUp =
+            !!lastFetchedDate &&
+            parseInt(lastFetchedDate, 10) >= parseInt(trackingEndDate, 10);
+
+          // Up-to-date cache
+          if (
+            result &&
+            result.date === currentDate &&
+            result.data &&
+            cacheIsFullyCaughtUp
+          ) {
+            resolve(result.data);
+            return;
+          }
 
           const fallbackKeyDate = result ? result.date : null;
 
@@ -944,6 +951,12 @@ $(function () {
               st = JSON.parse(st);
               if (Array.isArray(st)) {
                 // init sectionsLookup hash
+                if (
+                  !sectionsLookup[ch_id] ||
+                  !Object.prototype.hasOwnProperty.call(sectionsLookup[ch_id], mod_id)
+                ) {
+                  continue;
+                }
                 if (sectionsLookup[ch_id][mod_id].length == 0) {
                   for (var j = 0; j < st.length; j++) {
                     var sectionName = Object.keys(st[j])[0];
@@ -986,7 +999,7 @@ $(function () {
                 }
               }
             } catch (e) {
-              // console.log(e)
+              // Ignore malformed historical/test payloads.
             }
           }
         }

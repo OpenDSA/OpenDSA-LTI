@@ -77,4 +77,38 @@ class ApplicationController < ActionController::Base
   #me my code
   helper :table
 
+  protected
+
+  # -------------------------------------------------------------
+  # Saves the SPLICE state object (passed through by odsaMOD from the
+  # exercise iframe) on the given exercise progress, if one was sent.
+  # Uses update_column so it never overwrites score fields that the
+  # attempt's after_create hook updated on a different instance.
+  # A state that cannot be stored is logged, never raised: the attempt
+  # has already been saved and must not be reported as a failure.
+  # Oversized states are rejected before reaching the database, because
+  # MySQL drops the connection on packets over max_allowed_packet.
+  MAX_STATE_BYTES = 1.megabyte
+
+  def store_state(exercise_progress)
+    return unless params.key?(:state) && exercise_progress&.persisted?
+    state = params[:state]
+    state = state.to_unsafe_h if state.respond_to?(:to_unsafe_h)
+    if state.is_a?(String)
+      state = begin
+        JSON.parse(state)
+      rescue JSON::ParserError
+        state
+      end
+    end
+    state_bytes = state.to_json.bytesize
+    if state_bytes > MAX_STATE_BYTES
+      Rails.logger.error("store_state skipped for exercise_progress #{exercise_progress.id}: state is #{state_bytes} bytes (max #{MAX_STATE_BYTES})")
+      return
+    end
+    exercise_progress.update_column(:state, state)
+  rescue ActiveRecord::ActiveRecordError => e
+    Rails.logger.error("store_state failed for exercise_progress #{exercise_progress.id}: #{e.class}: #{e.message}")
+  end
+
 end

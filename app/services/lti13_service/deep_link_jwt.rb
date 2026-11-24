@@ -1,72 +1,174 @@
-# module for handling platform requests
 module Lti13Service
-    # Lti13Service::DeepLinkJwt.new(tool_objet).call
-    class DeepLinkJwt
-      attr_accessor :jwt, :signed_jwt
-  
-      def initialize(launch, tool_launch_url, content_items = [])
-        @launch = launch
-        @tool = launch.tool
-        @tool_launch_url = tool_launch_url
-        @content_items = content_items
-        @jwt = {}
-        generate_jwt
+  class DeepLinkJwt
+    attr_accessor :jwt, :signed_jwt
+
+    def initialize(launch, lms_instance, tool_launch_url, selected_content = {})
+      @launch = launch
+      @lms_instance = lms_instance
+      @tool_launch_url = tool_launch_url
+      @selected_content = selected_content.is_a?(Hash) ? selected_content : {}
+      @launch_payload = launch_payload
+      @jwt = {}
+      generate_jwt
+    end
+
+    def call
+      @signed_jwt
+    end
+
+    def generate_jwt
+      @jwt[Rails.configuration.lti_claims_and_scopes['message_type']] = 'LtiDeepLinkingResponse'
+      @jwt[Rails.configuration.lti_claims_and_scopes['lti_version']] = '1.3.0'
+      @jwt[Rails.configuration.lti_claims_and_scopes['deployment_id']] = deployment_id
+      add_security_details
+      add_content_items
+      add_data_claim
+      add_message_and_log
+      create_signed_jwt
+    end
+
+    def add_security_details
+      @jwt['iss'] = @lms_instance.client_id
+      @jwt['aud'] = @launch_payload['iss']
+      @jwt['iat'] = Time.now.to_i
+      @jwt['exp'] = Time.now.to_i + 300
+      @jwt['nonce'] = SecureRandom.hex(10)
+    end
+
+    def add_content_items
+      @jwt[Rails.configuration.lti_claims_and_scopes['content_item_claim']] = [build_content_item]
+    end
+
+    def add_data_claim
+      deep_linking_claim = Rails.configuration.lti_claims_and_scopes['deep_linking_claim']
+      deep_linking_data_claim = Rails.configuration.lti_claims_and_scopes['deep_linking_data_claim']
+
+      data = @launch_payload[deep_linking_data_claim]
+      if data.blank?
+        settings = @launch_payload[deep_linking_claim]
+        settings = settings.is_a?(Hash) ? settings : {}
+        return_url = settings['deep_link_return_url']
+        if return_url.present?
+          parsed = URI.parse(return_url)
+          params = URI.decode_www_form(parsed.query || '')
+          data_value = params.assoc('data')&.last
+          data = data_value if data_value.present?
+        end
       end
-  
-      def generate_jwt
-        @jwt[Rails.configuration.lti_claims_and_scopes['message_type']] = 'LtiDeepLinkingResponse'
-        @jwt[Rails.configuration.lti_claims_and_scopes['lti_version']] = '1.3.0'
-        @jwt[Rails.configuration.lti_claims_and_scopes['deployment_id']] = @tool.deployment_id
-        add_security_details
-        add_content_items
-        add_data_claim
-        add_message_and_log
-        create_signed_jwt
+
+      @jwt[deep_linking_data_claim] = data if data.present?
+    end
+
+    def add_message_and_log
+      @jwt[Rails.configuration.lti_claims_and_scopes['deep_linking_tool_msg_claim']] = "Successfully added Content Item from OpenDSA"
+      @jwt[Rails.configuration.lti_claims_and_scopes['deep_linking_tool_log_claim']] = "OpenDSA content item: #{@selected_content.to_s}"
+    end
+
+    def create_signed_jwt
+      @signed_jwt = Jwt::Encode.new(@jwt, @lms_instance.openssl_private_key).call
+    end
+
+    private
+
+    def launch_payload
+      dj = @launch.decoded_jwt
+      if dj.is_a?(String)
+        dj = JSON.parse(dj) rescue nil
       end
-  
-      def add_security_details
-        # iss is is the tool identifier from the platform standpoint
-        @jwt['iss'] = @tool.client_id
-  
-        # Audience(s) for whom this ID Token is intended i.e. the platform iss from id_token recieved during initial message to tool from platform
-        @jwt['aud'] = @launch.decoded_jwt['iss']
-  
-        # Time at which the Issuer generated the JWT (epoch)
-        @jwt['iat'] = Time.now.to_i
-  
-        # Expiration time on or after which the Client MUST NOT accept the ID Token for processing (epoch)
-        # reference implementation provides 5 minutes for clock skew
-        @jwt['exp'] = Time.now.to_i + 300
-  
-        # No sub for the a message back to the platform
-        # @launch_data['sub'] = 'n/a'
-  
-        # String value used to associate a Client session with an ID Token, and to mitigate replay attacks. The nonce value is a case-sensitive string.
-        @jwt['nonce'] = SecureRandom.hex(10)
-      end
-  
-      def add_content_items
-        content = []
-        content << @tool.html_item if @content_items.include?('html_item')
-        content << @tool.link_item if @content_items.include?('html_link')
-        content << @tool.image_item if @content_items.include?('image_item')
-        content << @tool.lti_item(@tool_launch_url) if @content_items.include?('lti_link')
-        content << @tool.file_item if @content_items.include?('file_link')
-        @jwt[Rails.configuration.lti_claims_and_scopes['content_item_claim']] = content
-      end
-  
-      def add_data_claim
-        data = @launch.decoded_jwt[Rails.configuration.lti_claims_and_scopes['deep_linking_claim']]['data']
-        @jwt[Rails.configuration.lti_claims_and_scopes['deep_linking_data_claim']] = data if data
-      end
-  
-      def add_message_and_log
-        @jwt[Rails.configuration.lti_claims_and_scopes['deep_linking_tool_msg_claim']] = "Successfuly added #{@content_items.count} Content Items from Reference Implementation"
-        @jwt[Rails.configuration.lti_claims_and_scopes['deep_linking_tool_log_claim']] = "Reference Implementation requested that the following type of content items be added: #{@content_items.to_s}"
-      end
-  
-      def create_signed_jwt
-        @signed_jwt = Jwt::Encode.new(@jwt, @tool.openssl_private_key).call
+      dj.is_a?(Array) ? dj.first : dj
+    end
+
+    def deployment_id
+      @launch_payload[Rails.configuration.lti_claims_and_scopes['deployment_id']]
+    end
+
+    # Build a single ltiResourceLink content item from the structured
+    # selected_content hash.
+    def build_content_item
+      if @selected_content['moduleInfo'].present?
+        build_module_item
+      elsif @selected_content['exerciseInfo'].present?
+        build_exercise_item
+      else
+        {
+          type: 'ltiResourceLink',
+          id: SecureRandom.hex(8),
+          title: 'OpenDSA Module',
+          url: @tool_launch_url,
+          placementAdvice: { presentationDocumentTarget: 'iframe' }
+        }
       end
     end
+
+    def build_module_item
+      info = @selected_content['moduleInfo'] || {}
+      settings = @selected_content['moduleSettings'] || {}
+      is_gradable = @selected_content['isGradable']
+      points = settings['points']
+
+      title = "OpenDSA: #{info['name']}"
+      launch_url_with_params, custom_params = build_module_url_and_custom(info)
+
+      item = {
+        type: 'ltiResourceLink',
+        id: SecureRandom.hex(8),
+        title: title,
+        url: launch_url_with_params,
+        presentationAdvice: { presentationDocumentTarget: 'iframe' },
+        custom: custom_params
+      }
+      if is_gradable && points.present?
+        item[:lineItem] = {
+          scoreMaximum: points.to_f
+        }
+      end
+      item
+    end
+
+    def build_exercise_item
+      info = @selected_content['exerciseInfo'] || {}
+      settings = @selected_content['exerciseSettings'] || {}
+      is_gradable = @selected_content['isGradable']
+      points = settings['points'] || 1
+
+      title = "OpenDSA: #{info['name']}"
+      short_name = info['short_name']
+      launch_url_with_params = "#{@tool_launch_url}?custom_ex_short_name=#{CGI.escape(short_name.to_s)}&custom_ex_settings=#{CGI.escape(settings.to_json)}"
+      custom_params = {
+        ex_short_name: short_name.to_s,
+        ex_settings: settings.to_json
+      }
+
+      item = {
+        type: 'ltiResourceLink',
+        id: SecureRandom.hex(8),
+        title: title,
+        url: launch_url_with_params,
+        presentationAdvice: { presentationDocumentTarget: 'iframe' },
+        custom: custom_params
+      }
+      if is_gradable
+        item[:lineItem] = {
+          scoreMaximum: points.to_f
+        }
+      end
+      item
+    end
+
+    def build_module_url_and_custom(info)
+      inst_module_id = info['id']
+      path = info['path'].to_s
+      name = info['name'].to_s
+
+      query = "custom_inst_module_id=#{CGI.escape(inst_module_id.to_s)}"
+      launch_url = "#{@tool_launch_url}?#{query}"
+
+      custom_params = {
+        inst_module_id: inst_module_id.to_s,
+        module_path: path.to_s,
+        module_name: name.to_s
+      }
+      [launch_url, custom_params]
+    end
   end
+end

@@ -1,23 +1,23 @@
 class Lti13::DeepLinkLaunchesController < ApplicationController
-  before_action :set_tool
-  skip_before_action only: :create
-  after_action :allow_iframe, only: [:show, :launch, :content_selection, :content_selected]
+  before_action :set_lms_instance, only: [:create, :show, :content_selection]
+  before_action :set_launch_for_content_selected, only: [:content_selected]
+  after_action :allow_iframe, only: [:show, :content_selection, :content_selected]
 
-  # POST lti/tools/#/deep_link_launches
-  # Handles the creation of a deep link launch
+  # POST /lti13/deep_link_launches
   def create
     if params[:id_token]&.present?
       @decoded_header = Jwt::Header.new(params[:id_token]).call
       kid = @decoded_header['kid']
 
-      @decoded_jwt = Lti13Service::DecodePlatformJwt.new(@tool, params[:id_token], kid).call
-      @launch = @tool.launches.build(jwt: params[:id_token], decoded_jwt: @decoded_jwt ? @decoded_jwt.first : nil, state: params[:state])
+      @decoded_jwt = Lti13Service::DecodePlatformJwt.new(@lms_instance, params[:id_token], kid).call
+      normalized_jwt = @decoded_jwt.is_a?(Array) ? @decoded_jwt.first : @decoded_jwt
+      @launch = @lms_instance.lti_launches.build(id_token: params[:id_token], decoded_jwt: normalized_jwt, state: params[:state], expires_at: Time.now + 1.hour)
     end
 
-    @launch ||= Launch.new
+    @launch ||= LtiLaunch.new
     respond_to do |format|
       if @launch.save
-        format.html { redirect_to [:lti13, @tool, @launch], notice: 'Successful Launch.' }
+        format.html { redirect_to [:lti13, @lms_instance, @launch], notice: 'Successful Launch.' }
         format.json { render :show, status: :created, location: @launch }
       else
         format.html { render json: 'Invalid Launch', status: :unprocessable_entity }
@@ -26,21 +26,12 @@ class Lti13::DeepLinkLaunchesController < ApplicationController
     end
   end
 
-  # GET lti/tools/#/deep_link_launch/*launch_id*
-  # allows user to select content
+  # GET /lti13/deep_link_launches/:id
   def show
-    @launch = Launch.find(params[:id])
+    @launch = LtiLaunch.find(params[:id])
   end
 
-  # GET lti/tools/#/deep_link_launch/*launch_id*/launch
-  # takes selected content and launches back to platform with JWT
-  def launch
-    @launch = Launch.find(params[:deep_link_launch_id])
-    @form_url = @launch.decoded_jwt[Rails.configuration.lti_claims_and_scopes['deep_linking_claim']]['deep_link_return_url']
-    @deep_link_jwt = Lti13Service::DeepLinkJwt.new(@launch, lti_tool_launches_url(@tool), params[:content_items])
-  end
-
-  # GET lti13/deep_linking/content_selection
+  # GET /lti13/deep_linking/content_selection
   def content_selection
     @launch_url = request.protocol + request.host_with_port + "/lti13/launches"
     module_info = InstModule.get_current_versions_dict()
@@ -51,35 +42,74 @@ class Lti13::DeepLinkLaunchesController < ApplicationController
     render 'resource', layout: 'lti_resource'
   end
 
-  # POST lti13/deep_linking/content_selected
+  # POST /lti13/deep_linking/content_selected
+  # Accepts a JSON body from lti_resource.js with:
+  #   launch_id, lms_instance_id, selected: { moduleInfo|exerciseInfo, ...settings, isGradable }
+  # Builds a signed LtiDeepLinkingResponse JWT and returns a redirect URL
+  # of the form "<deep_link_return_url>?JWT=<jwt>" for the browser to redirect to.
   def content_selected
-    @launch = Launch.find(params[:launch_id]) 
-    @form_url = @launch.decoded_jwt[Rails.configuration.lti_claims_and_scopes['deep_linking_claim']]['deep_link_return_url']
-    selected_content = params[:selected_content] 
-    Rails.logger.info "Selected Content: #{selected_content}"
+    selected_content = params[:selected]
+    Rails.logger.info "Selected Content: #{selected_content.inspect}"
 
-    deep_link_jwt_service = Lti13Service::DeepLinkJwt.new(@launch, selected_content)
+    selected_hash = selected_content.respond_to?(:to_unsafe_h) ? selected_content.to_unsafe_h : selected_content
+
+    deep_link_jwt_service = Lti13Service::DeepLinkJwt.new(@launch, @lms_instance, lti13_launches_url, selected_hash)
     deep_link_jwt = deep_link_jwt_service.call
     Rails.logger.info "Deep Link JWT: #{deep_link_jwt}"
 
-    # Return the selected content to LMS
-    redirect_to "#{@form_url}?JWT=#{deep_link_jwt}"
+    return_url = deep_link_return_url(@launch)
+    if return_url.blank?
+      render json: { error: 'Deep Linking return URL not found in launch JWT' }, status: :unprocessable_entity
+      return
+    end
+
+    render json: { jwt: deep_link_jwt, return_url: return_url }
   end
 
   #~ Private methods ..........................................................
 
   private
-  # -------------------------------------------------------------
 
-  def set_tool
-    @tool = Tool.find_by_id(params[:tool_id])
-    render json: { error: 'Tool not found' }, status: :not_found unless @tool
+  def set_lms_instance
+    lms_instance_id = params[:lms_instance_id] || session[:lms_instance_id]
+    @lms_instance = LmsInstance.find_by(id: lms_instance_id)
+    render json: { error: 'LMS Instance not found' }, status: :not_found unless @lms_instance
+  end
+
+  def set_launch_for_content_selected
+    @launch = LtiLaunch.find_by(id: params[:launch_id])
+    if @launch.nil?
+      render json: { error: 'LtiLaunch not found' }, status: :not_found
+      return
+    end
+    @lms_instance = @launch.lms_instance
+    if @lms_instance.nil?
+      render json: { error: 'LMS Instance not found for launch' }, status: :not_found
+    end
+  end
+
+  def deep_link_return_url(launch)
+    jwt_payload = launch.decoded_jwt.is_a?(Array) ? launch.decoded_jwt.first : launch.decoded_jwt
+    jwt_payload&.dig(Rails.configuration.lti_claims_and_scopes['deep_linking_claim'], 'deep_link_return_url')
   end
 
   def allow_iframe
     response.headers.except! 'X-Frame-Options'
-    puts "Response headers after removing X-Frame-Options from deep_link_controller: #{response.headers.inspect}"
-    response.headers['Content-Security-Policy'] = "frame-ancestors 'self' https://canvas.endeavour.cs.vt.edu"
+    Rails.logger.debug "Response headers after removing X-Frame-Options from deep_link_controller: #{response.headers.inspect}"
+    response.headers['Content-Security-Policy'] = "frame-ancestors #{frame_ancestors_directive}"
+  end
+
+  def frame_ancestors_directive
+    ancestors = "'self'"
+    url = @lms_instance&.url
+    return ancestors if url.blank?
+    uri = URI.parse(url)
+    origin = "#{uri.scheme}://#{uri.host}"
+    origin << ":#{uri.port}" if uri.port && uri.port != uri.default_port
+    "#{ancestors} #{origin}"
+  rescue URI::InvalidURIError => e
+    Rails.logger.warn "allow_iframe: invalid LMS instance URL #{url.inspect}: #{e.message}"
+    ancestors
   end
 
 end

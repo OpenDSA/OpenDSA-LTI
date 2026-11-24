@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_09_03_143505) do
+ActiveRecord::Schema.define(version: 2026_10_04_120000) do
 
   create_table "active_admin_comments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "namespace"
@@ -374,7 +374,7 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
   create_table "lti_launches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "lms_instance_id", null: false
     t.integer "user_id", null: false
-    t.integer "course_offering_id", null: false
+    t.integer "course_offering_id"
     t.text "id_token"
     t.text "decoded_jwt", size: :long, collation: "utf8mb4_bin"
     t.string "kid"
@@ -440,6 +440,7 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
     t.index ["inst_course_offering_exercise_id"], name: "odsa_exercise_attempts_inst_course_offering_exercise_id_fk"
     t.index ["inst_module_section_exercise_id"], name: "fk_rails_6944f2321b"
     t.index ["inst_section_id"], name: "odsa_exercise_attempts_inst_section_id_fk"
+    t.index ["user_id", "inst_book_section_exercise_id"], name: "idx_attempts_user_ibse"
     t.index ["user_id"], name: "odsa_exercise_attempts_user_id_fk"
   end
 
@@ -463,6 +464,7 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
     t.string "lis_result_sourcedid"
     t.integer "lms_access_id"
     t.integer "inst_module_section_exercise_id"
+    t.text "state", size: :medium
     t.index ["inst_book_section_exercise_id"], name: "odsa_exercise_progresses_inst_book_section_exercise_id_fk"
     t.index ["inst_course_offering_exercise_id"], name: "odsa_exercise_progresses_inst_course_offering_exercise_id_fk"
     t.index ["inst_module_section_exercise_id"], name: "fk_rails_7b1bb7d31f"
@@ -488,10 +490,12 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
     t.integer "lms_access_id"
     t.integer "inst_module_version_id"
     t.datetime "last_passback", null: false
+    t.bigint "lti_launch_id"
     t.index ["inst_book_id"], name: "odsa_module_progresses_inst_book_id_fk"
     t.index ["inst_chapter_module_id"], name: "odsa_module_progresses_inst_chapter_module_id_fk"
     t.index ["inst_module_version_id"], name: "fk_rails_38a9ac7560"
     t.index ["lms_access_id"], name: "odsa_module_progresses_lms_access_id_fk"
+    t.index ["lti_launch_id"], name: "index_odsa_module_progresses_on_lti_launch_id"
     t.index ["user_id", "inst_chapter_module_id"], name: "index_odsa_module_progress_on_user_and_module", unique: true
     t.index ["user_id", "inst_module_version_id"], name: "index_odsa_mod_prog_on_user_mod_version", unique: true
   end
@@ -538,6 +542,24 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
     t.index ["inst_module_version_id"], name: "fk_rails_599b647d17"
     t.index ["inst_section_id"], name: "odsa_user_interactions_inst_section_id_fk"
     t.index ["user_id"], name: "odsa_user_interactions_user_id_fk"
+  end
+
+  create_table "odsa_user_time_tracking_stagings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "inst_book_id"
+    t.integer "inst_module_id"
+    t.integer "inst_chapter_id"
+    t.string "uuid", limit: 50, null: false
+    t.string "session_date", limit: 50, null: false
+    t.decimal "total_time", precision: 10, scale: 2, null: false
+    t.text "sections_time", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["inst_book_id", "session_date"], name: "idx_oustt_on_book_and_date"
+    t.index ["inst_chapter_id"], name: "odsa_user_time_tracking_staging_inst_chapter_id_fk"
+    t.index ["inst_module_id"], name: "odsa_user_time_tracking_staging_inst_module_id_fk"
+    t.index ["user_id", "inst_book_id", "inst_module_id", "inst_chapter_id", "session_date"], name: "idx_oustt_on_daily_merge_key"
+    t.index ["user_id", "uuid"], name: "index_odsa_user_time_tracking_stagings_on_user_id_uuid", unique: true
   end
 
   create_table "odsa_user_time_trackings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -698,6 +720,7 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
   add_foreign_key "odsa_module_progresses", "inst_chapter_modules", name: "odsa_module_progresses_inst_chapter_module_id_fk"
   add_foreign_key "odsa_module_progresses", "inst_module_versions"
   add_foreign_key "odsa_module_progresses", "lms_accesses", name: "odsa_module_progresses_lms_access_id_fk"
+  add_foreign_key "odsa_module_progresses", "lti_launches"
   add_foreign_key "odsa_module_progresses", "users", name: "odsa_module_progresses_user_id_fk"
   add_foreign_key "odsa_student_extensions", "inst_sections", name: "odsa_student_extensions_inst_section_id_fk"
   add_foreign_key "odsa_student_extensions", "users", name: "odsa_student_extensions_user_id_fk"
@@ -708,6 +731,10 @@ ActiveRecord::Schema.define(version: 2024_09_03_143505) do
   add_foreign_key "odsa_user_interactions", "inst_module_versions"
   add_foreign_key "odsa_user_interactions", "inst_sections", name: "odsa_user_interactions_inst_section_id_fk"
   add_foreign_key "odsa_user_interactions", "users", name: "odsa_user_interactions_user_id_fk"
+  add_foreign_key "odsa_user_time_tracking_stagings", "inst_books", name: "odsa_user_time_tracking_staging_inst_book_id_fk"
+  add_foreign_key "odsa_user_time_tracking_stagings", "inst_chapters", name: "odsa_user_time_tracking_staging_inst_chapter_id_fk"
+  add_foreign_key "odsa_user_time_tracking_stagings", "inst_modules", name: "odsa_user_time_tracking_staging_inst_module_id_fk"
+  add_foreign_key "odsa_user_time_tracking_stagings", "users", name: "odsa_user_time_tracking_staging_user_id_fk"
   add_foreign_key "odsa_user_time_trackings", "inst_book_section_exercises", name: "odsa_user_time_tracking_inst_book_section_exercise_id_fk"
   add_foreign_key "odsa_user_time_trackings", "inst_books", name: "odsa_user_time_tracking_inst_book_id_fk"
   add_foreign_key "odsa_user_time_trackings", "inst_chapters", name: "odsa_user_time_tracking_inst_chapter_id_fk"

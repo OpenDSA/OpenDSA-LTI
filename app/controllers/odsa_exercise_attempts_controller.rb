@@ -117,6 +117,7 @@ class OdsaExerciseAttemptsController < ApplicationController
           exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
                                                            inst_course_offering_exercise_id: inst_course_offering_exercise.id)
         end
+        store_state(exercise_progress)
         if !already_proficient and exercise_progress.proficient? and
           exercise_progress.has_inst_course_offering_exercise?()
 
@@ -252,6 +253,7 @@ class OdsaExerciseAttemptsController < ApplicationController
             exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
               inst_course_offering_exercise_id: inst_course_offering_exercise.id)
           end
+          store_state(exercise_progress)
           if !already_proficient and exercise_progress.proficient? and
             exercise_progress.has_inst_course_offering_exercise?()
 
@@ -392,6 +394,7 @@ class OdsaExerciseAttemptsController < ApplicationController
             exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
               inst_course_offering_exercise_id: inst_course_offering_exercise.id)
           end
+          store_state(exercise_progress)
           if !already_proficient and exercise_progress.proficient? and
             exercise_progress.has_inst_course_offering_exercise?()
 
@@ -522,6 +525,7 @@ class OdsaExerciseAttemptsController < ApplicationController
             exercise_progress = OdsaExerciseProgress.find_by(user_id: current_user.id,
               inst_course_offering_exercise_id: inst_course_offering_exercise.id)
           end
+          store_state(exercise_progress)
           if !already_proficient and exercise_progress.proficient? and
             exercise_progress.has_inst_course_offering_exercise?()
 

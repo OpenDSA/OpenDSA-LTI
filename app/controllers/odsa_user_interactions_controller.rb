@@ -7,7 +7,7 @@ class OdsaUserInteractionsController < ApplicationController
   # POST /odsa_user_interactions/create
   def create
     failed_to_save = false
-    errors = []
+    error_msgs = []
     params[:eventList].each do |event|
       hasBook = event.key?(:inst_book_id)
       is_standalone_module = event.key?(:inst_module_version_id)

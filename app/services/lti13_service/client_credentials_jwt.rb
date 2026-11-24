@@ -17,7 +17,7 @@ module Lti13Service
     # Generate the payload for the JWT. 
     def generate_payload
       {
-        iss: @lms_instance.url,
+        iss: @lms_instance.client_id,
         sub: @lms_instance.client_id,
         aud: @lms_instance.oauth2_url,
         iat: Time.now.to_i,

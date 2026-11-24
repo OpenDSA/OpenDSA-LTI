@@ -39,8 +39,8 @@ module Lti13::LaunchesHelper
     jwt_body[Rails.configuration.lti_claims_and_scopes['start_assessment_url_claim']]
   end
 
-  def proctoring_jwt(launch)
-    LtiService::ProctoringJwt.new(launch).call
+  def proctoring_jwt(launch, lms_instance)
+    Lti13Service::ProctoringJwt.new(launch, lms_instance).call
   end
 
   def assignment_and_grades_launch?(jwt_body)

@@ -12,23 +12,27 @@ class InstBooksController < ApplicationController
     course_offering = inst_book.course_offering
     lms_instance = course_offering.lms_instance
 
-    # Determine LTI version from the LmsInstance
-    lti_version = lms_instance.lti_version
-    puts "Determined LTI version: #{lti_version}"
-    # Set URLs based on the LTI version
     if params[:operation] == 'generate_course'
+      lti_version = params[:lti_version].presence || lms_instance.lti_version
+      unless lti_version.in?(%w[LTI-1p0 LTI-1p3])
+        render plain: "Unsupported LTI version: #{lti_version}", status: :unprocessable_entity
+        return
+      end
+      if lti_version == 'LTI-1p3' && !lms_instance.supports_lti_1p3?
+        render plain: "This LMS instance is not configured for LTI 1.3 (missing client_id/oauth2_url)", status: :unprocessable_entity
+        return
+      end
+
+      Rails.logger.info "Determined LTI version: #{lti_version}"
       if lti_version == 'LTI-1p0'
         launch_url = host_port + "/lti/launch"
         resource_selection_url = host_port + "/lti/resource"
-      elsif lti_version == 'LTI-1p3'
+      else # LTI-1p3
         launch_url = host_port + "/lti13/launches"
         resource_selection_url = host_port + "/lti13/deep_linking/content_selection"
-      else
-        render plain: "Unsupported LTI version", status: :unprocessable_entity
-        return
       end
       @job = Delayed::Job.enqueue GenerateCourseJob.new(params[:id], launch_url, resource_selection_url,
-                                                        extrtool_launch_base_url, current_user.id)
+                                                        extrtool_launch_base_url, current_user.id, lti_version)
     else
       @job = Delayed::Job.enqueue CompileBookJob.new(params[:id], extrtool_launch_base_url, current_user.id)
     end
@@ -62,7 +66,7 @@ class InstBooksController < ApplicationController
         module_pos = 1
         modules.each do |name, deadline|
           due_date = nil
-          if (deadline != "undefined") 
+          if (deadline != "undefined")
             due_date = Time.strptime(deadline, "%m/%d/%Y %I:%M %P").strftime("%Y-%m-%d %H:%M")
           end
           md = InstModule.where("name = ?", name).first
@@ -71,7 +75,7 @@ class InstBooksController < ApplicationController
           module_pos = module_pos + 1
         end
       end
-      
+
       respond_to do |format|
         msg = {:status => "success", :message => "Modules due dates has been set successfully!"}
         format.json { render :json => msg }

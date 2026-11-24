@@ -28,9 +28,18 @@ class LmsInstance < ApplicationRecord
   #~ Relationships ............................................................
   has_many  :lms_accesses, inverse_of: :lms_instances
   has_many  :course_offerings, inverse_of: :lms_instance
+  has_many  :lti_launches, inverse_of: :lms_instance
   belongs_to  :lms_type, inverse_of: :lms_instances
   belongs_to :organization
   # has_many :users, :through => :lms_accesses
+
+  #~ Callbacks ..............................................................
+  # Auto-generate a 2048-bit RSA keypair on create for LTI 1.3 instances
+  # if the admin didn't paste one in. LTI 1.1 instances use
+  # consumer_key/consumer_secret instead and don't need a keypair.
+  # Mirrors Lti13Service::DynamicRegistration#generate_keypair so manual
+  # and dynamic registrations produce equivalent keypairs.
+  before_create :generate_keypair, if: -> { private_key.blank? && lti_version == 'LTI-1p3' }
 
   #~ Validation ...............................................................
 
@@ -71,6 +80,16 @@ class LmsInstance < ApplicationRecord
     jwk
   end
 
+  # Generate a 2048-bit RSA keypair and assign both PEMs. Called from
+  # the before_create callback when no private_key was provided, but
+  # also usable on an existing instance to rotate keys (call save
+  # afterwards).
+  def generate_keypair
+    rsa = OpenSSL::PKey::RSA.new(2048)
+    self.private_key = rsa.to_pem
+    self.public_key  = rsa.public_key.to_pem
+  end
+
     # Determine LTI version
   def lti_version
     if client_id.present? && oauth2_url.present?
@@ -78,6 +97,16 @@ class LmsInstance < ApplicationRecord
     else
       'LTI-1p0'
     end
+  end
+
+  # True if this LmsInstance has the configuration needed for LTI 1.3
+  # (client_id + oauth2_url; private_key is auto-generated on save).
+  # LTI 1.1 is always available — its consumer_key/consumer_secret are
+  # derived per-user from LmsAccess (see User#update_lms_access), not
+  # stored on the LmsInstance — so there is no supports_lti_1p1?
+  # counterpart.
+  def supports_lti_1p3?
+    client_id.present? && oauth2_url.present?
   end
 
   #~ Private instance methods .................................................

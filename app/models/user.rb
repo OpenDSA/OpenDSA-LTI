@@ -51,6 +51,7 @@ class User < ApplicationRecord
   has_many    :identities, inverse_of: :user, dependent: :destroy
   # has_many    :student_extensions
   has_many  :lms_accesses, inverse_of: :user
+  has_many  :lti_launches, inverse_of: :user
   has_many  :inst_books, inverse_of: :user
   has_many  :courses, inverse_of: :user
   has_many  :odsa_exercise_attempts, inverse_of: :user

@@ -199,6 +199,42 @@
       delete settings.isGradable;
     }
     window.content_item_params.course_offering_id = window.course_offering_id;
+
+    if (deepLinking && window.content_item_params.launch_id) {
+      $.ajax({
+        url: "/lti13/deep_linking/content_selected",
+        type: "post",
+        data: JSON.stringify(window.content_item_params),
+        contentType: "application/json",
+        beforeSend: function(xhr) {
+          var token = $('meta[name="csrf-token"]').attr("content");
+          if (token) {
+            xhr.setRequestHeader("X-CSRF-Token", token);
+          }
+        }
+      })
+        .done(function(data) {
+          if (data.jwt && data.return_url) {
+            var form = document.createElement("form");
+            form.method = "post";
+            form.action = data.return_url;
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "JWT";
+            input.value = data.jwt;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+          } else {
+            displayErrors(["No JWT or return URL returned from server."]);
+          }
+        })
+        .fail(function(data) {
+          displayErrors(data.responseJSON || ["Deep linking submission failed."]);
+        });
+      return;
+    }
+
     $.ajax({
       url: "/lti/content_item_selection",
       type: "post",
@@ -317,7 +353,7 @@
       $("#alert-box").css("display", "none");
     });
 
-    if (window.course_offering_id) {
+    if (window.course_offering_id || deepLinking) {
       // course offering already exists, let them pick an exercise/visualization
       initializeJsTree();
     } else {

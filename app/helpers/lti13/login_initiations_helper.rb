@@ -1,5 +1,9 @@
 module Lti13::LoginInitiationsHelper
     def build_auth_url(lms_instance, state, params, nonce)
+      if lms_instance.platform_oidc_auth_url.blank?
+        Rails.logger.error "build_auth_url: platform_oidc_auth_url is blank for LmsInstance ID #{lms_instance.id}"
+        return nil
+      end
       uri = URI.parse(lms_instance.platform_oidc_auth_url)
       uri_params = Rack::Utils.parse_query(uri.query)
       auth_params = {

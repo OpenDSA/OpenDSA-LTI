@@ -88,6 +88,10 @@ def get_individual_attempt
   @instBook = @course_offering.odsa_books.first
 
   @exercise_list = Hash.new { |hsh, key| hsh[key] = [] }
+  if @instBook.blank?
+    render json: { odsa_exercise_attempts: @exercise_list }
+    return
+  end
   chapters = InstChapter.where(inst_book_id: @instBook.id).order('position')
   chapters.each do |chapter|
     modules = InstChapterModule.where(inst_chapter_id: chapter.id).order('module_position')
