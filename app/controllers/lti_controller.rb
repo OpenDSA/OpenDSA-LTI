@@ -22,18 +22,22 @@ class LtiController < ApplicationController
     $oauth_creds = get_oauth_creds(params[:oauth_consumer_key])
 
     render('error') and return unless lti_authorize!
-    lms_instance = find_lms_instance_for_consumer_key()
+    lms_instance = find_lms_instance_for_launch
     if lms_instance.blank?
-      @message = 'OpenDSA: The consumer key is not associated with a configured LMS instance.'
+      @message = 'OpenDSA: The launching LMS instance could not be verified.'
       render('error')
       return
     end
     render('error') and return unless ensure_user(lms_instance)
 
     expected_course_num = get_lms_course_num(lms_instance.lms_type.name, lms_instance)
+    @course_offering = CourseOffering.find_by(
+        lms_instance_id: lms_instance.id,
+        lms_course_num: expected_course_num,
+        )
     @inst_book = InstBook.find_by(id: params[:custom_inst_book_id])
-    @course_offering = @inst_book&.course_offering
-    unless authorized_launch_course?(@course_offering, lms_instance, expected_course_num)
+    unless @course_offering.present? && @inst_book.present? &&
+           @inst_book.course_offering_id == @course_offering.id
       @message = 'OpenDSA: The selected book is not available in this course.'
       render('error')
       return
@@ -752,23 +756,26 @@ class LtiController < ApplicationController
     return lms_instance
   end
 
-  def find_lms_instance_for_consumer_key
-    key = params[:oauth_consumer_key]
-    lms_instances = LmsInstance.where(consumer_key: key).to_a
-    lms_instances += LmsAccess.where(consumer_key: key)
-                              .includes(:lms_instance)
-                              .map(&:lms_instance)
-                              .compact
-    lms_instances.uniq!
-    return nil unless lms_instances.size == 1
-
-    lms_instances.first
+  def find_lms_instance_for_launch
+    find_lms_instance_from_launch_url
   end
 
-  def authorized_launch_course?(course_offering, lms_instance, expected_course_num)
-    course_offering.present? &&
-        course_offering.lms_instance_id == lms_instance.id &&
-        course_offering.lms_course_num.to_s == expected_course_num.to_s
+  def find_lms_instance_from_launch_url
+    launch_urls = [
+      params[:lis_outcome_service_url],
+      params[:launch_presentation_return_url]
+    ].compact
+
+    launch_urls.each do |launch_url|
+      uri = URI.parse(launch_url.to_s)
+      host = uri.host || launch_url
+      lms_instance = LmsInstance.find_by(url: ["https://#{host}", "http://#{host}"])
+      return lms_instance if lms_instance
+    rescue URI::InvalidURIError
+      next
+    end
+
+    nil
   end
 
   def ensure_user(lms_instance)
